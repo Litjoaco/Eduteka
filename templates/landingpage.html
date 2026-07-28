@@ -1,0 +1,616 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eduteka - La gestión escolar en una sola plataforma</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS from local static -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- Bootstrap Icons (CDN for icons) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <!-- AOS Animation CSS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/landingpage.css' %}?v=3">
+    
+    <!-- Estilos inyectados para darle vida, color y profundidad al diseño -->
+    <style>
+        body {
+            background-color: #fcfcfd; /* Un blanco ligeramente azulado, menos plano */
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Contenedor seguro para que el fondo no quede oculto detrás del body */
+        .background-effects {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Manchas de color difuminadas (Blobs) para el fondo */
+        .bg-blob {
+            position: absolute;
+            filter: blur(70px);
+            opacity: 0.7;
+            animation: float-blob 15s ease-in-out infinite alternate;
+            border-radius: 50%;
+        }
+        .blob-purple {
+            top: -10%;
+            left: -10%;
+            width: 50vw;
+            height: 50vw;
+            background: radial-gradient(circle, rgba(123, 82, 217, 0.35) 0%, rgba(123, 82, 217, 0) 70%);
+        }
+        .blob-teal {
+            top: 20%;
+            right: -10%;
+            width: 40vw;
+            height: 40vw;
+            background: radial-gradient(circle, rgba(13, 148, 136, 0.35) 0%, rgba(13, 148, 136, 0) 70%);
+            animation-delay: -5s;
+        }
+        
+        @keyframes float-blob {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(40px, 60px) scale(1.1); }
+        }
+
+        /* Forzar fondo transparente para dejar ver las luces */
+        .hero-section {
+            background: transparent !important;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Navbar interactivo con Glassmorphism */
+        .navbar {
+            background: rgba(255, 255, 255, 0.85) !important;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        /* Diferenciación sutil de secciones */
+        .modules-section {
+            background-color: #f8fafc;
+            border-top: 1px solid rgba(0,0,0,0.03);
+            border-bottom: 1px solid rgba(0,0,0,0.03);
+            padding: 5rem 0;
+        }
+        .benefits-section {
+            padding: 5rem 0;
+        }
+        
+        /* Llamado a la acción (CTA) resaltado */
+        .cta-section {
+            background: linear-gradient(135deg, #7b52d9 0%, #4c1d95 100%);
+            border-radius: 24px;
+            padding: 4rem 2rem;
+            text-align: center;
+            margin: 4rem 0;
+            box-shadow: 0 20px 40px rgba(123, 82, 217, 0.25);
+        }
+        .cta-section h2 { color: #ffffff !important; font-weight: 800; margin-bottom: 1rem; }
+    </style>
+</head>
+<body>
+
+    <!-- Formas de color flotantes de fondo -->
+    <div class="background-effects">
+        <div class="bg-blob blob-purple"></div>
+        <div class="bg-blob blob-teal"></div>
+    </div>
+
+    <!-- 1. Navbar -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img src="{% static 'img/logo.png' %}" alt="Eduteka Logo" style="height: 140px; width: auto;">
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#inicio">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#modulos">Módulos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#beneficios">Beneficios</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contacto">Contacto</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center mt-3 mt-lg-0 gap-4">
+                    <a href="{% url 'login' %}" class="btn btn-outline-custom">Iniciar sesión</a>
+                    <a href="{% url 'registro' %}" class="btn btn-primary-custom">Registrarme</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 2. Hero principal -->
+    <section id="inicio" class="hero-section d-flex align-items-center">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 hero-content text-center text-lg-start" data-aos="fade-up">
+                    <h1 class="hero-title">La gestión escolar en <br class="d-none d-lg-block">
+                        <span class="letra-coral">u</span><span class="letra-turquesa">n</span><span class="letra-morado">a</span>
+                        <span class="letra-amarillo">s</span><span class="letra-azul">o</span><span class="letra-lila">l</span><span class="letra-turquesa">a</span>
+                        <span class="letra-coral">p</span><span class="letra-morado">l</span><span class="letra-amarillo">a</span><span class="letra-azul">t</span><span class="letra-turquesa">a</span><span class="letra-lila">f</span><span class="letra-coral">o</span><span class="letra-morado">r</span><span class="letra-amarillo">m</span><span class="letra-azul">a</span>
+                    </h1>
+                    <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="100">Eduteka centraliza alumnos, asistencia, notas, reportes y procesos administrativos para que los colegios trabajen de forma más simple y ordenada.</p>
+                    <div class="d-flex flex-wrap gap-3 hero-buttons" data-aos="fade-up" data-aos-delay="200">
+                        <a href="{% url 'registro_colegio' %}" class="btn btn-primary-custom btn-lg">Registrar mi colegio</a>
+                        <a href="{% url 'registro' %}" class="btn btn-outline-custom btn-lg">Crear cuenta de usuario</a>
+                    </div>
+                </div>
+                <div class="col-lg-6 mt-5 mt-lg-0" data-aos="fade-left" data-aos-delay="300">
+                    <!-- Simple Mockup -->
+                    <div class="hero-mockup overflow-hidden floating-element">
+                        <div class="mockup-header">
+                            <span class="mockup-dot dot-red"></span>
+                            <span class="mockup-dot dot-yellow"></span>
+                            <span class="mockup-dot dot-green"></span>
+                        </div>
+                        <div class="p-0">
+                            <img src="{% static 'img/resumen.png' %}" alt="Dashboard Resumen" class="img-fluid w-100">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. Cómo funciona (Diferencia de usuarios con Pestañas) -->
+        <section id="como-funciona" class="how-it-works-section mt-5" style="background-color: #f8fafc;">
+        
+        <!-- Cabecera con fondo dinámico limitado -->
+        <div class="role-header-wrapper position-relative" style="padding: 7rem 0 3rem 0; overflow: hidden;">
+            <!-- Fondos dinámicos limitados a esta cabecera -->
+            <div class="dynamic-bg bg-docente active"></div>
+            <div class="dynamic-bg bg-colegio"></div>
+            <div class="bg-overlay"></div>
+
+            <div class="container position-relative" style="z-index: 5;">
+                <div class="text-center mb-5 position-relative" data-aos="fade-up" style="padding: 1rem 0;">
+                    <span class="badge rounded-pill px-4 py-2 mb-4 shadow" style="background: var(--color-main); color: white; font-size: 0.9rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;">Tu rol en Eduteka</span>
+                    <h2 class="section-title mb-4" style="font-size: clamp(2.2rem, 4vw, 3.5rem); color: #000000; letter-spacing: -1px; font-weight: 900; line-height: 1.2; text-shadow: 0px 0px 15px rgba(255,255,255,0.8);">Hecho a la medida de tu perfil</h2>
+                    <p class="lead" style="color: #000000; max-width: 720px; margin: 0 auto; font-size: clamp(1.1rem, 2vw, 1.25rem); line-height: 1.7; font-weight: 700; text-shadow: 0px 0px 12px rgba(255,255,255,0.8);">Elige cómo interactúas con la plataforma y descubre las herramientas pensadas exclusivamente para ti y tu institución.</p>
+                </div>
+
+                <!-- Nav Tabs -->
+                <div class="d-flex justify-content-center" data-aos="fade-up" data-aos-delay="100">
+                    <ul class="nav nav-pills p-2 bg-white rounded-pill shadow-sm" id="pills-tab" role="tablist" style="border: 1px solid rgba(0,0,0,0.05);">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active rounded-pill px-4 py-3 fw-semibold d-flex align-items-center" id="pills-user-tab" data-bs-toggle="pill" data-bs-target="#pills-user" type="button" role="tab" aria-controls="pills-user" aria-selected="true" style="transition: all 0.3s ease;">
+                                <i class="bi bi-person-fill me-2 fs-5"></i>Soy usuario del colegio
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link rounded-pill px-4 py-3 fw-semibold d-flex align-items-center" id="pills-school-tab" data-bs-toggle="pill" data-bs-target="#pills-school" type="button" role="tab" aria-controls="pills-school" aria-selected="false" style="transition: all 0.3s ease;">
+                                <i class="bi bi-buildings me-2 fs-5"></i>Quiero registrar mi colegio
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estilos locales para esta sección -->
+        <style>
+            /* Animaciones y estilos del fondo sutil */
+            .dynamic-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; opacity: 0; z-index: 0; transform: scale(1.08); transition: opacity 1.5s ease-in-out, transform 8s ease-out; }
+            .dynamic-bg.active { opacity: 1; transform: scale(1); }
+            /* Reemplaza estas URLs de Unsplash por las tuyas usando {% static 'img/tu-foto.jpg' %} cuando quieras */
+            .bg-docente { background-image: url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2070&auto=format&fit=crop'); }
+            .bg-colegio { background-image: url('https://images.unsplash.com/photo-1577412647305-991150c7d163?q=80&w=2070&auto=format&fit=crop'); }
+            /* Capa superpuesta para asegurar máxima legibilidad */
+            .bg-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(248,250,252,0) 60%, #f8fafc 100%), linear-gradient(135deg, rgba(248, 250, 252, 0.70) 15%, rgba(248, 250, 252, 0.35) 100%); z-index: 1; pointer-events: none; }
+
+            #como-funciona .nav-pills .nav-link { color: #64748b !important; font-size: 1.05rem; }
+            #como-funciona .nav-pills .nav-link.active,
+            #como-funciona .nav-pills .nav-link.active:hover { background-color: #7066e0 !important; color: white !important; box-shadow: 0 4px 15px rgba(112, 102, 224, 0.35); font-weight: 700 !important; }
+            .step-item:not(:last-child)::after { content: ''; position: absolute; width: 2px; background: #e2e8f0; left: 24px; top: 50px; bottom: -24px; z-index: 1; }
+            .step-circle { width: 50px; height: 50px; font-size: 1.2rem; font-weight: 700; z-index: 2; transition: transform 0.3s ease; }
+            .step-item:hover .step-circle { transform: scale(1.1); }
+            .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08); }
+            @keyframes float-element {
+                0% { transform: translateY(0px); }
+                50% { transform: translateY(-12px); }
+                100% { transform: translateY(0px); }
+            }
+        </style>
+        
+        <div class="container" style="padding-bottom: 7rem; position: relative; z-index: 5;">
+            <!-- Tab Content -->
+            <div class="tab-content mt-4" id="pills-tabContent" data-aos="fade-up" data-aos-delay="200">
+                <!-- Tab 1: Usuario -->
+                <div class="tab-pane fade show active" id="pills-user" role="tabpanel" aria-labelledby="pills-user-tab">
+                    <div class="row align-items-center">
+                        <div class="col-lg-6 mb-5 mb-lg-0 pe-lg-5">
+                            <h3 class="mb-4 fw-bold" style="font-size: 2.5rem; color: #1e293b; line-height: 1.2;">Conéctate con tu colegio</h3>
+                            <p class="mb-5" style="font-size: 1.15rem; line-height: 1.7; color: #64748b;">Accede a tus calificaciones, revisa la asistencia y mantén comunicación directa con tu comunidad educativa según tu rol (alumno, familiar, profesor o directivo).</p>
+                            
+                            <div class="d-flex flex-column position-relative pb-4">
+                                <div class="step-item d-flex align-items-start mb-4 position-relative">
+                                    <div class="step-circle d-flex align-items-center justify-content-center flex-shrink-0 rounded-circle shadow" style="background: #7066e0; color: white;">1</div>
+                                    <div class="ms-4 pt-2 pb-3 bg-white px-4 rounded-4 shadow-sm w-100" style="border: 1px solid rgba(0,0,0,0.03);">
+                                        <h5 class="fw-bold mb-1" style="color: #1e293b;">Crea tu cuenta</h5>
+                                        <p class="text-secondary mb-0" style="font-size: 0.95rem;">Regístrate de forma gratuita con tu correo electrónico personal.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="step-item d-flex align-items-start mb-4 position-relative">
+                                    <div class="step-circle d-flex align-items-center justify-content-center flex-shrink-0 rounded-circle shadow-sm" style="background: white; color: #7066e0; border: 2px solid #7066e0;">2</div>
+                                    <div class="ms-4 pt-2 pb-3 bg-white px-4 rounded-4 shadow-sm w-100" style="border: 1px solid rgba(0,0,0,0.03);">
+                                        <h5 class="fw-bold mb-1" style="color: #1e293b;">Solicita acceso</h5>
+                                        <p class="text-secondary mb-0" style="font-size: 0.95rem;">Busca tu colegio en nuestra red y envía una solicitud para unirte.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="step-item d-flex align-items-start position-relative">
+                                    <div class="step-circle d-flex align-items-center justify-content-center flex-shrink-0 rounded-circle shadow-sm" style="background: white; color: #7066e0; border: 2px solid #7066e0;">3</div>
+                                    <div class="ms-4 pt-2 pb-3 bg-white px-4 rounded-4 shadow-sm w-100" style="border: 1px solid rgba(0,0,0,0.03);">
+                                        <h5 class="fw-bold mb-1" style="color: #1e293b;">Accede a tu portal</h5>
+                                        <p class="text-secondary mb-0" style="font-size: 0.95rem;">Una vez aprobado, accede a las herramientas y datos correspondientes a tu rol.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 d-flex flex-wrap gap-3">
+                                <a href="{% url 'registro' %}" class="btn btn-primary-custom rounded-pill d-inline-flex align-items-center px-4 py-3 fw-bold shadow" style="font-size: 1rem;">
+                                    Comenzar y crear mi cuenta <i class="bi bi-person-plus ms-2"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 text-center position-relative">
+                            <div class="position-absolute rounded-circle" style="width: 450px; height: 450px; background: radial-gradient(circle, rgba(112, 102, 224, 0.12) 0%, rgba(112, 102, 224, 0) 70%); top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 0;"></div>
+                            
+                            <div class="glass-card p-3 rounded-4 position-relative" style="z-index: 1; transform: perspective(1000px) rotateY(-5deg) translateY(-10px); transition: transform 0.5s ease;" onmouseover="this.style.transform='perspective(1000px) rotateY(0deg) translateY(0)'" onmouseout="this.style.transform='perspective(1000px) rotateY(-5deg) translateY(-10px)'">
+                                <!-- Interfaz falsa navegador -->
+                                <div class="d-flex align-items-center px-3 pb-3 mb-2" style="border-bottom: 1px solid rgba(0,0,0,0.05);">
+                                    <div class="d-flex gap-2">
+                                        <div class="rounded-circle shadow-sm" style="width: 12px; height: 12px; background: #ff5f56;"></div>
+                                        <div class="rounded-circle shadow-sm" style="width: 12px; height: 12px; background: #ffbd2e;"></div>
+                                        <div class="rounded-circle shadow-sm" style="width: 12px; height: 12px; background: #27c93f;"></div>
+                                    </div>
+                                </div>
+                                <div class="p-1">
+                                    <img src="{% static 'img/resumen.png' %}" alt="Portal Usuario" class="img-fluid rounded-3" style="box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Colegio -->
+                <div class="tab-pane fade" id="pills-school" role="tabpanel" aria-labelledby="pills-school-tab">
+                    <div class="row align-items-center">
+                        <div class="col-lg-6 mb-5 mb-lg-0 pe-lg-5">
+                            <span class="text-uppercase fw-bold mb-2 d-block" style="color: #0d9488; letter-spacing: 1px; font-size: 0.85rem;"><i class="bi bi-hdd-network-fill me-1"></i> Plataforma Institucional</span>
+                            <h3 class="mb-4 fw-bold" style="font-size: 2.5rem; color: #1e293b; line-height: 1.2;">Un ERP escolar completo y modular</h3>
+                            <p class="mb-5" style="font-size: 1.15rem; line-height: 1.7; color: #64748b;">Optimiza la administración de tu colegio. Configura módulos de asistencia, notas, contabilidad y comunicación a la medida de tu comunidad educativa.</p>
+                            
+                            <div class="d-flex flex-column position-relative pb-4">
+                                <div class="step-item d-flex align-items-start mb-4 position-relative">
+                                    <div class="step-circle d-flex align-items-center justify-content-center flex-shrink-0 rounded-circle shadow" style="background: #0d9488; color: white;">1</div>
+                                    <div class="ms-4 pt-2 pb-3 bg-white px-4 rounded-4 shadow-sm w-100" style="border: 1px solid rgba(0,0,0,0.03);">
+                                        <h5 class="fw-bold mb-1" style="color: #1e293b;">Registra tu institución</h5>
+                                        <p class="text-secondary mb-0" style="font-size: 0.95rem;">Da de alta tu colegio y configura el perfil básico y corporativo.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="step-item d-flex align-items-start mb-4 position-relative">
+                                    <div class="step-circle d-flex align-items-center justify-content-center flex-shrink-0 rounded-circle shadow-sm" style="background: white; color: #0d9488; border: 2px solid #0d9488;">2</div>
+                                    <div class="ms-4 pt-2 pb-3 bg-white px-4 rounded-4 shadow-sm w-100" style="border: 1px solid rgba(0,0,0,0.03);">
+                                        <h5 class="fw-bold mb-1" style="color: #1e293b;">Elige tu plan a medida</h5>
+                                        <p class="text-secondary mb-0" style="font-size: 0.95rem;">Selecciona el nivel de servicio y las herramientas que realmente necesitas.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="step-item d-flex align-items-start position-relative">
+                                    <div class="step-circle d-flex align-items-center justify-content-center flex-shrink-0 rounded-circle shadow-sm" style="background: white; color: #0d9488; border: 2px solid #0d9488;">3</div>
+                                    <div class="ms-4 pt-2 pb-3 bg-white px-4 rounded-4 shadow-sm w-100" style="border: 1px solid rgba(0,0,0,0.03);">
+                                        <h5 class="fw-bold mb-1" style="color: #1e293b;">Invita a tu comunidad</h5>
+                                        <p class="text-secondary mb-0" style="font-size: 0.95rem;">Agrega profesores, aprueba alumnos y comienza a operar tu escuela.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-3">
+                                <a href="{% url 'registro_colegio' %}" class="btn btn-outline-custom rounded-pill d-inline-flex align-items-center px-5 py-3 fw-bold shadow-sm" style="font-size: 1.05rem; border-color: #0d9488; color: #0d9488; background: white;">
+                                    Registrar mi colegio ahora <i class="bi bi-building ms-2 fs-5"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 text-center position-relative mt-5 mt-lg-0">
+                            <div class="position-absolute rounded-circle" style="width: 450px; height: 450px; background: radial-gradient(circle, rgba(13, 148, 136, 0.12) 0%, rgba(13, 148, 136, 0) 70%); top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 0;"></div>
+                            
+                            <div class="glass-card p-5 rounded-4 d-flex flex-column justify-content-center align-items-center position-relative" style="z-index: 1; min-height: 480px; transform: perspective(1000px) rotateY(5deg) translateY(-10px); transition: transform 0.5s ease;" onmouseover="this.style.transform='perspective(1000px) rotateY(0deg) translateY(0)'" onmouseout="this.style.transform='perspective(1000px) rotateY(5deg) translateY(-10px)'">
+                                <div class="mb-4 position-relative">
+                                    <!-- Bolitas flotantes para un toque más tec/moderno -->
+                                    <div class="position-absolute rounded-circle shadow" style="width: 24px; height: 24px; top: -10px; right: -15px; z-index: 2; background: linear-gradient(135deg, #f59e0b, #d97706); animation: float-element 2s ease-in-out infinite;"></div>
+                                    <div class="position-absolute rounded-circle shadow" style="width: 16px; height: 16px; bottom: 20px; left: -20px; z-index: 2; background: linear-gradient(135deg, #3b82f6, #2563eb); animation: float-element 2.5s ease-in-out infinite alternate;"></div>
+                                    
+                                    <i class="bi bi-laptop" style="font-size: 9rem; color: #0d9488; position: relative; z-index: 1;"></i>
+                                </div>
+                                <h4 class="fw-bold mb-2" style="color: #1e293b; font-size: 1.8rem;">Control Total en tu Panel</h4>
+                                <p class="mb-0" style="color: #64748b; font-size: 1.1rem; max-width: 85%;">Gestiona métricas, facturación y procesos académicos de forma unificada.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Sección de módulos -->
+    <section id="modulos" class="modules-section">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Módulos principales</h2>
+            <div class="row g-4">
+                <!-- Módulo 1 -->
+                <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="100">
+                    <div class="module-card">
+                        <div class="module-icon icon-purple">
+                            <i class="bi bi-book"></i>
+                        </div>
+                        <h3 class="module-title">Libro de clases</h3>
+                        <p class="mb-0">Gestión digital de contenidos y planificaciones.</p>
+                    </div>
+                </div>
+                <!-- Módulo 2 -->
+                <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="200">
+                    <div class="module-card">
+                        <div class="module-icon icon-mint">
+                            <i class="bi bi-calendar2-check"></i>
+                        </div>
+                        <h3 class="module-title">Asistencia</h3>
+                        <p class="mb-0">Registro rápido y preciso con alertas automáticas.</p>
+                    </div>
+                </div>
+                <!-- Módulo 3 -->
+                <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="300">
+                    <div class="module-card">
+                        <div class="module-icon icon-coral">
+                            <i class="bi bi-person-badge"></i>
+                        </div>
+                        <h3 class="module-title">Perfil del alumno</h3>
+                        <p class="mb-0">Ficha centralizada con historial académico y médico.</p>
+                    </div>
+                </div>
+                <!-- Módulo 4 -->
+                <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="400">
+                    <div class="module-card">
+                        <div class="module-icon icon-yellow">
+                            <i class="bi bi-bar-chart-line"></i>
+                        </div>
+                        <h3 class="module-title">Reportes</h3>
+                        <p class="mb-0">Generación de informes de notas y certificados.</p>
+                    </div>
+                </div>
+                <!-- Módulo 5 -->
+                <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="100">
+                    <div class="module-card">
+                        <div class="module-icon icon-blue">
+                            <i class="bi bi-calendar-event"></i>
+                        </div>
+                        <h3 class="module-title">Calendario</h3>
+                        <p class="mb-0">Eventos, pruebas y feriados escolares compartidos.</p>
+                    </div>
+                </div>
+                <!-- Módulo 6 -->
+                <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="200">
+                    <div class="module-card">
+                        <div class="module-icon icon-purple">
+                            <i class="bi bi-file-earmark-bar-graph"></i>
+                        </div>
+                        <h3 class="module-title">SIMCE</h3>
+                        <p class="mb-0">Gestión y análisis de ensayos estandarizados.</p>
+                    </div>
+                </div>
+                <!-- Módulo 7 -->
+                <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="300">
+                    <div class="module-card">
+                        <div class="module-icon icon-mint">
+                            <i class="bi bi-wallet2"></i>
+                        </div>
+                        <h3 class="module-title">Contabilidad</h3>
+                        <p class="mb-0">Control de pagos, mensualidades y matrículas.</p>
+                    </div>
+                </div>
+                <!-- Módulo 8 -->
+                <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="400">
+                    <div class="module-card">
+                        <div class="module-icon icon-gray">
+                            <i class="bi bi-box-seam"></i>
+                        </div>
+                        <h3 class="module-title">Proveedores</h3>
+                        <p class="mb-0">Administración de compras y recursos escolares.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. Sección de beneficios -->
+    <section id="beneficios" class="benefits-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 pe-lg-5" data-aos="fade-right">
+                    <h2 class="mb-4" style="font-size: 2.5rem; line-height: 1.3;">Todo lo que tu colegio necesita, en 
+                        <span class="letra-coral">u</span><span class="letra-turquesa">n</span>
+                        <span class="letra-morado">s</span><span class="letra-amarillo">o</span><span class="letra-azul">l</span><span class="letra-lila">o</span>
+                        <span class="letra-turquesa">l</span><span class="letra-coral">u</span><span class="letra-morado">g</span><span class="letra-amarillo">a</span><span class="letra-azul">r</span>
+                    </h2>
+                    <p class="mb-5" style="font-size: 1.1rem;">Nuestra plataforma está diseñada específicamente para las necesidades reales de los colegios, eliminando el papeleo y reduciendo el tiempo en tareas administrativas.</p>
+                    
+                    <div class="benefit-item" data-aos="fade-up" data-aos-delay="100">
+                        <i class="bi bi-check-circle-fill benefit-icon"></i>
+                        <div>
+                            <h5 class="mb-1">Centraliza la información académica.</h5>
+                            <p class="small">Todo el historial de los estudiantes accesible en segundos, de forma segura.</p>
+                        </div>
+                    </div>
+                    <div class="benefit-item" data-aos="fade-up" data-aos-delay="200">
+                        <i class="bi bi-check-circle-fill benefit-icon"></i>
+                        <div>
+                            <h5 class="mb-1">Mejora la comunicación interna.</h5>
+                            <p class="small">Conecta a directivos, profesores, alumnos y apoderados eficientemente.</p>
+                        </div>
+                    </div>
+                    <div class="benefit-item" data-aos="fade-up" data-aos-delay="300">
+                        <i class="bi bi-check-circle-fill benefit-icon"></i>
+                        <div>
+                            <h5 class="mb-1">Facilita reportes e informes.</h5>
+                            <p class="small">Exporta datos en formato oficial o personalizado con un par de clics.</p>
+                        </div>
+                    </div>
+                    <div class="benefit-item" data-aos="fade-up" data-aos-delay="400">
+                        <i class="bi bi-check-circle-fill benefit-icon"></i>
+                        <div>
+                            <h5 class="mb-1">Permite controlar asistencia, notas y alumnos.</h5>
+                            <p class="small">Herramientas ágiles para el día a día en el aula.</p>
+                        </div>
+                    </div>
+                    <div class="benefit-item" data-aos="fade-up" data-aos-delay="500">
+                        <i class="bi bi-check-circle-fill benefit-icon"></i>
+                        <div>
+                            <h5 class="mb-1">Sistema adaptable a cada colegio.</h5>
+                            <p class="small">Configurable según la metodología y reglas de tu institución educativa.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6" data-aos="fade-left" data-aos-delay="200">
+                    <div class="benefits-image-wrapper text-center floating-element">
+                        <img src="{% static 'img/mujer.png' %}" alt="Plataforma Integral" class="img-fluid rounded-4 shadow-lg">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. CTA final -->
+    <section class="container" data-aos="zoom-in">
+        <div class="cta-section">
+            <h2>Lleva a tu colegio al siguiente nivel</h2>
+            <p class="mb-4 text-white" style="opacity: 0.9; font-size: 1.1rem;">Contrata Eduteka hoy, elige tu plan y simplifica la administración escolar para toda tu comunidad.</p>
+            <a href="{% url 'registro_colegio' %}" class="btn btn-white btn-lg px-5" style="border-radius: 30px; font-weight: bold; text-transform: uppercase; font-size: 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">Registrar mi colegio</a>
+        </div>
+    </section>
+
+    <!-- 7. Footer -->
+    <footer id="contacto" class="footer">
+        <div class="container">
+            <div class="row gy-4">
+                <div class="col-lg-4 col-md-6">
+                    <a href="#" class="footer-logo text-decoration-none">
+                        <img src="{% static 'img/logo.png' %}" alt="Eduteka Logo" style="height: 100px; width: auto;">
+                    </a>
+                    <p class="footer-text">El ERP escolar diseñado para simplificar la vida de la comunidad educativa. Centraliza, organiza y optimiza los procesos de tu colegio.</p>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h5>Plataforma</h5>
+                    <ul class="footer-links">
+                        <li><a href="#modulos">Módulos</a></li>
+                        <li><a href="#beneficios">Beneficios</a></li>
+                        <li><a href="#">Integraciones</a></li>
+                        <li><a href="#">Precios</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h5>Compañía</h5>
+                    <ul class="footer-links">
+                        <li><a href="#">Sobre nosotros</a></li>
+                        <li><a href="#">Casos de éxito</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Empleos</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <h5>Contacto</h5>
+                    <ul class="footer-links">
+                        <li class="d-flex align-items-center mb-2">
+                            <i class="bi bi-envelope me-2" style="color: var(--color-secondary);"></i>
+                            <a href="mailto:hola@eduteka.com">hola@eduteka.com</a>
+                        </li>
+                        <li class="d-flex align-items-center mb-2">
+                            <i class="bi bi-telephone me-2" style="color: var(--color-secondary);"></i>
+                            <span class="footer-text mb-0">+1 234 567 8900</span>
+                        </li>
+                        <li class="d-flex align-items-center">
+                            <i class="bi bi-geo-alt me-2" style="color: var(--color-secondary);"></i>
+                            <span class="footer-text mb-0">Santiago, Chile</span>
+                        </li>
+                    </ul>
+                    <div class="d-flex gap-3 mt-4">
+                        <a href="#" class="fs-5" style="color: var(--text-secondary); transition: color 0.3s;" onmouseover="this.style.color='var(--color-main)'" onmouseout="this.style.color='var(--text-secondary)'"><i class="bi bi-linkedin"></i></a>
+                        <a href="#" class="fs-5" style="color: var(--text-secondary); transition: color 0.3s;" onmouseover="this.style.color='var(--color-main)'" onmouseout="this.style.color='var(--text-secondary)'"><i class="bi bi-twitter-x"></i></a>
+                        <a href="#" class="fs-5" style="color: var(--text-secondary); transition: color 0.3s;" onmouseover="this.style.color='var(--color-main)'" onmouseout="this.style.color='var(--text-secondary)'"><i class="bi bi-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2026 Eduteka. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS Bundle from local static -->
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    
+    <!-- AOS Animation JS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 500,
+            once: true,
+            offset: 100
+        });
+
+        // Transición de fondos para la sección "Tu rol en Eduteka"
+        document.addEventListener('DOMContentLoaded', function() {
+            const studentTab = document.getElementById('pills-user-tab');
+            const schoolTab = document.getElementById('pills-school-tab');
+            const bgDocente = document.querySelector('.bg-docente');
+            const bgColegio = document.querySelector('.bg-colegio');
+
+            if(studentTab && schoolTab) {
+                studentTab.addEventListener('show.bs.tab', function () {
+                    bgDocente.classList.add('active');
+                    bgColegio.classList.remove('active');
+                });
+
+                schoolTab.addEventListener('show.bs.tab', function () {
+                    bgColegio.classList.add('active');
+                    bgDocente.classList.remove('active');
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,345 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configura tu colegio - Paso 5 - Eduteka</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/configuracion_colegio_paso5.css' %}">
+    <style>
+        /* Unificar el diseño del Stepper para que sea igual en todos los pasos */
+        .stepper .step {
+            background: transparent !important;
+            border-radius: 0 !important;
+            padding: 0 !important;
+        }
+        .stepper .step-icon {
+            width: 32px !important;
+            height: 32px !important;
+            border-radius: 50% !important; /* Siempre circulares, elimina efecto pastilla */
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-weight: 700 !important;
+            background-image: none !important; /* Elimina íconos de fondo */
+            text-indent: 0 !important; /* Mantiene el número visible */
+        }
+        .stepper .step.completed .step-icon {
+            background-color: #7b52d9 !important; /* Color morado */
+            border-color: #7b52d9 !important;
+            color: #ffffff !important;
+        }
+        /* Ocultar checkmarks (ticket positivo) inyectados mediante seudo-elementos */
+        .stepper .step.completed .step-icon::before,
+        .stepper .step.completed .step-icon::after {
+            display: none !important;
+            content: none !important;
+        }
+        
+        /* Mejoras en las tarjetas de los módulos */
+        .module-card {
+            transition: all 0.3s ease !important;
+            border: 2px solid transparent;
+        }
+        .module-card.active {
+            border-color: #7b52d9 !important;
+            background-color: #fcfbfe !important;
+            box-shadow: 0 10px 25px rgba(123, 82, 217, 0.1) !important;
+        }
+        .module-card.inactive {
+            opacity: 0.7;
+            background-color: #f8fafc !important;
+            border-color: #e2e8f0 !important;
+        }
+
+        /* Estilos fijos y seguros para los botones del Paso 5 */
+        .btn-next {
+            background: linear-gradient(135deg, #7b52d9 0%, #6a44c2 100%) !important;
+            color: #fff !important;
+            border: none !important;
+            padding: 0.75rem 1.5rem !important;
+            border-radius: 12px !important;
+            font-weight: 700 !important;
+            box-shadow: 0 4px 15px rgba(123, 82, 217, 0.25) !important;
+            transition: all 0.3s ease !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+        }
+        .btn-next:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 20px rgba(123, 82, 217, 0.35) !important;
+        }
+        .btn-secondary-sm {
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #475569 !important;
+            padding: 0.5rem 1rem !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+            transition: all 0.2s ease !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
+        }
+        .btn-secondary-sm:hover {
+            background: #f8fafc !important;
+            border-color: #94a3b8 !important;
+            color: #0f172a !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="config-container">
+    
+    <!-- ==========================================
+         LEFT COLUMN 
+         ========================================== -->
+    <div class="left-column">
+        <div class="logo-container">
+            <img src="{% static 'img/logo.png' %}" alt="Eduteka Logo" style="height: 100px; width: auto;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzdiNTJkOSIgcng9IjIwIi8+PHRleHQgeD0iNTAiIHk9IjY0IiBmb250LWZhbWlseT0iSW50ZXIiIGZvbnQtd2VpZ2h0PSI4MDAiIGZvbnQtc2l6ZT0iNDgiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5FPC90ZXh0Pjwvc3ZnPg=='">
+        </div>
+        
+        <div class="header-text-group">
+            <div class="step-pill">
+                <i class="bi bi-puzzle-fill"></i> Paso 5 de 5
+            </div>
+            <h1>Activa los módulos que necesitas</h1>
+            <p class="desc-text">Selecciona los módulos que tu colegio utilizará en la plataforma. Puedes activarlos o desactivarlos cuando lo necesites.</p>
+        </div>
+        
+        <div class="illustration-wrapper">
+            <div class="deco-blob blob-1"></div>
+            <div class="deco-blob blob-2"></div>
+            <div class="deco-blob blob-3"></div>
+            <img src="{% static 'img/modulos.png' %}" alt="Ilustración Módulos" onerror="this.src='https://placehold.co/400x300/F4F0FF/7C5CFA?text=Modules+3D'">
+        </div>
+        
+        <div class="plan-includes-card">
+            <h3>Beneficios de los módulos</h3>
+            <ul class="plan-includes-list">
+                <li><i class="bi bi-sliders"></i> Personalización total</li>
+                <li><i class="bi bi-wallet2"></i> Solo pagas lo que usas</li>
+                <li><i class="bi bi-lightning-charge"></i> Activación inmediata</li>
+                <li><i class="bi bi-graph-up-arrow"></i> Escalabilidad para tu crecimiento</li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- ==========================================
+         MAIN CARD (RIGHT) 
+         ========================================== -->
+    <div class="main-card">
+        
+        <!-- Compact Stepper -->
+        <div class="stepper">
+            <div class="step completed">
+                <div class="step-icon">1</div>
+                <div class="step-text">Identidad</div>
+            </div>
+            <div class="step completed">
+                <div class="step-icon">2</div>
+                <div class="step-text">Contacto</div>
+            </div>
+            <div class="step completed">
+                <div class="step-icon">3</div>
+                <div class="step-text">Académica</div>
+            </div>
+            <div class="step completed">
+                <div class="step-icon">4</div>
+                <div class="step-text">Roles</div>
+            </div>
+            <div class="step active">
+                <div class="step-icon">5</div>
+                <div class="step-text">Módulos</div>
+            </div>
+        </div>
+        
+        <!-- Form Header -->
+        <div class="form-section-header">
+            <div class="section-icon-wrapper">
+                <i class="bi bi-puzzle-fill"></i>
+            </div>
+            <div class="section-titles">
+                <h2>5. Módulos y accesos</h2>
+                <p>Selecciona y activa los módulos que tu colegio utilizará en la plataforma.</p>
+            </div>
+        </div>
+        
+        <form id="config-form-paso5" method="post" action="{% url 'configuracion_colegio_paso5' colegio.id %}">
+            {% csrf_token %}
+            
+            <div class="modules-section-header">
+                <div class="modules-titles">
+                    <h3>Módulos disponibles</h3>
+                    <p>Activa los módulos que necesitas. Puedes modificarlos más adelante desde la configuración del colegio.</p>
+                </div>
+                <div class="modules-actions">
+                    <button type="button" class="btn-secondary-sm" id="btnToggleAll"><i class="bi bi-check2-all"></i> Seleccionar todos</button>
+                </div>
+            </div>
+
+            <!-- Modules Grid -->
+            <div class="modules-grid">
+                {% for mod_col in modulos_colegio %}
+                <div class="module-card {% if mod_col.activo %}active{% else %}inactive{% endif %}">
+                    <div class="module-header">
+                        <div class="module-icon"><i class="bi {{ mod_col.modulo.icono|default:'bi-puzzle' }}"></i></div>
+                        <label class="switch">
+                            <input type="checkbox" name="modulo_{{ mod_col.modulo.id }}" {% if mod_col.activo %}checked{% endif %}>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="module-content">
+                        <h4>{{ mod_col.modulo.nombre }}</h4>
+                        <p>{{ mod_col.modulo.descripcion }}</p>
+                    </div>
+                </div>
+                {% empty %}
+                <p>No hay módulos asignados a tu plan actual.</p>
+                {% endfor %}
+            </div>
+
+            <!-- Resumen de Selección -->
+            <div class="summary-section">
+                <h3>Resumen de tu selección</h3>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-icon turquoise"><i class="bi bi-puzzle"></i></div>
+                        <div class="metric-info">
+                            <span class="metric-value" id="summary-activos">{{ modulos_activos_count|default:"0" }}</span>
+                            <span class="metric-label">Módulos activos</span>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon coral"><i class="bi bi-puzzle"></i></div>
+                        <div class="metric-info">
+                            <span class="metric-value" id="summary-inactivos">{{ modulos_inactivos_count|default:"0" }}</span>
+                            <span class="metric-label">Módulos inactivos</span>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon purple"><i class="bi bi-people"></i></div>
+                        <div class="metric-info">
+                            <span class="metric-value">{{ usuarios_totales_count|default:"0" }}</span>
+                            <span class="metric-label">Usuarios que podrán acceder</span>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon yellow"><i class="bi bi-award"></i></div>
+                        <div class="metric-info">
+                            <span class="metric-value plan-value">{{ colegio.plan|default:"Plan Profesional" }}</span>
+                            <span class="metric-label">Plan recomendado</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+        
+        <!-- Info Box (Estructura Original Recuperada) -->
+        <div class="info-box">
+            <i class="bi bi-info-circle"></i>
+            <p>Puedes activar o desactivar módulos en cualquier momento desde la configuración del colegio.</p>
+        </div>
+
+        <!-- Botones Inferiores (Estructura Original con Estilos Forzados) -->
+        <div class="form-actions">
+            <a href="{% url 'configuracion_colegio_paso4' colegio.id %}" class="btn-back" style="color: #64748b; text-decoration: none; font-weight: 600; transition: color 0.2s;">Volver al paso 4</a>
+            <div class="right-actions">
+                <button type="submit" form="config-form-paso5" class="btn-next">
+                    Finalizar configuración <i class="bi bi-check2-circle"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const checkboxes = document.querySelectorAll('.module-card input[type="checkbox"]');
+        const btnToggleAll = document.getElementById('btnToggleAll');
+        
+        // Mapeo dinámico de Iconos y Colores según el nombre del módulo
+        const iconMap = {
+            'Libro de clases': { icon: 'bi-book', color: '#7b52d9', bg: '#f3f0ff' },
+            'Asistencia': { icon: 'bi-calendar-check', color: '#0d9488', bg: '#f0fdfa' },
+            'Perfil del estudiante': { icon: 'bi-person-vcard', color: '#e11d48', bg: '#fff1f2' },
+            'Calendario': { icon: 'bi-calendar-event', color: '#2563eb', bg: '#eff6ff' },
+            'Reportes y analíticas': { icon: 'bi-bar-chart', color: '#d97706', bg: '#fffbeb' },
+            'Finanzas': { icon: 'bi-calculator', color: '#059669', bg: '#ecfdf5' },
+            'Proveedores': { icon: 'bi-truck', color: '#475569', bg: '#f8fafc' },
+            'SIMCE': { icon: 'bi-clipboard-data', color: '#7c3aed', bg: '#eef2ff' }
+        };
+
+        // Asignar los iconos y colores estéticos
+        document.querySelectorAll('.module-card').forEach(card => {
+            const title = card.querySelector('h4').textContent.trim();
+            const iconDiv = card.querySelector('.module-icon');
+            const iconEl = iconDiv.querySelector('i');
+            
+            if (iconMap[title]) {
+                iconEl.className = `bi ${iconMap[title].icon}`;
+                iconDiv.style.color = iconMap[title].color;
+                iconDiv.style.backgroundColor = iconMap[title].bg;
+            }
+        });
+
+        function updateSummary() {
+            let activos = 0;
+            let inactivos = 0;
+
+            checkboxes.forEach(cb => {
+                const card = cb.closest('.module-card');
+                if (cb.checked) {
+                    activos++;
+                    card.classList.add('active');
+                    card.classList.remove('inactive');
+                } else {
+                    inactivos++;
+                    card.classList.remove('active');
+                    card.classList.add('inactive');
+                }
+            });
+
+            const sumActivos = document.getElementById('summary-activos');
+            const sumInactivos = document.getElementById('summary-inactivos');
+            
+            if (sumActivos) sumActivos.textContent = activos;
+            if (sumInactivos) sumInactivos.textContent = inactivos;
+            
+            if (activos === checkboxes.length) {
+                btnToggleAll.innerHTML = '<i class="bi bi-x-circle"></i> Deseleccionar todos';
+            } else {
+                btnToggleAll.innerHTML = '<i class="bi bi-check2-all"></i> Seleccionar todos';
+            }
+        }
+
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', updateSummary);
+        });
+
+        if (btnToggleAll) {
+            btnToggleAll.addEventListener('click', () => {
+                const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+                checkboxes.forEach(cb => {
+                    cb.checked = !allChecked;
+                });
+                updateSummary();
+            });
+        }
+
+        updateSummary();
+    });
+</script>
+</body>
+</html>

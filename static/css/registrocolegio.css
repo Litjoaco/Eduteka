@@ -1,0 +1,106 @@
+/* Estilos específicos para la vista de Registro de Colegio */
+.benefits-list {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 2rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+.benefit-chip {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.85rem;
+    color: var(--login-text-main);
+    font-weight: 600;
+    background: #ffffff;
+    padding: 0.5rem 1.2rem;
+    border-radius: 50rem;
+    box-shadow: 0 4px 12px rgba(21, 26, 53, 0.04);
+    border: 1px solid rgba(122, 90, 248, 0.1);
+    transition: transform 0.2s ease;
+}
+.benefit-chip:hover {
+    transform: translateY(-2px);
+}
+.benefit-chip i {
+    color: var(--login-primary);
+    margin-right: 0.4rem;
+    font-size: 1.1rem;
+}
+.step-badge {
+    display: inline-block;
+    background-color: rgba(122, 90, 248, 0.1);
+    color: var(--login-primary);
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+.form-label-custom {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--login-text-secondary);
+    margin-bottom: 0.25rem;
+    display: block;
+    text-align: left;
+}
+.form-control-custom, .form-select-custom {
+    border-radius: 14px;
+    border: 2px solid #EAEAF2;
+    padding: 0.65rem 1rem;
+    background-color: #F8F8FC;
+    font-weight: 500;
+    color: var(--login-text-main);
+    transition: all 0.3s ease;
+    width: 100%;
+    font-size: 0.95rem;
+}
+.form-control-custom::placeholder {
+    color: #b1b8c0;
+    font-weight: 400;
+}
+.form-control-custom:focus, .form-select-custom:focus {
+    border-color: var(--login-primary);
+    box-shadow: 0 0 0 4px rgba(122, 90, 248, 0.12);
+    background-color: #ffffff;
+    outline: none;
+}
+.register-card {
+    background: var(--login-card-bg);
+    border-radius: 28px;
+    padding: 2.5rem 2rem;
+    box-shadow: 0 30px 60px rgba(21, 26, 53, 0.08), 0 0 0 1px rgba(255,255,255,0.7) inset;
+    position: relative;
+    z-index: 2;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.4);
+}
+.login-link {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-weight: 500;
+    color: var(--login-text-secondary);
+}
+.login-link a {
+    color: var(--login-primary);
+    text-decoration: none;
+    font-weight: 700;
+    transition: all 0.2s ease;
+}
+.login-link a:hover {
+    color: var(--login-primary-hover);
+    text-decoration: underline;
+}
+
+/* Ajustes para pantallas grandes y scroll natural */
+@media (min-width: 992px) {
+    .register-card {
+        padding: 2.5rem;
+    }
+    .login-container {
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+}

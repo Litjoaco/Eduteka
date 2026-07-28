@@ -1,0 +1,253 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configura tu colegio - Paso 1 - Eduteka</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/configuracion_colegio.css' %}">
+    <style>
+        /* Unificar el diseño del Stepper para que sea igual en todos los pasos */
+        .stepper .step {
+            background: transparent !important;
+            border-radius: 0 !important;
+            padding: 0 !important;
+        }
+        .stepper .step-icon {
+            width: 32px !important;
+            height: 32px !important;
+            border-radius: 50% !important; /* Siempre circulares, elimina efecto pastilla */
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-weight: 700 !important;
+            background-image: none !important; /* Elimina íconos de fondo */
+            text-indent: 0 !important; /* Mantiene el número visible */
+        }
+        .stepper .step.completed .step-icon {
+            background-color: #7b52d9 !important; /* Color morado */
+            border-color: #7b52d9 !important;
+            color: #ffffff !important;
+        }
+        /* Ocultar checkmarks (ticket positivo) inyectados mediante seudo-elementos */
+        .stepper .step.completed .step-icon::before,
+        .stepper .step.completed .step-icon::after {
+            display: none !important;
+            content: none !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="config-container">
+    
+    <!-- ==========================================
+         LEFT COLUMN 
+         ========================================== -->
+    <div class="left-column">
+        <div class="logo-container">
+            <img src="/static/img/logo.png" alt="Eduteka Logo" style="height: 100px; width: auto;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzdiNTJkOSIgcng9IjIwIi8+PHRleHQgeD0iNTAiIHk9IjY0IiBmb250LWZhbWlseT0iSW50ZXIiIGZvbnQtd2VpZ2h0PSI4MDAiIGZvbnQtc2l6ZT0iNDgiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5FPC90ZXh0Pjwvc3ZnPg=='">
+        </div>
+        
+        <div class="header-text-group">
+            <div class="step-pill">
+                <i class="bi bi-geo-alt-fill"></i> Paso 1 de 5
+            </div>
+            <h1>Configura tu colegio</h1>
+            <p class="desc-text">Comienza definiendo la identidad básica de tu institución para que tu comunidad la reconozca fácilmente.</p>
+        </div>
+        
+        <div class="illustration-wrapper">
+            <div class="deco-blob blob-1"></div>
+            <div class="deco-blob blob-2"></div>
+            <div class="deco-blob blob-3"></div>
+            <img src="{% static 'img/personaliza colegio 1.png' %}" alt="Ilustración Colegio">
+        </div>
+        
+        <div class="plan-includes-card">
+            <h3>Lo que definirás ahora</h3>
+            <ul class="plan-includes-list">
+                <li><i class="bi bi-shield-check"></i> El nombre e identidad central.</li>
+                <li><i class="bi bi-image"></i> Los recursos gráficos principales.</li>
+                <li><i class="bi bi-layout-wtf"></i> La base visual para tu plataforma.</li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- ==========================================
+         MAIN CARD (RIGHT) 
+         ========================================== -->
+    <div class="main-card">
+        
+        <!-- Compact Stepper -->
+        <div class="stepper">
+            <div class="step active">
+                <div class="step-icon">1</div>
+                <div class="step-text">Identidad</div>
+            </div>
+            <div class="step">
+                <div class="step-icon">2</div>
+                <div class="step-text">Contacto</div>
+            </div>
+            <div class="step">
+                <div class="step-icon">3</div>
+                <div class="step-text">Académica</div>
+            </div>
+            <div class="step">
+                <div class="step-icon">4</div>
+                <div class="step-text">Roles</div>
+            </div>
+            <div class="step">
+                <div class="step-icon">5</div>
+                <div class="step-text">Módulos</div>
+            </div>
+        </div>
+        
+        <!-- Form Header -->
+        <div class="form-section-header">
+            <div class="section-icon-wrapper">
+                <i class="bi bi-building"></i>
+            </div>
+            <div class="section-titles">
+                <h2>Identidad del colegio</h2>
+                <p>Define la información pública principal de tu institución.</p>
+            </div>
+        </div>
+        
+        <!-- Content Grid (Form + Profile Preview) -->
+        <div class="content-grid">
+            
+            <!-- Fields Area -->
+            <div class="form-area">
+                {% if messages %}
+                    <div class="messages-container mb-4">
+                        {% for message in messages %}
+                            <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}" style="border-radius: 8px; font-size: 0.95rem;">
+                                <i class="bi bi-exclamation-circle-fill me-2"></i> {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <form id="config-form-paso1" method="post" enctype="multipart/form-data" action="{% url 'configuracion_colegio_paso1' colegio.id %}">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="nombre_oficial">Nombre oficial del colegio <span class="required">*</span></label>
+                        <input type="text" class="form-control" id="nombre_oficial" name="nombre_oficial" placeholder="Ej: Colegio Bilingüe Los Andes" value="{{ colegio.nombre|default:'' }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="nombre_corto">Nombre corto o Sigla <span class="required">*</span></label>
+                        <input type="text" class="form-control" id="nombre_corto" name="nombre_corto" placeholder="Ej: CLA" value="{{ colegio.nombre_corto|default:'' }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="eslogan">Eslogan o lema (Opcional)</label>
+                        <input type="text" class="form-control" id="eslogan" name="eslogan" placeholder="Ej: Formamos líderes para el futuro" value="{{ colegio.eslogan|default:'' }}">
+                    </div>
+                    
+                    <!-- Upload Grid -->
+                    <div class="upload-grid">
+                        <div class="upload-card" id="logo_block">
+                            <div class="upload-icon-circle">
+                                <i class="bi bi-shield-plus"></i>
+                            </div>
+                            <div class="upload-title">Logo institucional</div>
+                            <div class="upload-sub">PNG, JPG, SVG (Máx. 2MB)</div>
+                            <button type="button" class="btn-upload-outline">{% if colegio.logo %}Cambiar logo{% else %}Subir logo{% endif %}</button>
+                            <input type="file" id="logo_input" name="logo" accept=".png, .jpg, .jpeg, .svg">
+                        </div>
+                        
+                        <div class="upload-card" id="img_block">
+                            <div class="upload-icon-circle">
+                                <i class="bi bi-images"></i>
+                            </div>
+                            <div class="upload-title">Imagen de portada</div>
+                            <div class="upload-sub">JPG, PNG (Máx. 5MB)</div>
+                            <button type="button" class="btn-upload-outline">{% if colegio.imagen_portada %}Cambiar portada{% else %}Subir portada{% endif %}</button>
+                            <input type="file" id="img_input" name="imagen" accept=".png, .jpg, .jpeg">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Real Profile Preview Area -->
+            <div class="preview-area">
+                <div class="preview-label">
+                    <i class="bi bi-eye-fill"></i> Vista Previa del Perfil
+                </div>
+                
+                <div class="mockup-card">
+                    <div class="mockup-cover" id="prev-image-container" {% if colegio.imagen_portada %}style="background-image: url('{{ colegio.imagen_portada.url }}'); background-size: cover; background-position: center; background-color: #e2e8f0;"{% endif %}>
+                        {% if not colegio.imagen_portada %}<i class="bi bi-image-alt"></i>{% endif %}
+                    </div>
+                    <div class="mockup-body">
+                        <div class="mockup-logo-wrapper" id="prev-logo-container" {% if colegio.logo %}style="background-image: url('{{ colegio.logo.url }}'); background-size: cover; background-position: center; background-color: #ffffff;"{% endif %}>
+                            {% if not colegio.logo %}<i class="bi bi-building-add"></i>{% endif %}
+                        </div>
+                        <h4 class="mockup-title" id="prev-nombre">{{ colegio.nombre|default:"Colegio Bilingüe Los Andes" }}</h4>
+                        <div class="mockup-badges">
+                            <span class="mockup-badge" id="prev-corto">{{ colegio.nombre_corto|default:"CLA" }}</span>
+                        </div>
+                        <p class="mockup-slogan" id="prev-eslogan">{{ colegio.eslogan|default:'"Formamos líderes para el futuro"' }}</p>
+                    </div>
+                </div>
+            </div>
+            
+        </div> <!-- End Content Grid -->
+        
+        <!-- Bottom Actions & Tip -->
+        <div class="bottom-area">
+            <div class="tip-card">
+                <div class="tip-icon-bg">
+                    <i class="bi bi-stars"></i>
+                </div>
+                <p><strong>Consejo:</strong> Usa un logo en formato PNG con fondo transparente para que se integre perfectamente con la portada de tu institución.</p>
+            </div>
+            
+            <div class="action-bar">
+                <a href="#" class="btn-link-subtle">Guardar y continuar después</a>
+                <button type="button" class="btn-primary-gradient" onclick="document.getElementById('config-form-paso1').submit();">
+                    Guardar y continuar <i class="bi bi-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="{% static 'js/configuracion_colegio.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const updateText = (inputId, targetId, defaultText) => {
+            const input = document.getElementById(inputId);
+            const target = document.getElementById(targetId);
+            if(input && target) {
+                input.addEventListener('input', (e) => {
+                    target.innerHTML = e.target.value || defaultText;
+                });
+                // Disparar el evento para inicializar la vista previa con los textos que trae Django
+                input.dispatchEvent(new Event('input'));
+            }
+        };
+
+        updateText('nombre_oficial', 'prev-nombre', 'Colegio Bilingüe Los Andes');
+        updateText('nombre_corto', 'prev-corto', 'CLA');
+        updateText('eslogan', 'prev-eslogan', '"Formamos líderes para el futuro"');
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,205 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crea tu cuenta - Eduteka</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <!-- Custom Login/Register CSS -->
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    <link rel="stylesheet" href="{% static 'css/registropersonal.css' %}">
+    <link rel="stylesheet" href="{% static 'css/backbutton.css' %}">
+</head>
+<body class="login-body">
+
+    <!-- Botón volver -->
+    <a href="{% url 'landing_page' %}" class="back-button">
+        <i class="bi bi-arrow-left"></i> Volver
+    </a>
+
+    <!-- Organic Background Shapes & Patterns -->
+    <div class="bg-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+        <div class="shape shape-4"></div>
+        <div class="pattern-dots dots-1"></div>
+        <div class="pattern-dots dots-2"></div>
+    </div>
+
+    <div class="container login-container">
+        <div class="row w-100 m-0 align-items-center justify-content-center">
+            
+            <!-- Left Column: Welcome & Illustration (Hidden on mobile) -->
+            <div class="col-lg-6 d-none d-lg-flex flex-column justify-content-center welcome-section">
+                <!-- Header with logo in left column -->
+                <div class="mb-3">
+                    <img src="{% static 'img/logo.png' %}" alt="Eduteka Logo" class="logo-blend" style="height: 140px;">
+                </div>
+                
+                <h1 class="welcome-title">Crea tu cuenta en Eduteka</h1>
+                <p class="welcome-desc">Regístrate como usuario para acceder a la plataforma y luego solicitar acceso a tu colegio.</p>
+                
+                <!-- Conceptual Illustration (Image) -->
+                <div class="illustration-wrapper">
+                    <!-- Using the existing libro.png, matching the prompt's description contextually -->
+                    <img src="{% static 'img/libro.png' %}" alt="Libro abierto con módulos digitales flotantes como asistencia, calendario y perfil" class="img-fluid floating-illustration">
+                </div>
+            </div>
+
+            <!-- Right Column: Register Form Card -->
+            <div class="col-12 col-md-8 col-lg-5 offset-lg-1">
+                <div class="register-card">
+                    <div class="register-header">
+                        <!-- Logo display always visible -->
+                        <img src="{% static 'img/logo.png' %}" alt="Eduteka Logo" class="logo-blend" style="height: 80px; margin-bottom: 1.5rem;">
+                        
+                        <h2>Registrarme</h2>
+                        <p>Crea tu cuenta como usuario</p>
+                    </div>
+
+                    <form action="{% url 'registro' %}" method="POST">
+                        {% csrf_token %}
+                        
+                        {% if form.errors %}
+                            <div class="alert alert-danger" style="font-size: 0.9rem; border-radius: 8px;">
+                                <ul class="mb-0" style="padding-left: 1rem;">
+                                {% for field, errors in form.errors.items %}
+                                    {% for error in errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+
+                        <div class="row g-2 mb-3">
+                            <!-- Nombre Completo -->
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="nameInput" name="nombre_completo" placeholder="Nombre completo" value="{{ form.nombre_completo.value|default_if_none:'' }}" required>
+                                    <label for="nameInput">Nombre completo</label>
+                                </div>
+                            </div>
+
+                            <!-- RUT -->
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control rut-input" id="rutInput" name="rut" placeholder="12.345.678-9" value="{{ form.rut.value|default_if_none:'' }}" maxlength="12" required>
+                                    <label for="rutInput">RUT</label>
+                                </div>
+                            </div>
+                            
+                            <!-- Teléfono -->
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="telefonoInput" name="telefono" placeholder="+56 9 1234 5678" value="{{ form.telefono.value|default_if_none:'' }}" required>
+                                    <label for="telefonoInput">Teléfono</label>
+                                </div>
+                            </div>
+
+                            <!-- Correo Institucional -->
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <input type="email" class="form-control" id="emailInput" name="email" placeholder="correo@colegio.edu" value="{{ form.email.value|default_if_none:'' }}" autocapitalize="none" required>
+                                    <label for="emailInput">Correo institucional</label>
+                                </div>
+                            </div>
+                            
+                            <!-- Contraseña -->
+                            <div class="col-12">
+                                <div class="form-floating position-relative">
+                                    <input type="password" class="form-control" id="passwordInput" name="password" placeholder="Contraseña" required>
+                                    <label for="passwordInput">Contraseña</label>
+                                    <button type="button" class="btn border-0 position-absolute end-0 top-50 translate-middle-y" onclick="togglePassword('passwordInput', this)" style="z-index: 5; color: #6c757d; padding: 0.5rem 1rem;">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Confirmar Contraseña -->
+                            <div class="col-12">
+                                <div class="form-floating position-relative">
+                                    <input type="password" class="form-control" id="passwordConfirmInput" name="password_confirm" placeholder="Confirmar contraseña" required>
+                                    <label for="passwordConfirmInput">Confirmar contraseña</label>
+                                    <button type="button" class="btn border-0 position-absolute end-0 top-50 translate-middle-y" onclick="togglePassword('passwordConfirmInput', this)" style="z-index: 5; color: #6c757d; padding: 0.5rem 1rem;">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Terms and Conditions Checkbox -->
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="termsCheck" required>
+                            <label class="form-check-label" for="termsCheck">
+                                Acepto los <a href="#" style="color: var(--login-primary); font-weight: 500;">términos y condiciones</a>
+                            </label>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-register">
+                            Crear cuenta
+                        </button>
+
+                        <!-- Login link -->
+                        <div class="login-link">
+                            ¿Ya tienes cuenta? <a href="{% url 'login' %}">Iniciar sesión</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Formateador dinámico de RUT
+            document.querySelectorAll('.rut-input').forEach(input => {
+                input.addEventListener('input', function(e) {
+                    // Quitamos lo que no sea número o K, y limitamos a máximo 9 dígitos la base
+                    let value = e.target.value.replace(/[^0-9kK]/g, '').toUpperCase().slice(0, 9);
+                    
+                    if (value.length > 1) {
+                        value = value.slice(0, -1) + '-' + value.slice(-1);
+                    }
+                    if (value.length > 5) {
+                        value = value.slice(0, -5) + '.' + value.slice(-5);
+                    }
+                    if (value.length > 9) {
+                        value = value.slice(0, -9) + '.' + value.slice(-9);
+                    }
+                    e.target.value = value;
+                });
+            });
+        });
+        
+        function togglePassword(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const icon = btn.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+            }
+        }
+    </script>
+</body>
+</html>

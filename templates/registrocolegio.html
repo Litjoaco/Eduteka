@@ -1,0 +1,289 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registra tu colegio - Eduteka</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <!-- Custom Login/Register CSS -->
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    <link rel="stylesheet" href="{% static 'css/registrocolegio.css' %}">
+    <link rel="stylesheet" href="{% static 'css/backbutton.css' %}">
+</head>
+<body class="login-body">
+
+    <!-- Botón volver -->
+    <a href="{% url 'landing_page' %}" class="back-button">
+        <i class="bi bi-arrow-left"></i> Volver
+    </a>
+
+    <!-- Formas de fondo orgánicas -->
+    <div class="bg-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+        <div class="shape shape-4"></div>
+        <div class="pattern-dots dots-1"></div>
+        <div class="pattern-dots dots-2"></div>
+    </div>
+
+    <div class="container login-container">
+        <div class="row w-100 m-0 align-items-center justify-content-center">
+            
+            <!-- Columna Izquierda: Información (Oculta en móviles) -->
+            <div class="col-lg-6 d-none d-lg-flex flex-column justify-content-center welcome-section" style="padding-right: 3rem;">
+                <div class="mb-3">
+                    <img src="{% static 'img/logo.png' %}" alt="Eduteka Logo" class="logo-blend" style="height: 140px;">
+                </div>
+                
+                <h1 class="welcome-title" style="font-size: 2.85rem;">Registra tu colegio en Eduteka</h1>
+                <p class="welcome-desc">Crea la cuenta institucional de tu colegio para comenzar a centralizar la gestión académica, administrativa y contable en una sola plataforma.</p>
+                
+                <ul class="benefits-list mt-3">
+                    <li><span class="benefit-chip"><i class="bi bi-gear-fill"></i> Configuración simple</span></li>
+                    <li><span class="benefit-chip"><i class="bi bi-grid-1x2-fill"></i> Gestión modular</span></li>
+                    <li><span class="benefit-chip"><i class="bi bi-person-badge-fill"></i> Acceso por roles</span></li>
+                </ul>
+
+                <div class="illustration-wrapper mt-4">
+                    <!-- Imagen representativa de la plataforma -->
+                    <img src="{% static 'img/colegio.png' %}" alt="Ilustración de la plataforma administrativa de Eduteka" class="img-fluid floating-illustration" style="max-height: 480px; object-fit: contain;">
+                </div>
+            </div>
+
+            <!-- Columna Derecha: Tarjeta de Formulario -->
+            <div class="col-12 col-md-10 col-lg-6">
+                <div class="register-card">
+                    <div class="register-header text-center mb-3">
+                        <img src="{% static 'img/logo.png' %}" alt="Eduteka Logo" class="logo-blend" style="height: 80px; margin-bottom: 1.5rem;">
+                        
+                        <div class="step-badge">Paso 1 de 2</div>
+                        <h2 style="font-weight: 800; color: var(--login-text-main); font-size: 1.75rem; margin-bottom: 0.2rem;">Registrar colegio</h2>
+                        <h5 style="color: var(--login-primary); font-weight: 600; font-size: 1.05rem; margin-top: 0.2rem;">Crea tu cuenta institucional</h5>
+                        <p style="color: var(--login-text-secondary); font-size: 0.9rem; margin-top: 0.2rem; margin-bottom: 0;">Luego podrás elegir tu plan y configurar tus módulos.</p>
+                    </div>
+
+                    <form action="{% url 'registro_colegio' %}" method="POST">
+                        {% csrf_token %}
+                        
+                        {% if form.errors %}
+                            <div class="alert alert-danger" style="font-size: 0.9rem; border-radius: 8px;">
+                                <ul class="mb-0" style="padding-left: 1rem;">
+                                {% for field, errors in form.errors.items %}
+                                    {% for error in errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label-custom" for="schoolNameInput">Nombre del colegio</label>
+                                <input type="text" class="form-control-custom" id="schoolNameInput" name="nombre" placeholder="Colegio San Bernardo" value="{{ form.nombre.value|default_if_none:'' }}" required>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label class="form-label-custom" for="adminNameInput">Nombre completo del administrador</label>
+                                <input type="text" class="form-control-custom" id="adminNameInput" name="nombre_administrador" placeholder="Juan Pérez" value="{{ form.nombre_administrador.value|default_if_none:'' }}" required>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label-custom" for="adminRutInput">RUT del administrador</label>
+                                <input type="text" class="form-control-custom rut-input" id="adminRutInput" name="rut_administrador" placeholder="12.345.678-9" value="{{ form.rut_administrador.value|default_if_none:'' }}" maxlength="12" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label-custom" for="adminPhoneInput">Teléfono del administrador</label>
+                                <input type="text" class="form-control-custom" id="adminPhoneInput" name="telefono_administrador" placeholder="+56 9 1234 5678" value="{{ form.telefono_administrador.value|default_if_none:'' }}" required>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label-custom" for="emailInput">Correo cuenta administradora</label>
+                                <input type="email" class="form-control-custom" id="emailInput" name="correo_institucional" placeholder="director@colegio.edu" value="{{ form.correo_institucional.value|default_if_none:'' }}" autocapitalize="none" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label-custom" for="regionInput">Región</label>
+                                <select class="form-select-custom" id="regionInput" name="region" required>
+                                    <option value="" disabled selected>Seleccionar región</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label-custom" for="cityInput">Ciudad / Comuna</label>
+                                <select class="form-select-custom" id="cityInput" name="ciudad_comuna" required disabled>
+                                    <option value="" disabled selected>Seleccionar comuna</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label-custom" for="phoneInput">Teléfono del colegio</label>
+                                <input type="text" class="form-control-custom" id="phoneInput" name="telefono" placeholder="+56 9 1234 5678" value="{{ form.telefono.value|default_if_none:'' }}" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label-custom" for="schoolTypeInput">Tipo de institución</label>
+                                <select class="form-select-custom" id="schoolTypeInput" name="tipo_institucion" required>
+                                    <option value="" {% if not form.tipo_institucion.value %}selected{% endif %} disabled>Seleccionar tipo</option>
+                                    <option value="particular" {% if form.tipo_institucion.value == 'particular' %}selected{% endif %}>Particular</option>
+                                    <option value="subvencionado" {% if form.tipo_institucion.value == 'subvencionado' %}selected{% endif %}>Subvencionado</option>
+                                    <option value="municipal" {% if form.tipo_institucion.value == 'municipal' %}selected{% endif %}>Municipal</option>
+                                    <option value="instituto" {% if form.tipo_institucion.value == 'instituto' %}selected{% endif %}>Instituto</option>
+                                    <option value="otro" {% if form.tipo_institucion.value == 'otro' %}selected{% endif %}>Otro</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label-custom" for="studentsCountInput">Cantidad de alumnos</label>
+                                <select class="form-select-custom" id="studentsCountInput" name="cantidad_alumnos" required>
+                                    <option value="" {% if not form.cantidad_alumnos.value %}selected{% endif %} disabled>Seleccionar rango</option>
+                                    <option value="menos_100" {% if form.cantidad_alumnos.value == 'menos_100' %}selected{% endif %}>Menos de 100</option>
+                                    <option value="100_300" {% if form.cantidad_alumnos.value == '100_300' %}selected{% endif %}>100 a 300</option>
+                                    <option value="301_600" {% if form.cantidad_alumnos.value == '301_600' %}selected{% endif %}>301 a 600</option>
+                                    <option value="mas_600" {% if form.cantidad_alumnos.value == 'mas_600' %}selected{% endif %}>Más de 600</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label-custom" for="passwordInput">Contraseña</label>
+                                <div class="position-relative">
+                                    <input type="password" class="form-control-custom" id="passwordInput" name="password" placeholder="••••••••" required>
+                                    <button type="button" class="btn border-0 position-absolute end-0 top-50 translate-middle-y" onclick="togglePassword('passwordInput', this)" style="z-index: 5; color: #6c757d; padding: 0 1rem;">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label-custom" for="passwordConfirmInput">Confirmar contraseña</label>
+                                <div class="position-relative">
+                                    <input type="password" class="form-control-custom" id="passwordConfirmInput" name="password_confirm" placeholder="••••••••" required>
+                                    <button type="button" class="btn border-0 position-absolute end-0 top-50 translate-middle-y" onclick="togglePassword('passwordConfirmInput', this)" style="z-index: 5; color: #6c757d; padding: 0 1rem;">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-check mt-4 mb-4">
+                            <input class="form-check-input" type="checkbox" id="termsCheck" required>
+                            <label class="form-check-label" for="termsCheck">
+                                Acepto los <a href="#" style="color: var(--login-primary); font-weight: 600;">términos y condiciones</a>
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-login">
+                            Crear colegio
+                        </button>
+
+                        <div class="login-link">
+                            ¿Ya tienes cuenta? <a href="{% url 'login' %}">Iniciar sesión</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <script>
+        const chileData = {
+            "Arica y Parinacota": ["Arica", "Camarones", "Putre", "General Lagos"],
+            "Tarapacá": ["Iquique", "Alto Hospicio", "Pozo Almonte", "Camiña", "Colchane", "Huara", "Pica"],
+            "Antofagasta": ["Antofagasta", "Mejillones", "Sierra Gorda", "Taltal", "Calama", "Ollagüe", "San Pedro de Atacama", "Tocopilla", "María Elena"],
+            "Atacama": ["Copiapó", "Caldera", "Tierra Amarilla", "Chañaral", "Diego de Almagro", "Vallenar", "Alto del Carmen", "Freirina", "Huasco"],
+            "Coquimbo": ["La Serena", "Coquimbo", "Andacollo", "La Higuera", "Paihuano", "Vicuña", "Illapel", "Los Vilos", "Salamanca", "Ovalle", "Combarbalá", "Monte Patria", "Punitaqui", "Río Hurtado"],
+            "Valparaíso": ["Valparaíso", "Casablanca", "Concón", "Juan Fernández", "Puchuncaví", "Quintero", "Viña del Mar", "Isla de Pascua", "Los Andes", "Calle Larga", "La Ligua", "Cabildo", "Papudo", "Petorca", "Zapallar", "Quillota", "La Calera", "Hijuelas", "La Cruz", "Nogales", "San Antonio", "Algarrobo", "Cartagena", "El Quisco", "El Tabo", "Santo Domingo", "San Felipe", "Catemu", "Llaillay", "Panquehue", "Putaendo", "Santa María", "Quilpué", "Limache", "Olmué", "Villa Alemana"],
+            "Metropolitana de Santiago": ["Cerrillos", "Cerro Navia", "Conchalí", "El Bosque", "Estación Central", "Huechuraba", "Independencia", "La Cisterna", "La Florida", "La Granja", "La Pintana", "La Reina", "Las Condes", "Lo Barnechea", "Lo Espejo", "Lo Prado", "Macul", "Maipú", "Ñuñoa", "Pedro Aguirre Cerda", "Peñalolén", "Providencia", "Pudahuel", "Quilicura", "Quinta Normal", "Recoleta", "Renca", "Santiago", "San Joaquín", "San Miguel", "San Ramón", "Vitacura", "Puente Alto", "Pirque", "San José de Maipo", "Colina", "Lampa", "Tiltil", "San Bernardo", "Buin", "Calera de Tango", "Paine", "Melipilla", "Alhué", "Curacaví", "María Pinto", "San Pedro", "Talagante", "El Monte", "Isla de Maipo", "Padre Hurtado", "Peñaflor"],
+            "O'Higgins": ["Rancagua", "Codegua", "Coinco", "Coltauco", "Doñihue", "Graneros", "Las Cabras", "Machalí", "Malloa", "Mostazal", "Olivar", "Peumo", "Pichidegua", "Quinta de Tilcoco", "Rengo", "Requínoa", "San Vicente", "Pichilemu", "La Estrella", "Litueche", "Marchihue", "Navidad", "Paredones", "San Fernando", "Chépica", "Chimbarongo", "Lolol", "Nancagua", "Palmilla", "Peralillo", "Placilla", "Pumanque", "Santa Cruz"],
+            "Maule": ["Talca", "Constitución", "Curepto", "Empedrado", "Maule", "Pelarco", "Pencahue", "Río Claro", "San Clemente", "San Rafael", "Cauquenes", "Chanco", "Pelluhue", "Curicó", "Hualañé", "Licantén", "Molina", "Rauco", "Romeral", "Sagrada Familia", "Teno", "Vichuquén", "Linares", "Colbún", "Longaví", "Parral", "Retiro", "San Javier", "Villa Alegre", "Yerbas Buenas"],
+            "Ñuble": ["Cobquecura", "Coelemu", "Ninhue", "Portezuelo", "Quirihue", "Ránquil", "Treguaco", "Bulnes", "Chillán", "Chillán Viejo", "El Carmen", "Pemuco", "Pinto", "Quillón", "San Ignacio", "Yungay", "Coihueco", "Ñiquén", "San Carlos", "San Fabián", "San Nicolás"],
+            "Biobío": ["Concepción", "Coronel", "Chiguayante", "Florida", "Hualqui", "Lota", "Penco", "San Pedro de la Paz", "Santa Juana", "Talcahuano", "Tomé", "Hualpén", "Lebu", "Arauco", "Cañete", "Contulmo", "Curanilahue", "Los Álamos", "Tirúa", "Los Ángeles", "Antuco", "Cabrero", "Laja", "Mulchén", "Nacimiento", "Negrete", "Quilaco", "Quilleco", "San Rosendo", "Santa Bárbara", "Tucapel", "Yumbel", "Alto Biobío"],
+            "La Araucanía": ["Temuco", "Carahue", "Cunco", "Curarrehue", "Freire", "Galvarino", "Gorbea", "Lautaro", "Loncoche", "Melipeuco", "Nueva Imperial", "Padre las Casas", "Perquenco", "Pitrufquén", "Pucón", "Saavedra", "Teodoro Schmidt", "Toltén", "Vilcún", "Villarrica", "Cholchol", "Angol", "Collipulli", "Curacautín", "Ercilla", "Lonquimay", "Los Sauces", "Lumaco", "Purén", "Renaico", "Traiguén", "Victoria"],
+            "Los Ríos": ["Valdivia", "Corral", "Lanco", "Los Lagos", "Máfil", "Mariquina", "Paillaco", "Panguipulli", "La Unión", "Río Bueno", "Futrono", "Lago Ranco"],
+            "Los Lagos": ["Puerto Montt", "Calbuco", "Cochamó", "Fresia", "Frutillar", "Los Muermos", "Llanquihue", "Maullín", "Puerto Varas", "Castro", "Ancud", "Chonchi", "Curaco de Vélez", "Dalcahue", "Puqueldón", "Queilén", "Quellón", "Quemchi", "Quinchao", "Osorno", "Puerto Octay", "Purranque", "Puyehue", "Río Negro", "San Juan de la Costa", "San Pablo", "Chaitén", "Futaleufú", "Hualaihué", "Palena"],
+            "Aysén": ["Coihaique", "Lago Verde", "Aysén", "Cisnes", "Guaitecas", "Cochrane", "O'Higgins", "Tortel", "Chile Chico"],
+            "Magallanes": ["Punta Arenas", "Laguna Blanca", "Río Verde", "San Gregorio", "Cabo de Hornos", "Antártica", "Porvenir", "Primavera", "Timaukel", "Natales", "Torres del Paine"]
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const regionSelect = document.getElementById('regionInput');
+            const comunaSelect = document.getElementById('cityInput');
+            let preselectedRegion = "{{ form.region.value|default_if_none:''|escapejs }}";
+            let preselectedComuna = "{{ form.ciudad_comuna.value|default_if_none:''|escapejs }}";
+
+            for (const region in chileData) {
+                const option = document.createElement('option');
+                option.value = region;
+                option.textContent = region;
+                if (region === preselectedRegion) option.selected = true;
+                regionSelect.appendChild(option);
+            }
+
+            function updateComunas() {
+                const selectedRegion = regionSelect.value;
+                comunaSelect.innerHTML = '<option value="" disabled selected>Seleccionar comuna</option>';
+                if (selectedRegion && chileData[selectedRegion]) {
+                    comunaSelect.disabled = false;
+                    chileData[selectedRegion].forEach(comuna => {
+                        const option = document.createElement('option');
+                        option.value = comuna;
+                        option.textContent = comuna;
+                        if (comuna === preselectedComuna) option.selected = true;
+                        comunaSelect.appendChild(option);
+                    });
+                } else {
+                    comunaSelect.disabled = true;
+                }
+            }
+
+            regionSelect.addEventListener('change', function() {
+                preselectedComuna = '';
+                updateComunas();
+            });
+
+            if (preselectedRegion) updateComunas();
+
+            // Formateador dinámico de RUT
+            document.querySelectorAll('.rut-input').forEach(input => {
+                input.addEventListener('input', function(e) {
+                    // Quitamos lo que no sea número o K, y limitamos a máximo 9 dígitos la base
+                    let value = e.target.value.replace(/[^0-9kK]/g, '').toUpperCase().slice(0, 9);
+                    
+                    if (value.length > 1) {
+                        value = value.slice(0, -1) + '-' + value.slice(-1);
+                    }
+                    if (value.length > 5) {
+                        value = value.slice(0, -5) + '.' + value.slice(-5);
+                    }
+                    if (value.length > 9) {
+                        value = value.slice(0, -9) + '.' + value.slice(-9);
+                    }
+                    e.target.value = value;
+                });
+            });
+        });
+
+        function togglePassword(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const icon = btn.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+            }
+        }
+    </script>
+</body>
+</html>

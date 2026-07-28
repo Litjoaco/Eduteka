@@ -1,0 +1,72 @@
+.register-card {
+    background: var(--login-card-bg);
+    border-radius: 28px;
+    padding: 3rem 3.5rem;
+    box-shadow: 0 30px 60px rgba(21, 26, 53, 0.08), 0 0 0 1px rgba(255,255,255,0.7) inset;
+    position: relative;
+    z-index: 2;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.4);
+}
+
+.register-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.register-header h2 {
+    font-size: 1.85rem;
+    font-weight: 800;
+    color: var(--login-text-main);
+    margin-bottom: 0.5rem;
+}
+
+.register-header p {
+    color: var(--login-text-secondary);
+    font-size: 1rem;
+    margin-bottom: 0;
+}
+
+.btn-register {
+    background: var(--login-gradient);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    padding: 1rem 1.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    width: 100%;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 20px rgba(122, 90, 248, 0.25);
+    margin-bottom: 1.5rem;
+}
+
+.btn-register:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 25px rgba(122, 90, 248, 0.35);
+    color: white;
+}
+
+.login-link {
+    text-align: center;
+    font-size: 0.95rem;
+    color: var(--login-text-secondary);
+}
+
+.login-link a {
+    color: var(--login-primary);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.login-link a:hover {
+    color: var(--login-primary-hover);
+    text-decoration: underline;
+}
+
+@media (max-width: 767.98px) {
+    .register-card {
+        padding: 2rem;
+    }
+}

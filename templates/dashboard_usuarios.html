@@ -1,0 +1,617 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Profesor - Eduteka</title>
+
+    <!-- Bootstrap CSS desde local static -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    
+    <!-- Dependencias de UI adicionales (fuentes e iconos) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+<!-- Estilos CSS para el Dashboard Moderno SaaS -->
+<style>
+  :root {
+    --primary: #7C5CFC; /* Morado Eduteka */
+    --primary-soft: #F0EDFF;
+    --secondary: #65CDBF; /* Turquesa */
+    --accent: #F76F7A;
+    --warning: #F6C85F;
+    --dark: #151A35;
+    --gray-text: #687089;
+    --bg-color: #F8F9FC;
+    --border-color: #EAEBF0;
+    --border-gray: #D1D5DB; /* Añadido para el Timeline */
+    --white: #FFFFFF;
+    --sidebar-width: 240px;
+    
+    /* Variables para Mi Agenda Hoy */
+    --primary-purple: var(--primary);
+    --soft-gray: var(--bg-color);
+    --text-primary: var(--dark);
+    --text-secondary: var(--gray-text);
+  }
+  
+  html {
+    font-size: 14px; /* Tamaño estandar seguro */
+  }
+
+  body { 
+    background: var(--bg-color); 
+    color: var(--dark); 
+    font-family: 'Inter', sans-serif; 
+    overflow-x: hidden; 
+  }
+
+  /* Layout */
+  .app-container { display: flex; min-height: 100vh; width: 100vw; overflow-x: hidden; }
+  
+  /* Sidebar */
+  .sidebar { 
+    width: var(--sidebar-width); 
+    background: var(--white); 
+    border-right: 1px solid var(--border-color); 
+    position: fixed; 
+    top: 0; bottom: 0; left: 0; 
+    display: flex; flex-direction: column; 
+    z-index: 1040; 
+    transition: transform 0.3s ease; 
+  }
+  .sidebar-logo { display: flex; justify-content: center; align-items: center; padding: 1.25rem 0; width: 100%; background: transparent; border-bottom: none; }
+  .sidebar-logo img { max-height: 60px; width: auto; max-width: 80%; object-fit: contain; }
+  .sidebar-school { padding: 1.5rem; border-bottom: 1px solid var(--border-color); }
+  .sidebar-school-name { font-weight: 600; font-size: 0.9rem; }
+  .sidebar-school-sub { font-size: 0.8rem; color: var(--gray-text); }
+  
+  .sidebar-menu { padding: 1.5rem 1rem; flex: 1; overflow-y: auto; }
+  .menu-label { font-size: 0.75rem; text-transform: uppercase; color: var(--gray-text); font-weight: 600; margin-bottom: 0.75rem; padding-left: 0.5rem; }
+  .menu-item { display: flex; align-items: center; gap: 1rem; padding: 0.75rem 1rem; color: var(--gray-text); font-weight: 500; font-size: 0.9rem; border-radius: 8px; text-decoration: none; transition: all 0.2s ease; margin-bottom: 0.25rem; }
+  .menu-item i { font-size: 1.1rem; }
+  .menu-item:hover { background: var(--primary-soft); color: var(--primary); }
+  .menu-item.active { background: var(--primary); color: var(--white); font-weight: 600; box-shadow: 0 4px 12px rgba(124, 92, 252, 0.25); }
+  
+  .sidebar-bottom { padding: 1rem; border-top: 1px solid var(--border-color); }
+
+  /* Main Wrapper & Topbar */
+  .main-content { margin-left: var(--sidebar-width); flex: 1; display: flex; flex-direction: column; min-width: 0; transition: margin 0.3s ease; width: calc(100% - var(--sidebar-width)); }
+  .topbar { height: 64px; background: var(--white); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; position: sticky; top: 0; z-index: 1030; }
+  
+  .search-bar { position: relative; width: 100%; max-width: 320px; }
+  .search-bar input { width: 100%; border: 1px solid var(--border-color); border-radius: 8px; padding: 0.5rem 1rem 0.5rem 2.5rem; font-size: 0.9rem; background: var(--bg-color); outline: none; transition: border 0.2s; }
+  .search-bar input:focus { border-color: var(--primary); background: var(--white); }
+  .search-bar i { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--gray-text); }
+
+  .topbar-right { display: flex; align-items: center; gap: 1.5rem; }
+  .notification-btn { position: relative; background: none; border: none; font-size: 1.2rem; color: var(--gray-text); cursor: pointer; padding: 0; }
+  .notification-badge { position: absolute; top: -2px; right: -2px; background: var(--accent); color: white; font-size: 0.6rem; font-weight: bold; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  
+  .user-profile { display: flex; align-items: center; gap: 0.75rem; cursor: pointer; }
+  .user-profile img { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; }
+  .user-info { display: flex; flex-direction: column; }
+  .user-name { font-weight: 600; font-size: 0.9rem; color: var(--dark); }
+  .user-role { font-size: 0.8rem; color: var(--gray-text); }
+
+  /* Content Area */
+  .content-area { padding: 1.5rem 2rem; max-width: 1440px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+  
+  /* Hero */
+  .hero-section { margin-bottom: 1.5rem; }
+  .hero-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--dark); }
+  .hero-subtitle { color: var(--gray-text); font-size: 0.95rem; }
+
+  /* Layout Principal de 2 Columnas - FLEXBOX */
+  .main-dashboard-grid { 
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 1.5rem; 
+    align-items: flex-start; 
+    width: 100%;
+  }
+  .left-column { 
+    flex: 1 1 0%; 
+    min-width: 0; /* Previene desbordamiento de Canvas y contenido */
+  }
+  .right-column { 
+    flex: 0 0 340px; /* Ancho fijo garantizado */
+    max-width: 340px;
+    min-width: 0;
+  }
+
+  /* KPI Grid */
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+  .kpi-card { background: var(--white); border-radius: 12px; padding: 1.25rem; border: 1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 0.5rem; transition: transform 0.2s ease, box-shadow 0.2s ease; position: relative; overflow: hidden; }
+  .kpi-card-content { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 0.5rem; height: 100%; }
+  .kpi-wave-svg { position: absolute; bottom: 0; right: 0; width: 50%; height: auto; z-index: 0; }
+  .kpi-wave-svg.blue { color: rgba(96, 165, 250, 0.12); }
+  .kpi-wave-svg.green { color: rgba(39, 201, 63, 0.12); }
+  .kpi-wave-svg.purple { color: rgba(124, 92, 252, 0.12); }
+  .kpi-wave-svg.red { color: rgba(255, 95, 86, 0.12); }
+  .kpi-card:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,0.06); }
+  .kpi-header { display: flex; align-items: center; gap: 1rem; width: 100%; }
+  .kpi-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; flex-shrink: 0; }
+  .kpi-icon.blue { background: rgba(96, 165, 250, 0.1); color: #60A5FA; }
+  .kpi-icon.green { background: rgba(39, 201, 63, 0.1); color: #27c93f; }
+  .kpi-icon.purple { background: var(--primary-soft); color: var(--primary); }
+  .kpi-icon.red { background: rgba(255, 95, 86, 0.1); color: #ff5f56; }
+  .kpi-info { flex: 1; }
+  .kpi-title { font-size: 0.85rem; color: var(--gray-text); margin: 0; font-weight: 600; }
+  .kpi-value { font-size: 1.5rem; font-weight: 700; color: var(--dark); line-height: 1.2; display: flex; align-items: center; gap: 0.5rem; }
+  .kpi-trend { font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.4rem; border-radius: 6px; display: inline-flex; align-items: center; }
+  .trend-up { background: rgba(39, 201, 63, 0.1); color: #27c93f; }
+  .trend-down { background: rgba(255, 95, 86, 0.1); color: #ff5f56; }
+  .kpi-link { font-size: 0.85rem; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 0.3rem; margin-top: auto; transition: opacity 0.2s; }
+  .kpi-link:hover { opacity: 0.7; text-decoration: none; }
+  .kpi-link.blue { color: #60A5FA; }
+  .kpi-link.green { color: #27c93f; }
+  .kpi-link.purple { color: var(--primary); }
+  .kpi-link.red { color: #ff5f56; }
+
+  .dashboard-panel { background: var(--white); border-radius: 12px; border: 1px solid var(--border-color); padding: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+  .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+  .panel-title { font-size: 1.1rem; font-weight: 600; color: var(--dark); margin: 0; }
+
+  /* Quick Actions */
+  .quick-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+  .action-btn { background: var(--white); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem; text-align: center; color: var(--dark); text-decoration: none; font-weight: 600; font-size: 0.95rem; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+  .action-icon-wrap { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 0.25rem; font-size: 1.1rem; }
+  .action-icon-wrap.purple { background: var(--primary-soft); color: var(--primary); }
+  .action-icon-wrap.blue { background: rgba(96, 165, 250, 0.1); color: #60A5FA; }
+  .action-icon-wrap.green { background: rgba(39, 201, 63, 0.1); color: #27c93f; }
+  .action-icon-wrap.orange { background: rgba(246, 200, 95, 0.15); color: #D97706; }
+  .action-btn:hover { border-color: var(--primary); box-shadow: 0 4px 12px rgba(124, 92, 252, 0.1); color: var(--primary); transform: translateY(-2px); }
+
+  /* Alerts */
+  .alert-item { display: flex; gap: 0.75rem; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; align-items: flex-start; border: 1px solid var(--border-color); border-left: 4px solid transparent; background: var(--white); }
+  .alert-item.warning { background: rgba(246, 200, 95, 0.05); border-color: rgba(246, 200, 95, 0.2); border-left-color: #D97706; }
+  .alert-item.danger { background: rgba(247, 111, 122, 0.05); border-color: rgba(247, 111, 122, 0.2); border-left-color: var(--accent); }
+  .alert-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem; }
+  .alert-icon { font-size: 1.25rem; display: flex; align-items: center; }
+  .alert-item.warning .alert-icon { color: #D97706; }
+  .alert-item.danger .alert-icon { color: var(--accent); }
+  .alert-title { margin: 0; font-size: 0.95rem; color: var(--dark); font-weight: 600; line-height: 1.2; }
+  .alert-desc { font-size: 0.85rem; color: var(--gray-text); display: block; margin-left: 1.75rem; }
+
+  /* Lists & Timeline */
+  .activity-list, .timeline { list-style: none; padding: 0; margin: 0; }
+  .activity-item { display: flex; align-items: center; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid var(--border-color); }
+  .activity-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .activity-date { display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--bg-color); width: 40px; height: 40px; border-radius: 8px; }
+  .activity-date strong { font-size: 1rem; color: var(--dark); line-height: 1; }
+  .activity-date span { font-size: 0.7rem; color: var(--gray-text); text-transform: uppercase; }
+  .activity-details h5 { font-size: 0.95rem; margin: 0 0 0.25rem 0; font-weight: 600; }
+  .activity-details p { font-size: 0.85rem; color: var(--gray-text); margin: 0; }
+
+  .timeline { position: relative; }
+  .timeline::before { content: ''; position: absolute; left: 5px; top: 8px; bottom: 0; width: 2px; background: var(--border-gray); z-index: 1; }
+  .timeline-item { position: relative; padding-left: 2rem; padding-bottom: 1.5rem; }
+  .timeline-item:last-child { padding-bottom: 0; }
+  .timeline-item::before { content: ''; position: absolute; left: 0; top: 4px; width: 12px; height: 12px; border-radius: 50%; background: var(--white); border: 2px solid var(--primary); z-index: 2; box-shadow: 0 0 0 2px var(--white); }
+  .timeline-item::after { display: none; }
+  .timeline-time { font-size: 0.8rem; color: var(--gray-text); display: block; margin-bottom: 0.25rem; }
+  .timeline-content { font-size: 0.9rem; color: var(--dark); line-height: 1.4; }
+
+  /* Agenda Hoy Custom Styles */
+  .btn-agenda-primary, .btn-agenda-secondary {
+    padding: 0.35rem 0.6rem;
+    font-size: 0.75rem;
+    border-radius: 6px;
+    font-weight: 600;
+    white-space: nowrap;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .btn-agenda-primary { background-color: var(--primary); color: var(--white); border: none; }
+  .btn-agenda-primary:hover { background-color: #6344ce; }
+  .btn-agenda-secondary { background-color: var(--bg-color); color: var(--dark); border: 1px solid var(--border-color); }
+  .btn-agenda-secondary:hover { background-color: var(--border-gray); }
+  
+  .agenda-text-wrap {
+    flex: 1;
+    min-width: 0;
+  }
+  .agenda-text-wrap h4 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .main-dashboard-grid { 
+      flex-direction: column; 
+    }
+    .right-column {
+      flex: 1 1 auto;
+      max-width: 100%;
+      width: 100%;
+    }
+  }
+  @media (max-width: 992px) {
+    .sidebar { transform: translateX(-100%); }
+    .main-content { margin-left: 0; width: 100%; }
+    .topbar { padding: 0 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <img src="{% static 'img/logo.png' %}" alt="Eduteka Logo">
+        </div>
+        <div class="sidebar-school">
+            <div class="sidebar-school-name">{{ colegio.nombre|default:"Mi Colegio" }}</div>
+            <div class="sidebar-school-sub">Año Escolar {{ periodo.anio_academico|default:"Actual" }}</div>
+        </div>
+        
+        <nav class="sidebar-menu">
+            <div class="menu-label">Menú Principal</div>
+            <a href="#" class="menu-item active"><i class="bi bi-house"></i> Inicio</a>
+            <a href="#" class="menu-item"><i class="bi bi-book"></i> Académico</a>
+            <a href="#" class="menu-item"><i class="bi bi-calendar-check"></i> Asistencia</a>
+            <a href="#" class="menu-item"><i class="bi bi-calendar3"></i> Calendario</a>
+            <a href="#" class="menu-item"><i class="bi bi-bar-chart"></i> Reportes</a>
+            
+            <div class="menu-label mt-4">Administración</div>
+            <a href="#" class="menu-item"><i class="bi bi-wallet2"></i> Contabilidad</a>
+            <a href="#" class="menu-item"><i class="bi bi-truck"></i> Proveedores</a>
+            <a href="#" class="menu-item"><i class="bi bi-award"></i> SIMCE</a>
+        </nav>
+        
+        <div class="sidebar-bottom">
+            <a href="#" class="menu-item"><i class="bi bi-gear"></i> Configuración</a>
+            <a href="{% url 'logout' %}" class="menu-item text-danger"><i class="bi bi-box-arrow-right"></i> Cerrar Sesión</a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT WRAPPER -->
+    <div class="main-content">
+        
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-light d-lg-none" id="mobileMenuBtn">
+                    <i class="bi bi-list fs-5"></i>
+                </button>
+                <div class="search-bar d-none d-md-block">
+                    <i class="bi bi-search"></i>
+                    <input type="text" placeholder="Buscar alumnos, cursos, profesores...">
+                </div>
+            </div>
+            
+            <div class="topbar-right">
+                <button class="notification-btn">
+                    <i class="bi bi-bell"></i>
+                    <span class="notification-badge">3</span>
+                </button>
+                <div class="user-profile dropdown-toggle" data-bs-toggle="dropdown">
+                    <img src="https://ui-avatars.com/api/?name={{ request.user.first_name|default:request.user.username }}+{{ request.user.last_name|default:'' }}&background=7C5CFC&color=fff" alt="Perfil">
+                    <div class="user-info d-none d-sm-flex">
+                        <span class="user-name">{{ request.user.first_name|default:request.user.username }} {{ request.user.last_name|default:'' }}</span>
+                        <span class="user-role" style="text-transform: capitalize;">{{ miembro.rol.nombre|default:'Usuario' }}</span>
+                    </div>
+                </div>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2">
+                    <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i> Mi Perfil</a></li>
+                    <li><a class="dropdown-item" href="#"><i class="bi bi-building me-2"></i> Cambiar Institución</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="{% url 'logout' %}"><i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión</a></li>
+                </ul>
+            </div>
+        </header>
+
+        <!-- SCROLLABLE CONTENT -->
+        <main class="content-area">
+            
+            <!-- Hero Welcome -->
+            <div class="hero-section d-flex justify-content-between align-items-end flex-wrap gap-3">
+                <div>
+                    <h1 class="hero-title">Buenos días, {{ request.user.first_name|default:request.user.username }} 👋</h1>
+                    <p class="hero-subtitle mb-0">Aquí tienes tu resumen general para el día de hoy.</p>
+                </div>
+                <div class="text-end text-muted small" style="text-transform: capitalize;">
+                    <i class="bi bi-calendar-event me-1"></i> {{ hoy|date:"l, d \d\e F \d\e Y" }}
+                </div>
+            </div>
+
+            <!-- Contenedor Principal Dividido -->
+            <div class="main-dashboard-grid">
+                
+                <!-- Columna Izquierda (65%) -->
+                <div class="left-column">
+                    <!-- KPI Cards -->
+                    <div class="kpi-grid">
+                        <div class="kpi-card">
+                            <svg class="kpi-wave-svg blue" viewBox="0 0 144 54" preserveAspectRatio="none">
+                                <path fill="currentColor" d="M0,54 C40,20 100,40 144,0 L144,54 Z"></path>
+                            </svg>
+                            <div class="kpi-card-content">
+                                <div class="kpi-header">
+                                    <div class="kpi-icon blue"><i class="bi bi-people"></i></div>
+                                    <div class="kpi-title">Estudiantes Activos</div>
+                                </div>
+                                <div class="kpi-value">1.245 <span class="kpi-trend trend-up"><i class="bi bi-arrow-up-short"></i> 4%</span></div>
+                                <a href="#" class="kpi-link blue">Ver alumnos <i class="bi bi-arrow-right"></i></a>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <svg class="kpi-wave-svg green" viewBox="0 0 144 54" preserveAspectRatio="none">
+                                <path fill="currentColor" d="M0,54 C40,20 100,40 144,0 L144,54 Z"></path>
+                            </svg>
+                            <div class="kpi-card-content">
+                                <div class="kpi-header">
+                                    <div class="kpi-icon green"><i class="bi bi-check-circle"></i></div>
+                                    <div class="kpi-title">Asistencia Promedio</div>
+                                </div>
+                                <div class="kpi-value">92.4% <span class="kpi-trend trend-down"><i class="bi bi-arrow-down-short"></i> 1.2%</span></div>
+                                <a href="#" class="kpi-link green">Ver asistencia <i class="bi bi-arrow-right"></i></a>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <svg class="kpi-wave-svg purple" viewBox="0 0 144 54" preserveAspectRatio="none">
+                                <path fill="currentColor" d="M0,54 C40,20 100,40 144,0 L144,54 Z"></path>
+                            </svg>
+                            <div class="kpi-card-content">
+                                <div class="kpi-header">
+                                    <div class="kpi-icon purple"><i class="bi bi-journals"></i></div>
+                                    <div class="kpi-title">Cursos Activos</div>
+                                </div>
+                                <div class="kpi-value">{{ cursos_count|default:"0" }} <span class="kpi-trend text-muted bg-light"><i class="bi bi-dash"></i></span></div>
+                                <a href="#" class="kpi-link purple">Ver cursos <i class="bi bi-arrow-right"></i></a>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <svg class="kpi-wave-svg red" viewBox="0 0 144 54" preserveAspectRatio="none">
+                                <path fill="currentColor" d="M0,54 C40,20 100,40 144,0 L144,54 Z"></path>
+                            </svg>
+                            <div class="kpi-card-content">
+                                <div class="kpi-header">
+                                    <div class="kpi-icon red"><i class="bi bi-exclamation-triangle"></i></div>
+                                    <div class="kpi-title">Alumnos en Riesgo</div>
+                                </div>
+                                <div class="kpi-value">12 <span class="kpi-trend trend-down"><i class="bi bi-arrow-up-short"></i> 2</span></div>
+                                <a href="#" class="kpi-link red">Ver alertas <i class="bi bi-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions (Accesos RÃ¡pidos) -->
+                    <div class="quick-actions">
+                        <a href="#" class="action-btn">
+                            <div class="action-icon-wrap purple"><i class="bi bi-clipboard-check"></i></div>
+                            <span>Registrar Asistencia</span>
+                        </a>
+                        <a href="#" class="action-btn">
+                            <div class="action-icon-wrap blue"><i class="bi bi-journal-arrow-up"></i></div>
+                            <span>Subir Notas</span>
+                        </a>
+                        <a href="#" class="action-btn">
+                            <div class="action-icon-wrap green"><i class="bi bi-file-earmark-bar-graph"></i></div>
+                            <span>Generar Reporte</span>
+                        </a>
+                        <a href="#" class="action-btn">
+                            <div class="action-icon-wrap orange"><i class="bi bi-camera-video"></i></div>
+                            <span>Crear Reunión</span>
+                        </a>
+                    </div>
+
+                    <!-- Chart Panel -->
+                    <div class="dashboard-panel">
+                        <div class="panel-header">
+                            <h3 class="panel-title">Evolución de Asistencia</h3>
+                            <select class="form-select form-select-sm" style="width: auto; cursor: pointer;">
+                                <option>Últimos 6 meses</option>
+                                <option>Este mes</option>
+                            </select>
+                        </div>
+                        <div style="position: relative; height: 260px; width: 100%;">
+                            <canvas id="mainChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Columna Derecha (35%) -->
+                <div class="right-column">
+                    <!-- Mi Agenda Hoy -->
+                    <div class="dashboard-panel" style="margin-bottom: 1.5rem;">
+                        <div class="panel-header">
+                            <h3 class="panel-title">Mi Agenda Hoy</h3>
+                        </div>
+                        <ul class="activity-list">
+                            <li class="activity-item" style="justify-content: space-between; gap: 1rem;">
+                                <div class="activity-info" style="display: flex; align-items: center; gap: 0.75rem; flex: 1; min-width: 0;">
+                                    <div style="color: var(--text-secondary); flex-shrink: 0;">
+                                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20h.01M7 20h.01M17 20h.01M12 16h.01M7 16h.01M17 16h.01M12 12h.01M7 12h.01M17 12h.01M12 8h.01M7 8h.01M17 8h.01M12 4h.01M7 4h.01M17 4h.01"/></svg>
+                                    </div>
+                                    <div class="agenda-text-wrap">
+                                        <h4>09:15 | Matemáticas 2° Medio B | Sala 14</h4>
+                                    </div>
+                                </div>
+                                <button class="btn-agenda-primary">Pasar Lista</button>
+                            </li>
+                            <li class="activity-item" style="justify-content: space-between; gap: 1rem;">
+                                <div class="activity-info" style="display: flex; align-items: center; gap: 0.75rem; flex: 1; min-width: 0;">
+                                    <div style="color: var(--text-secondary); flex-shrink: 0;">
+                                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                    </div>
+                                    <div class="agenda-text-wrap">
+                                        <h4>11:30 | Reunión Equipo Directivo</h4>
+                                    </div>
+                                </div>
+                                <button class="btn-agenda-secondary">Ver Orden</button>
+                            </li>
+                            <li class="activity-item" style="justify-content: space-between; gap: 1rem;">
+                                <div class="activity-info" style="display: flex; align-items: center; gap: 0.75rem; flex: 1; min-width: 0;">
+                                    <div style="color: var(--text-secondary); flex-shrink: 0;">
+                                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                                    </div>
+                                    <div class="agenda-text-wrap">
+                                        <h4>14:00 | Calificar Historia 1° Medio A</h4>
+                                    </div>
+                                </div>
+                                <button class="btn-agenda-primary">Subir Notas</button>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Actividad y Alertas Recientes -->
+                    <div class="dashboard-panel" style="margin-bottom: 1.5rem;">
+                        <div class="panel-header">
+                            <h3 class="panel-title">Alertas del Sistema</h3>
+                        </div>
+                        <div class="alerts-container">
+                            <div class="alert-item warning">
+                                <div class="alert-content w-100">
+                                    <div class="alert-header">
+                                        <div class="alert-icon"><i class="bi bi-exclamation-circle-fill"></i></div>
+                                        <h4 class="alert-title">12 alumnos con asistencia crítica</h4>
+                                    </div>
+                                    <span class="alert-desc">Menor al 85% este semestre.</span>
+                                </div>
+                            </div>
+                            <div class="alert-item danger">
+                                <div class="alert-content w-100">
+                                    <div class="alert-header">
+                                        <div class="alert-icon"><i class="bi bi-x-circle-fill"></i></div>
+                                        <h4 class="alert-title">3 cursos sin registro</h4>
+                                    </div>
+                                    <span class="alert-desc">Falta asistencia en 2°A, 3°B y 4°C hoy.</span>
+                                </div>
+                            </div>
+                            <div class="alert-item warning">
+                                <div class="alert-content w-100">
+                                    <div class="alert-header">
+                                        <div class="alert-icon"><i class="bi bi-wallet-fill"></i></div>
+                                        <h4 class="alert-title">Pagos pendientes</h4>
+                                    </div>
+                                    <span class="alert-desc">Vencimiento de proveedores en 2 días.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actividad Reciente (Timeline) -->
+                    <div class="dashboard-panel">
+                        <div class="panel-header">
+                            <h3 class="panel-title">Actividad Reciente</h3>
+                            <a href="#" class="text-decoration-none small text-primary">Ver todo</a>
+                        </div>
+                        <ul class="timeline mt-3">
+                            <li class="timeline-item">
+                                <span class="timeline-time">Hace 15 min</span>
+                                <div class="timeline-content"><strong>María López</strong> (Prof.) subió notas de Matemáticas en 2°B.</div>
+                            </li>
+                            <li class="timeline-item">
+                                <span class="timeline-time">Hace 45 min</span>
+                                <div class="timeline-content"><strong>Juan Pérez</strong> (Inspector) cerró asistencia general.</div>
+                            </li>
+                            <li class="timeline-item">
+                                <span class="timeline-time">Hoy, 08:15 AM</span>
+                                <div class="timeline-content">Sistema sincronizó con base de datos MINEDUC exitosamente.</div>
+                            </li>
+                            <li class="timeline-item">
+                                <span class="timeline-time">Ayer, 16:30 PM</span>
+                                <div class="timeline-content">Nuevo apoderado registrado en plataforma.</div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    
+    // Sidebar toggle para dispositivos mÃ³viles
+    const mobileBtn = document.getElementById('mobileMenuBtn');
+    const sidebar = document.getElementById('sidebar');
+    
+    if(mobileBtn) {
+        mobileBtn.addEventListener('click', () => {
+            sidebar.style.transform = sidebar.style.transform === 'translateX(0px)' ? 'translateX(-100%)' : 'translateX(0px)';
+        });
+    }
+
+    // ConfiguraciÃ³n del GrÃ¡fico Principal (Chart.js)
+    const ctx = document.getElementById('mainChart').getContext('2d');
+    
+    // Efecto Gradiente debajo de la lÃ­nea
+    let gradient = ctx.createLinearGradient(0, 0, 0, 300);
+    gradient.addColorStop(0, 'rgba(124, 92, 252, 0.4)'); // Color primary Eduteka
+    gradient.addColorStop(1, 'rgba(124, 92, 252, 0.0)'); 
+
+    Chart.defaults.font.family = "'Inter', sans-serif";
+    Chart.defaults.color = '#687089';
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Asistencia (%)',
+                data: [90, 92, 88, 94, 95, 92],
+                borderColor: '#7C5CFC',
+                backgroundColor: gradient,
+                borderWidth: 3,
+                pointBackgroundColor: '#FFFFFF',
+                pointBorderColor: '#7C5CFC',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                fill: true,
+                tension: 0.4 // Curva suave
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }, // Sin leyenda extra
+                tooltip: {
+                    backgroundColor: '#151A35',
+                    padding: 12,
+                    titleFont: { size: 13 },
+                    bodyFont: { size: 13 },
+                    displayColors: false,
+                    callbacks: {
+                        label: function(context) { return context.parsed.y + '% Asistencia'; }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false, drawBorder: false }
+                },
+                y: {
+                    min: 80,
+                    max: 100,
+                    grid: { color: '#EAEBF0', drawBorder: false, borderDash: [5, 5] },
+                    ticks: { stepSize: 5, callback: function(value) { return value + '%'; } }
+                }
+            },
+            interaction: { mode: 'index', intersect: false }
+        }
+    });
+    
+  });
+</script>
+
+</body>
+</html>

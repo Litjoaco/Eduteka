@@ -1,0 +1,136 @@
+/* Grilla de Planes */
+.plans-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.8rem;
+}
+.plan-card-compact {
+    border: 2px solid #EAEAF2;
+    border-radius: 12px;
+    padding: 0.8rem 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #ffffff;
+    display: block;
+    position: relative;
+    overflow: hidden;
+    margin: 0;
+}
+.plan-card-compact:hover {
+    border-color: #d1c7f5;
+}
+.plan-card-compact input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+}
+.plan-card-compact:has(input:checked) {
+    border-color: #8B6FE8;
+    background-color: #f0ebff;
+    box-shadow: 0 4px 15px rgba(139, 111, 232, 0.1);
+}
+.plan-card-compact:has(input:checked) .plan-name {
+    color: #8B6FE8;
+}
+.plan-badge {
+    background: #8B6FE8;
+    color: white;
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 0.15rem 0.5rem;
+    border-radius: 5px;
+}
+
+/* Toggle de Facturación */
+.billing-toggle {
+    background-color: #F0F1F7;
+    border: 1px solid #EAEAF2;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.04);
+}
+.billing-btn {
+    color: #687089;
+    transition: all 0.3s ease;
+}
+input[name="billing"]:checked ~ .billing-btn {
+    background-color: #ffffff;
+    color: #8B6FE8;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.05);
+    transform: translateY(-1px);
+}
+
+/* Grilla de Módulos */
+.modules-grid-compact {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.6rem;
+}
+.module-item {
+    border: 2px solid #EAEAF2;
+    border-radius: 10px;
+    padding: 0.5rem 0.3rem;
+    text-align: center;
+    cursor: pointer;
+    background: #ffffff;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+    margin: 0;
+}
+.module-item i {
+    font-size: 1.3rem;
+    color: #a0aab5;
+    transition: all 0.2s ease;
+}
+.module-item span {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #687089;
+    line-height: 1.1;
+}
+.module-item:hover {
+    border-color: #d1c7f5;
+}
+.module-item input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+}
+.module-item:has(input:checked) {
+    border-color: #8B6FE8;
+    background-color: #f0ebff;
+}
+.module-item:has(input:checked) i {
+    color: #8B6FE8;
+}
+.module-item:has(input:checked) span {
+    color: #151A35;
+}
+.module-item:has(input:disabled) {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Resumen */
+.summary-horizontal {
+    border: 1px solid #EAEAF2;
+    background: #F8F9FC;
+}
+
+@media (max-width: 768px) {
+    .plans-grid, .modules-grid-compact {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .summary-horizontal {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+    .summary-horizontal .text-end {
+        text-align: left !important;
+        border-left: none !important;
+        padding-left: 0 !important;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 2px dashed #EAEAF2;
+        width: 100%;
+    }
+}

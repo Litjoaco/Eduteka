@@ -1,0 +1,325 @@
+/* Variables for Login */
+:root {
+    --login-bg: #F4F5FB; /* Slightly richer base */
+    --login-card-bg: rgba(255, 255, 255, 0.95);
+    --login-text-main: #151A35;
+    --login-text-secondary: #5C6584;
+    --login-primary: #7A5AF8;
+    --login-primary-hover: #6344E6;
+    --login-gradient: linear-gradient(135deg, #7A5AF8 0%, #A282FF 100%);
+    
+    /* Pastel Colors for Background */
+    --pastel-lilac: #D4C4FB;
+    --pastel-pink: #FFC4D9;
+    --pastel-turquoise: #A8E6CF;
+    --pastel-yellow: #FFF3D6;
+    --pastel-blue: #C4DFFB;
+}
+
+body.login-body {
+    background: linear-gradient(135deg, #F4F5FB 0%, #FAFAFF 100%);
+    font-family: 'Inter', sans-serif;
+    color: var(--login-text-main);
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Logo integration trick (removes white backgrounds on images placed over light/pastel BGs) */
+.logo-blend {
+    mix-blend-mode: multiply;
+    filter: contrast(1.05); /* Keeps colors vibrant */
+    border: none;
+    outline: none;
+}
+
+/* Organic Background Shapes */
+.bg-shapes {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.shape {
+    position: absolute;
+    filter: blur(80px);
+    opacity: 0.85;
+    border-radius: 50%;
+    animation: floatShape 20s ease-in-out infinite alternate;
+}
+
+.shape-1 {
+    width: 600px;
+    height: 600px;
+    background-image: radial-gradient(circle, var(--pastel-lilac) 0%, transparent 70%);
+    top: -150px;
+    left: -150px;
+}
+
+.shape-2 {
+    width: 700px;
+    height: 700px;
+    background-image: radial-gradient(circle, var(--pastel-pink) 0%, transparent 70%);
+    bottom: -200px;
+    right: -100px;
+    animation-delay: -5s;
+}
+
+.shape-3 {
+    width: 500px;
+    height: 500px;
+    background-image: radial-gradient(circle, var(--pastel-turquoise) 0%, transparent 70%);
+    top: 40%;
+    left: 30%;
+    animation-delay: -10s;
+    opacity: 0.7;
+}
+
+.shape-4 {
+    width: 400px;
+    height: 400px;
+    background-image: radial-gradient(circle, var(--pastel-blue) 0%, transparent 70%);
+    top: 10%;
+    right: 15%;
+    animation-delay: -7s;
+    opacity: 0.6;
+}
+
+/* Decorative patterns */
+.pattern-dots {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    background-image: radial-gradient(#C4C8DC 2px, transparent 2px);
+    background-size: 24px 24px;
+    z-index: -1;
+}
+
+.dots-1 {
+    top: 10%;
+    left: 45%;
+    opacity: 0.4;
+}
+
+.dots-2 {
+    bottom: 15%;
+    left: 8%;
+    opacity: 0.4;
+}
+
+@keyframes floatShape {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(40px, 30px) scale(1.1); }
+    100% { transform: translate(-30px, 50px) scale(0.9); }
+}
+
+/* Layout */
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+/* Left Column - Welcome & Illustration */
+.welcome-section {
+    padding-right: 4rem;
+}
+
+.welcome-title {
+    font-size: 3.25rem;
+    font-weight: 800;
+    color: var(--login-text-main);
+    margin-bottom: 0.5rem;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+}
+
+.welcome-desc {
+    font-size: 1.15rem;
+    color: var(--login-text-secondary);
+    margin-bottom: 1rem; /* Reduced empty space */
+    max-width: 95%;
+    line-height: 1.6;
+}
+
+/* Conceptual Illustration */
+.illustration-wrapper {
+    position: relative;
+    height: auto;
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-top: -1rem; /* Closer to the text */
+}
+
+.floating-illustration {
+    max-height: 550px; /* Much larger book */
+    width: 110%; /* Makes it expand naturally and feel more present */
+    object-fit: contain;
+    animation: floatIllustration 8s ease-in-out infinite;
+    z-index: 3;
+    position: relative;
+    filter: drop-shadow(0 25px 40px rgba(122, 90, 248, 0.15));
+    margin-left: -5%; /* Centers the overflowing image */
+}
+
+@keyframes floatIllustration {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-15px) rotate(1deg); }
+}
+
+/* Right Column - Premium Login Card */
+.login-card {
+    background: var(--login-card-bg);
+    border-radius: 28px;
+    padding: 3.5rem;
+    box-shadow: 0 30px 60px rgba(21, 26, 53, 0.08), 0 0 0 1px rgba(255,255,255,0.7) inset;
+    position: relative;
+    z-index: 2;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.4);
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.login-header h2 {
+    font-size: 1.85rem;
+    font-weight: 800;
+    color: var(--login-text-main);
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.01em;
+}
+
+.login-header p {
+    color: var(--login-text-secondary);
+    font-size: 1rem;
+}
+
+/* Form Styles - Defined Inputs */
+.form-floating {
+    margin-bottom: 1.5rem;
+}
+
+.form-control {
+    border-radius: 14px;
+    border: 2px solid #EAEAF2;
+    padding: 1rem 0.75rem;
+    height: calc(3.75rem + 2px);
+    line-height: 1.25;
+    background-color: #F8F8FC;
+    font-weight: 500;
+    color: var(--login-text-main);
+    transition: all 0.3s ease;
+}
+
+.form-control::placeholder {
+    color: transparent;
+}
+
+.form-control:focus {
+    border-color: var(--login-primary);
+    box-shadow: 0 0 0 4px rgba(122, 90, 248, 0.12);
+    background-color: #ffffff;
+}
+
+.form-floating>label {
+    padding: 1.15rem 0.75rem;
+    color: #8A92A6;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.form-floating>.form-control:focus~label,
+.form-floating>.form-control:not(:placeholder-shown)~label {
+    color: var(--login-primary);
+    transform: scale(.85) translateY(-.75rem) translateX(.15rem);
+    background-color: transparent;
+}
+
+/* Checkbox */
+.form-check-input {
+    width: 1.25em;
+    height: 1.25em;
+    margin-top: 0.15em;
+    border: 2px solid #EAEAF2;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.form-check-input:checked {
+    background-color: var(--login-primary);
+    border-color: var(--login-primary);
+}
+
+.form-check-label {
+    color: var(--login-text-secondary);
+    font-size: 0.95rem;
+    font-weight: 500;
+    padding-left: 0.4rem;
+    cursor: pointer;
+}
+
+.forgot-password {
+    color: var(--login-primary);
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.forgot-password:hover {
+    color: var(--login-primary-hover);
+    text-decoration: underline;
+}
+
+/* Enhanced Gradient Button */
+.btn-login {
+    background: var(--login-gradient);
+    color: #ffffff;
+    border: none;
+    border-radius: 14px;
+    padding: 1.1rem;
+    font-weight: 700;
+    font-size: 1.1rem;
+    width: 100%;
+    margin-top: 1rem;
+    letter-spacing: 0.02em;
+    box-shadow: 0 10px 20px rgba(122, 90, 248, 0.25);
+    transition: all 0.3s ease;
+}
+
+.btn-login:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 25px rgba(122, 90, 248, 0.35);
+    color: #ffffff;
+}
+
+.btn-login:active {
+    transform: translateY(0);
+    box-shadow: 0 5px 10px rgba(122, 90, 248, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 991.98px) {
+    .login-card {
+        padding: 2.5rem;
+        margin: 2rem 0;
+        box-shadow: 0 20px 40px rgba(21, 26, 53, 0.05);
+    }
+    .welcome-section {
+        display: none !important; /* Hide left column on mobile */
+    }
+}

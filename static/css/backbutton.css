@@ -1,0 +1,31 @@
+.back-button {
+    position: absolute;
+    top: 2rem;
+    left: 2rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--login-text-secondary, #687089);
+    font-weight: 600;
+    text-decoration: none;
+    z-index: 50;
+    transition: all 0.3s ease;
+    background: white;
+    padding: 0.6rem 1.2rem;
+    border-radius: 50rem;
+    box-shadow: 0 4px 12px rgba(21, 26, 53, 0.05);
+    border: 1px solid rgba(0,0,0,0.02);
+}
+.back-button:hover {
+    color: var(--login-primary, #8B6FE8);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(21, 26, 53, 0.08);
+}
+@media (max-width: 768px) {
+    .back-button {
+        top: 1rem;
+        left: 1rem;
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+}

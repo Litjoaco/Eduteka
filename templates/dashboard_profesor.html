@@ -1,0 +1,1121 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Profesor - Eduteka</title>
+
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+
+  :root {
+    --primary:        #7C5CFC;
+    --primary-hover:  #6344CE;
+    --primary-soft:   #F0EDFF;
+    --primary-mid:    #C5B6FF;
+    --secondary:      #65CDBF;
+    --accent:         #F76F7A;
+    --warning:        #F6C85F;
+    --dark:           #151A35;
+    --body-text:      #3B4163;
+    --muted:          #687089;
+    --bg:             #F8F9FC;
+    --surface:        #FFFFFF;
+    --border:         #EAEBF0;
+    --border-strong:  #D1D5DB;
+    --sidebar-w:      248px;
+
+    --radius-sm:  6px;
+    --radius-md:  10px;
+    --radius-lg:  14px;
+    --radius-xl:  18px;
+
+    --shadow-xs:  0 1px 3px rgba(15,22,41,0.06);
+    --shadow-sm:  0 2px 8px rgba(15,22,41,0.07);
+    --shadow-md:  0 6px 24px rgba(15,22,41,0.09);
+    --shadow-lg:  0 16px 48px rgba(108,79,240,0.12);
+  }
+
+  html, body { height: 100%; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--body-text);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── LAYOUT ─────────────────────────────────────── */
+  .app-shell {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+  }
+
+  /* ── SIDEBAR ─────────────────────────────────────── */
+  .sidebar {
+    width: var(--sidebar-w);
+    min-width: var(--sidebar-w);
+    flex-shrink: 0;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    position: fixed;
+    top: 0; bottom: 0; left: 0;
+    display: flex;
+    flex-direction: column;
+    z-index: 1040;
+    transition: transform .3s ease;
+  }
+
+  .sidebar-logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1.4rem 1.5rem 1rem;
+  }
+  .sidebar-logo img { max-height: 100px; width: auto; }
+
+  .sidebar-school {
+    margin: 0 1rem .75rem;
+    background: linear-gradient(135deg, var(--primary-soft) 0%, #E8E2FF 100%);
+    border-radius: var(--radius-lg);
+    padding: .9rem 1rem;
+  }
+  .sidebar-school-name {
+    font-weight: 700;
+    font-size: .85rem;
+    color: var(--primary);
+    margin-bottom: 2px;
+  }
+  .sidebar-school-sub {
+    font-size: .75rem;
+    color: var(--primary-hover);
+    font-weight: 500;
+  }
+
+  .sidebar-nav {
+    flex: 1;
+    overflow-y: auto;
+    padding: .75rem .75rem 0;
+    scrollbar-width: none;
+  }
+  .sidebar-nav::-webkit-scrollbar { display: none; }
+
+  .nav-section-label {
+    font-size: .67rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--muted);
+    padding: .5rem .75rem .3rem;
+    margin-top: .25rem;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: .6rem .85rem;
+    color: var(--muted);
+    font-weight: 500;
+    font-size: .88rem;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: background .15s, color .15s;
+    margin-bottom: 2px;
+  }
+  .nav-item i { font-size: 1.05rem; flex-shrink: 0; }
+  .nav-item:hover { background: var(--bg); color: var(--dark); }
+  .nav-item.active {
+    background: var(--primary);
+    color: #fff;
+    font-weight: 600;
+    box-shadow: 0 4px 14px rgba(108,79,240,.3);
+  }
+  .nav-item.active i { color: #fff; }
+
+  .sidebar-footer {
+    padding: .75rem;
+    border-top: 1px solid var(--border);
+    margin-top: auto;
+  }
+
+  /* ── MAIN WRAPPER ────────────────────────────────── */
+  .main-wrapper {
+    flex: 1;
+    min-width: 0;
+    margin-left: var(--sidebar-w);
+    display: flex;
+    flex-direction: column;
+    width: calc(100% - var(--sidebar-w));
+  }
+
+  /* ── TOPBAR ──────────────────────────────────────── */
+  .topbar {
+    height: 60px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.75rem;
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+    flex-shrink: 0;
+  }
+
+  .topbar-search {
+    position: relative;
+    width: 280px;
+  }
+  .topbar-search i {
+    position: absolute;
+    left: .85rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-size: 1rem;
+    pointer-events: none;
+  }
+  .topbar-search input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: .45rem 1rem .45rem 2.3rem;
+    font-size: .85rem;
+    font-family: inherit;
+    color: var(--dark);
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .topbar-search input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(108,79,240,.12);
+    background: var(--surface);
+  }
+  .topbar-search input::placeholder { color: var(--muted); }
+
+  .topbar-right { display: flex; align-items: center; gap: 1rem; }
+
+  .topbar-date {
+    font-size: .8rem;
+    color: var(--muted);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: .35rem .75rem;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .notif-btn {
+    position: relative;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 1rem;
+    transition: background .15s, color .15s;
+  }
+  .notif-btn:hover { background: var(--primary-soft); color: var(--primary); }
+  .notif-dot {
+    position: absolute;
+    top: 6px; right: 7px;
+    width: 7px; height: 7px;
+    background: var(--accent);
+    border-radius: 50%;
+    border: 1.5px solid var(--surface);
+  }
+
+  .user-chip {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    cursor: pointer;
+    padding: .3rem .75rem .3rem .35rem;
+    border-radius: 50px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .user-chip:hover { border-color: var(--primary-mid); box-shadow: var(--shadow-xs); }
+  .user-chip img {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .user-chip-name { font-weight: 600; font-size: .82rem; color: var(--dark); }
+  .user-chip-role { font-size: .72rem; color: var(--muted); text-transform: capitalize; }
+
+  /* ── CONTENT ─────────────────────────────────────── */
+  .content {
+    padding: 1.5rem 1.75rem;
+    flex: 1;
+    min-width: 0;
+    max-width: 1400px;
+    width: 100%;
+  }
+
+  /* Hero */
+  .hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .hero-title {
+    font-size: 1.7rem;
+    font-weight: 800;
+    color: var(--dark);
+    margin: 0 0 .2rem;
+    letter-spacing: -.02em;
+  }
+  .hero-sub { color: var(--muted); font-size: .9rem; margin: 0; }
+
+  /* ── 2-COLUMN GRID ───────────────────────────────── */
+  .dashboard-grid {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 1.25rem;
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .left-column {
+    flex: 1 1 0%;
+    min-width: 0;
+  }
+
+  .right-column {
+    flex: 0 0 340px;
+    max-width: 340px;
+    min-width: 0;
+  }
+
+  /* ── PANEL / CARD ────────────────────────────────── */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 1.25rem 1.4rem;
+    box-shadow: var(--shadow-xs);
+  }
+  .panel + .panel { margin-top: 1.25rem; }
+
+  .panel-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.1rem;
+  }
+  .panel-title {
+    font-size: .95rem;
+    font-weight: 700;
+    color: var(--dark);
+    margin: 0;
+    letter-spacing: -.01em;
+  }
+
+  /* ── KPI GRID ────────────────────────────────────── */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 1.1rem 1.2rem 1rem;
+    box-shadow: var(--shadow-xs);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform .2s, box-shadow .2s;
+  }
+  .kpi-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  }
+  .kpi-card.blue::before  { background: linear-gradient(90deg, #60A5FA, #93C5FD); }
+  .kpi-card.green::before { background: linear-gradient(90deg, #0FC4A7, #34D399); }
+  .kpi-card.purple::before{ background: linear-gradient(90deg, #6C4FF0, #A78BFA); }
+  .kpi-card.amber::before { background: linear-gradient(90deg, #F59E0B, #FDE68A); }
+  .kpi-card.red::before   { background: linear-gradient(90deg, #F45D6B, #FCA5A5); }
+
+  .kpi-icon-wrap {
+    width: 36px; height: 36px;
+    border-radius: var(--radius-md);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+    margin-bottom: .75rem;
+  }
+  .kpi-icon-wrap.blue   { background: #EFF6FF; color: #3B82F6; }
+  .kpi-icon-wrap.green  { background: #ECFDF5; color: #0FC4A7; }
+  .kpi-icon-wrap.purple { background: var(--primary-soft); color: var(--primary); }
+  .kpi-icon-wrap.amber  { background: #FFFBEB; color: #D97706; }
+  .kpi-icon-wrap.red    { background: #FEF2F2; color: #EF4444; }
+
+  .kpi-label {
+    font-size: .75rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    margin-bottom: .3rem;
+  }
+  .kpi-val {
+    font-size: 1.55rem;
+    font-weight: 800;
+    color: var(--dark);
+    letter-spacing: -.03em;
+    line-height: 1.1;
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    margin-bottom: .5rem;
+  }
+
+  .badge-trend {
+    font-size: .7rem;
+    font-weight: 700;
+    padding: .15rem .45rem;
+    border-radius: 50px;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+  }
+  .badge-trend.up   { background: #ECFDF5; color: #059669; }
+  .badge-trend.down { background: #FEF2F2; color: #DC2626; }
+  .badge-trend.flat { background: var(--bg); color: var(--muted); }
+
+  .kpi-footer-link {
+    font-size: .78rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: .25rem;
+    transition: gap .15s;
+  }
+  .kpi-footer-link:hover { gap: .45rem; }
+  .kpi-footer-link.blue   { color: #3B82F6; }
+  .kpi-footer-link.green  { color: #0FC4A7; }
+  .kpi-footer-link.purple { color: var(--primary); }
+  .kpi-footer-link.amber  { color: #D97706; }
+  .kpi-footer-link.red    { color: #EF4444; }
+
+  /* ── QUICK ACTIONS ───────────────────────────────── */
+  .quick-actions {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: .9rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .qa-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1rem .9rem .85rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .5rem;
+    text-decoration: none;
+    color: var(--body-text);
+    font-size: .82rem;
+    font-weight: 600;
+    text-align: center;
+    transition: all .2s;
+    box-shadow: var(--shadow-xs);
+  }
+  .qa-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: var(--primary-soft);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+  }
+  .qa-icon {
+    width: 38px; height: 38px;
+    border-radius: var(--radius-md);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+  }
+  .qa-icon.purple { background: var(--primary-soft); color: var(--primary); }
+  .qa-icon.blue   { background: #EFF6FF; color: #3B82F6; }
+  .qa-icon.green  { background: #ECFDF5; color: #0FC4A7; }
+  .qa-icon.amber  { background: #FFFBEB; color: #D97706; }
+
+  /* ── CHART PANEL ─────────────────────────────────── */
+  .chart-wrap {
+    position: relative;
+    height: 240px;
+    width: 100%;
+  }
+
+  /* ── AGENDA ──────────────────────────────────────── */
+  .agenda-list { list-style: none; padding: 0; margin: 0; }
+  .agenda-item {
+    display: flex;
+    align-items: center;
+    gap: .85rem;
+    padding: .85rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .agenda-item:last-child { border-bottom: none; padding-bottom: 0; }
+
+  .agenda-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .agenda-dot.purple { background: var(--primary); box-shadow: 0 0 0 3px rgba(108,79,240,.15); }
+  .agenda-dot.teal   { background: var(--secondary); box-shadow: 0 0 0 3px rgba(15,196,167,.15); }
+  .agenda-dot.amber  { background: var(--warning); box-shadow: 0 0 0 3px rgba(245,158,11,.15); }
+
+  .agenda-body { flex: 1; min-width: 0; }
+  .agenda-title {
+    font-size: .86rem;
+    font-weight: 600;
+    color: var(--dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0 0 2px;
+  }
+  .agenda-time { font-size: .75rem; color: var(--muted); }
+
+  .btn-pill {
+    padding: .3rem .75rem;
+    font-size: .75rem;
+    font-weight: 700;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: opacity .15s, transform .15s;
+    font-family: inherit;
+  }
+  .btn-pill:hover { opacity: .88; transform: scale(.97); }
+  .btn-pill.primary { background: var(--primary); color: #fff; }
+  .btn-pill.ghost   { background: var(--bg); color: var(--body-text); border: 1px solid var(--border); }
+
+  /* ── ALERTS ──────────────────────────────────────── */
+  .alert-card {
+    display: flex;
+    align-items: flex-start;
+    gap: .75rem;
+    padding: .85rem 1rem;
+    border-radius: var(--radius-lg);
+    margin-bottom: .75rem;
+    border: 1px solid transparent;
+  }
+  .alert-card:last-child { margin-bottom: 0; }
+  .alert-card.warn {
+    background: #FFFBEB;
+    border-color: #FDE68A;
+  }
+  .alert-card.danger {
+    background: #FFF1F2;
+    border-color: #FECDD3;
+  }
+  .alert-icon-box {
+    width: 32px; height: 32px;
+    border-radius: var(--radius-md);
+    display: flex; align-items: center; justify-content: center;
+    font-size: .95rem;
+    flex-shrink: 0;
+  }
+  .alert-card.warn .alert-icon-box   { background: #FEF3C7; color: #D97706; }
+  .alert-card.danger .alert-icon-box { background: #FFE4E6; color: #E11D48; }
+  .alert-title { font-size: .85rem; font-weight: 700; color: var(--dark); margin: 0 0 2px; }
+  .alert-sub   { font-size: .78rem; color: var(--muted); margin: 0; }
+
+  /* ── TIMELINE ────────────────────────────────────── */
+  .timeline { list-style: none; padding: 0; margin: 0; position: relative; }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 7px; top: 6px; bottom: 4px;
+    width: 2px;
+    background: var(--border);
+    border-radius: 2px;
+  }
+  .tl-item {
+    position: relative;
+    padding-left: 1.75rem;
+    padding-bottom: 1.2rem;
+  }
+  .tl-item:last-child { padding-bottom: 0; }
+  .tl-dot {
+    position: absolute;
+    left: 2px; top: 4px;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 2px solid var(--primary);
+    z-index: 1;
+  }
+  .tl-time { font-size: .73rem; color: var(--muted); display: block; margin-bottom: 2px; font-weight: 500; }
+  .tl-text { font-size: .83rem; color: var(--body-text); line-height: 1.45; }
+  .tl-text strong { color: var(--dark); font-weight: 700; }
+
+  /* ── FORM SELECT ─────────────────────────────────── */
+  .mini-select {
+    appearance: none;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: .3rem .65rem;
+    font-size: .78rem;
+    font-weight: 600;
+    font-family: inherit;
+    color: var(--body-text);
+    cursor: pointer;
+    outline: none;
+  }
+
+  /* ── "Ver todo" link ─────────────────────────────── */
+  .see-all {
+    font-size: .78rem;
+    font-weight: 600;
+    color: var(--primary);
+    text-decoration: none;
+  }
+  .see-all:hover { text-decoration: underline; }
+
+  /* ── RESPONSIVE ──────────────────────────────────── */
+  @media (max-width: 1280px) {
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .quick-actions { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 1024px) {
+    .dashboard-grid { 
+      flex-direction: column; 
+    }
+    .right-column {
+      flex: 1 1 auto;
+      max-width: 100%;
+      width: 100%;
+    }
+  }
+  @media (max-width: 992px) {
+    :root { --sidebar-w: 0px; }
+    .sidebar { transform: translateX(-248px); }
+    .sidebar.open { transform: translateX(0); width: 248px; min-width: 248px; }
+    .main-wrapper { margin-left: 0; width: 100%; }
+    .topbar { padding: 0 1rem; }
+    .content { padding: 1rem; }
+  }
+  @media (max-width: 640px) {
+    .kpi-grid { grid-template-columns: 1fr 1fr; }
+    .quick-actions { grid-template-columns: repeat(2, 1fr); }
+    .topbar-search, .topbar-date { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ── SIDEBAR ─────────────────────────────────── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img src="{% static 'img/logo.png' %}" alt="Eduteka">
+    </div>
+
+    <div style="padding: 0 .75rem .75rem;">
+      <div class="sidebar-school">
+        <div class="sidebar-school-name">{{ colegio.nombre|default:"Colegio San Arturo" }}</div>
+        <div class="sidebar-school-sub">Año Escolar {{ suscripcion.periodo_academico|default:"2026" }}</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Principal</div>
+      <a href="#" class="nav-item active"><i class="bi bi-house-fill"></i> Inicio</a>
+      <a href="#" class="nav-item"><i class="bi bi-book"></i> Académico</a>
+      <a href="#" class="nav-item"><i class="bi bi-calendar-check"></i> Asistencia</a>
+      <a href="#" class="nav-item"><i class="bi bi-calendar3"></i> Calendario</a>
+      <a href="#" class="nav-item"><i class="bi bi-bar-chart"></i> Reportes</a>
+
+      <div class="nav-section-label" style="margin-top:.75rem;">Administración</div>
+      <a href="#" class="nav-item"><i class="bi bi-wallet2"></i> Contabilidad</a>
+      <a href="#" class="nav-item"><i class="bi bi-truck"></i> Proveedores</a>
+      <a href="#" class="nav-item"><i class="bi bi-award"></i> SIMCE</a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="#" class="nav-item"><i class="bi bi-gear"></i> Configuración</a>
+      <a href="{% url 'logout' %}" class="nav-item" style="color:#EF4444;">
+        <i class="bi bi-box-arrow-right" style="color:#EF4444;"></i> Cerrar Sesión
+      </a>
+    </div>
+  </aside>
+
+  <!-- ── MAIN WRAPPER ────────────────────────────── -->
+  <div class="main-wrapper">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:.75rem;">
+        <button class="notif-btn d-lg-none" id="mobileMenuBtn" style="border:none;">
+          <i class="bi bi-list" style="font-size:1.2rem;"></i>
+        </button>
+        <div class="topbar-search d-none d-md-block">
+          <i class="bi bi-search"></i>
+          <input type="text" placeholder="Buscar alumnos, cursos…">
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <div class="topbar-date d-none d-sm-block">
+          <i class="bi bi-calendar3" style="margin-right:.35rem;"></i>Jueves, 28 May 2026
+        </div>
+        <button class="notif-btn">
+          <i class="bi bi-bell"></i>
+          <span class="notif-dot"></span>
+        </button>
+        <div class="user-chip dropdown-toggle" data-bs-toggle="dropdown">
+          <img src="https://ui-avatars.com/api/?name={{ request.user.first_name|default:'C' }}+{{ request.user.last_name|default:'A' }}&background=7C5CFC&color=fff" alt="Avatar">
+          <div class="d-none d-sm-block">
+            <div class="user-chip-name">{{ request.user.first_name|default:'Usuario' }} {{ request.user.last_name|default:'' }}</div>
+            <div class="user-chip-role">Administrador</div>
+          </div>
+        </div>
+        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" style="font-size:.85rem;border-radius:var(--radius-lg);border:1px solid var(--border)!important;">
+          <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i> Mi Perfil</a></li>
+          <li><a class="dropdown-item" href="#"><i class="bi bi-building me-2"></i> Cambiar Institución</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item text-danger" href="{% url 'logout' %}"><i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión</a></li>
+        </ul>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="content">
+
+      <!-- Hero -->
+      <div class="hero">
+        <div>
+          <h1 class="hero-title">Buenos días, {{ request.user.first_name|default:request.user.username }} 👋</h1>
+          <p class="hero-sub">Resumen general de tu institución al día de hoy.</p>
+        </div>
+      </div>
+      
+      {% if messages %}
+      <div class="mb-4">
+          {% for message in messages %}
+          <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert" style="border-radius: var(--radius-md);">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          {% endfor %}
+      </div>
+      {% endif %}
+
+      <!-- DASHBOARD GRID -->
+      <div class="dashboard-grid">
+
+        <!-- ── LEFT COLUMN ── -->
+        <div class="left-column">
+
+          <!-- KPIs -->
+          <div class="kpi-grid">
+            <div class="kpi-card blue">
+              <div class="kpi-icon-wrap blue"><i class="bi bi-puzzle-fill"></i></div>
+              <div class="kpi-label">Módulos Activos</div>
+              <div class="kpi-val">{{ modulos_activos_count|default:"0" }} <span class="badge-trend flat"><i class="bi bi-dash"></i></span></div>
+              <a href="#" class="kpi-footer-link blue">Ver módulos <i class="bi bi-arrow-right"></i></a>
+            </div>
+            <div class="kpi-card green">
+              <div class="kpi-icon-wrap green"><i class="bi bi-check-circle-fill"></i></div>
+              <div class="kpi-label">Usuarios Activos</div>
+              <div class="kpi-val">{{ usuarios_colegio_count|default:"0" }} <span class="badge-trend flat"><i class="bi bi-dash"></i></span></div>
+              <a href="#" class="kpi-footer-link green">Ver usuarios <i class="bi bi-arrow-right"></i></a>
+            </div>
+            <div class="kpi-card purple">
+              <div class="kpi-icon-wrap purple"><i class="bi bi-person-plus-fill"></i></div>
+              <div class="kpi-label">Solicitudes Pendientes</div>
+              <div class="kpi-val">{{ solicitudes_pendientes_count|default:"0" }} <span class="badge-trend up"><i class="bi bi-arrow-up-short"></i>Nuevas</span></div>
+              <a href="#solicitudes" class="kpi-footer-link purple">Gestionar <i class="bi bi-arrow-right"></i></a>
+            </div>
+            <div class="kpi-card amber">
+              <div class="kpi-icon-wrap amber"><i class="bi bi-shield-check"></i></div>
+              <div class="kpi-label">Plan Actual</div>
+              <div class="kpi-val" style="font-size: 1.1rem; padding-top: 0.4rem;">{{ suscripcion.plan.nombre|default:"Profesional" }}</div>
+              <a href="#" class="kpi-footer-link amber">Ver detalles <i class="bi bi-arrow-right"></i></a>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="quick-actions">
+            <a href="#" class="qa-btn">
+              <div class="qa-icon purple"><i class="bi bi-clipboard-check"></i></div>
+              Registrar Asistencia
+            </a>
+            <a href="#" class="qa-btn">
+              <div class="qa-icon blue"><i class="bi bi-journal-arrow-up"></i></div>
+              Subir Notas
+            </a>
+            <a href="#" class="qa-btn">
+              <div class="qa-icon green"><i class="bi bi-file-earmark-bar-graph"></i></div>
+              Generar Reporte
+            </a>
+            <a href="#" class="qa-btn">
+              <div class="qa-icon amber"><i class="bi bi-camera-video"></i></div>
+              Crear Reunión
+            </a>
+          </div>
+
+          <!-- Solicitudes Pendientes -->
+          <div class="panel" id="solicitudes" style="margin-bottom: 1.25rem;">
+            <div class="panel-head">
+              <h3 class="panel-title">Solicitudes de Acceso Pendientes</h3>
+              <span style="background:var(--primary-soft);color:var(--primary);font-size:.7rem;font-weight:700;padding:.2rem .55rem;border-radius:50px;">{{ solicitudes_pendientes_count|default:"0" }} nuevas</span>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-borderless align-middle custom-table mb-0">
+                <thead style="border-bottom: 1px solid var(--border);">
+                  <tr>
+                    <th style="color: var(--muted); font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">Usuario</th>
+                    <th style="color: var(--muted); font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">Correo</th>
+                    <th style="color: var(--muted); font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">Rol Solicitado</th>
+                    <th style="color: var(--muted); font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">Fecha</th>
+                    <th style="color: var(--muted); font-size: 0.8rem; font-weight: 600; text-transform: uppercase; text-align: right;">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for solicitud in solicitudes_pendientes %}
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center gap-2">
+                        <img src="https://ui-avatars.com/api/?name={{ solicitud.usuario.first_name|default:solicitud.usuario.email }}+{{ solicitud.usuario.last_name|default:'' }}&background=F0EDFF&color=7C5CFC" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%;">
+                        <span style="font-weight: 600; color: var(--dark); font-size: 0.85rem;">{{ solicitud.usuario.get_full_name|default:solicitud.usuario.email }}</span>
+                      </div>
+                    </td>
+                    <td style="color: var(--muted); font-size: 0.85rem;">{{ solicitud.usuario.email }}</td>
+                    <td><span style="background: var(--bg); color: var(--body-text); padding: 0.2rem 0.6rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--border);">{{ solicitud.get_rol_solicitado_display|default:solicitud.rol_solicitado|title }}</span></td>
+                    <td style="color: var(--muted); font-size: 0.85rem;">{{ solicitud.fecha_solicitud|date:"d M, Y" }}</td>
+                    <td style="text-align: right; white-space: nowrap;">
+                      <button type="button" data-url="{% url 'aprobar_solicitud' solicitud.id %}" data-username="{{ solicitud.usuario.get_full_name|default:solicitud.usuario.email }}" data-rolename="{{ solicitud.get_rol_solicitado_display|default:solicitud.rol_solicitado|title }}" onclick="abrirModalAprobar(this)" class="btn btn-sm" style="background: #ECFDF5; color: #059669; border: 1px solid #A7F3D0; font-weight: 600; font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 6px;" title="Aprobar"><i class="bi bi-check-lg"></i></button>
+                      <button type="button" data-url="{% url 'rechazar_solicitud' solicitud.id %}" data-username="{{ solicitud.usuario.get_full_name|default:solicitud.usuario.email }}" onclick="abrirModalRechazar(this)" class="btn btn-sm ms-1" style="background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA; font-weight: 600; font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 6px;" title="Rechazar"><i class="bi bi-x-lg"></i></button>
+                    </td>
+                  </tr>
+                  {% empty %}
+                  <tr>
+                    <td colspan="5" style="text-align: center; padding: 2rem; color: var(--muted); font-size: 0.85rem;">
+                      No hay solicitudes pendientes en este momento.
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Chart -->
+          <div class="panel">
+            <div class="panel-head">
+              <h3 class="panel-title">Evolución de Asistencia</h3>
+              <select class="mini-select">
+                <option>Últimos 6 meses</option>
+                <option>Este mes</option>
+              </select>
+            </div>
+            <div class="chart-wrap">
+              <canvas id="mainChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── RIGHT COLUMN ── -->
+        <div class="right-column">
+
+          <!-- Agenda Hoy -->
+          <div class="panel">
+            <div class="panel-head">
+              <h3 class="panel-title">Mi Agenda Hoy</h3>
+              <a href="#" class="see-all">Ver todo</a>
+            </div>
+            <ul class="agenda-list">
+              <li class="agenda-item">
+                <span class="agenda-dot purple"></span>
+                <div class="agenda-body">
+                  <p class="agenda-title">Matemáticas 2° Medio B · Sala 14</p>
+                  <span class="agenda-time"><i class="bi bi-clock" style="margin-right:.25rem;"></i>09:15 hrs</span>
+                </div>
+                <button class="btn-pill primary">Pasar Lista</button>
+              </li>
+              <li class="agenda-item">
+                <span class="agenda-dot teal"></span>
+                <div class="agenda-body">
+                  <p class="agenda-title">Reunión Equipo Directivo</p>
+                  <span class="agenda-time"><i class="bi bi-clock" style="margin-right:.25rem;"></i>11:30 hrs</span>
+                </div>
+                <button class="btn-pill ghost">Ver Orden</button>
+              </li>
+              <li class="agenda-item">
+                <span class="agenda-dot amber"></span>
+                <div class="agenda-body">
+                  <p class="agenda-title">Calificar Historia 1° Medio A</p>
+                  <span class="agenda-time"><i class="bi bi-clock" style="margin-right:.25rem;"></i>14:00 hrs</span>
+                </div>
+                <button class="btn-pill primary">Subir Notas</button>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Alertas -->
+          <div class="panel" style="margin-top:1.25rem;">
+            <div class="panel-head">
+              <h3 class="panel-title">Alertas del Sistema</h3>
+              <span style="background:#FEF2F2;color:#EF4444;font-size:.7rem;font-weight:700;padding:.2rem .55rem;border-radius:50px;">3 activas</span>
+            </div>
+            <div>
+              <div class="alert-card warn">
+                <div class="alert-icon-box"><i class="bi bi-exclamation-circle-fill"></i></div>
+                <div>
+                  <p class="alert-title">12 alumnos con asistencia crítica</p>
+                  <p class="alert-sub">Menor al 85% este semestre.</p>
+                </div>
+              </div>
+              <div class="alert-card danger">
+                <div class="alert-icon-box"><i class="bi bi-x-circle-fill"></i></div>
+                <div>
+                  <p class="alert-title">3 cursos sin registro hoy</p>
+                  <p class="alert-sub">Falta asistencia en 2°A, 3°B y 4°C.</p>
+                </div>
+              </div>
+              <div class="alert-card warn">
+                <div class="alert-icon-box"><i class="bi bi-wallet-fill"></i></div>
+                <div>
+                  <p class="alert-title">Pagos pendientes</p>
+                  <p class="alert-sub">Vencimiento de proveedores en 2 días.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actividad Reciente -->
+          <div class="panel" style="margin-top:1.25rem;">
+            <div class="panel-head">
+              <h3 class="panel-title">Actividad Reciente</h3>
+              <a href="#" class="see-all">Ver todo</a>
+            </div>
+            <ul class="timeline">
+              {% for sol in ultimas_solicitudes %}
+              <li class="tl-item">
+                <span class="tl-dot"></span>
+                <span class="tl-time">{{ sol.fecha_solicitud|timesince }}</span>
+                <p class="tl-text"><strong>{{ sol.usuario.get_full_name|default:sol.usuario.email }}</strong> solicitó acceso como {{ sol.rol_solicitado|title }}.</p>
+              </li>
+              {% empty %}
+              <li class="tl-item">
+                <span class="tl-dot"></span>
+                <span class="tl-time">Ahora</span>
+                <p class="tl-text">No hay actividad reciente para mostrar.</p>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+
+        </div><!-- /right column -->
+      </div><!-- /dashboard-grid -->
+
+    </main>
+  </div><!-- /main-wrapper -->
+</div><!-- /app-shell -->
+
+<!-- Modal Confirmar Aprobación -->
+<div class="modal fade" id="modalConfirmarAprobacion" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content" style="border-radius: var(--radius-xl); border: none; box-shadow: var(--shadow-lg);">
+      <div class="modal-body text-center" style="padding: 2.5rem 1.5rem 1.5rem;">
+        <div style="width: 64px; height: 64px; background: #ECFDF5; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem;">
+          <i class="bi bi-shield-check" style="font-size: 2rem; color: #10b981;"></i>
+        </div>
+        <h5 style="font-weight: 800; color: var(--dark); font-size: 1.25rem; margin-bottom: 0.75rem;">Aprobar Acceso</h5>
+        <p style="color: var(--muted); font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.5;">
+          ¿Confirma que desea otorgar acceso a la plataforma a <strong id="modalAprobarUserName" style="color: var(--dark);"></strong>?
+        </p>
+        
+        <div style="background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1.5rem; text-align: left;">
+          <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--muted); font-weight: 700; margin-bottom: 0.25rem;">Rol Asignado</div>
+          <div style="font-weight: 600; color: var(--primary); font-size: 0.95rem;" id="modalAprobarRoleName"></div>
+        </div>
+
+        <div class="d-flex gap-2 w-100">
+          <button type="button" class="btn btn-light flex-fill" data-bs-dismiss="modal" style="font-weight: 600; border-radius: var(--radius-md); font-size: 0.95rem; padding: 0.6rem;">Cancelar</button>
+          <form id="formAprobarSolicitud" method="POST" action="" class="flex-fill m-0">
+              {% csrf_token %}
+              <button type="submit" class="btn w-100" style="background: #10b981; color: white; border: none; font-weight: 600; border-radius: var(--radius-md); font-size: 0.95rem; padding: 0.6rem;">Sí, aprobar</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Confirmar Rechazo -->
+<div class="modal fade" id="modalConfirmarRechazo" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content" style="border-radius: var(--radius-xl); border: none; box-shadow: var(--shadow-lg);">
+      <div class="modal-body text-center" style="padding: 2.5rem 1.5rem 1.5rem;">
+        <div style="width: 64px; height: 64px; background: #FEF2F2; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem;">
+          <i class="bi bi-x-octagon" style="font-size: 2rem; color: #ef4444;"></i>
+        </div>
+        <h5 style="font-weight: 800; color: var(--dark); font-size: 1.25rem; margin-bottom: 0.75rem;">Rechazar Solicitud</h5>
+        <p style="color: var(--muted); font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.5;">
+          ¿Confirma que desea denegar el acceso al colegio a <strong id="modalRechazarUserName" style="color: var(--dark);"></strong>?
+        </p>
+        
+        <div style="background: #FFF1F2; border: 1px solid #FECDD3; border-radius: var(--radius-md); padding: 0.85rem; margin-bottom: 1.5rem; text-align: left; display: flex; gap: 0.75rem; align-items: flex-start;">
+          <i class="bi bi-exclamation-triangle-fill" style="color: #ef4444; font-size: 1.1rem; margin-top: 0.1rem;"></i>
+          <div>
+            <div style="font-size: 0.8rem; color: #BE123C; font-weight: 700; margin-bottom: 0.1rem;">Acción Irreversible</div>
+            <div style="font-size: 0.8rem; color: #E11D48; line-height: 1.4;">El usuario no podrá acceder a la plataforma.</div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-2 w-100">
+          <button type="button" class="btn btn-light flex-fill" data-bs-dismiss="modal" style="font-weight: 600; border-radius: var(--radius-md); font-size: 0.95rem; padding: 0.6rem;">Cancelar</button>
+          <form id="formRechazarSolicitud" method="POST" action="" class="flex-fill m-0">
+              {% csrf_token %}
+              <button type="submit" class="btn w-100" style="background: #ef4444; color: white; border: none; font-weight: 600; border-radius: var(--radius-md); font-size: 0.95rem; padding: 0.6rem;">Sí, rechazar</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+function abrirModalAprobar(btn) {
+      document.getElementById('formAprobarSolicitud').action = btn.getAttribute('data-url');
+      document.getElementById('modalAprobarUserName').textContent = btn.getAttribute('data-username');
+      document.getElementById('modalAprobarRoleName').textContent = btn.getAttribute('data-rolename');
+      var myModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalConfirmarAprobacion'));
+      myModal.show();
+  }
+
+function abrirModalRechazar(btn) {
+      document.getElementById('formRechazarSolicitud').action = btn.getAttribute('data-url');
+      document.getElementById('modalRechazarUserName').textContent = btn.getAttribute('data-username');
+      var myModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalConfirmarRechazo'));
+      myModal.show();
+  }
+
+document.addEventListener('DOMContentLoaded', function() {
+
+  // Mobile sidebar toggle
+  const mobileBtn = document.getElementById('mobileMenuBtn');
+  const sidebar   = document.getElementById('sidebar');
+  if (mobileBtn) {
+    mobileBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('open');
+    });
+  }
+
+  // Chart
+  const ctx = document.getElementById('mainChart').getContext('2d');
+
+  const grad = ctx.createLinearGradient(0, 0, 0, 240);
+  grad.addColorStop(0, 'rgba(108,79,240,.22)');
+  grad.addColorStop(1, 'rgba(108,79,240,.0)');
+
+  Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+  Chart.defaults.color = '#8892B0';
+
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
+      datasets: [{
+        label: 'Asistencia (%)',
+        data: [90, 92, 88, 94, 95, 92],
+        borderColor: '#6C4FF0',
+        backgroundColor: grad,
+        borderWidth: 2.5,
+        pointBackgroundColor: '#FFFFFF',
+        pointBorderColor: '#6C4FF0',
+        pointBorderWidth: 2,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        fill: true,
+        tension: 0.45
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#0F1629',
+          padding: 10,
+          cornerRadius: 8,
+          titleFont: { size: 12, weight: '600' },
+          bodyFont: { size: 12 },
+          displayColors: false,
+          callbacks: {
+            label: c => c.parsed.y + '% Asistencia'
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          border: { display: false },
+          ticks: { font: { size: 12, weight: '500' } }
+        },
+        y: {
+          min: 80, max: 100,
+          grid: { color: '#E4E6F0', borderDash: [4,4] },
+          border: { display: false, dash: [4,4] },
+          ticks: {
+            stepSize: 5,
+            font: { size: 12 },
+            callback: v => v + '%'
+          }
+        }
+      },
+      interaction: { mode: 'index', intersect: false }
+    }
+  });
+
+});
+</script>
+</body>
+</html>
