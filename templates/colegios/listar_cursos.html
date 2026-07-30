@@ -1,0 +1,491 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estructura Escolar | Eduteka</title>
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary: #7C5CFC;
+      --primary-soft: rgba(124, 92, 252, 0.08);
+      --primary-hover: #6747E3;
+      --secondary: #65CDBF;
+      --bg: #F8F9FD;
+      --white: #FFFFFF;
+      --dark: #151A35;
+      --gray-text: #687089;
+      --border: #BCC0CF;
+      --radius-lg: 16px;
+      --radius-md: 10px;
+      --radius-sm: 8px;
+    }
+
+    * {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+    }
+
+    /* WRAPPER & SIDEBAR */
+    .wrapper {
+      display: flex;
+      flex: 1;
+      position: relative;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 248px;
+      min-width: 248px;
+      flex-shrink: 0;
+      background: var(--white);
+      border-right: 1px solid var(--border);
+      position: fixed;
+      top: 0; bottom: 0; left: 0;
+      display: flex;
+      flex-direction: column;
+      z-index: 1040;
+      transition: transform .3s ease;
+    }
+
+    @media (max-width: 991.98px) {
+      .sidebar {
+        position: absolute;
+        left: -248px;
+        top: 0;
+        bottom: 0;
+        z-index: 1050;
+      }
+      .sidebar.active {
+        left: 0;
+      }
+    }
+
+    .sidebar-logo {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1.4rem 1.5rem 1rem;
+    }
+    .sidebar-logo img { max-height: 100px; width: auto; }
+
+    .sidebar-school {
+      margin: 0 1rem .75rem;
+      background: linear-gradient(135deg, var(--primary-soft) 0%, #E8E2FF 100%);
+      border-radius: var(--radius-lg);
+      padding: .9rem 1rem;
+    }
+    .sidebar-school-name {
+      font-weight: 700;
+      font-size: .85rem;
+      color: var(--primary);
+      margin-bottom: 2px;
+    }
+    .sidebar-school-sub {
+      font-size: .75rem;
+      color: var(--primary-hover);
+      font-weight: 500;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      overflow-y: auto;
+      padding: .75rem .75rem 0;
+      scrollbar-width: none;
+    }
+    .sidebar-nav::-webkit-scrollbar { display: none; }
+
+    .nav-section-label {
+      font-size: .67rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--gray-text);
+      padding: .5rem .75rem .3rem;
+      margin-top: .25rem;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      padding: .6rem .85rem;
+      color: var(--gray-text);
+      font-weight: 500;
+      font-size: .88rem;
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      transition: background .15s, color .15s;
+      margin-bottom: 2px;
+    }
+    .nav-item i { font-size: 1.05rem; flex-shrink: 0; }
+    .nav-item:hover { background: var(--bg); color: var(--dark); }
+    .nav-item.active {
+      background: var(--primary);
+      color: #fff;
+      font-weight: 600;
+      box-shadow: 0 4px 14px rgba(108,79,240,.3);
+    }
+    .nav-item.active i { color: #fff; }
+
+    .sidebar-footer {
+      padding: .75rem;
+      border-top: 1px solid var(--border);
+      margin-top: auto;
+    }
+
+    /* Estilos para letras/secciones */
+    .letra-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--border);
+      background: var(--white);
+      color: var(--gray-text);
+      font-weight: 700;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all .2s;
+      user-select: none;
+    }
+    .letra-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: var(--primary-soft);
+    }
+    .letter-checkbox:checked + .letra-btn {
+      background-color: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+      box-shadow: 0 3px 10px rgba(124,92,252,.3);
+    }
+    .letter-checkbox { display: none; }
+
+    /* MAIN CONTENT */
+    .main-content {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      margin-left: 248px;
+      width: calc(100% - 248px);
+    }
+
+    @media (max-width: 991.98px) {
+      .main-content {
+        margin-left: 0;
+        width: 100%;
+      }
+    }
+
+    .topbar {
+      height: 70px;
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      z-index: 98;
+    }
+
+    .content-body {
+      padding: 2rem;
+      flex-grow: 1;
+    }
+
+    /* DASHBOARD CARDS & TABLE */
+    .dashboard-panel {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+      margin-bottom: 2rem;
+    }
+
+    .curso-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .curso-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.03);
+    }
+
+    .badge-section {
+      background: var(--primary-soft);
+      color: var(--primary);
+      border: 1px solid var(--border);
+      font-weight: 600;
+      padding: 0.4rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .badge-section.inactive {
+      background: #FFF1F2;
+      color: #F43F5E;
+      border: 1px solid #FECDD3;
+    }
+  </style>
+</head>
+<body>
+
+<div class="wrapper">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img src="{% static 'img/logo.png' %}" alt="Eduteka">
+    </div>
+
+    <div style="padding: 0 .75rem .75rem;">
+      <div class="sidebar-school">
+        <div class="sidebar-school-name">{{ colegio.nombre|default:"Mi Colegio" }}</div>
+        <div class="sidebar-school-sub">Año Escolar {{ periodo.anio_academico|default:"Actual" }}</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Menú Principal</div>
+      <a href="{% url 'dashboard_usuario' %}" class="nav-item"><i class="bi bi-house"></i> Inicio</a>
+      <a href="{% url 'listar_estudiantes' %}" class="nav-item"><i class="bi bi-people"></i> Estudiantes</a>
+      <a href="{% url 'listar_asignaturas' %}" class="nav-item"><i class="bi bi-book"></i> Académico</a>
+      <a href="{% url 'listar_cursos' %}" class="nav-item active"><i class="bi bi-diagram-3"></i> Cursos</a>
+      <a href="{% url 'listar_personal' %}" class="nav-item"><i class="bi bi-person-badge"></i> Personal</a>
+      <a href="{% url 'registrar_asistencia' %}" class="nav-item"><i class="bi bi-calendar-check"></i> Asistencia</a>
+      <a href="#" class="nav-item"><i class="bi bi-calendar3"></i> Calendario</a>
+      <a href="{% url 'historial_asistencia' %}" class="nav-item"><i class="bi bi-bar-chart"></i> Reportes</a>
+
+      <div class="nav-section-label" style="margin-top:.75rem;">Administración</div>
+      <a href="#" class="nav-item"><i class="bi bi-wallet2"></i> Contabilidad</a>
+      <a href="#" class="nav-item"><i class="bi bi-truck"></i> Proveedores</a>
+      <a href="#" class="nav-item"><i class="bi bi-award"></i> SIMCE</a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="#" class="nav-item"><i class="bi bi-gear"></i> Configuración</a>
+      <a href="{% url 'logout' %}" class="nav-item" style="color:#EF4444;">
+        <i class="bi bi-box-arrow-right" style="color:#EF4444;"></i> Cerrar Sesión
+      </a>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+    <header class="topbar">
+      <div>
+        <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn" style="border:none; background:var(--primary-soft); color:var(--primary);">
+          <i class="bi bi-list fs-5"></i>
+        </button>
+        <span class="fw-bold text-dark"><i class="bi bi-diagram-3 text-primary me-2"></i>Estructura Académica</span>
+      </div>
+      <div class="topbar-right">
+        <div class="text-muted small fw-semibold">
+          <i class="bi bi-calendar3 me-1"></i> {{ hoy|date:"l, d \d\e F \d\e Y"|title }}
+        </div>
+      </div>
+    </header>
+
+    <main class="content-body">
+      <!-- Mensajes Django -->
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show shadow-sm mb-4" role="alert" style="border-radius: var(--radius-md);">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <!-- Header & Action -->
+      <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <div>
+          <h2 class="fw-bold text-dark mb-0">Niveles Escolares y Cursos</h2>
+          <p class="text-muted mb-0">Administra los cursos de tu colegio y agrega las secciones o letras correspondientes.</p>
+        </div>
+        {% if is_admin %}
+          <button class="btn btn-primary d-flex align-items-center gap-2 px-4 py-2" style="border-radius: var(--radius-md); font-weight:700;" data-bs-toggle="modal" data-bs-target="#modalCrearCurso">
+            <i class="bi bi-plus-lg"></i> Agregar Nivel Escolar
+          </button>
+        {% endif %}
+      </div>
+
+      <!-- Cursos list -->
+      <div class="row">
+        {% if cursos_con_secciones %}
+          {% for item in cursos_con_secciones %}
+            <div class="col-md-6 mb-4">
+              <div class="curso-card">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                  <div>
+                    <h4 class="fw-bold text-dark mb-1">{{ item.curso.nombre }}</h4>
+                    <span class="badge {% if item.curso.activo %}bg-success-light text-success{% else %}bg-danger-light text-danger{% endif %} small" style="background-color: {% if item.curso.activo %}#ECFDF5{% else %}#FFF1F2{% endif %}; border: 1px solid {% if item.curso.activo %}#A7F3D0{% else %}#FECDD3{% endif %}; font-size:0.75rem;">
+                      {% if item.curso.activo %}Activo{% else %}Inactivo{% endif %}
+                    </span>
+                  </div>
+                  
+                  {% if is_admin %}
+                    <div class="dropdown">
+                      <button class="btn btn-light btn-sm border" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: var(--radius-sm);">
+                        <i class="bi bi-three-dots-vertical"></i>
+                      </button>
+                      <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="border-radius: var(--radius-md);">
+                        <li>
+                          <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modalEditarCurso{{ item.curso.id }}">
+                            <i class="bi bi-pencil me-2 text-warning"></i> Editar Nombre
+                          </button>
+                        </li>
+                        <li>
+                          <a class="dropdown-item {% if item.curso.activo %}text-danger{% else %}text-success{% endif %}" href="{% url 'baja_curso' item.curso.id %}">
+                            <i class="bi {% if item.curso.activo %}bi-slash-circle text-danger{% else %}bi-check-circle text-success{% endif %} me-2"></i>
+                            {% if item.curso.activo %}Desactivar Nivel{% else %}Activar Nivel{% endif %}
+                          </a>
+                        </li>
+                      </ul>
+                    </div>
+                  {% endif %}
+                </div>
+
+                <!-- Secciones -->
+                <div class="mb-4">
+                  <div class="text-muted small fw-bold mb-2">Secciones Registradas:</div>
+                  <div class="d-flex flex-wrap gap-2">
+                    {% if item.secciones %}
+                      {% for sec in item.secciones %}
+                        <span class="badge-section {% if not sec.activo %}inactive{% endif %}">
+                          {{ sec.nombre }}
+                          {% if is_admin %}
+                            <a href="{% url 'baja_seccion' sec.id %}" class="ms-1 text-decoration-none text-danger" title="Eliminar Sección" onclick="return confirm('¿Seguro que deseas eliminar esta sección?')">
+                              <i class="bi bi-x-circle" style="font-size: 0.75rem;"></i>
+                            </a>
+                          {% endif %}
+                        </span>
+                      {% endfor %}
+                    {% else %}
+                      <span class="text-muted small italic">Sin secciones registradas</span>
+                    {% endif %}
+                  </div>
+                </div>
+
+                <!-- Botón rápido para agregar sección -->
+                {% if is_admin and item.curso.activo %}
+                  <div class="border-top pt-3">
+                    <div class="text-muted small fw-bold mb-2">Agregar Letras/Secciones:</div>
+                    <form method="POST" action="{% url 'crear_seccion' item.curso.id %}" class="d-flex flex-wrap gap-2 align-items-center">
+                      {% csrf_token %}
+                      {% for letra in "ABCDEFGH"|make_list %}
+                        <input class="letter-checkbox" type="checkbox" name="secciones_nuevas" value="Sección {{ letra }}" id="letra_{{ item.curso.id }}_{{ letra }}">
+                        <label class="letra-btn" for="letra_{{ item.curso.id }}_{{ letra }}" title="Sección {{ letra }}">{{ letra }}</label>
+                      {% endfor %}
+                      <button type="submit" class="btn btn-sm btn-primary px-3 fw-bold ms-1" style="border-radius: var(--radius-sm); font-size:0.8rem; height:34px;">
+                        <i class="bi bi-plus-lg me-1"></i>Agregar
+                      </button>
+                    </form>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+
+            <!-- MODAL EDITAR CURSO -->
+            <div class="modal fade" id="modalEditarCurso{{ item.curso.id }}" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content" style="border-radius: var(--radius-md); border:none;">
+                  <div class="modal-header border-bottom-0">
+                    <h5 class="fw-bold">Editar Nombre de Curso</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <form method="POST" action="{% url 'editar_curso' item.curso.id %}">
+                    {% csrf_token %}
+                    <div class="modal-body pt-0">
+                      <div class="mb-3">
+                        <label class="form-label small fw-bold">Nombre del Curso</label>
+                        <input type="text" name="nombre" value="{{ item.curso.nombre }}" class="form-control" required style="border-color: var(--border);">
+                      </div>
+                    </div>
+                    <div class="modal-footer border-top-0">
+                      <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                      <button type="submit" class="btn btn-primary fw-bold">Guardar Cambios</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+          {% endfor %}
+        {% else %}
+          <div class="col-12">
+            <div class="dashboard-panel text-center p-5">
+              <i class="bi bi-diagram-3 fs-1 text-muted mb-3 d-block"></i>
+              <h5 class="fw-bold text-secondary">No hay cursos registrados</h5>
+              <p class="text-muted">Crea el primer nivel escolar para el establecimiento usando el botón superior.</p>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- MODAL CREAR CURSO -->
+<div class="modal fade" id="modalCrearCurso" tabindex="-1" aria-labelledby="modalCrearCursoLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius: var(--radius-md); border:none; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+      <div class="modal-header border-bottom-0 p-4">
+        <h5 class="modal-title fw-bold" id="modalCrearCursoLabel">Crear Nuevo Nivel Escolar</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="POST" action="{% url 'crear_curso' %}">
+        {% csrf_token %}
+        <div class="modal-body p-4 pt-0">
+          <div class="mb-3">
+            <label for="nombre_curso" class="form-label small fw-bold text-dark">Nombre del Nivel</label>
+            <input type="text" class="form-control" id="nombre_curso" name="nombre" placeholder="Ej: 3° Básico" required style="border-color: var(--border);">
+          </div>
+        </div>
+        <div class="modal-footer border-top-0 p-4 pt-0">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary fw-bold">Crear Curso</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const mobileBtn = document.getElementById('mobileMenuBtn');
+    const sidebar = document.getElementById('sidebar');
+    if(mobileBtn) {
+      mobileBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('active');
+      });
+    }
+  });
+</script>
+</body>
+</html>

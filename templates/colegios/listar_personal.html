@@ -1,0 +1,425 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Equipo Escolar | Eduteka</title>
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary: #7C5CFC;
+      --primary-soft: rgba(124, 92, 252, 0.08);
+      --primary-hover: #6747E3;
+      --secondary: #65CDBF;
+      --bg: #F8F9FD;
+      --white: #FFFFFF;
+      --dark: #151A35;
+      --gray-text: #687089;
+      --border: #BCC0CF;
+      --radius-lg: 16px;
+      --radius-md: 10px;
+      --radius-sm: 8px;
+    }
+
+    * {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+    }
+
+    /* WRAPPER & SIDEBAR */
+    .wrapper {
+      display: flex;
+      flex: 1;
+      position: relative;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 260px;
+      background: var(--white);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; bottom: 0; left: 0;
+      z-index: 1040;
+      transition: transform 0.3s ease;
+    }
+
+    @media (max-width: 991.98px) {
+      .sidebar {
+        position: absolute;
+        left: -260px;
+        top: 0;
+        bottom: 0;
+        z-index: 1050;
+      }
+      .sidebar.active {
+        left: 0;
+      }
+    }
+
+    .sidebar-logo {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1.4rem 1.5rem 1rem;
+    }
+    .sidebar-logo img { max-height: 100px; width: auto; }
+
+    .sidebar-school {
+      margin: 0 .75rem .75rem;
+      background: linear-gradient(135deg, var(--primary-soft) 0%, #E8E2FF 100%);
+      border-radius: var(--radius-lg);
+      padding: .9rem 1rem;
+    }
+    .sidebar-school-name {
+      font-weight: 700;
+      font-size: .85rem;
+      color: var(--primary);
+      margin-bottom: 2px;
+    }
+    .sidebar-school-sub {
+      font-size: .75rem;
+      color: var(--primary-hover);
+      font-weight: 500;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      overflow-y: auto;
+      padding: .75rem .75rem 0;
+      scrollbar-width: none;
+    }
+    .sidebar-nav::-webkit-scrollbar { display: none; }
+
+    .nav-section-label {
+      font-size: .67rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--gray-text);
+      padding: .5rem .75rem .3rem;
+      margin-top: .25rem;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      padding: .6rem .85rem;
+      color: var(--gray-text);
+      font-weight: 500;
+      font-size: .88rem;
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      transition: background .15s, color .15s;
+      margin-bottom: 2px;
+    }
+    .nav-item i { font-size: 1.05rem; flex-shrink: 0; }
+    .nav-item:hover { background: var(--bg); color: var(--dark); }
+    .nav-item.active {
+      background: var(--primary);
+      color: #fff;
+      font-weight: 600;
+      box-shadow: 0 4px 14px rgba(108,79,240,.3);
+    }
+    .nav-item.active i { color: #fff; }
+
+    .sidebar-footer {
+      padding: .75rem;
+      border-top: 1px solid var(--border);
+      margin-top: auto;
+    }
+
+    /* MAIN CONTENT */
+    .main-content {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      margin-left: 248px;
+      width: calc(100% - 248px);
+    }
+
+    .topbar {
+      height: 70px;
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      z-index: 98;
+    }
+
+    .content-body {
+      padding: 2rem;
+      flex-grow: 1;
+    }
+
+    /* DASHBOARD PANEL */
+    .dashboard-panel {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+      margin-bottom: 2rem;
+    }
+
+    /* TABLE STYLING */
+    .table-container {
+      overflow-x: auto;
+    }
+
+    .table-premium {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+
+    .table-premium th {
+      background: var(--bg);
+      padding: 1rem;
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--gray-text);
+      border-bottom: 2px solid var(--border);
+      text-align: left;
+    }
+
+    .table-premium td {
+      padding: 1rem;
+      font-size: 0.9rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    .table-premium tr:last-child td {
+      border-bottom: none;
+    }
+
+    .member-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--primary-soft);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1rem;
+      border: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+<div class="wrapper">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img src="{% static 'img/logo.png' %}" alt="Eduteka Logo">
+    </div>
+
+    <div style="padding: 0 .75rem .75rem;">
+      <div class="sidebar-school">
+        <div class="sidebar-school-name">{{ colegio.nombre|default:"Mi Colegio" }}</div>
+        <div class="sidebar-school-sub">Año Escolar {{ periodo.anio_academico|default:"Actual" }}</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Menú Principal</div>
+      <a href="{% url 'dashboard_usuario' %}" class="nav-item"><i class="bi bi-house"></i> Inicio</a>
+      <a href="{% url 'listar_estudiantes' %}" class="nav-item"><i class="bi bi-people"></i> Estudiantes</a>
+      <a href="{% url 'listar_asignaturas' %}" class="nav-item"><i class="bi bi-book"></i> Académico</a>
+      <a href="{% url 'listar_cursos' %}" class="nav-item"><i class="bi bi-diagram-3"></i> Cursos</a>
+      <a href="{% url 'listar_personal' %}" class="nav-item active"><i class="bi bi-person-badge"></i> Personal</a>
+      <a href="{% url 'registrar_asistencia' %}" class="nav-item"><i class="bi bi-calendar-check"></i> Asistencia</a>
+      <a href="#" class="nav-item"><i class="bi bi-calendar3"></i> Calendario</a>
+      <a href="{% url 'historial_asistencia' %}" class="nav-item"><i class="bi bi-bar-chart"></i> Reportes</a>
+
+      <div class="nav-section-label" style="margin-top:.75rem;">Administración</div>
+      <a href="#" class="nav-item"><i class="bi bi-wallet2"></i> Contabilidad</a>
+      <a href="#" class="nav-item"><i class="bi bi-truck"></i> Proveedores</a>
+      <a href="#" class="nav-item"><i class="bi bi-award"></i> SIMCE</a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="#" class="nav-item"><i class="bi bi-gear"></i> Configuración</a>
+      <a href="{% url 'logout' %}" class="nav-item" style="color:#EF4444;">
+        <i class="bi bi-box-arrow-right" style="color:#EF4444;"></i> Cerrar Sesión
+      </a>
+    </div>
+  </aside>
+
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+    <header class="topbar">
+      <div>
+        <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn" style="border:none; background:var(--primary-soft); color:var(--primary);">
+          <i class="bi bi-list fs-5"></i>
+        </button>
+        <span class="fw-bold text-dark"><i class="bi bi-person-badge text-primary me-2"></i>Equipo y Colaboradores</span>
+      </div>
+      <div class="topbar-right">
+        <div class="text-muted small fw-semibold">
+          <i class="bi bi-calendar3 me-1"></i> {{ hoy|date:"l, d \d\e F \d\e Y"|title }}
+        </div>
+      </div>
+    </header>
+
+    <main class="content-body">
+      <!-- Mensajes Django -->
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show shadow-sm mb-4" role="alert" style="border-radius: var(--radius-md);">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <!-- Header -->
+      <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <div>
+          <h2 class="fw-bold text-dark mb-0">Gestión de Personal Escolar</h2>
+          <p class="text-muted mb-0">Controla los accesos de docentes y administrativos y asigna sus cargos oficiales.</p>
+        </div>
+      </div>
+
+      <!-- Tabla del Personal -->
+      <div class="dashboard-panel">
+        <div class="table-container">
+          <table class="table-premium">
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Email</th>
+                <th>Rol Actual</th>
+                <th>Estado de Acceso</th>
+                {% if is_admin %}
+                  <th style="text-align: right;">Acciones</th>
+                {% endif %}
+              </tr>
+            </thead>
+            <tbody>
+              {% if personal %}
+                {% for miembro in personal %}
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center gap-3">
+                        <div class="member-avatar">
+                          {{ miembro.usuario.username|slice:":2"|upper }}
+                        </div>
+                        <div>
+                          <div class="fw-bold text-dark">{{ miembro.usuario.first_name|default:miembro.usuario.username }}</div>
+                          <div class="text-muted small">Registrado: {{ miembro.usuario.date_joined|date:"d M Y" }}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>{{ miembro.usuario.email }}</td>
+                    <td>
+                      <span class="badge bg-light text-dark border px-2.5 py-1.5 fw-semibold" style="border-radius:6px; font-size:0.8rem; border-color: var(--border) !important;">
+                        {{ miembro.rol.nombre }}
+                      </span>
+                    </td>
+                    <td>
+                      <span class="badge {% if miembro.activo %}bg-success-light text-success{% else %}bg-danger-light text-danger{% endif %} px-2 py-1 fw-bold" style="background-color: {% if miembro.activo %}#ECFDF5{% else %}#FFF1F2{% endif %}; border: 1px solid {% if miembro.activo %}#A7F3D0{% else %}#FECDD3{% endif %}; font-size: 0.75rem;">
+                        {% if miembro.activo %}Acceso Permitido{% else %}Acceso Suspendido{% endif %}
+                      </span>
+                    </td>
+                    {% if is_admin %}
+                      <td style="text-align: right;">
+                        <div class="d-flex justify-content-end gap-2">
+                          <button class="btn btn-sm btn-outline-primary fw-semibold" data-bs-toggle="modal" data-bs-target="#modalEditarRol{{ miembro.id }}">
+                            <i class="bi bi-shield-lock me-1"></i> Rol
+                          </button>
+                          
+                          {% if miembro.usuario != request.user %}
+                            <a class="btn btn-sm {% if miembro.activo %}btn-outline-danger{% else %}btn-outline-success{% endif %} fw-semibold" href="{% url 'baja_personal' miembro.id %}">
+                              <i class="bi {% if miembro.activo %}bi-slash-circle{% else %}bi-check-circle{% endif %} me-1"></i>
+                              {% if miembro.activo %}Suspender{% else %}Re-activar{% endif %}
+                            </a>
+                          {% endif %}
+                        </div>
+                      </td>
+                    {% endif %}
+                  </tr>
+
+                  <!-- MODAL EDITAR ROL -->
+                  <div class="modal fade" id="modalEditarRol{{ miembro.id }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                      <div class="modal-content" style="border-radius: var(--radius-md); border:none;">
+                        <div class="modal-header border-bottom-0">
+                          <h5 class="fw-bold">Modificar Cargo de Personal</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form method="POST" action="{% url 'editar_personal' miembro.id %}">
+                          {% csrf_token %}
+                          <div class="modal-body pt-0">
+                            <p class="text-muted small mb-3">Cambiar el cargo para: <strong>{{ miembro.usuario.username }}</strong>. Esto modificará sus accesos y privilegios en el sistema.</p>
+                            <div class="mb-3">
+                              <label class="form-label small fw-bold">Seleccionar Rol</label>
+                              <select name="rol" class="form-select" required style="border-color: var(--border);">
+                                {% for r in roles %}
+                                  <option value="{{ r.id }}" {% if miembro.rol.id == r.id %}selected{% endif %}>{{ r.nombre }}</option>
+                                {% endfor %}
+                              </select>
+                            </div>
+                          </div>
+                          <div class="modal-footer border-top-0">
+                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary fw-bold">Cambiar Cargo</button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td colspan="5" class="text-center text-muted py-4">No se registran otros colaboradores en el establecimiento.</td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const mobileBtn = document.getElementById('mobileMenuBtn');
+    const sidebar = document.getElementById('sidebar');
+    if(mobileBtn) {
+      mobileBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('active');
+      });
+    }
+  });
+</script>
+</body>
+</html>

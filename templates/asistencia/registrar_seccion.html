@@ -1,0 +1,345 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planilla de Asistencia - {{ seccion.nombre }} - Eduteka</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+<style>
+  :root {
+    --primary: #7C5CFC;
+    --primary-soft: #F0EDFF;
+    --secondary: #65CDBF;
+    --accent: #F76F7A;
+    --warning: #F6C85F;
+    --dark: #151A35;
+    --gray-text: #687089;
+    --bg-color: #F8F9FC;
+    --border-color: #BCC0CF;
+    --white: #FFFFFF;
+    --sidebar-width: 240px;
+  }
+  
+  html {
+    font-size: 14px;
+  }
+
+  body { 
+    background: var(--bg-color); 
+    color: var(--dark); 
+    font-family: 'Inter', sans-serif; 
+    overflow-x: hidden; 
+  }
+
+  .app-container { display: flex; min-height: 100vh; width: 100vw; overflow-x: hidden; }
+  
+  .sidebar { 
+    width: var(--sidebar-width); 
+    background: var(--white); 
+    border-right: 1px solid var(--border-color); 
+    position: fixed; 
+    top: 0; bottom: 0; left: 0; 
+    display: flex; flex-direction: column; 
+    z-index: 1040; 
+  }
+  .sidebar-logo { display: flex; justify-content: center; align-items: center; padding: 1.4rem 1.5rem 1rem; width: 100%; background: transparent; }
+  .sidebar-logo img { max-height: 100px; width: auto; max-width: 85%; object-fit: contain; }
+  .sidebar-school {
+    margin: 0 .75rem .75rem;
+    background: linear-gradient(135deg, rgba(124, 92, 252, 0.08) 0%, #E8E2FF 100%);
+    border-radius: 12px;
+    padding: .9rem 1rem;
+  }
+  .sidebar-school-name { font-weight: 700; font-size: .85rem; color: #7C5CFC; margin-bottom: 2px; }
+  .sidebar-school-sub { font-size: .75rem; color: #6747E3; font-weight: 500; }
+  
+  .sidebar-menu { padding: .75rem .75rem 0; flex: 1; overflow-y: auto; scrollbar-width: none; }
+  .sidebar-menu::-webkit-scrollbar { display: none; }
+  .menu-label { font-size: .67rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #687089; padding: .5rem .75rem .3rem; margin-top: .25rem; }
+  .menu-item { display: flex; align-items: center; gap: .75rem; padding: .6rem .85rem; color: #687089; font-weight: 500; font-size: .88rem; border-radius: 10px; text-decoration: none; transition: background .15s, color .15s; margin-bottom: 2px; }
+  .menu-item i { font-size: 1.05rem; flex-shrink: 0; }
+  .menu-item:hover { background: #F8F9FD; color: #151A35; transform: none; }
+  .menu-item.active { background: #7C5CFC; color: #fff; font-weight: 600; box-shadow: 0 4px 14px rgba(108,79,240,.3); }
+  .menu-item.active i { color: #fff; }
+  
+  .sidebar-bottom { padding: .75rem; border-top: 1px solid #BCC0CF; margin-top: auto; }
+
+  .main-content { margin-left: var(--sidebar-width); flex: 1; display: flex; flex-direction: column; min-width: 0; width: calc(100% - var(--sidebar-width)); }
+  .topbar { height: 64px; background: var(--white); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; position: sticky; top: 0; z-index: 1030; }
+
+  .topbar-right { display: flex; align-items: center; gap: 1.5rem; }
+  .user-profile { display: flex; align-items: center; gap: 0.75rem; cursor: pointer; }
+  .user-profile img { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; }
+  .user-info { display: flex; flex-direction: column; }
+  .user-name { font-weight: 600; font-size: 0.9rem; color: var(--dark); }
+  .user-role { font-size: 0.8rem; color: var(--gray-text); }
+
+  .content-area { padding: 1.5rem 2rem; max-width: 1440px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+  
+  .dashboard-panel { background: var(--white); border-radius: 12px; border: 1px solid var(--border-color); padding: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+  
+  /* Table styling */
+  .table-responsive { border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color); }
+  .table-asistencia th { background: #F8F9FC; color: var(--gray-text); font-weight: 600; font-size: 0.85rem; text-transform: uppercase; border-bottom: 1px solid var(--border-color); padding: 1rem; }
+  .table-asistencia td { padding: 1rem; vertical-align: middle; border-bottom: 1px solid var(--border-color); }
+  
+  /* Status button design */
+  .btn-check-group { display: flex; gap: 0.25rem; }
+  
+  /* Customize Bootstrap buttons to match states */
+  .btn-state-presente { border-color: rgba(39, 201, 63, 0.2); color: #27c93f; }
+  .btn-check:checked + .btn-state-presente { background-color: #27c93f; border-color: #27c93f; color: white; box-shadow: 0 4px 10px rgba(39, 201, 63, 0.2); }
+  
+  .btn-state-tarde { border-color: rgba(246, 200, 95, 0.3); color: #D97706; }
+  .btn-check:checked + .btn-state-tarde { background-color: #F6C85F; border-color: #F6C85F; color: #151A35; box-shadow: 0 4px 10px rgba(246, 200, 95, 0.2); }
+  
+  .btn-state-ausente { border-color: rgba(255, 95, 86, 0.2); color: #ff5f56; }
+  .btn-check:checked + .btn-state-ausente { background-color: #ff5f56; border-color: #ff5f56; color: white; box-shadow: 0 4px 10px rgba(255, 95, 86, 0.2); }
+  
+  .btn-state-justificado { border-color: rgba(96, 165, 250, 0.2); color: #60A5FA; }
+  .btn-check:checked + .btn-state-justificado { background-color: #60A5FA; border-color: #60A5FA; color: white; box-shadow: 0 4px 10px rgba(96, 165, 250, 0.2); }
+
+  @media (max-width: 992px) {
+    .sidebar { transform: translateX(-100%); }
+    .main-content { margin-left: 0; width: 100%; }
+  }
+
+  /* ── ELEVATED PREMIUM STYLES ── */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Fade-in staggered animations on load */
+  .dashboard-panel, .table-responsive, .btn {
+    animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  /* Body background glowing gradients */
+  body {
+    position: relative;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    top: -15%; left: 65%;
+    width: 50vw; height: 50vw;
+    background: radial-gradient(circle, rgba(124, 92, 252, 0.07) 0%, rgba(255,255,255,0) 70%);
+    z-index: -2;
+    pointer-events: none;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    top: 45%; left: -15%;
+    width: 40vw; height: 40vw;
+    background: radial-gradient(circle, rgba(101, 205, 191, 0.06) 0%, rgba(255,255,255,0) 70%);
+    z-index: -2;
+    pointer-events: none;
+  }
+
+  /* Smooth dynamic transitions */
+  .nav-item, .menu-item, .user-profile, .btn, .form-control {
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+  }
+
+</style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <img src="{% static 'img/logo.png' %}" alt="Eduteka Logo">
+        </div>
+        <div style="padding: 0 .75rem .75rem;">
+          <div class="sidebar-school">
+            <div class="sidebar-school-name">{{ colegio.nombre|default:"Mi Colegio" }}</div>
+            <div class="sidebar-school-sub">Año Escolar {{ periodo.anio_academico|default:"Actual" }}</div>
+          </div>
+        </div>
+        
+        <nav class="sidebar-menu">
+            <div class="menu-label">Menú Principal</div>
+            <a href="{% url 'dashboard_usuario' %}" class="menu-item"><i class="bi bi-house"></i> Inicio</a>
+            <a href="{% url 'listar_estudiantes' %}" class="menu-item"><i class="bi bi-people"></i> Estudiantes</a>
+            <a href="{% url 'listar_asignaturas' %}" class="menu-item"><i class="bi bi-book"></i> Académico</a>
+            <a href="{% url 'listar_cursos' %}" class="menu-item"><i class="bi bi-diagram-3"></i> Cursos</a>
+            <a href="{% url 'listar_personal' %}" class="menu-item"><i class="bi bi-person-badge"></i> Personal</a>
+            <a href="{% url 'registrar_asistencia' %}" class="menu-item active"><i class="bi bi-calendar-check"></i> Asistencia</a>
+            <a href="#" class="menu-item"><i class="bi bi-calendar3"></i> Calendario</a>
+            <a href="{% url 'historial_asistencia' %}" class="menu-item"><i class="bi bi-bar-chart"></i> Reportes</a>
+            
+            <div class="menu-label mt-4">Administración</div>
+            <a href="#" class="menu-item"><i class="bi bi-wallet2"></i> Contabilidad</a>
+            <a href="#" class="menu-item"><i class="bi bi-truck"></i> Proveedores</a>
+            <a href="#" class="menu-item"><i class="bi bi-award"></i> SIMCE</a>
+        </nav>
+        
+        <div class="sidebar-bottom">
+            <a href="#" class="menu-item"><i class="bi bi-gear"></i> Configuración</a>
+            <a href="{% url 'logout' %}" class="menu-item text-danger"><i class="bi bi-box-arrow-right"></i> Cerrar Sesión</a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <header class="topbar">
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-light d-lg-none" id="mobileMenuBtn">
+                    <i class="bi bi-list fs-5"></i>
+                </button>
+                <h4 class="mb-0 fw-semibold text-dark">{{ seccion.nombre }}</h4>
+            </div>
+            
+            <div class="topbar-right">
+                <div class="user-profile dropdown-toggle" data-bs-toggle="dropdown">
+                    <img src="https://ui-avatars.com/api/?name={{ request.user.first_name|default:request.user.username }}+{{ request.user.last_name|default:'' }}&background=7C5CFC&color=fff" alt="Perfil">
+                    <div class="user-info d-none d-sm-flex">
+                        <span class="user-name">{{ request.user.first_name|default:request.user.username }}</span>
+                        <span class="user-role">{{ miembro.rol.nombre|default:'Profesor' }}</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="content-area">
+            <!-- Back navigation and actions -->
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                <div class="d-flex align-items-center gap-2">
+                    <a href="/asistencia/registrar/?fecha={{ fecha_str }}" class="btn btn-light btn-sm rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                        <i class="bi bi-arrow-left fs-5"></i>
+                    </a>
+                    <div>
+                        <h2 class="fw-bold text-dark mb-0">Planilla de Asistencia</h2>
+                        <p class="text-muted mb-0"><i class="bi bi-calendar-event me-1"></i> Fecha del registro: <strong>{{ fecha|date:"d \d\e F, Y" }}</strong></p>
+                    </div>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-outline-success btn-sm fw-semibold" onclick="marcarTodosPresente()">
+                        <i class="bi bi-check-all me-1"></i> Marcar todos Presente
+                    </button>
+                </div>
+            </div>
+
+            <!-- Attendance Sheet -->
+            <form id="attendanceSheetForm" method="POST">
+                {% csrf_token %}
+                <div class="dashboard-panel p-0 overflow-hidden">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-asistencia mb-0">
+                            <thead>
+                                <tr>
+                                    <th style="width: 5%;">#</th>
+                                    <th style="width: 30%;">Estudiante</th>
+                                    <th style="width: 12%;">RUT</th>
+                                    <th style="width: 35%; text-align: center;">Estado</th>
+                                    <th style="width: 18%;">Observación</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if estudiantes %}
+                                    {% for est in estudiantes %}
+                                        <tr>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>
+                                                <div class="fw-semibold text-dark">{{ est.nombre_completo }}</div>
+                                            </td>
+                                            <td class="text-secondary small">{{ est.rut|default:"-" }}</td>
+                                            <td>
+                                                <div class="btn-check-group justify-content-center">
+                                                    <!-- Presente -->
+                                                    <input type="radio" class="btn-check" name="estado_{{ est.id }}" id="presente_{{ est.id }}" value="presente" {% if est.estado_actual == 'presente' %}checked{% endif %}>
+                                                    <label class="btn btn-outline-secondary btn-sm btn-state-presente px-2 py-1 fw-semibold text-capitalize d-flex align-items-center gap-1" for="presente_{{ est.id }}">
+                                                        <i class="bi bi-check-circle"></i> Presente
+                                                    </label>
+
+                                                    <!-- Atrasado -->
+                                                    <input type="radio" class="btn-check" name="estado_{{ est.id }}" id="tarde_{{ est.id }}" value="tarde" {% if est.estado_actual == 'tarde' %}checked{% endif %}>
+                                                    <label class="btn btn-outline-secondary btn-sm btn-state-tarde px-2 py-1 fw-semibold text-capitalize d-flex align-items-center gap-1" for="tarde_{{ est.id }}">
+                                                        <i class="bi bi-clock"></i> Atrasado
+                                                    </label>
+
+                                                    <!-- Ausente -->
+                                                    <input type="radio" class="btn-check" name="estado_{{ est.id }}" id="ausente_{{ est.id }}" value="ausente" {% if est.estado_actual == 'ausente' %}checked{% endif %}>
+                                                    <label class="btn btn-outline-secondary btn-sm btn-state-ausente px-2 py-1 fw-semibold text-capitalize d-flex align-items-center gap-1" for="ausente_{{ est.id }}">
+                                                        <i class="bi bi-x-circle"></i> Ausente
+                                                    </label>
+
+                                                    <!-- Justificado -->
+                                                    <input type="radio" class="btn-check" name="estado_{{ est.id }}" id="justificado_{{ est.id }}" value="justificado" {% if est.estado_actual == 'justificado' %}checked{% endif %}>
+                                                    <label class="btn btn-outline-secondary btn-sm btn-state-justificado px-2 py-1 fw-semibold text-capitalize d-flex align-items-center gap-1" for="justificado_{{ est.id }}">
+                                                        <i class="bi bi-file-earmark-text"></i> Justificado
+                                                    </label>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control form-control-sm border-light bg-light" name="obs_{{ est.id }}" value="{{ est.obs_actual }}" placeholder="Agregar nota...">
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="5" class="text-center p-5">
+                                            <i class="bi bi-people fs-2 text-muted"></i>
+                                            <h6 class="mt-2 fw-semibold">No hay estudiantes inscritos en esta sección.</h6>
+                                            <p class="text-muted small">Por favor matricula estudiantes para registrar asistencia.</p>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Submit section -->
+                {% if estudiantes %}
+                    <div class="d-flex justify-content-end gap-3 mt-4 mb-5">
+                        <a href="/asistencia/registrar/?fecha={{ fecha_str }}" class="btn btn-light fw-semibold">Cancelar</a>
+                        <button type="submit" class="btn btn-primary fw-semibold px-4 shadow-sm">
+                            <i class="bi bi-save me-1"></i> Guardar Asistencia
+                        </button>
+                    </div>
+                {% endif %}
+            </form>
+        </main>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const mobileBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.getElementById('sidebar');
+        
+        if(mobileBtn) {
+            mobileBtn.addEventListener('click', () => {
+                sidebar.style.transform = sidebar.style.transform === 'translateX(0px)' ? 'translateX(-100%)' : 'translateX(0px)';
+            });
+        }
+    });
+
+    function marcarTodosPresente() {
+        const checkButtons = document.querySelectorAll('input[type="radio"][value="presente"]');
+        checkButtons.forEach(btn => {
+            btn.checked = true;
+        });
+    }
+</script>
+</body>
+</html>

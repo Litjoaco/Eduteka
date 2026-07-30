@@ -4,6 +4,7 @@ from django.contrib import messages
 from solicitudes.models import SolicitudAcceso, MiembroColegio
 from colegios.models import Colegio, ColegioModulo, RolColegio
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 @login_required
 def dashboard_view(request):
@@ -24,6 +25,11 @@ def dashboard_view(request):
         
         # Suscripción actual
         suscripcion = getattr(colegio, 'suscripcion', None)
+        
+        # Alumnos en riesgo
+        from asistencia.utils import calcular_alumnos_en_riesgo
+        alumnos_en_riesgo = calcular_alumnos_en_riesgo(colegio)
+        alumnos_en_riesgo_count = len(alumnos_en_riesgo)
     else:
         # Si no tiene colegio, redirigir a solicitar acceso o registro
         return redirect('solicitar_acceso')
@@ -36,6 +42,9 @@ def dashboard_view(request):
         'usuarios_colegio_count': usuarios_colegio_count,
         'solicitudes_pendientes': solicitudes_pendientes,
         'ultimas_solicitudes': ultimas_solicitudes,
+        'alumnos_en_riesgo': alumnos_en_riesgo,
+        'alumnos_en_riesgo_count': alumnos_en_riesgo_count,
+        'hoy': timezone.now(),
     }
     return render(request, 'dashboard_profesor.html', context)
 

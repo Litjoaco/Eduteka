@@ -29,6 +29,7 @@ urlpatterns = [
     path('colegios/', include('colegios.urls')),
     path('solicitudes/', include('solicitudes.urls')),
     path('dashboard/', include('dashboard.urls')),
+    path('asistencia/', include('asistencia.urls')),
     path('api/buscar-colegios/', colegios_views.api_buscar_colegios, name='api_buscar_colegios'),
 ]
 

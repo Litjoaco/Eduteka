@@ -10,6 +10,7 @@ from usuarios.models import PerfilUsuario
 from .models import Colegio, Suscripcion, ColegioModulo, ConfiguracionAcademica, RolColegio, Permiso, RolPermiso, CursoColegio, SeccionCurso
 from .forms import RegistroColegioPaso1Form, RegistroColegioPaso2Form
 from solicitudes.models import MiembroColegio
+from django.contrib.auth.decorators import login_required
 
 def registro_colegio_paso1_view(request):
     # Si hay un usuario logueado, cerramos su sesión inmediatamente para evitar 
@@ -392,3 +393,584 @@ def configuracion_colegio_paso5_view(request, colegio_id):
     
     modulos = ColegioModulo.objects.filter(colegio=colegio)
     return render(request, 'configuracion_colegio_paso5.html', {'modulos_colegio': modulos, 'colegio': colegio})
+
+
+from django.db.models import Q
+from .models import Estudiante, Asignatura
+
+def obtener_colegio_usuario(user):
+    colegio = user.colegios_administrados.order_by('-fecha_creacion').first()
+    if not colegio:
+        miembro = MiembroColegio.objects.filter(usuario=user, activo=True).order_by('-fecha_ingreso').first()
+        if miembro:
+            colegio = miembro.colegio
+    return colegio
+
+@login_required
+def listar_estudiantes_view(request):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        messages.error(request, "No estás asociado a ningún colegio.")
+        return redirect('solicitar_acceso')
+
+    # Filtrado por curso/seccion
+    seccion_id = request.GET.get('seccion')
+    busqueda = request.GET.get('q', '').strip()
+
+    estudiantes = Estudiante.objects.filter(colegio=colegio).order_by('seccion__curso__nombre', 'nombre_completo')
+
+    if seccion_id and seccion_id.isdigit():
+        estudiantes = estudiantes.filter(seccion_id=int(seccion_id))
+
+    if busqueda:
+        estudiantes = estudiantes.filter(
+            Q(nombre_completo__icontains=busqueda) | 
+            Q(rut__icontains=busqueda)
+        )
+
+    # Secciones para el dropdown de filtros
+    secciones = SeccionCurso.objects.filter(curso__colegio=colegio, activo=True).order_by('curso__nombre', 'nombre')
+
+    context = {
+        'colegio': colegio,
+        'estudiantes': estudiantes,
+        'secciones': secciones,
+        'seccion_seleccionada': int(seccion_id) if seccion_id and seccion_id.isdigit() else None,
+        'busqueda': busqueda,
+    }
+    return render(request, 'colegios/listar_estudiantes.html', context)
+
+@login_required
+def matricular_estudiante_view(request):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        messages.error(request, "No tienes permisos de administrador.")
+        return redirect('dashboard_usuario')
+
+    miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
+    is_admin = request.user.colegios_administrados.filter(id=colegio.id).exists() or (miembro and miembro.rol.nombre in ['Administrador', 'Director'])
+    if not is_admin:
+        messages.error(request, "No tienes permisos para matricular estudiantes.")
+        return redirect('listar_estudiantes')
+
+    if request.method == 'POST':
+        nombre_completo = request.POST.get('nombre_completo', '').strip()
+        rut = request.POST.get('rut', '').strip()
+        seccion_id = request.POST.get('seccion')
+
+        if not nombre_completo or not seccion_id:
+            messages.error(request, "El nombre completo y el curso/sección son requeridos.")
+        else:
+            seccion = get_object_or_404(SeccionCurso, id=seccion_id, curso__colegio=colegio)
+            Estudiante.objects.create(
+                colegio=colegio,
+                seccion=seccion,
+                nombre_completo=nombre_completo,
+                rut=rut,
+                activo=True
+            )
+            messages.success(request, f"Estudiante {nombre_completo} matriculado con éxito.")
+            return redirect('listar_estudiantes')
+
+    secciones = SeccionCurso.objects.filter(curso__colegio=colegio, activo=True).order_by('curso__nombre', 'nombre')
+    context = {
+        'colegio': colegio,
+        'secciones': secciones,
+        'titulo_pagina': 'Matricular Estudiante',
+        'boton_texto': 'Matricular',
+    }
+    return render(request, 'colegios/matricular_estudiante.html', context)
+
+@login_required
+def editar_estudiante_view(request, estudiante_id):
+    colegio = obtener_colegio_usuario(request.user)
+    estudiante = get_object_or_404(Estudiante, id=estudiante_id, colegio=colegio)
+
+    miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
+    is_admin = request.user.colegios_administrados.filter(id=colegio.id).exists() or (miembro and miembro.rol.nombre in ['Administrador', 'Director'])
+    if not is_admin:
+        messages.error(request, "No tienes permisos para editar estudiantes.")
+        return redirect('listar_estudiantes')
+
+    if request.method == 'POST':
+        nombre_completo = request.POST.get('nombre_completo', '').strip()
+        rut = request.POST.get('rut', '').strip()
+        seccion_id = request.POST.get('seccion')
+        activo = request.POST.get('activo') == 'true'
+
+        if not nombre_completo or not seccion_id:
+            messages.error(request, "El nombre completo y el curso/sección son requeridos.")
+        else:
+            seccion = get_object_or_404(SeccionCurso, id=seccion_id, curso__colegio=colegio)
+            estudiante.nombre_completo = nombre_completo
+            estudiante.rut = rut
+            estudiante.seccion = seccion
+            estudiante.activo = activo
+            estudiante.save()
+            messages.success(request, f"Ficha de {nombre_completo} modificada con éxito.")
+            return redirect('listar_estudiantes')
+
+    secciones = SeccionCurso.objects.filter(curso__colegio=colegio, activo=True).order_by('curso__nombre', 'nombre')
+    context = {
+        'colegio': colegio,
+        'estudiante': estudiante,
+        'secciones': secciones,
+        'titulo_pagina': 'Editar Ficha de Estudiante',
+        'boton_texto': 'Guardar Cambios',
+    }
+    return render(request, 'colegios/matricular_estudiante.html', context)
+
+@login_required
+def baja_estudiante_view(request, estudiante_id):
+    colegio = obtener_colegio_usuario(request.user)
+    estudiante = get_object_or_404(Estudiante, id=estudiante_id, colegio=colegio)
+
+    miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
+    is_admin = request.user.colegios_administrados.filter(id=colegio.id).exists() or (miembro and miembro.rol.nombre in ['Administrador', 'Director'])
+    if not is_admin:
+        messages.error(request, "No tienes permisos para dar de baja estudiantes.")
+        return redirect('listar_estudiantes')
+
+    estudiante.activo = not estudiante.activo
+    estudiante.save()
+    estado = "activado" if estudiante.activo else "desactivado (baja)"
+    messages.success(request, f"Estudiante {estudiante.nombre_completo} ha sido {estado} correctamente.")
+    return redirect('listar_estudiantes')
+
+@login_required
+def listar_asignaturas_view(request):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        messages.error(request, "No estás asociado a ningún colegio.")
+        return redirect('solicitar_acceso')
+
+    cursos = CursoColegio.objects.filter(colegio=colegio, activo=True).order_by('nombre')
+    
+    plan_estudios = []
+    for cur in cursos:
+        asignaturas = Asignatura.objects.filter(curso=cur).order_by('nombre')
+        plan_estudios.append({
+            'curso': cur,
+            'asignaturas': asignaturas,
+            'cantidad': asignaturas.count()
+        })
+
+    miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
+    is_admin = request.user.colegios_administrados.filter(id=colegio.id).exists() or (miembro and miembro.rol.nombre in ['Administrador', 'Director'])
+
+    context = {
+        'colegio': colegio,
+        'plan_estudios': plan_estudios,
+        'is_admin': is_admin,
+    }
+    return render(request, 'colegios/listar_asignaturas.html', context)
+
+@login_required
+def crear_asignatura_view(request):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        messages.error(request, "No tienes permisos.")
+        return redirect('dashboard_usuario')
+
+    miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
+    is_admin = request.user.colegios_administrados.filter(id=colegio.id).exists() or (miembro and miembro.rol.nombre in ['Administrador', 'Director'])
+    if not is_admin:
+        messages.error(request, "No tienes permisos para crear asignaturas.")
+        return redirect('listar_asignaturas')
+
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre', '').strip()
+        cursos_ids = request.POST.getlist('cursos')
+        docente_id = request.POST.get('docente')
+
+        if not nombre or not any(cursos_ids):
+            messages.error(request, "El nombre de la asignatura y al menos un curso son requeridos.")
+        else:
+            docente = None
+            if docente_id:
+                docente = get_object_or_404(User, id=docente_id)
+            
+            created_count = 0
+            for curso_id in cursos_ids:
+                curso = get_object_or_404(CursoColegio, id=curso_id, colegio=colegio)
+                exists = Asignatura.objects.filter(curso=curso, nombre=nombre).exists()
+                if not exists:
+                    Asignatura.objects.create(
+                        colegio=colegio,
+                        curso=curso,
+                        nombre=nombre,
+                        docente=docente,
+                        activo=True
+                    )
+                    created_count += 1
+            
+            if created_count > 0:
+                messages.success(request, f"Asignatura '{nombre}' creada con éxito en {created_count} curso(s).")
+            else:
+                messages.info(request, f"La asignatura '{nombre}' ya existía en los cursos seleccionados.")
+            return redirect('listar_asignaturas')
+
+    cursos = CursoColegio.objects.filter(colegio=colegio, activo=True).order_by('nombre')
+    profesores_miembros = MiembroColegio.objects.filter(colegio=colegio, rol__nombre='Profesor', activo=True).select_related('usuario')
+    profesores = [m.usuario for m in profesores_miembros]
+
+    context = {
+        'colegio': colegio,
+        'cursos': cursos,
+        'profesores': profesores,
+        'titulo_pagina': 'Crear Nueva Asignatura',
+        'boton_texto': 'Crear Asignatura',
+        'es_creacion': True,
+    }
+    return render(request, 'colegios/crear_asignatura.html', context)
+
+@login_required
+def editar_asignatura_view(request, asignatura_id):
+    colegio = obtener_colegio_usuario(request.user)
+    asignatura = get_object_or_404(Asignatura, id=asignatura_id, colegio=colegio)
+
+    miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
+    is_admin = request.user.colegios_administrados.filter(id=colegio.id).exists() or (miembro and miembro.rol.nombre in ['Administrador', 'Director'])
+    if not is_admin:
+        messages.error(request, "No tienes permisos para editar asignaturas.")
+        return redirect('listar_asignaturas')
+
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre', '').strip()
+        curso_id = request.POST.get('curso')
+        docente_id = request.POST.get('docente')
+        activo = request.POST.get('activo') == 'true'
+
+        if not nombre or not curso_id:
+            messages.error(request, "El nombre de la asignatura y el curso son requeridos.")
+        else:
+            curso = get_object_or_404(CursoColegio, id=curso_id, colegio=colegio)
+            docente = None
+            if docente_id:
+                docente = get_object_or_404(User, id=docente_id)
+            
+            asignatura.nombre = nombre
+            asignatura.curso = curso
+            asignatura.docente = docente
+            asignatura.activo = activo
+            asignatura.save()
+            
+            messages.success(request, f"Asignatura '{nombre}' modificada con éxito.")
+            return redirect('listar_asignaturas')
+
+    cursos = CursoColegio.objects.filter(colegio=colegio, activo=True).order_by('nombre')
+    profesores_miembros = MiembroColegio.objects.filter(colegio=colegio, rol__nombre='Profesor', activo=True).select_related('usuario')
+    profesores = [m.usuario for m in profesores_miembros]
+
+    context = {
+        'colegio': colegio,
+        'asignatura': asignatura,
+        'cursos': cursos,
+        'profesores': profesores,
+        'titulo_pagina': 'Editar Asignatura',
+        'boton_texto': 'Guardar Cambios',
+        'es_creacion': False,
+    }
+    return render(request, 'colegios/crear_asignatura.html', context)
+
+@login_required
+def eliminar_asignatura_view(request, asignatura_id):
+    colegio = obtener_colegio_usuario(request.user)
+    asignatura = get_object_or_404(Asignatura, id=asignatura_id, colegio=colegio)
+
+    miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
+    is_admin = request.user.colegios_administrados.filter(id=colegio.id).exists() or (miembro and miembro.rol.nombre in ['Administrador', 'Director'])
+    if not is_admin:
+        messages.error(request, "No tienes permisos para eliminar asignaturas.")
+        return redirect('listar_asignaturas')
+
+    nombre = asignatura.nombre
+    asignatura.delete()
+    messages.success(request, f"La asignatura '{nombre}' ha sido eliminada correctamente.")
+    return redirect('listar_asignaturas')
+
+@login_required
+def precargar_asignaturas_base_view(request):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        messages.error(request, "No tienes permisos.")
+        return redirect('dashboard_usuario')
+
+    miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
+    is_admin = request.user.colegios_administrados.filter(id=colegio.id).exists() or (miembro and miembro.rol.nombre in ['Administrador', 'Director'])
+    if not is_admin:
+        messages.error(request, "No tienes permisos para realizar esta acción.")
+        return redirect('listar_asignaturas')
+
+    if request.method == 'POST':
+        asignaturas_seleccionadas = request.POST.getlist('asignaturas_base')
+        cursos_seleccionados = request.POST.getlist('cursos_destino')
+
+        if not asignaturas_seleccionadas or not cursos_seleccionados:
+            messages.error(request, "Debes seleccionar al menos una asignatura y al menos un curso.")
+            return redirect('listar_asignaturas')
+
+        created_count = 0
+        for curso_id in cursos_seleccionados:
+            curso = get_object_or_404(CursoColegio, id=curso_id, colegio=colegio)
+            for nombre_asig in asignaturas_seleccionadas:
+                exists = Asignatura.objects.filter(curso=curso, nombre=nombre_asig).exists()
+                if not exists:
+                    Asignatura.objects.create(
+                        colegio=colegio,
+                        curso=curso,
+                        nombre=nombre_asig,
+                        docente=None,
+                        activo=True
+                    )
+                    created_count += 1
+
+        if created_count > 0:
+            messages.success(request, f"Se crearon exitosamente {created_count} asignaturas en los cursos seleccionados.")
+        else:
+            messages.info(request, "Todas las asignaturas seleccionadas ya existían en los cursos correspondientes.")
+
+    return redirect('listar_asignaturas')
+
+@login_required
+def listar_cursos_view(request):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        messages.error(request, "No tienes un establecimiento asociado.")
+        return redirect('dashboard_usuario')
+        
+    miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
+    is_admin = request.user.colegios_administrados.filter(id=colegio.id).exists() or (miembro and miembro.rol.nombre in ['Administrador', 'Director'])
+    if not is_admin:
+        messages.error(request, "Acceso denegado. Se requieren permisos de administrador.")
+        return redirect('dashboard_usuario')
+
+    cursos_db = CursoColegio.objects.filter(colegio=colegio).order_by('nombre')
+    cursos_con_secciones = []
+    for c in cursos_db:
+        secciones = SeccionCurso.objects.filter(curso=c).order_by('nombre')
+        cursos_con_secciones.append({
+            'curso': c,
+            'secciones': secciones,
+            'cantidad_secciones': secciones.count()
+        })
+
+    from django.utils import timezone
+    context = {
+        'colegio': colegio,
+        'cursos_con_secciones': cursos_con_secciones,
+        'hoy': timezone.now(),
+        'is_admin': is_admin
+    }
+    return render(request, 'colegios/listar_cursos.html', context)
+
+@login_required
+def crear_curso_view(request):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        return redirect('dashboard_usuario')
+
+    miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
+    is_admin = request.user.colegios_administrados.filter(id=colegio.id).exists() or (miembro and miembro.rol.nombre in ['Administrador', 'Director'])
+    if not is_admin:
+        messages.error(request, "No tienes permisos.")
+        return redirect('listar_cursos')
+
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre', '').strip()
+        if not nombre:
+            messages.error(request, "El nombre del curso es requerido.")
+        else:
+            exists = CursoColegio.objects.filter(colegio=colegio, nombre=nombre).exists()
+            if exists:
+                curso = CursoColegio.objects.filter(colegio=colegio, nombre=nombre).first()
+                if not curso.activo:
+                    curso.activo = True
+                    curso.save()
+                    messages.success(request, f"El curso '{nombre}' ha sido reactivado.")
+                else:
+                    messages.error(request, f"El curso '{nombre}' ya existe.")
+            else:
+                CursoColegio.objects.create(
+                    colegio=colegio,
+                    nombre=nombre,
+                    activo=True
+                )
+                messages.success(request, f"Curso '{nombre}' creado con éxito.")
+    return redirect('listar_cursos')
+
+@login_required
+def editar_curso_view(request, curso_id):
+    colegio = obtener_colegio_usuario(request.user)
+    curso = get_object_or_404(CursoColegio, id=curso_id, colegio=colegio)
+
+    miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
+    is_admin = request.user.colegios_administrados.filter(id=colegio.id).exists() or (miembro and miembro.rol.nombre in ['Administrador', 'Director'])
+    if not is_admin:
+        messages.error(request, "No tienes permisos.")
+        return redirect('listar_cursos')
+
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre', '').strip()
+        if not nombre:
+            messages.error(request, "El nombre no puede estar vacío.")
+        else:
+            curso.nombre = nombre
+            curso.save()
+            messages.success(request, f"Curso actualizado a '{nombre}' correctamente.")
+    return redirect('listar_cursos')
+
+@login_required
+def baja_curso_view(request, curso_id):
+    colegio = obtener_colegio_usuario(request.user)
+    curso = get_object_or_404(CursoColegio, id=curso_id, colegio=colegio)
+
+    miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
+    is_admin = request.user.colegios_administrados.filter(id=colegio.id).exists() or (miembro and miembro.rol.nombre in ['Administrador', 'Director'])
+    if not is_admin:
+        messages.error(request, "No tienes permisos.")
+        return redirect('listar_cursos')
+
+    curso.activo = not curso.activo
+    curso.save()
+    
+    SeccionCurso.objects.filter(curso=curso).update(activo=curso.activo)
+    
+    estado = "activado" if curso.activo else "desactivado (baja lógica)"
+    messages.success(request, f"El curso '{curso.nombre}' ha sido {estado} correctamente.")
+    return redirect('listar_cursos')
+
+@login_required
+def crear_seccion_view(request, curso_id):
+    colegio = obtener_colegio_usuario(request.user)
+    curso = get_object_or_404(CursoColegio, id=curso_id, colegio=colegio)
+
+    miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
+    is_admin = request.user.colegios_administrados.filter(id=colegio.id).exists() or (miembro and miembro.rol.nombre in ['Administrador', 'Director'])
+    if not is_admin:
+        messages.error(request, "No tienes permisos.")
+        return redirect('listar_cursos')
+
+    if request.method == 'POST':
+        secciones_nuevas = request.POST.getlist('secciones_nuevas')
+        if not secciones_nuevas:
+            messages.error(request, "Debes seleccionar al menos una sección.")
+        else:
+            created_count = 0
+            ya_existen = []
+            for valor in secciones_nuevas:
+                valor = valor.strip()
+                # El valor viene como "Sección A" - extraemos la letra (último carácter)
+                letra = valor[-1].upper() if valor else ''
+                if not letra or len(letra) != 1:
+                    continue
+                nombre_seccion = f"{curso.nombre} {letra}"
+                secc, created = SeccionCurso.objects.get_or_create(
+                    curso=curso,
+                    letra=letra,
+                    defaults={'nombre': nombre_seccion, 'activo': True}
+                )
+                if created:
+                    created_count += 1
+                elif not secc.activo:
+                    secc.activo = True
+                    secc.nombre = nombre_seccion
+                    secc.save()
+                    created_count += 1
+                else:
+                    ya_existen.append(letra)
+            if created_count > 0:
+                messages.success(request, f"Se agregaron {created_count} secciones correctamente a {curso.nombre}.")
+            if ya_existen:
+                messages.warning(request, f"Las secciones {', '.join(ya_existen)} ya existen en {curso.nombre}.")
+    return redirect('listar_cursos')
+
+
+@login_required
+def baja_seccion_view(request, seccion_id):
+    colegio = obtener_colegio_usuario(request.user)
+    seccion = get_object_or_404(SeccionCurso, id=seccion_id, curso__colegio=colegio)
+
+    miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
+    is_admin = request.user.colegios_administrados.filter(id=colegio.id).exists() or (miembro and miembro.rol.nombre in ['Administrador', 'Director'])
+    if not is_admin:
+        messages.error(request, "No tienes permisos.")
+        return redirect('listar_cursos')
+
+    from colegios.models import Estudiante
+    if Estudiante.objects.filter(seccion=seccion).exists():
+        messages.error(request, f"No se puede eliminar la sección '{seccion.nombre}' porque contiene alumnos matriculados.")
+    else:
+        nombre = seccion.nombre
+        seccion.delete()
+        messages.success(request, f"La sección '{nombre}' ha sido eliminada correctamente.")
+    return redirect('listar_cursos')
+
+@login_required
+def listar_personal_view(request):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        messages.error(request, "No tienes un establecimiento asociado.")
+        return redirect('dashboard_usuario')
+        
+    miembro_solicitante = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
+    is_admin = request.user.colegios_administrados.filter(id=colegio.id).exists() or (miembro_solicitante and miembro_solicitante.rol.nombre in ['Administrador', 'Director'])
+    if not is_admin:
+        messages.error(request, "Acceso denegado. Se requieren permisos de administrador.")
+        return redirect('dashboard_usuario')
+
+    personal = MiembroColegio.objects.filter(colegio=colegio).select_related('usuario', 'rol').order_by('usuario__first_name')
+    roles = RolColegio.objects.filter(colegio=colegio)
+
+    from django.utils import timezone
+    context = {
+        'colegio': colegio,
+        'personal': personal,
+        'roles': roles,
+        'hoy': timezone.now(),
+        'is_admin': is_admin
+    }
+    return render(request, 'colegios/listar_personal.html', context)
+
+@login_required
+def editar_personal_view(request, miembro_id):
+    colegio = obtener_colegio_usuario(request.user)
+    miembro = get_object_or_404(MiembroColegio, id=miembro_id, colegio=colegio)
+
+    miembro_solicitante = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
+    is_admin = request.user.colegios_administrados.filter(id=colegio.id).exists() or (miembro_solicitante and miembro_solicitante.rol.nombre in ['Administrador', 'Director'])
+    if not is_admin:
+        messages.error(request, "No tienes permisos.")
+        return redirect('listar_personal')
+
+    if request.method == 'POST':
+        rol_id = request.POST.get('rol')
+        if rol_id:
+            nuevo_rol = get_object_or_404(RolColegio, id=rol_id, colegio=colegio)
+            miembro.rol = nuevo_rol
+            miembro.save()
+            messages.success(request, f"El rol de {miembro.usuario.username} ha sido cambiado a {nuevo_rol.nombre}.")
+    return redirect('listar_personal')
+
+@login_required
+def baja_personal_view(request, miembro_id):
+    colegio = obtener_colegio_usuario(request.user)
+    miembro = get_object_or_404(MiembroColegio, id=miembro_id, colegio=colegio)
+
+    if miembro.usuario == request.user:
+        messages.error(request, "No puedes cambiar tu propio estado de acceso.")
+        return redirect('listar_personal')
+
+    miembro_solicitante = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
+    is_admin = request.user.colegios_administrados.filter(id=colegio.id).exists() or (miembro_solicitante and miembro_solicitante.rol.nombre in ['Administrador', 'Director'])
+    if not is_admin:
+        messages.error(request, "No tienes permisos.")
+        return redirect('listar_personal')
+
+    miembro.activo = not miembro.activo
+    miembro.save()
+    
+    estado = "reactivado" if miembro.activo else "desactivado (baja de acceso)"
+    messages.success(request, f"El acceso para {miembro.usuario.username} ha sido {estado}.")
+    return redirect('listar_personal')
+

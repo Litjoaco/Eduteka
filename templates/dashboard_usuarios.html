@@ -24,7 +24,7 @@
     --dark: #151A35;
     --gray-text: #687089;
     --bg-color: #F8F9FC;
-    --border-color: #EAEBF0;
+    --border-color: #BCC0CF;
     --border-gray: #D1D5DB; /* Añadido para el Timeline */
     --white: #FFFFFF;
     --sidebar-width: 240px;
@@ -240,6 +240,98 @@
     .main-content { margin-left: 0; width: 100%; }
     .topbar { padding: 0 1.5rem; }
   }
+
+  /* ── ELEVATED PREMIUM STYLES ── */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Fade-in staggered animations on load */
+  .dashboard-panel, .kpi-card, .qa-btn, .action-btn {
+    animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .kpi-card:nth-child(1) { animation-delay: 0.05s; }
+  .kpi-card:nth-child(2) { animation-delay: 0.1s; }
+  .kpi-card:nth-child(3) { animation-delay: 0.15s; }
+  .kpi-card:nth-child(4) { animation-delay: 0.2s; }
+
+  /* Body background glowing gradients */
+  body {
+    position: relative;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    top: -15%; left: 65%;
+    width: 50vw; height: 50vw;
+    background: radial-gradient(circle, rgba(124, 92, 252, 0.07) 0%, rgba(255,255,255,0) 70%);
+    z-index: -2;
+    pointer-events: none;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    top: 45%; left: -15%;
+    width: 40vw; height: 40vw;
+    background: radial-gradient(circle, rgba(101, 205, 191, 0.06) 0%, rgba(255,255,255,0) 70%);
+    z-index: -2;
+    pointer-events: none;
+  }
+
+  /* Smooth dynamic transitions */
+  .nav-item, .menu-item, .kpi-card, .qa-btn, .action-btn, .user-profile, .seccion-card {
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+  }
+
+  /* Sidebar items hover */
+  .nav-item:hover, .menu-item:hover {
+    transform: translateX(5px);
+    background-color: var(--primary-soft) !important;
+    color: var(--primary) !important;
+  }
+  
+  /* KPI Cards premium hover */
+  .kpi-card:hover {
+    transform: translateY(-5px) scale(1.01) !important;
+    box-shadow: 0 12px 30px rgba(124, 92, 252, 0.12) !important;
+  }
+
+  /* Quick action buttons premium hover */
+  .qa-btn:hover, .action-btn:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 8px 24px rgba(124, 92, 252, 0.12) !important;
+  }
+
+  /* Hero title text gradient */
+  .hero-title {
+    background: linear-gradient(135deg, var(--dark) 20%, var(--primary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+  }
+
+  /* Custom glassmorphism overlays */
+  .sidebar {
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+  }
+  .topbar {
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+  }
+  .sidebar-school {
+    background: linear-gradient(135deg, rgba(124, 92, 252, 0.08) 0%, rgba(101, 205, 191, 0.08) 100%) !important;
+    border: 1px solid rgba(124, 92, 252, 0.12) !important;
+  }
 </style>
 </head>
 <body>
@@ -257,11 +349,14 @@
         
         <nav class="sidebar-menu">
             <div class="menu-label">Menú Principal</div>
-            <a href="#" class="menu-item active"><i class="bi bi-house"></i> Inicio</a>
-            <a href="#" class="menu-item"><i class="bi bi-book"></i> Académico</a>
-            <a href="#" class="menu-item"><i class="bi bi-calendar-check"></i> Asistencia</a>
+            <a href="{% url 'dashboard_usuario' %}" class="menu-item active"><i class="bi bi-house"></i> Inicio</a>
+            <a href="{% url 'listar_estudiantes' %}" class="menu-item"><i class="bi bi-people"></i> Estudiantes</a>
+            <a href="{% url 'listar_asignaturas' %}" class="menu-item"><i class="bi bi-book"></i> Académico</a>
+            <a href="{% url 'listar_cursos' %}" class="menu-item"><i class="bi bi-diagram-3"></i> Cursos</a>
+            <a href="{% url 'listar_personal' %}" class="menu-item"><i class="bi bi-person-badge"></i> Personal</a>
+            <a href="{% url 'registrar_asistencia' %}" class="menu-item"><i class="bi bi-calendar-check"></i> Asistencia</a>
             <a href="#" class="menu-item"><i class="bi bi-calendar3"></i> Calendario</a>
-            <a href="#" class="menu-item"><i class="bi bi-bar-chart"></i> Reportes</a>
+            <a href="{% url 'historial_asistencia' %}" class="menu-item"><i class="bi bi-bar-chart"></i> Reportes</a>
             
             <div class="menu-label mt-4">Administración</div>
             <a href="#" class="menu-item"><i class="bi bi-wallet2"></i> Contabilidad</a>
@@ -380,7 +475,7 @@
                                     <div class="kpi-icon red"><i class="bi bi-exclamation-triangle"></i></div>
                                     <div class="kpi-title">Alumnos en Riesgo</div>
                                 </div>
-                                <div class="kpi-value">12 <span class="kpi-trend trend-down"><i class="bi bi-arrow-up-short"></i> 2</span></div>
+                                <div class="kpi-value">{{ alumnos_en_riesgo_count|default:"0" }} <span class="kpi-trend {% if alumnos_en_riesgo_count > 0 %}trend-down{% else %}text-muted bg-light{% endif %}"><i class="bi {% if alumnos_en_riesgo_count > 0 %}bi-arrow-up-short{% else %}bi-dash{% endif %}"></i></span></div>
                                 <a href="#" class="kpi-link red">Ver alertas <i class="bi bi-arrow-right"></i></a>
                             </div>
                         </div>
@@ -388,7 +483,7 @@
 
                     <!-- Quick Actions (Accesos RÃ¡pidos) -->
                     <div class="quick-actions">
-                        <a href="#" class="action-btn">
+                        <a href="{% url 'registrar_asistencia' %}" class="action-btn">
                             <div class="action-icon-wrap purple"><i class="bi bi-clipboard-check"></i></div>
                             <span>Registrar Asistencia</span>
                         </a>
@@ -471,15 +566,31 @@
                             <h3 class="panel-title">Alertas del Sistema</h3>
                         </div>
                         <div class="alerts-container">
-                            <div class="alert-item warning">
+                            {% if alumnos_en_riesgo_count > 0 %}
+                            <div class="alert-item danger">
                                 <div class="alert-content w-100">
-                                    <div class="alert-header">
-                                        <div class="alert-icon"><i class="bi bi-exclamation-circle-fill"></i></div>
-                                        <h4 class="alert-title">12 alumnos con asistencia crítica</h4>
+                                    <div class="alert-header" style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <div class="alert-icon" style="color: #ff5f56;"><i class="bi bi-exclamation-circle-fill"></i></div>
+                                        <h4 class="alert-title" style="margin: 0;">{{ alumnos_en_riesgo_count }} alumnos con asistencia crítica</h4>
                                     </div>
-                                    <span class="alert-desc">Menor al 85% este semestre.</span>
+                                    <ul class="mb-0 mt-2 small text-danger" style="padding-left: 1.25rem; font-size: 0.78rem; list-style-type: disc;">
+                                        {% for r in alumnos_en_riesgo|slice:":4" %}
+                                            <li>{{ r.estudiante.nombre_completo }} ({{ r.estudiante.seccion.nombre }}): <strong>{{ r.tasa }}%</strong></li>
+                                        {% endfor %}
+                                    </ul>
                                 </div>
                             </div>
+                            {% else %}
+                            <div class="alert-item" style="background: rgba(39, 201, 63, 0.05); border: 1px solid rgba(39, 201, 63, 0.15); border-left: 4px solid #27c93f; display: flex; padding: 0.75rem 1rem; border-radius: 8px;">
+                                <div class="alert-content w-100">
+                                    <div class="alert-header" style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <div class="alert-icon" style="color: #27c93f;"><i class="bi bi-check-circle-fill"></i></div>
+                                        <h4 class="alert-title" style="margin: 0; font-size: 0.85rem; font-weight: 700; color: var(--dark);">Asistencia impecable</h4>
+                                    </div>
+                                    <span class="alert-desc" style="display: block; margin-top: 0.25rem; font-size: 0.78rem; color: var(--muted);">Ningún alumno tiene asistencia crítica (<85%).</span>
+                                </div>
+                            </div>
+                            {% endif %}
                             <div class="alert-item danger">
                                 <div class="alert-content w-100">
                                     <div class="alert-header">

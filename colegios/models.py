@@ -209,6 +209,23 @@ class SeccionCurso(models.Model):
         return self.nombre
 
 
+class Estudiante(models.Model):
+    colegio = models.ForeignKey(Colegio, on_delete=models.CASCADE, related_name='estudiantes')
+    seccion = models.ForeignKey(SeccionCurso, on_delete=models.SET_NULL, null=True, blank=True, related_name='estudiantes')
+    nombre_completo = models.CharField(max_length=150)
+    rut = models.CharField(max_length=12, blank=True, null=True)
+    activo = models.BooleanField(default=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Estudiante"
+        verbose_name_plural = "Estudiantes"
+
+    def __str__(self):
+        return f"{self.nombre_completo} - {self.seccion.nombre if self.seccion else 'Sin Sección'}"
+
+
 # --- ROLES Y PERMISOS RELACIONALES ---
 
 class Permiso(models.Model):
@@ -262,3 +279,20 @@ class RolPermiso(models.Model):
 
     def __str__(self):
         return f"{self.rol.nombre} - {self.modulo.nombre}"
+
+
+class Asignatura(models.Model):
+    colegio = models.ForeignKey(Colegio, on_delete=models.CASCADE, related_name='asignaturas')
+    curso = models.ForeignKey(CursoColegio, on_delete=models.CASCADE, related_name='asignaturas')
+    nombre = models.CharField(max_length=100)
+    docente = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='asignaturas_dictadas')
+    activo = models.BooleanField(default=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Asignatura"
+        verbose_name_plural = "Asignaturas"
+        unique_together = ('curso', 'nombre')
+
+    def __str__(self):
+        return f"{self.nombre} - {self.curso.nombre}"

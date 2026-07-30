@@ -1,0 +1,349 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Asistencia - Eduteka</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+<style>
+  :root {
+    --primary: #7C5CFC;
+    --primary-soft: #F0EDFF;
+    --secondary: #65CDBF;
+    --accent: #F76F7A;
+    --warning: #F6C85F;
+    --dark: #151A35;
+    --gray-text: #687089;
+    --bg-color: #F8F9FC;
+    --border-color: #BCC0CF;
+    --white: #FFFFFF;
+    --sidebar-width: 240px;
+  }
+  
+  html {
+    font-size: 14px;
+  }
+
+  body { 
+    background: var(--bg-color); 
+    color: var(--dark); 
+    font-family: 'Inter', sans-serif; 
+    overflow-x: hidden; 
+  }
+
+  /* Layout */
+  .app-container { display: flex; min-height: 100vh; width: 100vw; overflow-x: hidden; }
+  
+  /* Sidebar */
+  .sidebar { 
+    width: var(--sidebar-width); 
+    background: var(--white); 
+    border-right: 1px solid var(--border-color); 
+    position: fixed; 
+    top: 0; bottom: 0; left: 0; 
+    display: flex; flex-direction: column; 
+    z-index: 1040; 
+    transition: transform 0.3s ease; 
+  }
+  .sidebar-logo { display: flex; justify-content: center; align-items: center; padding: 1.4rem 1.5rem 1rem; width: 100%; background: transparent; }
+  .sidebar-logo img { max-height: 100px; width: auto; max-width: 85%; object-fit: contain; }
+  .sidebar-school {
+    margin: 0 .75rem .75rem;
+    background: linear-gradient(135deg, rgba(124, 92, 252, 0.08) 0%, #E8E2FF 100%);
+    border-radius: 12px;
+    padding: .9rem 1rem;
+  }
+  .sidebar-school-name { font-weight: 700; font-size: .85rem; color: #7C5CFC; margin-bottom: 2px; }
+  .sidebar-school-sub { font-size: .75rem; color: #6747E3; font-weight: 500; }
+  
+  .sidebar-menu { padding: .75rem .75rem 0; flex: 1; overflow-y: auto; scrollbar-width: none; }
+  .sidebar-menu::-webkit-scrollbar { display: none; }
+  .menu-label { font-size: .67rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #687089; padding: .5rem .75rem .3rem; margin-top: .25rem; }
+  .menu-item { display: flex; align-items: center; gap: .75rem; padding: .6rem .85rem; color: #687089; font-weight: 500; font-size: .88rem; border-radius: 10px; text-decoration: none; transition: background .15s, color .15s; margin-bottom: 2px; }
+  .menu-item i { font-size: 1.05rem; flex-shrink: 0; }
+  .menu-item:hover { background: #F8F9FD; color: #151A35; transform: none; }
+  .menu-item.active { background: #7C5CFC; color: #fff; font-weight: 600; box-shadow: 0 4px 14px rgba(108,79,240,.3); }
+  .menu-item.active i { color: #fff; }
+  
+  .sidebar-bottom { padding: .75rem; border-top: 1px solid #BCC0CF; margin-top: auto; }
+
+  /* Main Wrapper & Topbar */
+  .main-content { margin-left: var(--sidebar-width); flex: 1; display: flex; flex-direction: column; min-width: 0; transition: margin 0.3s ease; width: calc(100% - var(--sidebar-width)); }
+  .topbar { height: 64px; background: var(--white); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; position: sticky; top: 0; z-index: 1030; }
+
+  .topbar-right { display: flex; align-items: center; gap: 1.5rem; }
+  .user-profile { display: flex; align-items: center; gap: 0.75rem; cursor: pointer; }
+  .user-profile img { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; }
+  .user-info { display: flex; flex-direction: column; }
+  .user-name { font-weight: 600; font-size: 0.9rem; color: var(--dark); }
+  .user-role { font-size: 0.8rem; color: var(--gray-text); }
+
+  /* Content Area */
+  .content-area { padding: 1.5rem 2rem; max-width: 1440px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+  
+  /* Panels */
+  .dashboard-panel { background: var(--white); border-radius: 12px; border: 1px solid var(--border-color); padding: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+  .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+  .panel-title { font-size: 1.1rem; font-weight: 600; color: var(--dark); margin: 0; }
+
+  /* Section cards */
+  .seccion-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.25rem; margin-top: 1rem; }
+  .seccion-card { 
+    background: var(--white); 
+    border: 1px solid var(--border-color); 
+    border-radius: 12px; 
+    padding: 1.25rem; 
+    cursor: pointer; 
+    transition: all 0.2s ease; 
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 120px;
+    position: relative;
+    overflow: hidden;
+  }
+  .seccion-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(124, 92, 252, 0.1);
+  }
+  .seccion-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 4px; height: 100%;
+    background: var(--primary);
+  }
+  .seccion-card-title { font-size: 1.1rem; font-weight: 700; color: var(--dark); margin-bottom: 0.25rem; }
+  .seccion-card-subtitle { font-size: 0.85rem; color: var(--gray-text); }
+  .seccion-card-badge { align-self: flex-start; font-size: 0.75rem; font-weight: 600; background: var(--primary-soft); color: var(--primary); padding: 0.25rem 0.5rem; border-radius: 6px; margin-top: 0.75rem; }
+
+  @media (max-width: 992px) {
+    .sidebar { transform: translateX(-100%); }
+    .main-content { margin-left: 0; width: 100%; }
+  }
+
+  /* ── ELEVATED PREMIUM STYLES ── */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Fade-in staggered animations on load */
+  .dashboard-panel, .seccion-card {
+    animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  /* Body background glowing gradients */
+  body {
+    position: relative;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    top: -15%; left: 65%;
+    width: 50vw; height: 50vw;
+    background: radial-gradient(circle, rgba(124, 92, 252, 0.07) 0%, rgba(255,255,255,0) 70%);
+    z-index: -2;
+    pointer-events: none;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    top: 45%; left: -15%;
+    width: 40vw; height: 40vw;
+    background: radial-gradient(circle, rgba(101, 205, 191, 0.06) 0%, rgba(255,255,255,0) 70%);
+    z-index: -2;
+    pointer-events: none;
+  }
+
+  /* Smooth dynamic transitions */
+  .nav-item, .menu-item, .user-profile, .seccion-card, .btn {
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+  }
+
+</style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <img src="{% static 'img/logo.png' %}" alt="Eduteka Logo">
+        </div>
+        <div style="padding: 0 .75rem .75rem;">
+          <div class="sidebar-school">
+            <div class="sidebar-school-name">{{ colegio.nombre|default:"Mi Colegio" }}</div>
+            <div class="sidebar-school-sub">Año Escolar {{ periodo.anio_academico|default:"Actual" }}</div>
+          </div>
+        </div>
+        
+        <nav class="sidebar-menu">
+            <div class="menu-label">Menú Principal</div>
+            <a href="{% url 'dashboard_usuario' %}" class="menu-item"><i class="bi bi-house"></i> Inicio</a>
+            <a href="{% url 'listar_estudiantes' %}" class="menu-item"><i class="bi bi-people"></i> Estudiantes</a>
+            <a href="{% url 'listar_asignaturas' %}" class="menu-item"><i class="bi bi-book"></i> Académico</a>
+            <a href="{% url 'listar_cursos' %}" class="menu-item"><i class="bi bi-diagram-3"></i> Cursos</a>
+            <a href="{% url 'listar_personal' %}" class="menu-item"><i class="bi bi-person-badge"></i> Personal</a>
+            <a href="{% url 'registrar_asistencia' %}" class="menu-item active"><i class="bi bi-calendar-check"></i> Asistencia</a>
+            <a href="#" class="menu-item"><i class="bi bi-calendar3"></i> Calendario</a>
+            <a href="{% url 'historial_asistencia' %}" class="menu-item"><i class="bi bi-bar-chart"></i> Reportes</a>
+            
+            <div class="menu-label mt-4">Administración</div>
+            <a href="#" class="menu-item"><i class="bi bi-wallet2"></i> Contabilidad</a>
+            <a href="#" class="menu-item"><i class="bi bi-truck"></i> Proveedores</a>
+            <a href="#" class="menu-item"><i class="bi bi-award"></i> SIMCE</a>
+        </nav>
+        
+        <div class="sidebar-bottom">
+            <a href="#" class="menu-item"><i class="bi bi-gear"></i> Configuración</a>
+            <a href="{% url 'logout' %}" class="menu-item text-danger"><i class="bi bi-box-arrow-right"></i> Cerrar Sesión</a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <header class="topbar">
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-light d-lg-none" id="mobileMenuBtn">
+                    <i class="bi bi-list fs-5"></i>
+                </button>
+                <h4 class="mb-0 fw-semibold text-dark">Registro de Asistencia</h4>
+            </div>
+            
+            <div class="topbar-right">
+                <div class="user-profile dropdown-toggle" data-bs-toggle="dropdown">
+                    <img src="https://ui-avatars.com/api/?name={{ request.user.first_name|default:request.user.username }}+{{ request.user.last_name|default:'' }}&background=7C5CFC&color=fff" alt="Perfil">
+                    <div class="user-info d-none d-sm-flex">
+                        <span class="user-name">{{ request.user.first_name|default:request.user.username }}</span>
+                        <span class="user-role">{{ miembro.rol.nombre|default:'Profesor' }}</span>
+                    </div>
+                </div>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2">
+                    <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i> Mi Perfil</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="{% url 'logout' %}"><i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión</a></li>
+                </ul>
+            </div>
+        </header>
+
+        <main class="content-area">
+            <!-- Breadcrumbs / Back button -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold text-dark">Tomar Asistencia</h2>
+                    <p class="text-muted mb-0">Selecciona el curso y la fecha para registrar la asistencia.</p>
+                </div>
+                <a href="{% url 'historial_asistencia' %}" class="btn btn-outline-primary d-flex align-items-center gap-2">
+                    <i class="bi bi-clock-history"></i> Ver Historial de Asistencia
+                </a>
+            </div>
+
+            <!-- Messages alert -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Configuration / Selector Panel -->
+            <div class="dashboard-panel">
+                <form id="attendanceSelectorForm" method="POST" action="{% url 'registrar_asistencia' %}">
+                    {% csrf_token %}
+                    <div class="row align-items-end g-3">
+                        <div class="col-md-4">
+                            <label for="fechaInput" class="form-label fw-semibold text-dark">Fecha del Registro</label>
+                            <input type="date" class="form-control" id="fechaInput" name="fecha" value="{{ fecha_actual }}" max="{{ hoy|date:'Y-m-d' }}" required>
+                        </div>
+                        <div class="col-md-8">
+                            <p class="text-muted small mb-1"><i class="bi bi-info-circle me-1"></i> La fecha seleccionada se aplicará al curso que selecciones en el panel inferior.</p>
+                        </div>
+                    </div>
+                    
+                    <input type="hidden" id="seccionIdInput" name="seccion_id" value="">
+                </form>
+            </div>
+
+            <!-- Sections List -->
+            <div class="mt-4">
+                <h4 class="fw-semibold mb-3 text-dark">Tus Cursos y Secciones</h4>
+                {% if cursos %}
+                    <div class="row g-4">
+                        {% for curso in cursos %}
+                            <div class="col-md-6 col-lg-4">
+                                <div class="dashboard-panel h-100 d-flex flex-column justify-content-between" style="border-left: 4px solid var(--primary); padding: 1.25rem;">
+                                    <div>
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h5 class="fw-bold text-dark mb-0" style="font-size: 1.15rem;">{{ curso.nombre }}</h5>
+                                            <span class="badge bg-light text-primary font-weight-600 px-2 py-1" style="font-size: 0.75rem; text-transform: capitalize;">
+                                                {{ curso.get_nivel_display|default:curso.nivel }}
+                                            </span>
+                                        </div>
+                                        <p class="text-secondary small mb-3"><i class="bi bi-clock me-1"></i> Jornada: {{ curso.get_jornada_display|default:curso.jornada }}</p>
+                                    </div>
+                                    
+                                    <div>
+                                        <div class="text-muted small mb-2 fw-semibold">Seleccionar sección:</div>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            {% for sec in curso.secciones.all %}
+                                                <button type="button" class="btn btn-outline-primary btn-sm fw-semibold rounded-pill px-3 py-2 d-flex align-items-center gap-1 transition-all" onclick="selectSection({{ sec.id }})" style="min-width: 55px; justify-content: center;">
+                                                    Sección {{ sec.letra }}
+                                                </button>
+                                            {% empty %}
+                                                <span class="text-muted small italic">Sin secciones activas</span>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center p-5 bg-white rounded-3 border border-dashed">
+                        <i class="bi bi-journal-x fs-1 text-muted"></i>
+                        <h5 class="mt-3 fw-semibold">No se encontraron cursos activos</h5>
+                        <p class="text-muted">Por favor, asegúrate de configurar los cursos de tu establecimiento en la sección de administración.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const mobileBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.getElementById('sidebar');
+        
+        if(mobileBtn) {
+            mobileBtn.addEventListener('click', () => {
+                sidebar.style.transform = sidebar.style.transform === 'translateX(0px)' ? 'translateX(-100%)' : 'translateX(0px)';
+            });
+        }
+    });
+
+    function selectSection(id) {
+        document.getElementById('seccionIdInput').value = id;
+        document.getElementById('attendanceSelectorForm').submit();
+    }
+</script>
+</body>
+</html>

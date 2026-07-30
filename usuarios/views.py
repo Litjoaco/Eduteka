@@ -91,11 +91,18 @@ def dashboard_usuarios_view(request):
     periodo = ConfiguracionAcademica.objects.filter(colegio=colegio).first()
     cursos_count = CursoColegio.objects.filter(colegio=colegio, activo=True).count()
     
+    # Alumnos en riesgo
+    from asistencia.utils import calcular_alumnos_en_riesgo
+    alumnos_en_riesgo = calcular_alumnos_en_riesgo(colegio)
+    alumnos_en_riesgo_count = len(alumnos_en_riesgo)
+    
     context = {
         'colegio': colegio,
         'miembro': miembro,
         'periodo': periodo,
         'cursos_count': cursos_count,
         'hoy': timezone.now(),
+        'alumnos_en_riesgo': alumnos_en_riesgo,
+        'alumnos_en_riesgo_count': alumnos_en_riesgo_count,
     }
     return render(request, 'dashboard_usuarios.html', context)

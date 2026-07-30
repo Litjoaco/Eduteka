@@ -27,7 +27,7 @@
     --muted:          #687089;
     --bg:             #F8F9FC;
     --surface:        #FFFFFF;
-    --border:         #EAEBF0;
+    --border:         #BCC0CF;
     --border-strong:  #D1D5DB;
     --sidebar-w:      248px;
 
@@ -641,6 +641,99 @@
     .quick-actions { grid-template-columns: repeat(2, 1fr); }
     .topbar-search, .topbar-date { display: none; }
   }
+
+  /* ── ELEVATED PREMIUM STYLES ── */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Fade-in staggered animations on load */
+  .panel, .kpi-card, .qa-btn, .action-btn {
+    animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .kpi-card:nth-child(1) { animation-delay: 0.05s; }
+  .kpi-card:nth-child(2) { animation-delay: 0.1s; }
+  .kpi-card:nth-child(3) { animation-delay: 0.15s; }
+  .kpi-card:nth-child(4) { animation-delay: 0.2s; }
+
+  /* Body background glowing gradients */
+  body {
+    position: relative;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    top: -15%; left: 65%;
+    width: 50vw; height: 50vw;
+    background: radial-gradient(circle, rgba(124, 92, 252, 0.07) 0%, rgba(255,255,255,0) 70%);
+    z-index: -2;
+    pointer-events: none;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    top: 45%; left: -15%;
+    width: 40vw; height: 40vw;
+    background: radial-gradient(circle, rgba(101, 205, 191, 0.06) 0%, rgba(255,255,255,0) 70%);
+    z-index: -2;
+    pointer-events: none;
+  }
+
+  /* Smooth dynamic transitions */
+  .nav-item, .menu-item, .kpi-card, .qa-btn, .action-btn, .user-chip, .btn-pill, .seccion-card {
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+  }
+
+  /* Sidebar items hover */
+  .nav-item:hover, .menu-item:hover {
+    transform: translateX(5px);
+    background-color: var(--primary-soft) !important;
+    color: var(--primary) !important;
+  }
+  
+  /* KPI Cards premium hover */
+  .kpi-card:hover {
+    transform: translateY(-5px) scale(1.01) !important;
+    box-shadow: 0 12px 30px rgba(124, 92, 252, 0.12) !important;
+    border-color: var(--primary-mid) !important;
+  }
+
+  /* Quick action buttons premium hover */
+  .qa-btn:hover, .action-btn:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 8px 24px rgba(124, 92, 252, 0.12) !important;
+  }
+
+  /* Hero title text gradient */
+  .hero-title {
+    background: linear-gradient(135deg, var(--dark) 20%, var(--primary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+  }
+
+  /* Custom glassmorphism overlays */
+  .sidebar {
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+  }
+  .topbar {
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+  }
+  .sidebar-school {
+    background: linear-gradient(135deg, rgba(124, 92, 252, 0.08) 0%, rgba(101, 205, 191, 0.08) 100%) !important;
+    border: 1px solid rgba(124, 92, 252, 0.12) !important;
+  }
 </style>
 </head>
 <body>
@@ -662,11 +755,14 @@
 
     <nav class="sidebar-nav">
       <div class="nav-section-label">Principal</div>
-      <a href="#" class="nav-item active"><i class="bi bi-house-fill"></i> Inicio</a>
-      <a href="#" class="nav-item"><i class="bi bi-book"></i> Académico</a>
-      <a href="#" class="nav-item"><i class="bi bi-calendar-check"></i> Asistencia</a>
+      <a href="{% url 'dashboard_usuario' %}" class="nav-item active"><i class="bi bi-house-fill"></i> Inicio</a>
+      <a href="{% url 'listar_estudiantes' %}" class="nav-item"><i class="bi bi-people"></i> Estudiantes</a>
+      <a href="{% url 'listar_asignaturas' %}" class="nav-item"><i class="bi bi-book"></i> Académico</a>
+      <a href="{% url 'listar_cursos' %}" class="nav-item"><i class="bi bi-diagram-3"></i> Cursos</a>
+      <a href="{% url 'listar_personal' %}" class="nav-item"><i class="bi bi-person-badge"></i> Personal</a>
+      <a href="{% url 'registrar_asistencia' %}" class="nav-item"><i class="bi bi-calendar-check"></i> Asistencia</a>
       <a href="#" class="nav-item"><i class="bi bi-calendar3"></i> Calendario</a>
-      <a href="#" class="nav-item"><i class="bi bi-bar-chart"></i> Reportes</a>
+      <a href="{% url 'historial_asistencia' %}" class="nav-item"><i class="bi bi-bar-chart"></i> Reportes</a>
 
       <div class="nav-section-label" style="margin-top:.75rem;">Administración</div>
       <a href="#" class="nav-item"><i class="bi bi-wallet2"></i> Contabilidad</a>
@@ -699,7 +795,7 @@
 
       <div class="topbar-right">
         <div class="topbar-date d-none d-sm-block">
-          <i class="bi bi-calendar3" style="margin-right:.35rem;"></i>Jueves, 28 May 2026
+          <i class="bi bi-calendar3" style="margin-right:.35rem;"></i>{{ hoy|date:"l, d \d\e F \d\e Y"|title }}
         </div>
         <button class="notif-btn">
           <i class="bi bi-bell"></i>
@@ -779,7 +875,7 @@
 
           <!-- Quick Actions -->
           <div class="quick-actions">
-            <a href="#" class="qa-btn">
+            <a href="{% url 'registrar_asistencia' %}" class="qa-btn">
               <div class="qa-icon purple"><i class="bi bi-clipboard-check"></i></div>
               Registrar Asistencia
             </a>
@@ -899,16 +995,31 @@
           <div class="panel" style="margin-top:1.25rem;">
             <div class="panel-head">
               <h3 class="panel-title">Alertas del Sistema</h3>
-              <span style="background:#FEF2F2;color:#EF4444;font-size:.7rem;font-weight:700;padding:.2rem .55rem;border-radius:50px;">3 activas</span>
+              <span style="background:#FEF2F2;color:#EF4444;font-size:.7rem;font-weight:700;padding:.2rem .55rem;border-radius:50px;">{% if alumnos_en_riesgo_count > 0 %}3{% else %}2{% endif %} activas</span>
             </div>
             <div>
-              <div class="alert-card warn">
-                <div class="alert-icon-box"><i class="bi bi-exclamation-circle-fill"></i></div>
-                <div>
-                  <p class="alert-title">12 alumnos con asistencia crítica</p>
-                  <p class="alert-sub">Menor al 85% este semestre.</p>
+              {% if alumnos_en_riesgo_count > 0 %}
+              <div class="alert-card danger">
+                <div class="alert-icon-box" style="background:#FFE4E6; color:#E11D48;"><i class="bi bi-exclamation-circle-fill"></i></div>
+                <div class="w-100">
+                  <p class="alert-title">{{ alumnos_en_riesgo_count }} alumnos con asistencia crítica</p>
+                  <p class="alert-sub" style="font-size: 0.78rem;">Menor al 85% de asistencia:</p>
+                  <ul class="mb-0 mt-1 p-0 small text-danger list-unstyled" style="font-size: 0.75rem; line-height: 1.3;">
+                    {% for r in alumnos_en_riesgo|slice:":4" %}
+                      <li>• {{ r.estudiante.nombre_completo }} ({{ r.estudiante.seccion.nombre }}): <strong>{{ r.tasa }}%</strong></li>
+                    {% endfor %}
+                  </ul>
                 </div>
               </div>
+              {% else %}
+              <div class="alert-card" style="background: rgba(39, 201, 63, 0.05); border: 1px solid rgba(39, 201, 63, 0.15);">
+                <div class="alert-icon-box" style="background: rgba(39, 201, 63, 0.15); color: #27c93f;"><i class="bi bi-check-circle-fill"></i></div>
+                <div>
+                  <p class="alert-title" style="color: var(--dark); font-weight: 700; margin-bottom: 2px;">Asistencia impecable</p>
+                  <p class="alert-sub" style="color: var(--muted); margin: 0;">Ningún alumno tiene asistencia crítica (<85%).</p>
+                </div>
+              </div>
+              {% endif %}
               <div class="alert-card danger">
                 <div class="alert-icon-box"><i class="bi bi-x-circle-fill"></i></div>
                 <div>

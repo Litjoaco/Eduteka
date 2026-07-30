@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'planes',
     'solicitudes',
     'dashboard',
+    'asistencia',
 ]
 
 MIDDLEWARE = [
@@ -119,9 +120,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es-cl'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Santiago'
 
 USE_I18N = True
 
