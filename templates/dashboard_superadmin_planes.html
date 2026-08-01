@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Planes y Suscripciones - Super Admin Eduteka</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap Icons for logo -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <!-- Heroicons -->
+    <script src="https://unpkg.com/heroicons@2.0.18/24/outline/index.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            navy: '#0F172A',
+                            teal: '#0D9488',
+                            tealLight: '#14B8A6',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800 antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR -->
+        <aside class="w-64 bg-slate-900 text-slate-300 flex-shrink-0 flex flex-col transition-all duration-300">
+            <div class="px-6 py-6 border-b border-slate-700/50 mb-6">
+                <div class="flex items-center gap-3 mb-1">
+                    <i class="bi bi-mortarboard-fill text-teal-600 text-[32px]"></i>
+                    <span class="text-2xl font-bold text-white tracking-tight">Eduteka</span>
+                </div>
+                <div class="text-xs font-semibold text-teal-600 tracking-widest">SUPER ADMIN</div>
+            </div>
+
+            <nav class="flex-1 px-4 space-y-1 overflow-y-auto">
+                <a href="{% url 'dashboard_superadmin' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
+                    Dashboard
+                </a>
+                <a href="{% url 'dashboard_superadmin_colegios' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                    Colegios Clientes
+                </a>
+                <a href="{% url 'dashboard_superadmin_planes' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium bg-teal-600 text-white shadow-sm">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
+                    Planes y Suscripciones
+                </a>
+                <a href="{% url 'dashboard_superadmin_facturacion' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                    Facturación y SII
+                </a>
+                <a href="{% url 'dashboard_superadmin_ordenes' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" /></svg>
+                    Órdenes de Compra
+                </a>
+                <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                    Módulos ERP
+                </a>
+                <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                    Mercado Público MP
+                </a>
+                <a href="{% url 'dashboard_superadmin_estadisticas' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                    Estadísticas Globales
+                </a>
+                <a href="{% url 'dashboard_superadmin_configuracion' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                    Configuración
+                </a>
+            </nav>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <div class="flex-1 flex flex-col h-screen overflow-hidden">
+            
+            <!-- TOPBAR -->
+            <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-8 shrink-0">
+                <div class="relative w-96">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                    </div>
+                    <input type="text" placeholder="Buscar colegios, órdenes, planes..." class="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-full leading-5 bg-slate-50 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-teal-500 focus:border-teal-500 sm:text-sm transition-colors">
+                </div>
+
+                <div class="flex items-center gap-6">
+                    <button class="relative text-slate-400 hover:text-slate-500 focus:outline-none transition-colors">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                        <span class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white">1</span>
+                    </button>
+                    <div class="flex items-center gap-3 cursor-pointer">
+                        <div class="h-9 w-9 rounded-full bg-slate-900 flex items-center justify-center text-white font-semibold text-sm shadow-sm">
+                            AE
+                        </div>
+                        <span class="text-sm font-semibold text-slate-700">Admin Eduteka</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- MAIN SCROLLABLE CONTENT -->
+            <main class="flex-1 overflow-y-auto p-8">
+                
+                <!-- Page Header -->
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
+                    <div>
+                        <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Gestión de Planes y Suscripciones</h1>
+                    </div>
+                    <button class="inline-flex items-center justify-center rounded-md border border-transparent bg-teal-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-colors">
+                        <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                        Crear Nuevo Plan
+                    </button>
+                </div>
+
+                <!-- Pricing Cards Section -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
+                    
+                    <!-- Card 1: Plan Básico -->
+                    <div class="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden flex flex-col h-full hover:shadow-lg transition-shadow">
+                        <div class="p-8 flex-1">
+                            <h3 class="text-xl font-bold text-slate-900 mb-2">Plan Básico</h3>
+                            <div class="flex items-baseline mb-6">
+                                <span class="text-3xl font-extrabold text-slate-900">$150.000</span>
+                                <span class="text-slate-500 ml-1 text-sm font-medium">CLP / mes</span>
+                            </div>
+                            
+                            <ul class="space-y-4 mb-8">
+                                <li class="flex items-start">
+                                    <svg class="h-5 w-5 text-teal-500 shrink-0 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                    <span class="text-slate-600 text-sm">Libro de Clases</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <svg class="h-5 w-5 text-teal-500 shrink-0 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                    <span class="text-slate-600 text-sm">Asistencia</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <svg class="h-5 w-5 text-teal-500 shrink-0 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                    <span class="text-slate-600 text-sm">Anotaciones</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <svg class="h-5 w-5 text-teal-500 shrink-0 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                    <span class="text-slate-600 text-sm">Perfil del Alumno</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="px-8 pb-8 mt-auto">
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="text-sm font-medium text-slate-500">
+                                    <i class="bi bi-building mr-1"></i> 45 Colegios suscritos
+                                </span>
+                            </div>
+                            <button class="w-full inline-flex justify-center items-center px-4 py-2.5 border border-slate-300 shadow-sm text-sm font-medium rounded-md text-slate-700 bg-white hover:bg-slate-50 focus:outline-none transition-colors">
+                                Editar Plan
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Plan Estándar -->
+                    <div class="bg-white rounded-2xl shadow-md border-t-8 border-t-teal-600 border-l border-r border-b border-slate-200 overflow-hidden flex flex-col h-full relative hover:shadow-lg transition-shadow scale-105 z-10">
+                        <div class="absolute top-0 inset-x-0 h-px bg-teal-600"></div>
+                        <div class="absolute top-4 right-4 bg-teal-100 text-teal-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">Destacado</div>
+                        <div class="p-8 flex-1">
+                            <h3 class="text-xl font-bold text-slate-900 mb-2">Plan Estándar</h3>
+                            <div class="flex items-baseline mb-6">
+                                <span class="text-3xl font-extrabold text-slate-900">$250.000</span>
+                                <span class="text-slate-500 ml-1 text-sm font-medium">CLP / mes</span>
+                            </div>
+                            
+                            <ul class="space-y-4 mb-8">
+                                <li class="flex items-start">
+                                    <svg class="h-5 w-5 text-teal-500 shrink-0 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                    <span class="text-slate-600 text-sm font-medium">Todo lo del Básico +</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <svg class="h-5 w-5 text-teal-500 shrink-0 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                    <span class="text-slate-600 text-sm">Contabilidad</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <svg class="h-5 w-5 text-teal-500 shrink-0 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                    <span class="text-slate-600 text-sm">Calendario Compartido</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <svg class="h-5 w-5 text-teal-500 shrink-0 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                    <span class="text-slate-600 text-sm">Reportes Básicos</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="px-8 pb-8 mt-auto">
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="text-sm font-bold text-teal-700">
+                                    <i class="bi bi-building mr-1"></i> 120 Colegios suscritos
+                                </span>
+                            </div>
+                            <button class="w-full inline-flex justify-center items-center px-4 py-2.5 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 focus:outline-none transition-colors">
+                                Editar Plan
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: Plan Premium -->
+                    <div class="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden flex flex-col h-full hover:shadow-lg transition-shadow">
+                        <div class="p-8 flex-1">
+                            <h3 class="text-xl font-bold text-slate-900 mb-2">Plan Premium</h3>
+                            <div class="flex items-baseline mb-6">
+                                <span class="text-3xl font-extrabold text-slate-900">$400.000</span>
+                                <span class="text-slate-500 ml-1 text-sm font-medium">CLP / mes</span>
+                            </div>
+                            
+                            <ul class="space-y-4 mb-8">
+                                <li class="flex items-start">
+                                    <svg class="h-5 w-5 text-teal-500 shrink-0 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                    <span class="text-slate-600 text-sm font-medium">Todo lo del Estándar +</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <svg class="h-5 w-5 text-teal-500 shrink-0 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                    <span class="text-slate-600 text-sm">Módulo SIMCE</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <svg class="h-5 w-5 text-teal-500 shrink-0 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                    <span class="text-slate-600 text-sm">Módulo Proveedores</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <svg class="h-5 w-5 text-teal-500 shrink-0 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                    <span class="text-slate-600 text-sm">Licitaciones (Mercado Público)</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="px-8 pb-8 mt-auto">
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="text-sm font-medium text-slate-500">
+                                    <i class="bi bi-building mr-1"></i> 50 Colegios suscritos
+                                </span>
+                            </div>
+                            <button class="w-full inline-flex justify-center items-center px-4 py-2.5 border border-slate-300 shadow-sm text-sm font-medium rounded-md text-slate-700 bg-white hover:bg-slate-50 focus:outline-none transition-colors">
+                                Editar Plan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity Table Section -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden w-full mb-8">
+                    <div class="px-6 py-5 border-b border-slate-200">
+                        <h2 class="text-lg font-bold text-slate-900">Actividad Reciente de Suscripciones</h2>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-slate-200">
+                            <thead class="bg-slate-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Colegio</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Fecha</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Movimiento</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Plan Anterior</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Plan Nuevo</th>
+                                    <th scope="col" class="px-6 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Valor Adicional</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-slate-200">
+                                <!-- Fila 1 -->
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
+                                        Liceo Santa María
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                                        31/07/2026
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            <svg class="mr-1.5 h-2 w-2 text-green-400" fill="currentColor" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3" /></svg>
+                                            Upgrade
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                                        Estándar
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
+                                        Premium
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium text-green-600">
+                                        +$150.000
+                                    </td>
+                                </tr>
+
+                                <!-- Fila 2 -->
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
+                                        Colegio Arturo Prat
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                                        28/07/2026
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                            <svg class="mr-1.5 h-2 w-2 text-blue-400" fill="currentColor" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3" /></svg>
+                                            Nueva Suscripción
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                                        Ninguno
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
+                                        Premium
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium text-green-600">
+                                        +$400.000
+                                    </td>
+                                </tr>
+
+                                <!-- Fila 3 -->
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
+                                        Instituto Tecnológico
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                                        25/07/2026
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                            <svg class="mr-1.5 h-2 w-2 text-red-400" fill="currentColor" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3" /></svg>
+                                            Downgrade
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                                        Estándar
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
+                                        Básico
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium text-red-600">
+                                        -$100.000
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+</body>
+</html>

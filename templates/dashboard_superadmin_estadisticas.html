@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estadísticas Globales - Super Admin Eduteka</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            navy: '#0F172A',
+                            teal: '#0D9488',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800 antialiased relative">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR -->
+        <aside class="w-64 bg-slate-900 text-slate-300 flex-shrink-0 flex flex-col transition-all duration-300">
+            <div class="px-6 py-6 border-b border-slate-700/50 mb-6">
+                <div class="flex items-center gap-3 mb-1">
+                    <i class="bi bi-mortarboard-fill text-teal-600 text-[32px]"></i>
+                    <span class="text-2xl font-bold text-white tracking-tight">Eduteka</span>
+                </div>
+                <div class="text-xs font-semibold text-teal-600 tracking-widest">SUPER ADMIN</div>
+            </div>
+
+            <nav class="flex-1 px-4 space-y-1 overflow-y-auto">
+                <a href="{% url 'dashboard_superadmin' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
+                    Dashboard
+                </a>
+                <a href="{% url 'dashboard_superadmin_colegios' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                    Colegios Clientes
+                </a>
+                <a href="{% url 'dashboard_superadmin_planes' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
+                    Planes y Suscripciones
+                </a>
+                <a href="{% url 'dashboard_superadmin_facturacion' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                    Facturación y SII
+                </a>
+                <a href="{% url 'dashboard_superadmin_ordenes' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" /></svg>
+                    Órdenes de Compra
+                </a>
+                <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                    Módulos ERP
+                </a>
+                <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                    Mercado Público MP
+                </a>
+                <a href="{% url 'dashboard_superadmin_estadisticas' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium bg-teal-600 text-white shadow-sm">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                    Estadísticas Globales
+                </a>
+                <a href="{% url 'dashboard_superadmin_configuracion' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                    Configuración
+                </a>
+            </nav>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <div class="flex-1 flex flex-col h-screen overflow-hidden">
+            
+            <!-- TOPBAR -->
+            <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-8 shrink-0">
+                <div class="relative w-96">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                    </div>
+                    <input type="text" placeholder="Buscar colegios, órdenes, planes..." class="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-full leading-5 bg-slate-50 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-teal-500 focus:border-teal-500 sm:text-sm transition-colors">
+                </div>
+
+                <div class="flex items-center gap-6">
+                    <button class="relative text-slate-400 hover:text-slate-500 focus:outline-none transition-colors">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                        <span class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white">1</span>
+                    </button>
+                    <div class="flex items-center gap-3 cursor-pointer">
+                        <div class="h-9 w-9 rounded-full bg-slate-900 flex items-center justify-center text-white font-semibold text-sm shadow-sm">
+                            AE
+                        </div>
+                        <span class="text-sm font-semibold text-slate-700">Admin Eduteka</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- MAIN SCROLLABLE CONTENT -->
+            <main class="flex-1 overflow-y-auto p-8 relative">
+                
+                <!-- Page Header & Actions -->
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                    <div>
+                        <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Estadísticas Globales y Reportes</h1>
+                        <p class="text-sm text-slate-500 mt-1">Centro de mando y análisis del rendimiento del ERP.</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none transition-colors">
+                            <i class="bi bi-funnel mr-2"></i> Filtrar por Año: 2026
+                        </button>
+                        <button class="inline-flex items-center justify-center rounded-lg border border-transparent bg-teal-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-teal-700 focus:outline-none transition-colors">
+                            <i class="bi bi-cloud-download mr-2"></i> Exportar Reporte (PDF)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KPIs (Top Row) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    
+                    <!-- KPI 1 -->
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col">
+                        <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2">Total Alumnos en el Sistema</h3>
+                        <div class="mt-auto">
+                            <p class="text-3xl font-bold text-slate-900">145.200</p>
+                            <p class="text-sm font-medium text-green-600 mt-1 flex items-center gap-1">
+                                <i class="bi bi-arrow-up-right"></i> +12% este semestre
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- KPI 2 -->
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col">
+                        <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2">Total Profesores Activos</h3>
+                        <div class="mt-auto">
+                            <p class="text-3xl font-bold text-slate-900">8.450</p>
+                            <p class="text-sm font-medium text-slate-400 mt-1">
+                                Base docente actual
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- KPI 3 -->
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col">
+                        <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2">Plan Más Popular</h3>
+                        <div class="mt-auto">
+                            <p class="text-3xl font-bold text-teal-600">Estándar</p>
+                            <p class="text-sm font-medium text-slate-400 mt-1">
+                                Representa el 55% de clientes
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- KPI 4 -->
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col">
+                        <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2">Tasa de Retención</h3>
+                        <div class="mt-auto">
+                            <p class="text-3xl font-bold text-green-600">98.5%</p>
+                            <p class="text-sm font-medium text-slate-400 mt-1">
+                                Baja tasa de cancelación
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Charts Section (Middle Row) -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                    
+                    <!-- Left Chart: Pie Chart -->
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 sm:p-8">
+                        <h2 class="text-lg font-bold text-slate-900 mb-6">Distribución de Planes Suscritos</h2>
+                        
+                        <div class="flex flex-col items-center justify-center space-y-6">
+                            <!-- Simulated Chart Area -->
+                            <div class="w-full h-64 bg-slate-100 rounded-lg border-2 border-dashed border-slate-300 flex items-center justify-center relative overflow-hidden">
+                                <i class="bi bi-pie-chart text-slate-300 text-[100px]"></i>
+                                <span class="absolute text-slate-400 text-sm font-medium">Área de Gráfico Interactivo</span>
+                            </div>
+                            
+                            <!-- Legend -->
+                            <div class="flex flex-wrap justify-center gap-6 text-sm font-medium text-slate-700">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-3 h-3 rounded-full bg-teal-600"></span>
+                                    <span>Premium (25%)</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="w-3 h-3 rounded-full bg-blue-500"></span>
+                                    <span>Estándar (55%)</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="w-3 h-3 rounded-full bg-slate-300"></span>
+                                    <span>Básico (20%)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Chart: Bar Chart -->
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 sm:p-8">
+                        <h2 class="text-lg font-bold text-slate-900 mb-6">Uso de Módulos Adicionales</h2>
+                        
+                        <div class="flex flex-col justify-center space-y-6 h-full pb-4">
+                            <!-- Simulated Chart Area (Bars) -->
+                            <div class="w-full h-64 bg-slate-100 rounded-lg border-2 border-dashed border-slate-300 flex flex-col justify-center px-8 py-4 gap-4 relative">
+                                
+                                <div class="flex items-center gap-4">
+                                    <span class="text-xs font-semibold text-slate-500 w-28 text-right truncate">Libro de Clases</span>
+                                    <div class="flex-1 h-5 bg-slate-200 rounded-r-md">
+                                        <div class="h-full bg-teal-600 rounded-r-md" style="width: 100%;"></div>
+                                    </div>
+                                    <span class="text-xs font-bold text-slate-700 w-12">100%</span>
+                                </div>
+                                
+                                <div class="flex items-center gap-4">
+                                    <span class="text-xs font-semibold text-slate-500 w-28 text-right truncate">Contabilidad</span>
+                                    <div class="flex-1 h-5 bg-slate-200 rounded-r-md">
+                                        <div class="h-full bg-teal-500 rounded-r-md" style="width: 75%;"></div>
+                                    </div>
+                                    <span class="text-xs font-bold text-slate-700 w-12">75%</span>
+                                </div>
+                                
+                                <div class="flex items-center gap-4">
+                                    <span class="text-xs font-semibold text-slate-500 w-28 text-right truncate">Mercado Público</span>
+                                    <div class="flex-1 h-5 bg-slate-200 rounded-r-md">
+                                        <div class="h-full bg-blue-500 rounded-r-md" style="width: 40%;"></div>
+                                    </div>
+                                    <span class="text-xs font-bold text-slate-700 w-12">40%</span>
+                                </div>
+                                
+                                <div class="flex items-center gap-4">
+                                    <span class="text-xs font-semibold text-slate-500 w-28 text-right truncate">SIMCE</span>
+                                    <div class="flex-1 h-5 bg-slate-200 rounded-r-md">
+                                        <div class="h-full bg-blue-400 rounded-r-md" style="width: 35%;"></div>
+                                    </div>
+                                    <span class="text-xs font-bold text-slate-700 w-12">35%</span>
+                                </div>
+
+                                <div class="flex items-center gap-4">
+                                    <span class="text-xs font-semibold text-slate-500 w-28 text-right truncate">Proveedores</span>
+                                    <div class="flex-1 h-5 bg-slate-200 rounded-r-md">
+                                        <div class="h-full bg-slate-400 rounded-r-md" style="width: 20%;"></div>
+                                    </div>
+                                    <span class="text-xs font-bold text-slate-700 w-12">20%</span>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Ranking Section (Bottom Row) -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-0 overflow-hidden mb-12">
+                    <div class="px-6 py-5 border-b border-slate-200 bg-white">
+                        <h2 class="text-lg font-bold text-slate-900">Top 5 Colegios por Volumen de Alumnos</h2>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-slate-200">
+                            <thead class="bg-slate-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Posición</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Colegio</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Plan</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">N° Alumnos</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">N° Profesores</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Ingreso Mensual (MRR)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-slate-100">
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-6 py-4 whitespace-nowrap text-xl font-black text-yellow-500">#1</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-900">Colegio Arturo Prat</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 border border-purple-200">Premium</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700 font-medium">2.500</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">120</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-900">$400.000</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-6 py-4 whitespace-nowrap text-xl font-black text-slate-400">#2</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-900">Liceo Santa María</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 border border-purple-200">Premium</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700 font-medium">2.100</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">95</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-900">$400.000</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-6 py-4 whitespace-nowrap text-xl font-black text-orange-400">#3</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-900">Instituto Nacional</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">Estándar</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700 font-medium">1.800</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">80</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-900">$250.000</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+</body>
+</html>

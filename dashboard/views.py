@@ -88,3 +88,63 @@ def rechazar_solicitud(request, solicitud_id):
         else:
             messages.error(request, "No tienes permiso para rechazar esta solicitud.")
     return redirect('dashboard_profesor')
+
+def dashboard_superadmin_view(request):
+    return render(request, 'dashboard_superadmin.html')
+
+def dashboard_superadmin_colegios_view(request):
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre')
+        contacto = request.POST.get('contacto', 'Sin Contacto')
+        email = request.POST.get('email', 'admin@colegio.cl')
+        direccion = request.POST.get('direccion', '')
+        
+        # Mapeo simple de cantidad de alumnos al choice del modelo
+        alumnos_raw = request.POST.get('alumnos', '0')
+        try:
+            num_alumnos = int(alumnos_raw)
+        except ValueError:
+            num_alumnos = 0
+            
+        if num_alumnos < 100:
+            cantidad_alumnos = 'menos_100'
+        elif num_alumnos <= 300:
+            cantidad_alumnos = '100_300'
+        elif num_alumnos <= 600:
+            cantidad_alumnos = '301_600'
+        else:
+            cantidad_alumnos = 'mas_600'
+
+        Colegio.objects.create(
+            nombre=nombre,
+            nombre_administrador=contacto,
+            correo_institucional=email,
+            direccion=direccion,
+            telefono='000000000', # Dummy
+            ciudad_comuna='Santiago', # Dummy
+            tipo_institucion='particular', # Dummy
+            cantidad_alumnos=cantidad_alumnos,
+            estado='activo',
+            configuracion_completa=True
+        )
+        messages.success(request, 'Colegio creado exitosamente.')
+        return redirect('dashboard_superadmin_colegios')
+
+    colegios = Colegio.objects.all().order_by('-fecha_creacion')
+    return render(request, 'dashboard_superadmin_colegios.html', {'colegios': colegios})
+
+def dashboard_superadmin_planes_view(request):
+    return render(request, 'dashboard_superadmin_planes.html')
+
+def dashboard_superadmin_facturacion_view(request):
+    return render(request, 'dashboard_superadmin_facturacion.html')
+
+def dashboard_superadmin_ordenes_view(request):
+    return render(request, 'dashboard_superadmin_ordenes.html')
+
+def dashboard_superadmin_configuracion_view(request):
+    return render(request, 'dashboard_superadmin_configuracion.html')
+
+def dashboard_superadmin_estadisticas_view(request):
+    return render(request, 'dashboard_superadmin_estadisticas.html')
+
