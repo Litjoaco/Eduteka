@@ -417,43 +417,8 @@
 <body>
 
 <div class="wrapper">
-  <!-- SIDEBAR -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-logo">
-      <img src="{% static 'img/logo.png' %}" alt="Eduteka">
-    </div>
+  {% include 'colegios/_sidebar.html' with active_page='estudiantes' %}
 
-    <div style="padding: 0 .75rem .75rem;">
-      <div class="sidebar-school">
-        <div class="sidebar-school-name">{{ colegio.nombre|default:"Mi Colegio" }}</div>
-        <div class="sidebar-school-sub">Año Escolar {{ periodo.anio_academico|default:"Actual" }}</div>
-      </div>
-    </div>
-
-    <nav class="sidebar-nav">
-      <div class="nav-section-label">Menú Principal</div>
-      <a href="{% url 'dashboard_usuario' %}" class="nav-item"><i class="bi bi-house"></i> Inicio</a>
-      <a href="{% url 'listar_estudiantes' %}" class="nav-item active"><i class="bi bi-people"></i> Estudiantes</a>
-      <a href="{% url 'listar_asignaturas' %}" class="nav-item"><i class="bi bi-book"></i> Académico</a>
-      <a href="{% url 'listar_cursos' %}" class="nav-item"><i class="bi bi-diagram-3"></i> Cursos</a>
-      <a href="{% url 'listar_personal' %}" class="nav-item"><i class="bi bi-person-badge"></i> Personal</a>
-      <a href="{% url 'registrar_asistencia' %}" class="nav-item"><i class="bi bi-calendar-check"></i> Asistencia</a>
-      <a href="#" class="nav-item"><i class="bi bi-calendar3"></i> Calendario</a>
-      <a href="{% url 'historial_asistencia' %}" class="nav-item"><i class="bi bi-bar-chart"></i> Reportes</a>
-
-      <div class="nav-section-label" style="margin-top:.75rem;">Administración</div>
-      <a href="#" class="nav-item"><i class="bi bi-wallet2"></i> Contabilidad</a>
-      <a href="#" class="nav-item"><i class="bi bi-truck"></i> Proveedores</a>
-      <a href="#" class="nav-item"><i class="bi bi-award"></i> SIMCE</a>
-    </nav>
-
-    <div class="sidebar-footer">
-      <a href="#" class="nav-item"><i class="bi bi-gear"></i> Configuración</a>
-      <a href="{% url 'logout' %}" class="nav-item" style="color:#EF4444;">
-        <i class="bi bi-box-arrow-right" style="color:#EF4444;"></i> Cerrar Sesión
-      </a>
-    </div>
-  </aside>
 
   <!-- MAIN CONTENT -->
   <div class="main-content">
@@ -481,15 +446,7 @@
 
     <!-- CONTENT BODY -->
     <main class="content-body">
-      <!-- Mensajes Django -->
-      {% if messages %}
-        {% for message in messages %}
-          <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show shadow-sm mb-4" role="alert" style="border-radius: var(--radius-md);">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        {% endfor %}
-      {% endif %}
+
 
       <!-- Header & Action -->
       <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
@@ -588,19 +545,38 @@
                     </td>
                     <td class="text-center">
                       <div class="d-flex justify-content-center gap-2">
+                        <a href="{% url 'hoja_vida_estudiante' est.id %}" class="btn btn-outline-warning btn-sm px-2.5 text-dark fw-semibold" style="border-radius: var(--radius-sm);" title="Ver Hoja de Vida Conductual">
+                          <i class="bi bi-shield-check me-1 text-warning"></i> Hoja de Vida
+                        </a>
+                        <a href="{% url 'boletin_estudiante' est.id %}" target="_blank" class="btn btn-outline-info btn-sm px-2.5" style="border-radius: var(--radius-sm);" title="Ver Boletín de Notas">
+                          <i class="bi bi-file-earmark-text me-1"></i> Boletín
+                        </a>
                         <a href="{% url 'editar_estudiante' est.id %}" class="btn btn-outline-primary btn-sm px-2.5" style="border-radius: var(--radius-sm);" title="Editar ficha">
                           <i class="bi bi-pencil-square"></i> Editar
                         </a>
                         {% if est.activo %}
-                          <a href="{% url 'baja_estudiante' est.id %}" class="btn btn-outline-danger btn-sm px-2.5" style="border-radius: var(--radius-sm);" title="Dar de baja">
-                            <i class="bi bi-person-x"></i> Dar de Baja
+                          <a href="{% url 'baja_estudiante' est.id %}" 
+                             class="btn btn-outline-danger btn-sm px-2.5 js-confirm-delete" 
+                             data-confirm-title="¿Dar de baja a {{ est.nombre_completo }}?"
+                             data-confirm-text="El alumno pasará a estado inactivo."
+                             data-confirm-btn="Sí, dar de baja"
+                             style="border-radius: var(--radius-sm);" title="Dar de baja">
+                            <i class="bi bi-person-x"></i> Baja
                           </a>
                         {% else %}
-                          <a href="{% url 'baja_estudiante' est.id %}" class="btn btn-outline-success btn-sm px-2.5" style="border-radius: var(--radius-sm);" title="Re-activar estudiante">
+                          <a href="{% url 'baja_estudiante' est.id %}" 
+                             class="btn btn-outline-success btn-sm px-2.5 js-confirm-delete" 
+                             data-confirm-title="¿Re-activar a {{ est.nombre_completo }}?"
+                             data-confirm-text="El alumno volverá a estar activo en la nómina."
+                             data-confirm-btn="Sí, activar"
+                             style="border-radius: var(--radius-sm);" title="Re-activar estudiante">
                             <i class="bi bi-person-check"></i> Activar
                           </a>
                         {% endif %}
+
                       </div>
+
+
                     </td>
                   </tr>
                 {% endfor %}
@@ -615,9 +591,41 @@
               {% endif %}
             </tbody>
           </table>
+
+          {% if estudiantes.has_other_pages %}
+            <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+              <div class="text-muted small">
+                Mostrando estudiantes <strong>{{ estudiantes.start_index }} - {{ estudiantes.end_index }}</strong> de <strong>{{ estudiantes.paginator.count }}</strong>
+              </div>
+              <nav>
+                <ul class="pagination pagination-sm mb-0">
+                  {% if estudiantes.has_previous %}
+                    <li class="page-item"><a class="page-link text-primary fw-bold" href="?page={{ estudiantes.previous_page_number }}{% if seccion_seleccionada %}&seccion={{ seccion_seleccionada }}{% endif %}{% if busqueda %}&q={{ busqueda }}{% endif %}">‹ Anterior</a></li>
+                  {% else %}
+                    <li class="page-item disabled"><span class="page-link">‹ Anterior</span></li>
+                  {% endif %}
+
+                  {% for i in estudiantes.paginator.page_range %}
+                    {% if estudiantes.number == i %}
+                      <li class="page-item active"><span class="page-link bg-primary border-primary">{{ i }}</span></li>
+                    {% else %}
+                      <li class="page-item"><a class="page-link" href="?page={{ i }}{% if seccion_seleccionada %}&seccion={{ seccion_seleccionada }}{% endif %}{% if busqueda %}&q={{ busqueda }}{% endif %}">{{ i }}</a></li>
+                    {% endif %}
+                  {% endfor %}
+
+                  {% if estudiantes.has_next %}
+                    <li class="page-item"><a class="page-link text-primary fw-bold" href="?page={{ estudiantes.next_page_number }}{% if seccion_seleccionada %}&seccion={{ seccion_seleccionada }}{% endif %}{% if busqueda %}&q={{ busqueda }}{% endif %}">Siguiente ›</a></li>
+                  {% else %}
+                    <li class="page-item disabled"><span class="page-link">Siguiente ›</span></li>
+                  {% endif %}
+                </ul>
+              </nav>
+            </div>
+          {% endif %}
         </div>
       </div>
     </main>
+
   </div>
 </div>
 

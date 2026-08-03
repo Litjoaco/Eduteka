@@ -719,20 +719,11 @@
     display: inline-block;
   }
 
-  /* Custom glassmorphism overlays */
-  .sidebar {
-    background: rgba(255, 255, 255, 0.85) !important;
-    backdrop-filter: blur(16px) !important;
-    -webkit-backdrop-filter: blur(16px) !important;
-  }
+  /* Custom glassmorphism on topbar only */
   .topbar {
-    background: rgba(255, 255, 255, 0.8) !important;
+    background: rgba(255,255,255,.8) !important;
     backdrop-filter: blur(12px) !important;
     -webkit-backdrop-filter: blur(12px) !important;
-  }
-  .sidebar-school {
-    background: linear-gradient(135deg, rgba(124, 92, 252, 0.08) 0%, rgba(101, 205, 191, 0.08) 100%) !important;
-    border: 1px solid rgba(124, 92, 252, 0.12) !important;
   }
 </style>
 </head>
@@ -740,43 +731,7 @@
 
 <div class="app-shell">
 
-  <!-- ── SIDEBAR ─────────────────────────────────── -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-logo">
-      <img src="{% static 'img/logo.png' %}" alt="Eduteka">
-    </div>
-
-    <div style="padding: 0 .75rem .75rem;">
-      <div class="sidebar-school">
-        <div class="sidebar-school-name">{{ colegio.nombre|default:"Colegio San Arturo" }}</div>
-        <div class="sidebar-school-sub">Año Escolar {{ suscripcion.periodo_academico|default:"2026" }}</div>
-      </div>
-    </div>
-
-    <nav class="sidebar-nav">
-      <div class="nav-section-label">Principal</div>
-      <a href="{% url 'dashboard_usuario' %}" class="nav-item active"><i class="bi bi-house-fill"></i> Inicio</a>
-      <a href="{% url 'listar_estudiantes' %}" class="nav-item"><i class="bi bi-people"></i> Estudiantes</a>
-      <a href="{% url 'listar_asignaturas' %}" class="nav-item"><i class="bi bi-book"></i> Académico</a>
-      <a href="{% url 'listar_cursos' %}" class="nav-item"><i class="bi bi-diagram-3"></i> Cursos</a>
-      <a href="{% url 'listar_personal' %}" class="nav-item"><i class="bi bi-person-badge"></i> Personal</a>
-      <a href="{% url 'registrar_asistencia' %}" class="nav-item"><i class="bi bi-calendar-check"></i> Asistencia</a>
-      <a href="#" class="nav-item"><i class="bi bi-calendar3"></i> Calendario</a>
-      <a href="{% url 'historial_asistencia' %}" class="nav-item"><i class="bi bi-bar-chart"></i> Reportes</a>
-
-      <div class="nav-section-label" style="margin-top:.75rem;">Administración</div>
-      <a href="#" class="nav-item"><i class="bi bi-wallet2"></i> Contabilidad</a>
-      <a href="#" class="nav-item"><i class="bi bi-truck"></i> Proveedores</a>
-      <a href="#" class="nav-item"><i class="bi bi-award"></i> SIMCE</a>
-    </nav>
-
-    <div class="sidebar-footer">
-      <a href="#" class="nav-item"><i class="bi bi-gear"></i> Configuración</a>
-      <a href="{% url 'logout' %}" class="nav-item" style="color:#EF4444;">
-        <i class="bi bi-box-arrow-right" style="color:#EF4444;"></i> Cerrar Sesión
-      </a>
-    </div>
-  </aside>
+  {% include 'colegios/_sidebar.html' with active_page='inicio' %}
 
   <!-- ── MAIN WRAPPER ────────────────────────────── -->
   <div class="main-wrapper">
@@ -828,16 +783,7 @@
         </div>
       </div>
       
-      {% if messages %}
-      <div class="mb-4">
-          {% for message in messages %}
-          <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert" style="border-radius: var(--radius-md);">
-              {{ message }}
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-          {% endfor %}
-      </div>
-      {% endif %}
+
 
       <!-- DASHBOARD GRID -->
       <div class="dashboard-grid">
@@ -848,28 +794,28 @@
           <!-- KPIs -->
           <div class="kpi-grid">
             <div class="kpi-card blue">
-              <div class="kpi-icon-wrap blue"><i class="bi bi-puzzle-fill"></i></div>
-              <div class="kpi-label">Módulos Activos</div>
-              <div class="kpi-val">{{ modulos_activos_count|default:"0" }} <span class="badge-trend flat"><i class="bi bi-dash"></i></span></div>
-              <a href="#" class="kpi-footer-link blue">Ver módulos <i class="bi bi-arrow-right"></i></a>
+              <div class="kpi-icon-wrap blue"><i class="bi bi-people-fill"></i></div>
+              <div class="kpi-label">Estudiantes Activos</div>
+              <div class="kpi-val">{{ total_estudiantes_count|default:"0" }}</div>
+              <a href="{% url 'listar_estudiantes' %}" class="kpi-footer-link blue">Ver alumnos <i class="bi bi-arrow-right"></i></a>
             </div>
             <div class="kpi-card green">
-              <div class="kpi-icon-wrap green"><i class="bi bi-check-circle-fill"></i></div>
-              <div class="kpi-label">Usuarios Activos</div>
-              <div class="kpi-val">{{ usuarios_colegio_count|default:"0" }} <span class="badge-trend flat"><i class="bi bi-dash"></i></span></div>
-              <a href="#" class="kpi-footer-link green">Ver usuarios <i class="bi bi-arrow-right"></i></a>
+              <div class="kpi-icon-wrap green"><i class="bi bi-person-badge-fill"></i></div>
+              <div class="kpi-label">Personal y Docentes</div>
+              <div class="kpi-val">{{ usuarios_colegio_count|default:"0" }}</div>
+              <a href="{% url 'listar_personal' %}" class="kpi-footer-link green">Ver personal <i class="bi bi-arrow-right"></i></a>
             </div>
             <div class="kpi-card purple">
-              <div class="kpi-icon-wrap purple"><i class="bi bi-person-plus-fill"></i></div>
-              <div class="kpi-label">Solicitudes Pendientes</div>
-              <div class="kpi-val">{{ solicitudes_pendientes_count|default:"0" }} <span class="badge-trend up"><i class="bi bi-arrow-up-short"></i>Nuevas</span></div>
-              <a href="#solicitudes" class="kpi-footer-link purple">Gestionar <i class="bi bi-arrow-right"></i></a>
+              <div class="kpi-icon-wrap purple"><i class="bi bi-diagram-3-fill"></i></div>
+              <div class="kpi-label">Cursos Registrados</div>
+              <div class="kpi-val">{{ total_cursos_count|default:"0" }}</div>
+              <a href="{% url 'listar_cursos' %}" class="kpi-footer-link purple">Ver cursos <i class="bi bi-arrow-right"></i></a>
             </div>
             <div class="kpi-card amber">
-              <div class="kpi-icon-wrap amber"><i class="bi bi-shield-check"></i></div>
-              <div class="kpi-label">Plan Actual</div>
-              <div class="kpi-val" style="font-size: 1.1rem; padding-top: 0.4rem;">{{ suscripcion.plan.nombre|default:"Profesional" }}</div>
-              <a href="#" class="kpi-footer-link amber">Ver detalles <i class="bi bi-arrow-right"></i></a>
+              <div class="kpi-icon-wrap amber"><i class="bi bi-exclamation-triangle-fill"></i></div>
+              <div class="kpi-label">Alumnos en Riesgo</div>
+              <div class="kpi-val text-danger">{{ alumnos_en_riesgo_count|default:"0" }}</div>
+              <a href="{% url 'convivencia_hub' %}" class="kpi-footer-link amber">Revisar alertas <i class="bi bi-arrow-right"></i></a>
             </div>
           </div>
 
@@ -879,19 +825,20 @@
               <div class="qa-icon purple"><i class="bi bi-clipboard-check"></i></div>
               Registrar Asistencia
             </a>
-            <a href="#" class="qa-btn">
-              <div class="qa-icon blue"><i class="bi bi-journal-arrow-up"></i></div>
-              Subir Notas
+            <a href="{% url 'libro_calificaciones' %}" class="qa-btn">
+              <div class="qa-icon blue"><i class="bi bi-journal-bookmark-fill"></i></div>
+              Libro de Calificaciones
             </a>
-            <a href="#" class="qa-btn">
-              <div class="qa-icon green"><i class="bi bi-file-earmark-bar-graph"></i></div>
-              Generar Reporte
+            <a href="{% url 'convivencia_hub' %}" class="qa-btn">
+              <div class="qa-icon green"><i class="bi bi-shield-check"></i></div>
+              Convivencia Escolar
             </a>
-            <a href="#" class="qa-btn">
-              <div class="qa-icon amber"><i class="bi bi-camera-video"></i></div>
-              Crear Reunión
+            <a href="{% url 'configuracion_politicas' %}" class="qa-btn">
+              <div class="qa-icon amber"><i class="bi bi-sliders"></i></div>
+              Políticas Académicas
             </a>
           </div>
+
 
           <!-- Solicitudes Pendientes -->
           <div class="panel" id="solicitudes" style="margin-bottom: 1.25rem;">

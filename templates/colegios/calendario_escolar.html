@@ -1,0 +1,533 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agenda & Calendario Escolar - Eduteka</title>
+
+  <!-- Bootstrap CSS & Icons -->
+  <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+  <!-- FullCalendar v6 CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+
+  <style>
+    :root {
+      --primary: #7C5CFC;
+      --primary-hover: #6344CE;
+      --primary-soft: #F0EDFF;
+      --secondary: #65CDBF;
+      --dark: #151A35;
+      --gray-text: #687089;
+      --bg-color: #F8F9FC;
+      --border-color: #E2E8F0;
+      --white: #FFFFFF;
+    }
+
+    html { font-size: 14px; }
+    body { background: var(--bg-color); color: var(--dark); font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    .app-container { display: flex; min-height: 100vh; width: 100vw; overflow-x: hidden; }
+    .main-content { margin-left: 248px; flex: 1; display: flex; flex-direction: column; min-width: 0; width: calc(100% - 248px); }
+    .topbar { height: 64px; background: var(--white); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; position: sticky; top: 0; z-index: 1030; }
+
+    .content-area { padding: 2rem; max-width: 1350px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+
+    .panel-card {
+      background: var(--white);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 1.75rem;
+      box-shadow: 0 8px 25px rgba(15,22,41,0.03);
+      margin-bottom: 2rem;
+    }
+
+    /* FullCalendar v6 Styling & Spacing Fixes */
+    #calendar {
+      background: var(--white);
+      border-radius: 14px;
+      padding: .5rem;
+    }
+    .fc-theme-standard td, .fc-theme-standard th {
+      border-color: #EEF2F6 !important;
+    }
+    .fc-header-toolbar {
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem !important;
+    }
+    .fc-toolbar-title {
+      font-weight: 800 !important;
+      font-size: 1.35rem !important;
+      color: var(--dark) !important;
+    }
+
+    /* SEPARACIÓN Y ESTILO DE BOTONES EN LA TOOLBAR */
+    .fc-button-group {
+      display: flex !important;
+      gap: 6px !important;
+    }
+    .fc-button-group > .fc-button {
+      margin-right: 0 !important;
+      border-radius: 10px !important;
+      border: 1px solid var(--border-color) !important;
+      background-color: var(--white) !important;
+      color: var(--dark) !important;
+      font-weight: 600 !important;
+      padding: .45rem .85rem !important;
+      transition: all 0.2s ease !important;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03) !important;
+    }
+    .fc-button-group > .fc-button:hover {
+      background-color: var(--primary-soft) !important;
+      color: var(--primary) !important;
+      border-color: var(--primary) !important;
+    }
+    .fc-button-group > .fc-button-active {
+      background-color: var(--primary) !important;
+      color: var(--white) !important;
+      border-color: var(--primary) !important;
+      box-shadow: 0 4px 12px rgba(124, 92, 252, 0.25) !important;
+    }
+    .fc-today-button {
+      background-color: var(--primary-soft) !important;
+      color: var(--primary) !important;
+      border: 1px solid var(--primary-soft) !important;
+      font-weight: 700 !important;
+      border-radius: 10px !important;
+    }
+
+    .fc-event {
+      cursor: pointer;
+      border-radius: 8px !important;
+      padding: 4px 8px !important;
+      font-size: .84rem !important;
+      font-weight: 700 !important;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.06);
+      transition: transform 0.15s ease;
+    }
+    .fc-event:hover {
+      transform: scale(1.02);
+    }
+
+    /* CARDS DE SELECCIÓN DE CATEGORÍA */
+    .category-radio-group {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: .75rem;
+    }
+    .category-radio-btn {
+      position: relative;
+    }
+    .category-radio-btn input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+    }
+    .category-card-label {
+      display: flex;
+      align-items: center;
+      gap: .65rem;
+      padding: .75rem 1rem;
+      border-radius: 12px;
+      border: 2px solid var(--border-color);
+      background: var(--white);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-weight: 600;
+      font-size: .86rem;
+    }
+    .category-radio-btn input[type="radio"]:checked + .category-card-label {
+      border-color: var(--primary);
+      background: var(--primary-soft);
+      color: var(--primary);
+      box-shadow: 0 4px 12px rgba(124, 92, 252, 0.15);
+    }
+
+    .modal-header-gradient {
+      background: linear-gradient(135deg, #7C5CFC 0%, #906EFE 100%);
+      color: #ffffff;
+      padding: 1.5rem 1.75rem;
+    }
+    .btn-submit-warm {
+      background: linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: .75rem 1.5rem;
+      font-weight: 700;
+      box-shadow: 0 6px 18px rgba(124, 92, 252, 0.3);
+      transition: all .2s ease;
+    }
+    .btn-submit-warm:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(124, 92, 252, 0.4);
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  {% include 'colegios/_sidebar.html' with active_page='calendario' %}
+
+  <div class="main-content">
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-light d-lg-none" id="mobileMenuBtn">
+          <i class="bi bi-list fs-5"></i>
+        </button>
+        <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-calendar2-week-fill text-primary me-2"></i>Agenda & Calendario Escolar</h5>
+      </div>
+
+      <div class="d-flex align-items-center gap-3">
+        <button type="button" class="btn btn-outline-primary btn-sm fw-bold px-3 py-2" data-bs-toggle="modal" data-bs-target="#syncCelularModal" style="border-radius:10px;">
+          <i class="bi bi-phone-fill me-1.5"></i> Sincronizar con Celular / Google Calendar
+        </button>
+      </div>
+    </header>
+
+
+    <!-- CONTENT AREA -->
+    <main class="content-area">
+
+      <!-- HEADER CONTROLES -->
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div>
+          <h3 class="fw-bold text-dark mb-1">Planificación y Horario Institucional <i class="bi bi-stars text-warning ms-1"></i></h3>
+          <p class="text-muted mb-0">Haz clic en cualquier día u hora para agendar clases fijas, evaluaciones o reuniones de personal.</p>
+        </div>
+
+        <div class="d-flex gap-2 flex-wrap align-items-center">
+          {% if is_admin and personal %}
+            <div class="d-flex align-items-center gap-2">
+              <label class="fw-semibold text-muted extra-small mb-0">Docente / Personal:</label>
+              <select id="filtroDocente" class="form-select form-select-sm fw-semibold" style="width: 220px; border-radius:10px;">
+                <option value="">-- Todos los Docentes --</option>
+                {% for p in personal %}
+                  <option value="{{ p.usuario.id }}">{{ p.usuario.get_full_name|default:p.usuario.username }} ({{ p.rol.nombre|default:"Personal" }})</option>
+                {% endfor %}
+              </select>
+            </div>
+          {% endif %}
+
+          <button class="btn btn-primary fw-bold px-3 py-2.5" data-bs-toggle="modal" data-bs-target="#nuevoEventoModal" style="border-radius:12px; box-shadow: 0 4px 14px rgba(124, 92, 252, 0.25);">
+            <i class="bi bi-calendar-plus-fill me-1.5"></i> + Agendar Evento / Clase
+          </button>
+        </div>
+      </div>
+
+      <!-- PANEL PRINCIPAL FULLCALENDAR -->
+      <div class="panel-card">
+        <div id="calendar"></div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- MODAL NUEVO EVENTO BONITO Y PROFESIONAL -->
+<div class="modal fade" id="nuevoEventoModal" tabindex="-1" aria-labelledby="nuevoEventoModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content" style="border-radius: 20px; border: none; overflow: hidden; box-shadow: 0 20px 60px rgba(15,22,41,0.2);">
+      
+      <!-- CABECERA DEGRADADA CÁLIDA -->
+      <div class="modal-header modal-header-gradient border-0">
+        <div>
+          <h5 class="modal-title fw-bold mb-1 d-flex align-items-center" id="nuevoEventoModalLabel">
+            <i class="bi bi-calendar2-plus-fill fs-4 me-2 text-warning"></i> Agendar en el Calendario Escolar
+          </h5>
+          <p class="mb-0 opacity-90 extra-small">Planifica una clase fija semanal, evaluación o reunión institucional.</p>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <form method="POST" action="{% url 'calendario_escolar' %}">
+        {% csrf_token %}
+        <div class="modal-body p-4">
+
+          <!-- SELECCIÓN VISUAL DE CATEGORÍA -->
+          <div class="mb-4">
+            <label class="form-label fw-bold text-dark small mb-2"><i class="bi bi-tags-fill me-1 text-primary"></i>Tipo de Compromiso Escolar</label>
+            <div class="category-radio-group">
+              <div class="category-radio-btn">
+                <input type="radio" name="tipo" id="catReunion" value="reunion" checked>
+                <label for="catReunion" class="category-card-label">
+                  <i class="bi bi-people-fill text-warning fs-5"></i> Reunión / Citación
+                </label>
+              </div>
+              <div class="category-radio-btn">
+                <input type="radio" name="tipo" id="catEvaluacion" value="evaluacion">
+                <label for="catEvaluacion" class="category-card-label">
+                  <i class="bi bi-pencil-square text-danger fs-5"></i> Prueba / Evaluación
+                </label>
+              </div>
+              <div class="category-radio-btn">
+                <input type="radio" name="tipo" id="catClase" value="clase">
+                <label for="catClase" class="category-card-label">
+                  <i class="bi bi-journal-bookmark-fill text-primary fs-5"></i> Clase / Cátedra
+                </label>
+              </div>
+              <div class="category-radio-btn">
+                <input type="radio" name="tipo" id="catActividad" value="actividad">
+                <label for="catActividad" class="category-card-label">
+                  <i class="bi bi-flag-fill text-success fs-5"></i> Actividad Institucional
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- TOGGLE: HORARIO SEMANAL FIJO VS EVENTO PUNTUAL -->
+          <div class="p-3 bg-light rounded-3 mb-4 border" style="border-radius:14px; background:#F8FAFC;">
+            <div class="form-check form-switch mb-1">
+              <input class="form-check-input" type="checkbox" name="es_recurrente" id="esRecurrenteCheck">
+              <label class="form-check-label fw-bold text-dark small" for="esRecurrenteCheck">
+                <i class="bi bi-arrow-repeat text-primary me-1 fs-6"></i> Horario Semanal Fijo (Se repite todas las semanas este mismo día)
+              </label>
+            </div>
+            <div class="text-muted extra-small">Ideal para clases fijas de asignatura o bloques permanentes en el horario del profesor.</div>
+          </div>
+
+          <!-- TÍTULO -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold text-dark small">Título del Evento o Asunto</label>
+            <input type="text" name="titulo" class="form-control form-control-lg fs-6" placeholder="Ej: Reunión de Apoderados 5° B, Evaluación Coef 2 Historia, Clase de Matemáticas..." required style="border-radius:12px;">
+          </div>
+
+          <!-- CURSO RELACIONADO -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold text-dark small">Curso Dirigido (Opcional)</label>
+            <select name="curso_id" class="form-select" style="border-radius:12px;">
+              <option value="">-- Todo el Establecimiento --</option>
+              {% for c in cursos %}
+                <option value="{{ c.id }}">{{ c.nombre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- SECCIÓN DE CITACIÓN INSTITUCIONAL PARA DIRECTORES -->
+          {% if is_admin and personal %}
+            <div class="p-3.5 bg-light rounded-3 mb-3 border style-citacion" style="border-radius:14px; background:#F8FAFC;">
+              <div class="fw-bold text-dark small mb-2"><i class="bi bi-person-gear text-primary me-1"></i>Convocatoria de Personal / Profesores</div>
+              
+              <div class="form-check form-switch mb-2">
+                <input class="form-check-input" type="checkbox" name="es_para_todos" id="esParaTodosCheck">
+                <label class="form-check-label fw-semibold text-dark small" for="esParaTodosCheck">
+                  Convocar a Todos los Docentes / Todo el Personal
+                </label>
+              </div>
+
+              <div id="docenteEspecificoGroup">
+                <label class="form-label fw-semibold text-dark extra-small mb-1">O cita a un funcionario en particular:</label>
+                <select name="asignado_a_id" class="form-select form-select-sm" style="border-radius:8px;">
+                  <option value="">-- Sin citación individual --</option>
+                  {% for p in personal %}
+                    <option value="{{ p.usuario.id }}">{{ p.usuario.get_full_name|default:p.usuario.username }} - {{ p.rol.nombre }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          {% endif %}
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold text-dark small">Fecha / Día de Inicio</label>
+              <input type="date" name="fecha_inicio" id="modalFechaInicio" value="{{ hoy|date:'Y-m-d' }}" class="form-control" required style="border-radius:12px;">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold text-dark small">Hora de Inicio (Formato 24 hrs)</label>
+              <input type="time" name="hora_inicio" id="modalHoraInicio" value="08:30" class="form-control" required style="border-radius:12px;">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold text-dark small">Lugar / Sala (Opcional)</label>
+            <input type="text" name="lugar" class="form-control" placeholder="Ej: Sala 14, Salón de Actos, Laboratorio 2..." style="border-radius:12px;">
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label fw-semibold text-dark small">Detalles o Recomendaciones</label>
+            <textarea name="descripcion" class="form-control" rows="3" placeholder="Escribe aquí notas adicionales o instrucciones para los asistentes..." style="border-radius:12px;"></textarea>
+          </div>
+
+        </div>
+
+        <div class="modal-footer bg-light border-0 p-3">
+          <button type="button" class="btn btn-light fw-bold px-4" data-bs-dismiss="modal" style="border-radius:12px;">Cancelar</button>
+          <button type="submit" class="btn btn-submit-warm px-4"><i class="bi bi-check2-circle me-1.5"></i> Agendar en el Calendario</button>
+        </div>
+      </form>
+</div>
+
+<!-- MODAL DE SINCRONIZACIÓN MÓVIL Y GOOGLE CALENDAR -->
+<div class="modal fade" id="syncCelularModal" tabindex="-1" aria-labelledby="syncCelularModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius: 20px; border: none; overflow: hidden; box-shadow: 0 20px 60px rgba(15,22,41,0.2);">
+      <div class="modal-header modal-header-gradient border-0">
+        <div>
+          <h5 class="modal-title fw-bold mb-1 d-flex align-items-center" id="syncCelularModalLabel">
+            <i class="bi bi-phone-vibrate-fill fs-4 me-2 text-warning"></i> Sincroniza la Agenda en tu Celular
+          </h5>
+          <p class="mb-0 opacity-90 extra-small">Accede a tus clases y reuniones directamente en tu teléfono móvil o aplicación preferida.</p>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body p-4">
+        
+        <!-- OPCIÓN 1: GOOGLE CALENDAR -->
+        <a href="{{ google_cal_feed_url }}" target="_blank" class="btn btn-outline-danger w-100 p-3 text-start mb-3 border text-decoration-none d-flex align-items-center justify-content-between" style="border-radius:14px; background:#FFF5F5;">
+          <div>
+            <div class="fw-bold text-danger fs-6 mb-1"><i class="bi bi-google me-2"></i>Añadir a Google Calendar (Android / Gmail)</div>
+            <div class="text-muted extra-small">Suscríbete con 1-clic y mantén tu agenda sincronizada automáticamente en la app de Google.</div>
+          </div>
+          <i class="bi bi-box-arrow-up-right fs-5 text-danger ms-2"></i>
+        </a>
+
+        <!-- OPCIÓN 2: APPLE CALENDAR / IPHONE -->
+        <a href="{{ webcal_url }}" class="btn btn-outline-primary w-100 p-3 text-start mb-3 border text-decoration-none d-flex align-items-center justify-content-between" style="border-radius:14px; background:#F0EDFF;">
+          <div>
+            <div class="fw-bold text-primary fs-6 mb-1"><i class="bi bi-apple me-2"></i>Sincronizar en iPhone / Apple Calendar / Outlook</div>
+            <div class="text-muted extra-small">Abre directamente el feed de suscripción en vivo en tu iPhone, Mac o Microsoft Outlook.</div>
+          </div>
+          <i class="bi bi-arrow-right-circle-fill fs-5 text-primary ms-2"></i>
+        </a>
+
+        <!-- OPCIÓN 3: DESCARGAR ARCHIVO .ICS -->
+        <a href="{% url 'exportar_ical_agenda' %}" class="btn btn-light w-100 p-3 text-start border text-decoration-none d-flex align-items-center justify-content-between" style="border-radius:14px; background:#F8FAFC;">
+          <div>
+            <div class="fw-bold text-dark fs-6 mb-1"><i class="bi bi-download me-2 text-secondary"></i>Descargar Archivo iCal (.ics)</div>
+            <div class="text-muted extra-small">Descarga el archivo completo de eventos para importar manualmente en cualquier calendario.</div>
+          </div>
+          <i class="bi bi-file-earmark-arrow-down fs-5 text-secondary ms-2"></i>
+        </a>
+
+      </div>
+      
+      <div class="modal-footer bg-light border-0 p-3">
+        <button type="button" class="btn btn-secondary fw-bold px-4" data-bs-dismiss="modal" style="border-radius:12px;">Entendido</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const calendarEl = document.getElementById("calendar");
+    const filtroDocenteSelect = document.getElementById("filtroDocente");
+    const nuevoEventoModal = new bootstrap.Modal(document.getElementById('nuevoEventoModal'));
+
+    // Configuración FullCalendar v6 con Formato de Hora Chileno 24h
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: "dayGridMonth",
+      locale: "es",
+      slotMinTime: "07:30:00",
+      slotMaxTime: "20:30:00",
+      slotLabelFormat: {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+        meridiem: false
+      },
+      eventTimeFormat: {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      },
+      headerToolbar: {
+        left: "prev,next today",
+        center: "title",
+        right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek"
+      },
+      buttonText: {
+        today: "Hoy",
+        month: "Mes",
+        week: "Semana por Horas",
+        day: "Día por Horas",
+        list: "Lista"
+      },
+      navLinks: true,
+      selectable: true,
+      selectMirror: true,
+      editable: false,
+      dayMaxEvents: true,
+      events: function(info, successCallback, failureCallback) {
+        const docId = filtroDocenteSelect ? filtroDocenteSelect.value : '';
+        fetch(`{% url 'api_eventos_calendario' %}?docente_id=${docId}`)
+          .then(res => res.json())
+          .then(data => successCallback(data))
+          .catch(err => failureCallback(err));
+      },
+
+      // Al hacer clic en un día o bloque horario -> abrir modal pre-llenado
+      select: function(info) {
+        const fechaSelect = info.startStr.split("T")[0];
+        const horaSelect = info.startStr.includes("T") ? info.startStr.split("T")[1].substring(0, 5) : "08:30";
+
+        document.getElementById("modalFechaInicio").value = fechaSelect;
+        document.getElementById("modalHoraInicio").value = horaSelect;
+        nuevoEventoModal.show();
+      },
+
+      // Al hacer clic en un evento -> ver detalles con SweetAlert2
+      eventClick: function(info) {
+        const props = info.event.extendedProps;
+        let htmlContent = `
+          <div class="text-start fs-6">
+            <p class="mb-1"><strong>Categoría:</strong> ${props.tipo}</p>
+            <p class="mb-1"><strong>Modalidad:</strong> ${props.es_recurrente ? '<span class="badge bg-primary-subtle text-primary">Horario Semanal Fijo</span>' : '<span class="badge bg-light text-dark border">Evento Puntual</span>'}</p>
+            <p class="mb-1"><strong>Lugar / Sala:</strong> ${props.lugar}</p>
+            <p class="mb-1"><strong>Curso:</strong> ${props.curso}</p>
+            <p class="mb-1"><strong>Convocado / Asignado:</strong> ${props.docente}</p>
+            ${props.descripcion ? `<div class="p-3 bg-light rounded-3 mt-3"><em>${props.descripcion}</em></div>` : ''}
+          </div>
+        `;
+
+        Swal.fire({
+          title: info.event.title,
+          html: htmlContent,
+          icon: "info",
+          confirmButtonText: "Cerrar",
+          confirmButtonColor: "#7C5CFC",
+          showDenyButton: true,
+          denyButtonText: "Eliminar Evento",
+          denyButtonColor: "#E11D48",
+          customClass: { popup: "rounded-4 shadow-lg" }
+        }).then((result) => {
+          if (result.isDenied) {
+            window.location.href = `/colegios/calendario/eliminar/${info.event.id}/`;
+          }
+        });
+      }
+    });
+
+    calendar.render();
+
+    if (filtroDocenteSelect) {
+      filtroDocenteSelect.addEventListener("change", function() {
+        calendar.refetchEvents();
+      });
+    }
+
+    // Toggle docente específico al marcar 'Convocar a todos'
+    const esParaTodosCheck = document.getElementById("esParaTodosCheck");
+    const docenteGroup = document.getElementById("docenteEspecificoGroup");
+    if (esParaTodosCheck && docenteGroup) {
+      esParaTodosCheck.addEventListener("change", function() {
+        if (this.checked) {
+          docenteGroup.style.display = "none";
+        } else {
+          docenteGroup.style.display = "block";
+        }
+      });
+    }
+  });
+</script>
+</body>
+</html>

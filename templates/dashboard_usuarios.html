@@ -50,34 +50,12 @@
   /* Layout */
   .app-container { display: flex; min-height: 100vh; width: 100vw; overflow-x: hidden; }
   
-  /* Sidebar */
-  .sidebar { 
-    width: var(--sidebar-width); 
-    background: var(--white); 
-    border-right: 1px solid var(--border-color); 
-    position: fixed; 
-    top: 0; bottom: 0; left: 0; 
-    display: flex; flex-direction: column; 
-    z-index: 1040; 
-    transition: transform 0.3s ease; 
-  }
-  .sidebar-logo { display: flex; justify-content: center; align-items: center; padding: 1.25rem 0; width: 100%; background: transparent; border-bottom: none; }
-  .sidebar-logo img { max-height: 60px; width: auto; max-width: 80%; object-fit: contain; }
-  .sidebar-school { padding: 1.5rem; border-bottom: 1px solid var(--border-color); }
-  .sidebar-school-name { font-weight: 600; font-size: 0.9rem; }
-  .sidebar-school-sub { font-size: 0.8rem; color: var(--gray-text); }
-  
-  .sidebar-menu { padding: 1.5rem 1rem; flex: 1; overflow-y: auto; }
-  .menu-label { font-size: 0.75rem; text-transform: uppercase; color: var(--gray-text); font-weight: 600; margin-bottom: 0.75rem; padding-left: 0.5rem; }
-  .menu-item { display: flex; align-items: center; gap: 1rem; padding: 0.75rem 1rem; color: var(--gray-text); font-weight: 500; font-size: 0.9rem; border-radius: 8px; text-decoration: none; transition: all 0.2s ease; margin-bottom: 0.25rem; }
-  .menu-item i { font-size: 1.1rem; }
-  .menu-item:hover { background: var(--primary-soft); color: var(--primary); }
-  .menu-item.active { background: var(--primary); color: var(--white); font-weight: 600; box-shadow: 0 4px 12px rgba(124, 92, 252, 0.25); }
-  
-  .sidebar-bottom { padding: 1rem; border-top: 1px solid var(--border-color); }
+  .sidebar-menu { padding: .5rem .65rem 0; flex: 1; overflow-y: auto; scrollbar-width: none; }
+  .sidebar-menu::-webkit-scrollbar { display: none; }
+
 
   /* Main Wrapper & Topbar */
-  .main-content { margin-left: var(--sidebar-width); flex: 1; display: flex; flex-direction: column; min-width: 0; transition: margin 0.3s ease; width: calc(100% - var(--sidebar-width)); }
+  .main-content { margin-left: 248px; flex: 1; display: flex; flex-direction: column; min-width: 0; width: calc(100% - 248px); }
   .topbar { height: 64px; background: var(--white); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; position: sticky; top: 0; z-index: 1030; }
   
   .search-bar { position: relative; width: 100%; max-width: 320px; }
@@ -317,58 +295,18 @@
     display: inline-block;
   }
 
-  /* Custom glassmorphism overlays */
-  .sidebar {
-    background: rgba(255, 255, 255, 0.85) !important;
-    backdrop-filter: blur(16px) !important;
-    -webkit-backdrop-filter: blur(16px) !important;
-  }
+  /* Custom glassmorphism on topbar only */
   .topbar {
-    background: rgba(255, 255, 255, 0.8) !important;
+    background: rgba(255,255,255,.8) !important;
     backdrop-filter: blur(12px) !important;
     -webkit-backdrop-filter: blur(12px) !important;
-  }
-  .sidebar-school {
-    background: linear-gradient(135deg, rgba(124, 92, 252, 0.08) 0%, rgba(101, 205, 191, 0.08) 100%) !important;
-    border: 1px solid rgba(124, 92, 252, 0.12) !important;
   }
 </style>
 </head>
 <body>
 
 <div class="app-container">
-    <!-- SIDEBAR -->
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-logo">
-            <img src="{% static 'img/logo.png' %}" alt="Eduteka Logo">
-        </div>
-        <div class="sidebar-school">
-            <div class="sidebar-school-name">{{ colegio.nombre|default:"Mi Colegio" }}</div>
-            <div class="sidebar-school-sub">Año Escolar {{ periodo.anio_academico|default:"Actual" }}</div>
-        </div>
-        
-        <nav class="sidebar-menu">
-            <div class="menu-label">Menú Principal</div>
-            <a href="{% url 'dashboard_usuario' %}" class="menu-item active"><i class="bi bi-house"></i> Inicio</a>
-            <a href="{% url 'listar_estudiantes' %}" class="menu-item"><i class="bi bi-people"></i> Estudiantes</a>
-            <a href="{% url 'listar_asignaturas' %}" class="menu-item"><i class="bi bi-book"></i> Académico</a>
-            <a href="{% url 'listar_cursos' %}" class="menu-item"><i class="bi bi-diagram-3"></i> Cursos</a>
-            <a href="{% url 'listar_personal' %}" class="menu-item"><i class="bi bi-person-badge"></i> Personal</a>
-            <a href="{% url 'registrar_asistencia' %}" class="menu-item"><i class="bi bi-calendar-check"></i> Asistencia</a>
-            <a href="#" class="menu-item"><i class="bi bi-calendar3"></i> Calendario</a>
-            <a href="{% url 'historial_asistencia' %}" class="menu-item"><i class="bi bi-bar-chart"></i> Reportes</a>
-            
-            <div class="menu-label mt-4">Administración</div>
-            <a href="#" class="menu-item"><i class="bi bi-wallet2"></i> Contabilidad</a>
-            <a href="#" class="menu-item"><i class="bi bi-truck"></i> Proveedores</a>
-            <a href="#" class="menu-item"><i class="bi bi-award"></i> SIMCE</a>
-        </nav>
-        
-        <div class="sidebar-bottom">
-            <a href="#" class="menu-item"><i class="bi bi-gear"></i> Configuración</a>
-            <a href="{% url 'logout' %}" class="menu-item text-danger"><i class="bi bi-box-arrow-right"></i> Cerrar Sesión</a>
-        </div>
-    </aside>
+  {% include 'colegios/_sidebar.html' with active_page='inicio' %}
 
     <!-- MAIN CONTENT WRAPPER -->
     <div class="main-content">

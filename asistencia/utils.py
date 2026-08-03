@@ -19,14 +19,19 @@ def calcular_alumnos_en_riesgo(colegio):
         )
     ).select_related('seccion')
     
+    from colegios.models import ConfiguracionAcademica
+    periodo = ConfiguracionAcademica.objects.filter(colegio=colegio).first()
+    porcentaje_minimo = float(periodo.porcentaje_asistencia_minima) if (periodo and periodo.porcentaje_asistencia_minima) else 85.0
+
     alumnos_en_riesgo = []
     for est in estudiantes:
         if est.total_clases > 0:
             tasa = (est.presentes_tardes_justificados / est.total_clases) * 100
-            if tasa < 85.0:
+            if tasa < porcentaje_minimo:
                 alumnos_en_riesgo.append({
                     'estudiante': est,
                     'tasa': round(tasa, 1),
                     'faltas': est.faltas
                 })
     return alumnos_en_riesgo
+

@@ -1,0 +1,222 @@
+{% load static %}
+{% comment %}
+  Sidebar unificado Eduteka (248px - Estilo Inicio).
+  Uso: {% include 'colegios/_sidebar.html' with active_page='inicio' %}
+  active_page opciones: inicio | estudiantes | academico | cursos | personal | asistencia | notas | calendario | reportes
+
+  Requiere en el contexto:
+    - colegio         -> objeto Colegio
+    - periodo         -> objeto ConfiguracionAcademica
+    - miembro         -> objeto MiembroColegio del usuario actual (puede ser None si es superadmin)
+    - is_admin        -> True si el usuario es Director o Administrador
+{% endcomment %}
+
+<style>
+  /* ═══ SIDEBAR ÚNICO 248PX (EXACTO INICIO) ═════════════════════════════ */
+  html {
+    font-size: 14px !important;
+  }
+
+  :root {
+
+    --sw: 248px;
+    --primary:       #7C5CFC;
+    --primary-soft:  rgba(124,92,252,.08);
+    --primary-hover: #6747E3;
+    --bg:            #F8F9FD;
+    --white:         #FFFFFF;
+    --dark:          #151A35;
+    --gray-text:     #687089;
+    --border:        #BCC0CF;
+    --radius-lg:     16px;
+    --radius-md:     10px;
+  }
+
+  .sidebar {
+    width: var(--sw); min-width: var(--sw);
+    background: var(--white);
+    border-right: 1px solid var(--border);
+    position: fixed; top: 0; bottom: 0; left: 0;
+    display: flex; flex-direction: column;
+    z-index: 1040;
+    transition: transform .3s ease;
+  }
+  @media (max-width: 991.98px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.open, .sidebar.active { transform: translateX(0); }
+  }
+
+  .sidebar-logo {
+    display: flex; justify-content: center; align-items: center;
+    padding: 1.25rem 1.5rem .9rem;
+  }
+  .sidebar-logo img { max-height: 88px; width: auto; max-width: 85%; }
+
+  .sidebar-school {
+    margin: 0 .75rem .5rem;
+    background: linear-gradient(135deg, var(--primary-soft) 0%, #E8E2FF 100%);
+    border-radius: var(--radius-lg);
+    padding: .75rem .9rem;
+  }
+  .sidebar-school-name { font-weight: 700; font-size: .82rem; color: var(--primary); margin-bottom: 2px; }
+  .sidebar-school-sub  { font-size: .7rem;  color: var(--primary-hover); font-weight: 500; }
+
+  .sidebar-role-badge {
+    margin: 0 .75rem .5rem;
+    background: rgba(101,205,191,.1);
+    border-radius: 8px;
+    padding: .35rem .75rem;
+    display: flex; align-items: center; gap: .4rem;
+    font-size: .72rem; font-weight: 600; color: #148A7A;
+  }
+  .sidebar-role-badge.admin { background: rgba(124,92,252,.08); color: var(--primary); }
+
+  .sidebar-nav {
+    flex: 1; overflow-y: auto;
+    padding: .4rem .65rem 0;
+    scrollbar-width: none;
+  }
+  .sidebar-nav::-webkit-scrollbar { display: none; }
+
+  .nav-section-label {
+    font-size: .62rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .08em; color: var(--gray-text);
+    padding: .5rem .75rem .2rem; margin-top: .2rem;
+  }
+
+  .nav-item {
+    display: flex; align-items: center; gap: .7rem;
+    padding: .52rem .8rem;
+    color: var(--gray-text); font-weight: 500; font-size: .86rem;
+    border-radius: var(--radius-md); text-decoration: none;
+    transition: background .15s, color .15s;
+    margin-bottom: 2px;
+  }
+  .nav-item i { font-size: 1rem; flex-shrink: 0; }
+  .nav-item:hover { background: var(--bg); color: var(--dark); }
+  .nav-item.active {
+    background: var(--primary); color: #fff; font-weight: 600;
+    box-shadow: 0 4px 14px rgba(108,79,240,.28);
+  }
+  .nav-item.active i { color: #fff; }
+  .nav-item.danger { color: #EF4444; }
+  .nav-item.danger i { color: #EF4444; }
+  .nav-item.danger:hover { background: #FEF2F2; color: #DC2626; }
+
+  .sidebar-footer {
+    padding: .65rem; border-top: 1px solid var(--border); margin-top: auto;
+  }
+
+  /* Main content offset unificado a 248px */
+  .main-content, .main-wrapper {
+    margin-left: 248px !important;
+    width: calc(100% - 248px) !important;
+    min-height: 100vh; display: flex; flex-direction: column;
+  }
+  @media (max-width: 991.98px) {
+    .main-content, .main-wrapper { margin-left: 0 !important; width: 100% !important; }
+  }
+</style>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <img src="{% static 'img/logo.png' %}" alt="Eduteka">
+  </div>
+
+  <div style="padding: 0 .75rem .35rem;">
+    <div class="sidebar-school">
+      <div class="sidebar-school-name">{{ colegio.nombre|default:"Mi Colegio" }}</div>
+      <div class="sidebar-school-sub">Año Escolar {{ periodo.anio_academico|default:"Actual" }}</div>
+    </div>
+  </div>
+
+  {% if miembro %}
+  <div style="padding: 0 .75rem .4rem;">
+    <div class="sidebar-role-badge {% if is_admin %}admin{% endif %}">
+      {% if is_admin %}
+        <i class="bi bi-shield-check"></i>
+      {% else %}
+        <i class="bi bi-mortarboard"></i>
+      {% endif %}
+      {{ miembro.rol.nombre|default:"Usuario" }}
+    </div>
+  </div>
+  {% endif %}
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Principal</div>
+
+    <a href="{% url 'dashboard_usuario' %}" class="nav-item {% if active_page == 'inicio' %}active{% endif %}">
+      <i class="bi bi-house"></i> Inicio
+    </a>
+
+    {% if is_admin %}
+    {# ── Solo directores / administradores ── #}
+    <a href="{% url 'listar_estudiantes' %}" class="nav-item {% if active_page == 'estudiantes' %}active{% endif %}">
+      <i class="bi bi-people"></i> Estudiantes
+    </a>
+    <a href="{% url 'listar_asignaturas' %}" class="nav-item {% if active_page == 'academico' %}active{% endif %}">
+      <i class="bi bi-book"></i> Académico
+    </a>
+    <a href="{% url 'listar_cursos' %}" class="nav-item {% if active_page == 'cursos' %}active{% endif %}">
+      <i class="bi bi-diagram-3"></i> Cursos
+    </a>
+    <a href="{% url 'listar_personal' %}" class="nav-item {% if active_page == 'personal' %}active{% endif %}">
+      <i class="bi bi-person-badge"></i> Personal
+    </a>
+    {% endif %}
+
+    {# ── Todos los roles ven asistencia, notas y reportes ── #}
+    <a href="{% url 'registrar_asistencia' %}" class="nav-item {% if active_page == 'asistencia' %}active{% endif %}">
+      <i class="bi bi-calendar-check"></i> Asistencia
+    </a>
+    <a href="{% url 'libro_calificaciones' %}" class="nav-item {% if active_page == 'notas' %}active{% endif %}">
+      <i class="bi bi-journal-bookmark"></i> Calificaciones
+    </a>
+    <a href="{% url 'convivencia_hub' %}" class="nav-item {% if active_page == 'convivencia' %}active{% endif %}">
+      <i class="bi bi-shield-check"></i> Convivencia Escolar
+    </a>
+
+    <a href="{% url 'calendario_escolar' %}" class="nav-item {% if active_page == 'calendario' %}active{% endif %}">
+      <i class="bi bi-calendar3"></i> Calendario
+    </a>
+
+
+    <a href="{% url 'centro_reportes' %}" class="nav-item {% if active_page == 'reportes' %}active{% endif %}">
+      <i class="bi bi-bar-chart"></i> Reportes
+    </a>
+
+    {% if is_admin %}
+    <div class="nav-section-label" style="margin-top:.4rem;">Administración</div>
+    <a href="#" class="nav-item"><i class="bi bi-wallet2"></i> Contabilidad</a>
+    <a href="#" class="nav-item"><i class="bi bi-truck"></i> Proveedores</a>
+    <a href="#" class="nav-item"><i class="bi bi-award"></i> SIMCE</a>
+    {% endif %}
+  </nav>
+
+  <div class="sidebar-footer">
+    {% if is_admin %}
+      <a href="{% url 'configuracion_politicas' %}" class="nav-item {% if active_page == 'configuracion' %}active{% endif %}">
+        <i class="bi bi-gear"></i> Configuración
+      </a>
+    {% endif %}
+    <a href="{% url 'logout' %}" class="nav-item danger">
+      <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+    </a>
+  </div>
+
+</aside>
+
+{% load static %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="{% static 'js/eduteka-alerts.js' %}"></script>
+<script>
+  {% if messages %}
+    document.addEventListener("DOMContentLoaded", function() {
+      {% for message in messages %}
+        showEdutekaToast('{% if message.tags == "error" %}error{% elif message.tags == "warning" %}warning{% else %}success{% endif %}', '{{ message|escapejs }}');
+      {% endfor %}
+    });
+  {% endif %}
+</script>
+

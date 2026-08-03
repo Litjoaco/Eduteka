@@ -163,8 +163,9 @@
 
     /* MAIN CONTENT */
     .main-content {
-      margin-left: 260px;
-      width: calc(100% - 260px);
+      margin-left: 248px;
+      width: calc(100% - 248px);
+
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -272,42 +273,8 @@
 <body>
 
 <div class="wrapper">
-  <!-- SIDEBAR -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-logo">
-      <img src="{% static 'img/logo.png' %}" alt="Eduteka Logo">
-    </div>
-    <div style="padding: 0 .75rem .75rem;">
-      <div class="sidebar-school">
-        <div class="sidebar-school-name">{{ colegio.nombre|default:"Mi Colegio" }}</div>
-        <div class="sidebar-school-sub">Año Escolar {{ periodo.anio_academico|default:"Actual" }}</div>
-      </div>
-    </div>
+  {% include 'colegios/_sidebar.html' with active_page='estudiantes' %}
 
-    <nav class="sidebar-nav">
-      <div class="nav-section-label">Menú Principal</div>
-      <a href="{% url 'dashboard_usuario' %}" class="nav-item"><i class="bi bi-house"></i> Inicio</a>
-      <a href="{% url 'listar_estudiantes' %}" class="nav-item active"><i class="bi bi-people"></i> Estudiantes</a>
-      <a href="{% url 'listar_asignaturas' %}" class="nav-item"><i class="bi bi-book"></i> Académico</a>
-      <a href="{% url 'listar_cursos' %}" class="nav-item"><i class="bi bi-diagram-3"></i> Cursos</a>
-      <a href="{% url 'listar_personal' %}" class="nav-item"><i class="bi bi-person-badge"></i> Personal</a>
-      <a href="{% url 'registrar_asistencia' %}" class="nav-item"><i class="bi bi-calendar-check"></i> Asistencia</a>
-      <a href="#" class="nav-item"><i class="bi bi-calendar3"></i> Calendario</a>
-      <a href="{% url 'historial_asistencia' %}" class="nav-item"><i class="bi bi-bar-chart"></i> Reportes</a>
-
-      <div class="nav-section-label" style="margin-top:.75rem;">Administración</div>
-      <a href="#" class="nav-item"><i class="bi bi-wallet2"></i> Contabilidad</a>
-      <a href="#" class="nav-item"><i class="bi bi-truck"></i> Proveedores</a>
-      <a href="#" class="nav-item"><i class="bi bi-award"></i> SIMCE</a>
-    </nav>
-
-    <div class="sidebar-footer">
-      <a href="#" class="nav-item"><i class="bi bi-gear"></i> Configuración</a>
-      <a href="{% url 'logout' %}" class="nav-item" style="color:#EF4444;">
-        <i class="bi bi-box-arrow-right" style="color:#EF4444;"></i> Cerrar Sesión
-      </a>
-    </div>
-  </aside>
 
   <!-- MAIN CONTENT -->
   <div class="main-content">

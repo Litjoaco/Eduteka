@@ -96,11 +96,18 @@ def dashboard_usuarios_view(request):
     alumnos_en_riesgo = calcular_alumnos_en_riesgo(colegio)
     alumnos_en_riesgo_count = len(alumnos_en_riesgo)
     
+    # Rol del usuario para filtrar sidebar
+    is_admin = (
+        request.user.colegios_administrados.filter(id=colegio.id).exists()
+        or (miembro and miembro.rol.nombre in ['Administrador', 'Director'])
+    )
+
     context = {
         'colegio': colegio,
         'miembro': miembro,
         'periodo': periodo,
         'cursos_count': cursos_count,
+        'is_admin': is_admin,
         'hoy': timezone.now(),
         'alumnos_en_riesgo': alumnos_en_riesgo,
         'alumnos_en_riesgo_count': alumnos_en_riesgo_count,

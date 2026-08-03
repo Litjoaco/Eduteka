@@ -33,6 +33,32 @@ urlpatterns = [
 
     # Gestión de Personal
     path('personal/', views.listar_personal_view, name='listar_personal'),
+    path('personal/crear-rol/', views.crear_rol_personalizado_view, name='crear_rol_personalizado'),
     path('personal/editar/<int:miembro_id>/', views.editar_personal_view, name='editar_personal'),
+    path('personal/asignar-materias/<int:miembro_id>/', views.asignar_asignaturas_docente_view, name='asignar_asignaturas_docente'),
     path('personal/baja/<int:miembro_id>/', views.baja_personal_view, name='baja_personal'),
+
+
+
+    # Centro de Reportes
+    path('reportes/', views.centro_reportes_view, name='centro_reportes'),
+
+    # Configuración de Políticas Académicas
+    path('configuracion/politicas/', views.configuracion_politicas_view, name='configuracion_politicas'),
+
+    # Convivencia Escolar y Hoja de Vida
+    path('convivencia/', views.convivencia_hub_view, name='convivencia_hub'),
+    path('convivencia/<int:estudiante_id>/', views.hoja_vida_estudiante_view, name='hoja_vida_estudiante'),
+    path('convivencia/anotacion/eliminar/<int:anotacion_id>/', views.eliminar_anotacion_view, name='eliminar_anotacion'),
+
+    # Agenda y Calendario Escolar
+    path('calendario/', views.calendario_escolar_view, name='calendario_escolar'),
+    path('calendario/api/eventos/', views.api_eventos_calendario_view, name='api_eventos_calendario'),
+    path('calendario/exportar-ical/', views.exportar_ical_agenda_view, name='exportar_ical_agenda'),
+    path('calendario/eliminar/<int:evento_id>/', views.eliminar_evento_agenda_view, name='eliminar_evento_agenda'),
 ]
+
+
+
+
+

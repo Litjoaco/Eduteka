@@ -19,18 +19,57 @@ def obtener_colegio_usuario(user):
             colegio = miembro.colegio
     return colegio
 
+def obtener_datos_base_asistencia(request):
+    user = request.user
+    colegio = user.colegios_administrados.order_by('-fecha_creacion').first()
+    miembro = None
+    if not colegio:
+        miembro = MiembroColegio.objects.filter(usuario=user, activo=True).order_by('-fecha_ingreso').first()
+        if miembro:
+            colegio = miembro.colegio
+    else:
+        miembro = MiembroColegio.objects.filter(usuario=user, colegio=colegio, activo=True).first()
+
+    if colegio and not miembro:
+        miembro = MiembroColegio.objects.filter(usuario=user, colegio=colegio).first()
+
+    from colegios.models import ConfiguracionAcademica
+    periodo = ConfiguracionAcademica.objects.filter(colegio=colegio).first() if colegio else None
+
+    is_admin = False
+    if colegio:
+        is_admin = (
+            user.colegios_administrados.filter(id=colegio.id).exists()
+            or (miembro and miembro.rol and miembro.rol.nombre in ['Administrador', 'Director'])
+        )
+
+    return colegio, miembro, periodo, is_admin
+
+from colegios.models import Colegio, CursoColegio, SeccionCurso, Estudiante, Asignatura
+
 @login_required
 def registrar_asistencia_view(request):
-    colegio = obtener_colegio_usuario(request.user)
+    colegio, miembro, periodo, is_admin = obtener_datos_base_asistencia(request)
     if not colegio:
         messages.warning(request, "No tienes un colegio asociado para registrar asistencia.")
         return redirect('solicitar_acceso')
 
-    # Obtener los cursos con sus secciones activas pre-cargadas
-    secciones_activas = SeccionCurso.objects.filter(activo=True).order_by('letra')
+    modalidad = periodo.modalidad_asistencia if periodo else 'asignatura'
+
+    # Obtener los cursos con sus secciones activas pre-cargadas para este colegio
+    secciones_activas = SeccionCurso.objects.filter(curso__colegio=colegio, activo=True).order_by('letra')
     cursos = CursoColegio.objects.filter(colegio=colegio, activo=True).prefetch_related(
         Prefetch('secciones', queryset=secciones_activas)
     ).order_by('nivel', 'nombre')
+
+
+    # Asignaturas disponibles si es modalidad por asignatura
+    asignaturas_disponibles = []
+    if modalidad == 'asignatura':
+        if is_admin:
+            asignaturas_disponibles = Asignatura.objects.filter(colegio=colegio, activo=True).select_related('curso')
+        else:
+            asignaturas_disponibles = Asignatura.objects.filter(colegio=colegio, docente=request.user, activo=True).select_related('curso')
 
     # Procesar selección inicial
     fecha_str = request.GET.get('fecha') or request.POST.get('fecha')
@@ -39,20 +78,30 @@ def registrar_asistencia_view(request):
 
     if request.method == 'POST' and 'seccion_id' in request.POST:
         seccion_id = request.POST.get('seccion_id')
+        asignatura_id = request.POST.get('asignatura_id')
+        if modalidad == 'asignatura' and asignatura_id:
+            return redirect(f'/asistencia/registrar/{seccion_id}/?fecha={fecha_str}&asignatura={asignatura_id}')
         return redirect(f'/asistencia/registrar/{seccion_id}/?fecha={fecha_str}')
 
     context = {
         'colegio': colegio,
+        'miembro': miembro,
+        'periodo': periodo,
+        'is_admin': is_admin,
         'cursos': cursos,
+        'modalidad': modalidad,
+        'asignaturas_disponibles': asignaturas_disponibles,
         'fecha_actual': fecha_str,
         'hoy': timezone.now().date(),
     }
     return render(request, 'asistencia/registrar.html', context)
 
+
 @login_required
 def registrar_asistencia_seccion_view(request, seccion_id):
-    colegio = obtener_colegio_usuario(request.user)
+    colegio, miembro, periodo, is_admin = obtener_datos_base_asistencia(request)
     seccion = get_object_or_404(SeccionCurso, id=seccion_id, curso__colegio=colegio)
+    modalidad = periodo.modalidad_asistencia if periodo else 'asignatura'
 
     fecha_str = request.GET.get('fecha')
     if not fecha_str:
@@ -64,6 +113,21 @@ def registrar_asistencia_seccion_view(request, seccion_id):
         fecha_obj = timezone.now().date()
         fecha_str = fecha_obj.strftime('%Y-%m-%d')
 
+    # Asignaturas de la sección si aplica la modalidad
+    asignaturas_disponibles = []
+    asignatura_seleccionada = None
+    if modalidad == 'asignatura':
+        if is_admin:
+            asignaturas_disponibles = Asignatura.objects.filter(curso=seccion.curso, activo=True).order_by('nombre')
+        else:
+            asignaturas_disponibles = Asignatura.objects.filter(curso=seccion.curso, docente=request.user, activo=True).order_by('nombre')
+        
+        asignatura_id = request.GET.get('asignatura')
+        if asignatura_id and asignatura_id.isdigit():
+            asignatura_seleccionada = asignaturas_disponibles.filter(id=int(asignatura_id)).first()
+        if not asignatura_seleccionada and asignaturas_disponibles.exists():
+            asignatura_seleccionada = asignaturas_disponibles.first()
+
     # Obtener alumnos de la sección
     estudiantes = Estudiante.objects.filter(seccion=seccion, activo=True).order_by('nombre_completo')
 
@@ -71,6 +135,7 @@ def registrar_asistencia_seccion_view(request, seccion_id):
         # Crear o actualizar el registro principal de asistencia
         registro, created = RegistroAsistencia.objects.get_or_create(
             seccion=seccion,
+            asignatura=asignatura_seleccionada,
             fecha=fecha_obj,
             defaults={'creado_por': request.user}
         )
@@ -92,11 +157,18 @@ def registrar_asistencia_seccion_view(request, seccion_id):
                 }
             )
 
-        messages.success(request, f"¡Asistencia de {seccion.nombre} para el {fecha_obj.strftime('%d/%m/%Y')} guardada con éxito!")
+        asig_nombre = f" en {asignatura_seleccionada.nombre}" if asignatura_seleccionada else ""
+        messages.success(request, f"¡Asistencia de {seccion.nombre}{asig_nombre} para el {fecha_obj.strftime('%d/%m/%Y')} guardada con éxito!")
+        if asignatura_seleccionada:
+            return redirect(f'/asistencia/registrar/{seccion.id}/?fecha={fecha_str}&asignatura={asignatura_seleccionada.id}')
         return redirect(f'/asistencia/registrar/?fecha={fecha_str}')
 
     # Si es GET, ver si ya existe un registro de asistencia
-    registro_existente = RegistroAsistencia.objects.filter(seccion=seccion, fecha=fecha_obj).first()
+    registro_existente = RegistroAsistencia.objects.filter(
+        seccion=seccion,
+        asignatura=asignatura_seleccionada,
+        fecha=fecha_obj
+    ).first()
     
     # Mapear estados existentes si los hay
     estados_alumnos = {}
@@ -107,6 +179,7 @@ def registrar_asistencia_seccion_view(request, seccion_id):
             estados_alumnos[det.estudiante_id] = det.estado
             obs_alumnos[det.estudiante_id] = det.observacion or ''
 
+
     # Adjuntar estado temporal al objeto estudiante para renderizado fácil en template
     for est in estudiantes:
         est.estado_actual = estados_alumnos.get(est.id, 'presente')
@@ -114,29 +187,40 @@ def registrar_asistencia_seccion_view(request, seccion_id):
 
     context = {
         'colegio': colegio,
+        'miembro': miembro,
+        'periodo': periodo,
+        'is_admin': is_admin,
         'seccion': seccion,
         'fecha': fecha_obj,
         'fecha_str': fecha_str,
         'estudiantes': estudiantes,
         'registro_existente': registro_existente,
+        'modalidad': modalidad,
+        'asignatura_seleccionada': asignatura_seleccionada,
+        'asignaturas_disponibles': asignaturas_disponibles,
     }
     return render(request, 'asistencia/registrar_seccion.html', context)
 
+
 @login_required
 def historial_asistencia_view(request):
-    colegio = obtener_colegio_usuario(request.user)
+    colegio, miembro, periodo, is_admin = obtener_datos_base_asistencia(request)
     if not colegio:
         messages.warning(request, "No tienes un colegio asociado para ver historial.")
         return redirect('solicitar_acceso')
 
-    # Obtener los cursos con sus secciones activas pre-cargadas
-    secciones_activas = SeccionCurso.objects.filter(activo=True).order_by('letra')
+    # Obtener los cursos con sus secciones activas pre-cargadas para este colegio
+    secciones_activas = SeccionCurso.objects.filter(curso__colegio=colegio, activo=True).order_by('letra')
     cursos = CursoColegio.objects.filter(colegio=colegio, activo=True).prefetch_related(
         Prefetch('secciones', queryset=secciones_activas)
     ).order_by('nivel', 'nombre')
 
+
     context = {
         'colegio': colegio,
+        'miembro': miembro,
+        'periodo': periodo,
+        'is_admin': is_admin,
         'cursos': cursos,
     }
     return render(request, 'asistencia/historial.html', context)
@@ -144,7 +228,7 @@ def historial_asistencia_view(request):
 @login_required
 def historial_seccion_view(request, seccion_id):
     from django.db.models import Count, Q
-    colegio = obtener_colegio_usuario(request.user)
+    colegio, miembro, periodo, is_admin = obtener_datos_base_asistencia(request)
     seccion = get_object_or_404(SeccionCurso, id=seccion_id, curso__colegio=colegio)
 
     # Obtener mes de filtro (GET)
@@ -239,6 +323,9 @@ def historial_seccion_view(request, seccion_id):
 
     context = {
         'colegio': colegio,
+        'miembro': miembro,
+        'periodo': periodo,
+        'is_admin': is_admin,
         'seccion': seccion,
         'historial_data': historial_data,
         'mes_seleccionado': mes_seleccionado,
@@ -247,6 +334,7 @@ def historial_seccion_view(request, seccion_id):
         'alumnos_resumen': alumnos_resumen,
     }
     return render(request, 'asistencia/historial_seccion.html', context)
+
 
 @login_required
 def exportar_asistencia_excel(request, seccion_id):

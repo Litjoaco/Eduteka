@@ -1,16 +1,25 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from django.http import JsonResponse
+
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
 import json
 from django.contrib import messages
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
+from django.core.paginator import Paginator
 from usuarios.models import PerfilUsuario
-from .models import Colegio, Suscripcion, ColegioModulo, ConfiguracionAcademica, RolColegio, Permiso, RolPermiso, CursoColegio, SeccionCurso
+
+from .models import Colegio, Suscripcion, ColegioModulo, ConfiguracionAcademica, RolColegio, Permiso, RolPermiso, CursoColegio, SeccionCurso, Asignatura
+
 from .forms import RegistroColegioPaso1Form, RegistroColegioPaso2Form
 from solicitudes.models import MiembroColegio
 from django.contrib.auth.decorators import login_required
+from django.utils import timezone
+from datetime import datetime
+
+
 
 def registro_colegio_paso1_view(request):
     # Si hay un usuario logueado, cerramos su sesión inmediatamente para evitar 
@@ -252,8 +261,9 @@ def configuracion_colegio_paso3_view(request, colegio_id):
                             SeccionCurso.objects.update_or_create(
                                 curso=curso_obj,
                                 letra=letra,
-                                defaults={'nombre': f"{curso_obj.nombre} {letra}", 'activo': True}
+                                defaults={'nombre': f"{curso_obj.nombre} {letra}"[:150], 'activo': True}
                             )
+
                 
                 # Eliminar cursos que el usuario quitó explícitamente de la tabla
                 CursoColegio.objects.filter(colegio=colegio).exclude(id__in=cursos_mantener).delete()
@@ -404,7 +414,10 @@ def obtener_colegio_usuario(user):
         miembro = MiembroColegio.objects.filter(usuario=user, activo=True).order_by('-fecha_ingreso').first()
         if miembro:
             colegio = miembro.colegio
+    if colegio:
+        asegurar_roles_base_colegio(colegio, user)
     return colegio
+
 
 @login_required
 def listar_estudiantes_view(request):
@@ -431,14 +444,27 @@ def listar_estudiantes_view(request):
     # Secciones para el dropdown de filtros
     secciones = SeccionCurso.objects.filter(curso__colegio=colegio, activo=True).order_by('curso__nombre', 'nombre')
 
+    miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
+    periodo = ConfiguracionAcademica.objects.filter(colegio=colegio).first()
+    is_admin = request.user.colegios_administrados.filter(id=colegio.id).exists() or (miembro and miembro.rol and miembro.rol.nombre in ['Administrador', 'Director'])
+
+    paginator = Paginator(estudiantes, 10)
+    page_number = request.GET.get('page', 1)
+    estudiantes_page = paginator.get_page(page_number)
+
     context = {
         'colegio': colegio,
-        'estudiantes': estudiantes,
+        'miembro': miembro,
+        'periodo': periodo,
+        'is_admin': is_admin,
+        'estudiantes': estudiantes_page,
         'secciones': secciones,
         'seccion_seleccionada': int(seccion_id) if seccion_id and seccion_id.isdigit() else None,
         'busqueda': busqueda,
     }
     return render(request, 'colegios/listar_estudiantes.html', context)
+
+
 
 @login_required
 def matricular_estudiante_view(request):
@@ -472,14 +498,19 @@ def matricular_estudiante_view(request):
             messages.success(request, f"Estudiante {nombre_completo} matriculado con éxito.")
             return redirect('listar_estudiantes')
 
+    periodo = ConfiguracionAcademica.objects.filter(colegio=colegio).first()
     secciones = SeccionCurso.objects.filter(curso__colegio=colegio, activo=True).order_by('curso__nombre', 'nombre')
     context = {
         'colegio': colegio,
+        'miembro': miembro,
+        'periodo': periodo,
+        'is_admin': is_admin,
         'secciones': secciones,
         'titulo_pagina': 'Matricular Estudiante',
         'boton_texto': 'Matricular',
     }
     return render(request, 'colegios/matricular_estudiante.html', context)
+
 
 @login_required
 def editar_estudiante_view(request, estudiante_id):
@@ -556,14 +587,18 @@ def listar_asignaturas_view(request):
         })
 
     miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
-    is_admin = request.user.colegios_administrados.filter(id=colegio.id).exists() or (miembro and miembro.rol.nombre in ['Administrador', 'Director'])
+    periodo = ConfiguracionAcademica.objects.filter(colegio=colegio).first()
+    is_admin = request.user.colegios_administrados.filter(id=colegio.id).exists() or (miembro and miembro.rol and miembro.rol.nombre in ['Administrador', 'Director'])
 
     context = {
         'colegio': colegio,
+        'miembro': miembro,
+        'periodo': periodo,
         'plan_estudios': plan_estudios,
         'is_admin': is_admin,
     }
     return render(request, 'colegios/listar_asignaturas.html', context)
+
 
 @login_required
 def crear_asignatura_view(request):
@@ -755,14 +790,22 @@ def listar_cursos_view(request):
             'cantidad_secciones': secciones.count()
         })
 
-    from django.utils import timezone
+    periodo = ConfiguracionAcademica.objects.filter(colegio=colegio).first()
+    paginator = Paginator(cursos_con_secciones, 10)
+    page_number = request.GET.get('page', 1)
+    cursos_page = paginator.get_page(page_number)
+
     context = {
         'colegio': colegio,
-        'cursos_con_secciones': cursos_con_secciones,
+        'miembro': miembro,
+        'periodo': periodo,
+        'cursos_con_secciones': cursos_page,
         'hoy': timezone.now(),
         'is_admin': is_admin
     }
+
     return render(request, 'colegios/listar_cursos.html', context)
+
 
 @login_required
 def crear_curso_view(request):
@@ -906,6 +949,57 @@ def baja_seccion_view(request, seccion_id):
         messages.success(request, f"La sección '{nombre}' ha sido eliminada correctamente.")
     return redirect('listar_cursos')
 
+def asegurar_roles_base_colegio(colegio, usuario=None):
+
+    if not RolColegio.objects.filter(colegio=colegio).exists():
+        roles_base = RolColegio.objects.filter(es_base=True, colegio=None)
+        if not roles_base.exists():
+            nombres_base = [
+                ('Administrador', 'Acceso total a la administración y gestión institucional.'),
+                ('Director', 'Dirección académica, reportes y políticas de evaluación.'),
+                ('Profesor', 'Gestión de clases, calificaciones, asistencia y observaciones.'),
+                ('Inspector', 'Control de asistencia general y convivencia escolar.'),
+                ('Secretario', 'Administración de matrículas y documentación de estudiantes.'),
+                ('Contabilidad', 'Gestión de cobros, facturación y finanzas.'),
+                ('Apoderado', 'Visualización de notas, asistencia y comunicados de pupilos.')
+            ]
+            for nombre, desc in nombres_base:
+                RolColegio.objects.get_or_create(
+                    colegio=None,
+                    nombre=nombre,
+                    defaults={'descripcion': desc, 'es_base': True, 'activo': True}
+                )
+            roles_base = RolColegio.objects.filter(es_base=True, colegio=None)
+
+        for rb in roles_base:
+            nuevo_rol = RolColegio.objects.create(
+                colegio=colegio,
+                nombre=rb.nombre,
+                descripcion=rb.descripcion,
+                es_base=False,
+                activo=True
+            )
+            for rp in rb.permisos.all():
+                RolPermiso.objects.create(
+                    rol=nuevo_rol,
+                    modulo=rp.modulo,
+                    puede_ver=rp.puede_ver,
+                    puede_crear=rp.puede_crear,
+                    puede_editar=rp.puede_editar,
+                    puede_eliminar=rp.puede_eliminar,
+                    puede_exportar=rp.puede_exportar,
+                    puede_aprobar=rp.puede_aprobar,
+                    puede_enviar_mensajes=rp.puede_enviar_mensajes,
+                    puede_administrar=rp.puede_administrar
+                )
+            if usuario and rb.nombre == 'Administrador':
+                MiembroColegio.objects.get_or_create(
+                    usuario=usuario,
+                    colegio=colegio,
+                    defaults={'rol': nuevo_rol, 'activo': True}
+                )
+
+
 @login_required
 def listar_personal_view(request):
     colegio = obtener_colegio_usuario(request.user)
@@ -913,24 +1007,101 @@ def listar_personal_view(request):
         messages.error(request, "No tienes un establecimiento asociado.")
         return redirect('dashboard_usuario')
         
+    asegurar_roles_base_colegio(colegio, request.user)
+
     miembro_solicitante = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
-    is_admin = request.user.colegios_administrados.filter(id=colegio.id).exists() or (miembro_solicitante and miembro_solicitante.rol.nombre in ['Administrador', 'Director'])
+    is_admin = request.user.colegios_administrados.filter(id=colegio.id).exists() or (miembro_solicitante and miembro_solicitante.rol and miembro_solicitante.rol.nombre in ['Administrador', 'Director'])
     if not is_admin:
         messages.error(request, "Acceso denegado. Se requieren permisos de administrador.")
         return redirect('dashboard_usuario')
 
     personal = MiembroColegio.objects.filter(colegio=colegio).select_related('usuario', 'rol').order_by('usuario__first_name')
-    roles = RolColegio.objects.filter(colegio=colegio)
+    roles = RolColegio.objects.filter(colegio=colegio).order_by('nombre')
+    asignaturas_colegio = Asignatura.objects.filter(colegio=colegio, activo=True).select_related('curso')
 
-    from django.utils import timezone
+    periodo = ConfiguracionAcademica.objects.filter(colegio=colegio).first()
+    paginator = Paginator(personal, 10)
+    page_number = request.GET.get('page', 1)
+    personal_page = paginator.get_page(page_number)
+
     context = {
         'colegio': colegio,
-        'personal': personal,
+        'miembro': miembro_solicitante,
+        'periodo': periodo,
+        'personal': personal_page,
         'roles': roles,
+        'asignaturas_colegio': asignaturas_colegio,
         'hoy': timezone.now(),
         'is_admin': is_admin
     }
     return render(request, 'colegios/listar_personal.html', context)
+
+
+
+@login_required
+def crear_rol_personalizado_view(request):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        messages.error(request, "No estás asociado a ningún colegio.")
+        return redirect('solicitar_acceso')
+
+    miembro_solicitante = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
+    is_admin = request.user.colegios_administrados.filter(id=colegio.id).exists() or (miembro_solicitante and miembro_solicitante.rol and miembro_solicitante.rol.nombre in ['Administrador', 'Director'])
+    if not is_admin:
+        messages.error(request, "Acceso denegado. Se requieren permisos de Administrador.")
+        return redirect('listar_personal')
+
+    if request.method == 'POST':
+        nombre_rol = request.POST.get('nombre_rol', '').strip()
+        descripcion = request.POST.get('descripcion', '').strip()
+
+        if not nombre_rol:
+            messages.error(request, "El nombre del rol es obligatorio.")
+            return redirect('listar_personal')
+
+        rol_existente = RolColegio.objects.filter(colegio=colegio, nombre__iexact=nombre_rol).first()
+        if rol_existente:
+            messages.warning(request, f"El rol '{nombre_rol}' ya existe en tu colegio.")
+            return redirect('listar_personal')
+
+        nuevo_rol = RolColegio.objects.create(
+            colegio=colegio,
+            nombre=nombre_rol,
+            descripcion=descripcion,
+            es_base=False,
+            activo=True
+        )
+        messages.success(request, f"¡El rol personalizado '{nuevo_rol.nombre}' fue creado exitosamente!")
+
+    return redirect('listar_personal')
+
+
+
+@login_required
+def asignar_asignaturas_docente_view(request, miembro_id):
+    colegio = obtener_colegio_usuario(request.user)
+    miembro = get_object_or_404(MiembroColegio, id=miembro_id, colegio=colegio)
+
+    miembro_solicitante = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
+    is_admin = request.user.colegios_administrados.filter(id=colegio.id).exists() or (miembro_solicitante and miembro_solicitante.rol.nombre in ['Administrador', 'Director'])
+    if not is_admin:
+        messages.error(request, "Acceso denegado. Se requieren permisos de administrador.")
+        return redirect('listar_personal')
+
+    if request.method == 'POST':
+        asignaturas_ids = request.POST.getlist('asignaturas')
+        # Limpiar asignaciones previas de este docente en este colegio
+        Asignatura.objects.filter(colegio=colegio, docente=miembro.usuario).update(docente=None)
+        # Asignar seleccionadas
+        if asignaturas_ids:
+            Asignatura.objects.filter(colegio=colegio, id__in=asignaturas_ids).update(docente=miembro.usuario)
+
+        docente_nombre = miembro.usuario.get_full_name() or miembro.usuario.username
+        messages.success(request, f"Se actualizaron exitosamente las asignaturas asignadas a {docente_nombre}.")
+
+    return redirect('listar_personal')
+
+
 
 @login_required
 def editar_personal_view(request, miembro_id):
@@ -973,4 +1144,533 @@ def baja_personal_view(request, miembro_id):
     estado = "reactivado" if miembro.activo else "desactivado (baja de acceso)"
     messages.success(request, f"El acceso para {miembro.usuario.username} ha sido {estado}.")
     return redirect('listar_personal')
+
+
+@login_required
+def centro_reportes_view(request):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        messages.error(request, "No estás asociado a ningún colegio.")
+        return redirect('solicitar_acceso')
+
+    miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
+    periodo = ConfiguracionAcademica.objects.filter(colegio=colegio).first()
+    is_admin = (
+        request.user.colegios_administrados.filter(id=colegio.id).exists()
+        or (miembro and miembro.rol and miembro.rol.nombre in ['Administrador', 'Director'])
+    )
+
+    secciones_count = SeccionCurso.objects.filter(curso__colegio=colegio, activo=True).count()
+    estudiantes_count = Estudiante.objects.filter(colegio=colegio, activo=True).count()
+
+    from asistencia.utils import calcular_alumnos_en_riesgo
+    alumnos_riesgo_asistencia = len(calcular_alumnos_en_riesgo(colegio))
+
+    from calificaciones.models import Nota
+    alumnos_riesgo_notas = Nota.objects.filter(evaluacion__colegio=colegio, valor__lt=4.0).values('estudiante').distinct().count()
+
+    context = {
+        'colegio': colegio,
+        'miembro': miembro,
+        'periodo': periodo,
+        'is_admin': is_admin,
+        'secciones_count': secciones_count,
+        'estudiantes_count': estudiantes_count,
+        'alumnos_riesgo_asistencia': alumnos_riesgo_asistencia,
+        'alumnos_riesgo_notas': alumnos_riesgo_notas,
+        'hoy': timezone.now(),
+    }
+    return render(request, 'colegios/reportes_hub.html', context)
+
+
+@login_required
+def configuracion_politicas_view(request):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        messages.error(request, "No estás asociado a ningún colegio.")
+        return redirect('solicitar_acceso')
+
+    miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
+    is_admin = (
+        request.user.colegios_administrados.filter(id=colegio.id).exists()
+        or (miembro and miembro.rol and miembro.rol.nombre in ['Administrador', 'Director'])
+    )
+    if not is_admin:
+        messages.error(request, "Acceso denegado. Se requieren permisos de Administrador.")
+        return redirect('dashboard_usuario')
+
+    periodo, _ = ConfiguracionAcademica.objects.get_or_create(
+        colegio=colegio,
+        defaults={
+            'anio_academico': timezone.now().year,
+            'fecha_inicio': timezone.now().date(),
+            'fecha_termino': timezone.now().date(),
+        }
+    )
+
+    if request.method == 'POST':
+        periodo.modalidad_asistencia = request.POST.get('modalidad_asistencia', 'asignatura')
+        try:
+            periodo.porcentaje_asistencia_minima = int(request.POST.get('porcentaje_asistencia_minima', 85))
+        except ValueError:
+            periodo.porcentaje_asistencia_minima = 85
+
+        periodo.tipo_calificacion = request.POST.get('tipo_calificacion', 'numerica')
+        try:
+            periodo.nota_minima_aprobacion = float(request.POST.get('nota_minima_aprobacion', 4.0))
+        except ValueError:
+            periodo.nota_minima_aprobacion = 4.0
+
+        try:
+            periodo.porcentaje_exigencia = int(request.POST.get('porcentaje_exigencia', 60))
+        except ValueError:
+            periodo.porcentaje_exigencia = 60
+
+        periodo.regla_redondeo = request.POST.get('regla_redondeo', 'un_decimal')
+        periodo.tipo_calculo_promedio = request.POST.get('tipo_calculo_promedio', 'ponderado')
+        periodo.visibilidad_notas_apoderados = request.POST.get('visibilidad_notas_apoderados', 'inmediata')
+        periodo.notificar_ausencias = (request.POST.get('notificar_ausencias') == 'on')
+        periodo.notificar_notas_rojas = (request.POST.get('notificar_notas_rojas') == 'on')
+
+        periodo.save()
+        messages.success(request, "¡Configuración de Políticas Académicas actualizada exitosamente!")
+        return redirect('configuracion_politicas')
+
+    context = {
+        'colegio': colegio,
+        'miembro': miembro,
+        'periodo': periodo,
+        'is_admin': is_admin,
+        'hoy': timezone.now(),
+    }
+    return render(request, 'colegios/configuracion_politicas.html', context)
+
+
+@login_required
+def hoja_vida_estudiante_view(request, estudiante_id):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        messages.error(request, "No estás asociado a ningún colegio.")
+        return redirect('solicitar_acceso')
+
+    estudiante = get_object_or_404(Estudiante, id=estudiante_id, colegio=colegio)
+    seccion = estudiante.seccion
+    periodo = ConfiguracionAcademica.objects.filter(colegio=colegio).first()
+
+    miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
+    is_admin = (
+        request.user.colegios_administrados.filter(id=colegio.id).exists()
+        or (miembro and miembro.rol and miembro.rol.nombre in ['Administrador', 'Director'])
+    )
+
+    if request.method == 'POST':
+        tipo = request.POST.get('tipo', 'neutra')
+        gravedad = request.POST.get('gravedad', 'leve')
+        titulo = request.POST.get('titulo', '').strip()
+        descripcion = request.POST.get('descripcion', '').strip()
+        asignatura_id = request.POST.get('asignatura_id')
+
+        if not titulo or not descripcion:
+            messages.error(request, "El título y la descripción son obligatorios.")
+            return redirect('hoja_vida_estudiante', estudiante_id=estudiante.id)
+
+        asig_obj = None
+        if asignatura_id:
+            asig_obj = Asignatura.objects.filter(id=asignatura_id, colegio=colegio).first()
+
+        from colegios.models import AnotacionEstudiante
+        AnotacionEstudiante.objects.create(
+            colegio=colegio,
+            estudiante=estudiante,
+            asignatura=asig_obj,
+            docente=request.user,
+            tipo=tipo,
+            gravedad=gravedad,
+            titulo=titulo,
+            descripcion=descripcion,
+            fecha=timezone.now().date()
+        )
+        messages.success(request, f"¡Anotación agregada exitosamente a la hoja de vida de {estudiante.nombre_completo}!")
+        return redirect('hoja_vida_estudiante', estudiante_id=estudiante.id)
+
+    from colegios.models import AnotacionEstudiante
+    anotaciones = AnotacionEstudiante.objects.filter(estudiante=estudiante).select_related('docente', 'asignatura')
+
+    positivas_cnt = anotaciones.filter(tipo='positiva').count()
+    negativas_cnt = anotaciones.filter(tipo='negativa').count()
+    citaciones_cnt = anotaciones.filter(tipo='citacion').count()
+    neutras_cnt = anotaciones.filter(tipo='neutra').count()
+
+    if negativas_cnt == 0:
+        semaforo_estado = 'excelente'
+        semaforo_texto = 'Excelente Conducta'
+        semaforo_color = 'success'
+    elif negativas_cnt <= 2:
+        semaforo_estado = 'atencion'
+        semaforo_texto = 'Atención Requerida'
+        semaforo_color = 'warning'
+    else:
+        semaforo_estado = 'alerta'
+        semaforo_texto = 'Alerta Convivencia Escolar'
+        semaforo_color = 'danger'
+
+    asignaturas_curso = []
+    estudiantes_seccion = []
+    if seccion:
+        asignaturas_curso = Asignatura.objects.filter(curso=seccion.curso, activo=True).order_by('nombre')
+        estudiantes_seccion = Estudiante.objects.filter(seccion=seccion, activo=True).order_by('nombre_completo')
+
+    context = {
+        'colegio': colegio,
+        'miembro': miembro,
+        'periodo': periodo,
+        'is_admin': is_admin,
+        'active_page': 'convivencia',
+        'estudiante': estudiante,
+        'seccion': seccion,
+        'estudiantes_seccion': estudiantes_seccion,
+        'anotaciones': anotaciones,
+        'positivas_cnt': positivas_cnt,
+        'negativas_cnt': negativas_cnt,
+        'citaciones_cnt': citaciones_cnt,
+        'neutras_cnt': neutras_cnt,
+        'semaforo_estado': semaforo_estado,
+        'semaforo_texto': semaforo_texto,
+        'semaforo_color': semaforo_color,
+        'asignaturas_curso': asignaturas_curso,
+        'hoy': timezone.now(),
+    }
+    return render(request, 'colegios/hoja_vida_estudiante.html', context)
+
+
+
+@login_required
+def eliminar_anotacion_view(request, anotacion_id):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        messages.error(request, "No estás asociado a ningún colegio.")
+        return redirect('solicitar_acceso')
+
+    from colegios.models import AnotacionEstudiante
+    anotacion = get_object_or_404(AnotacionEstudiante, id=anotacion_id, colegio=colegio)
+    estudiante_id = anotacion.estudiante.id
+
+    miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
+    is_admin = (
+        request.user.colegios_administrados.filter(id=colegio.id).exists()
+        or (miembro and miembro.rol and miembro.rol.nombre in ['Administrador', 'Director'])
+    )
+
+    if not is_admin and anotacion.docente != request.user:
+        messages.error(request, "No tienes permiso para eliminar esta anotación.")
+        return redirect('hoja_vida_estudiante', estudiante_id=estudiante_id)
+
+    anotacion.delete()
+    messages.success(request, "Anotación eliminada correctamente.")
+    return redirect('hoja_vida_estudiante', estudiante_id=estudiante_id)
+
+
+@login_required
+def convivencia_hub_view(request):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        messages.error(request, "No estás asociado a ningún colegio.")
+        return redirect('solicitar_acceso')
+
+    miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
+    periodo = ConfiguracionAcademica.objects.filter(colegio=colegio).first()
+    is_admin = (
+        request.user.colegios_administrados.filter(id=colegio.id).exists()
+        or (miembro and miembro.rol and miembro.rol.nombre in ['Administrador', 'Director'])
+    )
+
+    secciones = SeccionCurso.objects.filter(curso__colegio=colegio, activo=True).select_related('curso').order_by('curso__nombre', 'nombre')
+
+    seccion_id = request.GET.get('seccion')
+    busqueda = request.GET.get('q', '').strip()
+
+    estudiantes_qs = Estudiante.objects.filter(colegio=colegio, activo=True).select_related('seccion', 'seccion__curso').order_by('seccion__curso__nombre', 'nombre_completo')
+
+    if seccion_id and seccion_id.isdigit():
+        estudiantes_qs = estudiantes_qs.filter(seccion_id=int(seccion_id))
+
+    if busqueda:
+        from django.db.models import Q
+        estudiantes_qs = estudiantes_qs.filter(
+            Q(nombre_completo__icontains=busqueda) | Q(rut__icontains=busqueda)
+        )
+
+    from colegios.models import AnotacionEstudiante
+    estudiantes_data = []
+    total_alertas_count = 0
+
+    for est in estudiantes_qs:
+        anotaciones = AnotacionEstudiante.objects.filter(estudiante=est)
+        pos_cnt = anotaciones.filter(tipo='positiva').count()
+        neg_cnt = anotaciones.filter(tipo='negativa').count()
+        cit_cnt = anotaciones.filter(tipo='citacion').count()
+
+        if neg_cnt == 0:
+            semaforo_color = 'success'
+            semaforo_text = 'Excelente'
+        elif neg_cnt <= 2:
+            semaforo_color = 'warning'
+            semaforo_text = 'Atención'
+        else:
+            semaforo_color = 'danger'
+            semaforo_text = 'Alerta'
+            total_alertas_count += 1
+
+        estudiantes_data.append({
+            'estudiante': est,
+            'pos_cnt': pos_cnt,
+            'neg_cnt': neg_cnt,
+            'cit_cnt': cit_cnt,
+            'semaforo_color': semaforo_color,
+            'semaforo_text': semaforo_text,
+        })
+
+    paginator = Paginator(estudiantes_data, 10)
+    page_number = request.GET.get('page', 1)
+    estudiantes_data_page = paginator.get_page(page_number)
+
+    context = {
+        'colegio': colegio,
+        'miembro': miembro,
+        'periodo': periodo,
+        'is_admin': is_admin,
+        'active_page': 'convivencia',
+        'secciones': secciones,
+        'seccion_seleccionada': int(seccion_id) if (seccion_id and seccion_id.isdigit()) else None,
+        'busqueda': busqueda,
+        'estudiantes_data': estudiantes_data_page,
+        'total_alertas_count': total_alertas_count,
+        'hoy': timezone.now(),
+    }
+    return render(request, 'colegios/convivencia_hub.html', context)
+
+
+
+@login_required
+def calendario_escolar_view(request):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        messages.error(request, "No estás asociado a ningún colegio.")
+        return redirect('solicitar_acceso')
+
+    miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
+    periodo = ConfiguracionAcademica.objects.filter(colegio=colegio).first()
+    is_admin = (
+        request.user.colegios_administrados.filter(id=colegio.id).exists()
+        or (miembro and miembro.rol and miembro.rol.nombre in ['Administrador', 'Director'])
+    )
+
+    from colegios.models import EventoAgenda
+    if request.method == 'POST':
+        titulo = request.POST.get('titulo', '').strip()
+        tipo = request.POST.get('tipo', 'actividad')
+        fecha_str = request.POST.get('fecha_inicio')
+        hora_str = request.POST.get('hora_inicio', '08:00')
+        lugar = request.POST.get('lugar', '').strip()
+        curso_id = request.POST.get('curso_id')
+
+        asignado_a_id = request.POST.get('asignado_a_id')
+        es_para_todos = (request.POST.get('es_para_todos') in ['on', '1', 'true'])
+        es_recurrente = (request.POST.get('es_recurrente') in ['on', '1', 'true'])
+
+        descripcion = request.POST.get('descripcion', '').strip()
+
+        if titulo and fecha_str:
+            try:
+                dt_str = f"{fecha_str} {hora_str}"
+                fecha_inicio = timezone.make_aware(datetime.strptime(dt_str, '%Y-%m-%d %H:%M'))
+            except ValueError:
+                fecha_inicio = timezone.now()
+
+            dia_semana = fecha_inicio.weekday() if es_recurrente else None
+            curso_obj = CursoColegio.objects.filter(id=curso_id, colegio=colegio).first() if (curso_id and curso_id.isdigit()) else None
+            asignado_obj = User.objects.filter(id=asignado_a_id).first() if (asignado_a_id and asignado_a_id.isdigit()) else None
+
+            EventoAgenda.objects.create(
+                colegio=colegio,
+                creado_por=request.user,
+                asignado_a=asignado_obj,
+                es_para_todos=es_para_todos,
+                es_recurrente=es_recurrente,
+                dia_semana=dia_semana,
+                titulo=titulo,
+                tipo=tipo,
+                fecha_inicio=fecha_inicio,
+                lugar=lugar if lugar else None,
+                curso=curso_obj,
+                descripcion=descripcion if descripcion else None
+            )
+            messages.success(request, f"¡Evento '{titulo}' guardado en la agenda!")
+            return redirect('calendario_escolar')
+
+    hoy_date = timezone.now().date()
+    eventos_hoy = EventoAgenda.objects.filter(colegio=colegio, fecha_inicio__date=hoy_date).order_by('fecha_inicio')
+    proximos_eventos = EventoAgenda.objects.filter(colegio=colegio, fecha_inicio__date__gte=hoy_date).order_by('fecha_inicio')[:20]
+    cursos = CursoColegio.objects.filter(colegio=colegio, activo=True).order_by('nivel', 'nombre')
+    personal = MiembroColegio.objects.filter(colegio=colegio, activo=True).select_related('usuario', 'rol').order_by('usuario__first_name')
+
+    abs_ical_url = request.build_absolute_uri(reverse('exportar_ical_agenda')) + f"?colegio_id={colegio.id}"
+    webcal_url = abs_ical_url.replace('https://', 'webcal://').replace('http://', 'webcal://')
+    google_cal_feed_url = f"https://calendar.google.com/calendar/r?cid={webcal_url}"
+
+
+    context = {
+        'colegio': colegio,
+        'miembro': miembro,
+        'periodo': periodo,
+        'is_admin': is_admin,
+        'active_page': 'calendario',
+        'eventos_hoy': eventos_hoy,
+        'proximos_eventos': proximos_eventos,
+        'cursos': cursos,
+        'personal': personal,
+        'hoy': timezone.now(),
+        'abs_ical_url': abs_ical_url,
+        'webcal_url': webcal_url,
+        'google_cal_feed_url': google_cal_feed_url,
+    }
+    return render(request, 'colegios/calendario_escolar.html', context)
+
+
+
+@login_required
+def api_eventos_calendario_view(request):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        return JsonResponse([], safe=False)
+
+    docente_id = request.GET.get('docente_id')
+    from colegios.models import EventoAgenda
+    from django.db.models import Q
+
+    qs = EventoAgenda.objects.filter(colegio=colegio)
+
+    if docente_id and docente_id.isdigit():
+        target_uid = int(docente_id)
+        qs = qs.filter(Q(asignado_a_id=target_uid) | Q(creado_por_id=target_uid) | Q(es_para_todos=True))
+
+    events_list = []
+    color_map = {
+        'clase': '#7C5CFC',       # Morado
+        'evaluacion': '#E11D48',  # Rojo
+        'reunion': '#D97706',     # Naranja
+        'actividad': '#059669',   # Verde
+    }
+
+    for ev in qs:
+        item = {
+            'id': ev.id,
+            'title': ev.titulo,
+            'backgroundColor': color_map.get(ev.tipo, '#7C5CFC'),
+            'borderColor': color_map.get(ev.tipo, '#7C5CFC'),
+            'extendedProps': {
+                'tipo': ev.get_tipo_display(),
+                'lugar': ev.lugar or 'Sin definir',
+                'curso': ev.curso.nombre if ev.curso else 'General',
+                'docente': ev.asignado_a.get_full_name() if ev.asignado_a else ('Todos' if ev.es_para_todos else (ev.creado_por.get_full_name() if ev.creado_por else 'Institución')),
+                'descripcion': ev.descripcion or '',
+                'es_recurrente': ev.es_recurrente,
+            }
+        }
+        if ev.es_recurrente and ev.dia_semana is not None:
+            fc_dow = (ev.dia_semana + 1) % 7
+            item['daysOfWeek'] = [fc_dow]
+            item['startTime'] = ev.fecha_inicio.strftime('%H:%M:%S')
+        else:
+            item['start'] = ev.fecha_inicio.isoformat()
+            if ev.fecha_fin:
+                item['end'] = ev.fecha_fin.isoformat()
+
+        events_list.append(item)
+
+    return JsonResponse(events_list, safe=False)
+
+
+
+def exportar_ical_agenda_view(request):
+    from django.http import HttpResponse
+    from colegios.models import Colegio, EventoAgenda
+
+    colegio = None
+    if request.user.is_authenticated:
+        colegio = obtener_colegio_usuario(request.user)
+
+    colegio_id = request.GET.get('colegio_id')
+    if not colegio and colegio_id and colegio_id.isdigit():
+        colegio = Colegio.objects.filter(id=colegio_id).first()
+
+    if not colegio:
+        return HttpResponse("Colegio no encontrado.", status=404)
+
+    eventos = EventoAgenda.objects.filter(colegio=colegio).order_by('fecha_inicio')
+
+    lines = [
+        "BEGIN:VCALENDAR",
+        "VERSION:2.0",
+        "PRODID:-//Eduteka//Agenda Escolar//ES",
+        "CALSCALE:GREGORIAN",
+        f"X-WR-CALNAME:Agenda {colegio.nombre}",
+    ]
+
+    for ev in eventos:
+        dtstart = ev.fecha_inicio.strftime('%Y%m%dT%H%M%SZ')
+        dtstamp = ev.fecha_creacion.strftime('%Y%m%dT%H%M%SZ')
+        summary = ev.titulo.replace('\n', ' ')
+        desc = (ev.descripcion or '').replace('\n', ' ')
+        location = (ev.lugar or '').replace('\n', ' ')
+
+        lines.extend([
+            "BEGIN:VEVENT",
+            f"UID:eduteka-event-{ev.id}@{colegio.id}",
+            f"DTSTAMP:{dtstamp}",
+            f"DTSTART:{dtstart}",
+            f"SUMMARY:{summary}",
+            f"DESCRIPTION:{desc}",
+            f"LOCATION:{location}",
+            "END:VEVENT",
+        ])
+
+    lines.append("END:VCALENDAR")
+    ics_content = "\r\n".join(lines)
+
+    response = HttpResponse(ics_content, content_type='text/calendar; charset=utf-8')
+    response['Content-Disposition'] = f'attachment; filename="agenda_{colegio.id}.ics"'
+    return response
+
+
+
+@login_required
+def eliminar_evento_agenda_view(request, evento_id):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        messages.error(request, "No estás asociado a ningún colegio.")
+        return redirect('solicitar_acceso')
+
+    from colegios.models import EventoAgenda
+    evento = get_object_or_404(EventoAgenda, id=evento_id, colegio=colegio)
+
+    miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
+    is_admin = (
+        request.user.colegios_administrados.filter(id=colegio.id).exists()
+        or (miembro and miembro.rol and miembro.rol.nombre in ['Administrador', 'Director'])
+    )
+
+    if not is_admin and evento.creado_por != request.user:
+        messages.error(request, "No tienes permiso para eliminar este evento.")
+        return redirect('calendario_escolar')
+
+    evento.delete()
+    messages.success(request, "Evento eliminado de la agenda.")
+    return redirect('calendario_escolar')
+
+
+
+
+
+
 

@@ -1,0 +1,273 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configuración de Políticas Académicas - Eduteka</title>
+
+  <!-- Bootstrap CSS y Fuentes -->
+  <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+  <style>
+    :root {
+      --primary: #7C5CFC;
+      --primary-soft: #F0EDFF;
+      --secondary: #65CDBF;
+      --dark: #151A35;
+      --gray-text: #687089;
+      --bg-color: #F8F9FC;
+      --border-color: #E2E8F0;
+      --white: #FFFFFF;
+    }
+
+    html { font-size: 14px; }
+
+    body {
+      background: var(--bg-color);
+      color: var(--dark);
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+
+    .app-container { display: flex; min-height: 100vh; width: 100vw; overflow-x: hidden; }
+    .main-content { margin-left: 248px; flex: 1; display: flex; flex-direction: column; min-width: 0; width: calc(100% - 248px); }
+    .topbar { height: 64px; background: var(--white); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; position: sticky; top: 0; z-index: 1030; }
+
+    .content-area { padding: 2rem; max-width: 1200px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+
+    .policy-card {
+      background: var(--white);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.75rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+      transition: border-color .2s ease;
+    }
+    .policy-card:hover {
+      border-color: var(--primary);
+    }
+    .policy-icon {
+      width: 46px; height: 46px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; flex-shrink: 0;
+    }
+
+    .option-radio-box {
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      cursor: pointer;
+      transition: all .2s ease;
+      background: #FAFAFD;
+    }
+    .option-radio-box:hover {
+      border-color: var(--primary);
+      background: var(--white);
+    }
+    .option-radio-box input[type="radio"]:checked + label {
+      color: var(--primary);
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  {% include 'colegios/_sidebar.html' with active_page='configuracion' %}
+
+  <div class="main-content">
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-light d-lg-none" id="mobileMenuBtn">
+          <i class="bi bi-list fs-5"></i>
+        </button>
+        <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-gear text-primary me-2"></i>Configuración Institucional</h5>
+      </div>
+
+      <div class="d-flex align-items-center gap-3">
+        <span class="badge bg-light text-dark border px-3 py-2" style="font-size:.78rem;">
+          <i class="bi bi-building me-1 text-primary"></i> {{ colegio.nombre }}
+        </span>
+      </div>
+    </header>
+
+    <!-- CONTENT AREA -->
+    <main class="content-area">
+
+
+
+      <!-- HEADER INTRO -->
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+        <div>
+          <h3 class="fw-bold text-dark mb-1">Políticas Académicas y de Evaluación</h3>
+          <p class="text-muted mb-0">Personaliza las reglas del sistema de acuerdo a las políticas oficiales de tu establecimiento.</p>
+        </div>
+      </div>
+
+      <form method="POST" action="{% url 'configuracion_politicas' %}">
+        {% csrf_token %}
+
+        <!-- SECCIÓN 1: ASISTENCIA -->
+        <div class="policy-card">
+          <div class="d-flex align-items-center gap-3 mb-4">
+            <div class="policy-icon text-primary bg-primary-soft">
+              <i class="bi bi-calendar-check"></i>
+            </div>
+            <div>
+              <h5 class="fw-bold text-dark mb-1">1. Políticas de Asistencia Escolar</h5>
+              <p class="text-muted small mb-0">Define la modalidad con la que tus profesores tomarán lista y las alertas de inasistencia.</p>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold text-dark small">Modalidad de Asistencia</label>
+              <div class="d-flex flex-column gap-2">
+                <div class="form-check option-radio-box">
+                  <input class="form-check-input" type="radio" name="modalidad_asistencia" id="mod_asignatura" value="asignatura" {% if periodo.modalidad_asistencia == 'asignatura' %}checked{% endif %}>
+                  <label class="form-check-label w-100" for="mod_asignatura">
+                    <div class="fw-bold text-dark mb-0">Por Asignatura / Bloque de Clase</div>
+                    <div class="text-muted small">Cada profesor toma lista en su materia correspondiente durante la jornada.</div>
+                  </label>
+                </div>
+                <div class="form-check option-radio-box">
+                  <input class="form-check-input" type="radio" name="modalidad_asistencia" id="mod_diaria" value="diaria" {% if periodo.modalidad_asistencia == 'diaria' %}checked{% endif %}>
+                  <label class="form-check-label w-100" for="mod_diaria">
+                    <div class="fw-bold text-dark mb-0">Asistencia Diaria General</div>
+                    <div class="text-muted small">Un único pase de lista diario por curso (ideal para Educación Básica).</div>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold text-dark small">Porcentaje Mínimo de Asistencia para Promoción (%)</label>
+              <input type="number" name="porcentaje_asistencia_minima" class="form-control mb-2" value="{{ periodo.porcentaje_asistencia_minima|default:85 }}" min="50" max="100" required>
+              <span class="text-muted extra-small d-block"><i class="bi bi-info-circle me-1"></i>Normativa MINEDUC estándar en Chile es 85%. Los estudiantes bajo este porcentaje serán marcados en Riesgo de Reprobación.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 2: CALIFICACIONES Y EXIGENCIA (DECRETO 67) -->
+        <div class="policy-card">
+          <div class="d-flex align-items-center gap-3 mb-4">
+            <div class="policy-icon text-success" style="background:#ECFDF5;">
+              <i class="bi bi-journal-bookmark"></i>
+            </div>
+            <div>
+              <h5 class="fw-bold text-dark mb-1">2. Escala de Calificación y Exigencia (Decreto 67)</h5>
+              <p class="text-muted small mb-0">Configura la escala de notas y la exigencia requerida para la aprobación de asignaturas.</p>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-4">
+              <label class="form-label fw-semibold text-dark small">Tipo de Calificación</label>
+              <select name="tipo_calificacion" class="form-select">
+                <option value="numerica" {% if periodo.tipo_calificacion == 'numerica' %}selected{% endif %}>Notas Numéricas (1.0 a 7.0)</option>
+                <option value="conceptual" {% if periodo.tipo_calificacion == 'conceptual' %}selected{% endif %}>Evaluación Conceptual (L, PL, NL)</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold text-dark small">Nota Mínima de Aprobación</label>
+              <input type="number" step="0.1" name="nota_minima_aprobacion" class="form-control" value="{{ periodo.nota_minima_aprobacion|default:4.0 }}" min="1.0" max="7.0" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold text-dark small">Porcentaje de Exigencia (%)</label>
+              <input type="number" name="porcentaje_exigencia" class="form-control" value="{{ periodo.porcentaje_exigencia|default:60 }}" min="40" max="80" required>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 3: PROMEDIOS Y REDONDEO -->
+        <div class="policy-card">
+          <div class="d-flex align-items-center gap-3 mb-4">
+            <div class="policy-icon text-info" style="background:#F0F9FF;">
+              <i class="bi bi-calculator"></i>
+            </div>
+            <div>
+              <h5 class="fw-bold text-dark mb-1">3. Reglas de Promedio y Redondeo</h5>
+              <p class="text-muted small mb-0">Determina cómo se calcularán y cerrarán las notas finales de cada asignatura.</p>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold text-dark small">Criterio de Redondeo de Notas</label>
+              <select name="regla_redondeo" class="form-select">
+                <option value="un_decimal" {% if periodo.regla_redondeo == 'un_decimal' %}selected{% endif %}>Redondear a 1 decimal (Ejemplo: 5.65 → 5.7)</option>
+                <option value="dos_decimales" {% if periodo.regla_redondeo == 'dos_decimales' %}selected{% endif %}>Redondear a 2 decimales (Ejemplo: 5.65)</option>
+                <option value="truncado" {% if periodo.regla_redondeo == 'truncado' %}selected{% endif %}>Truncar sin redondear (Ejemplo: 5.69 → 5.6)</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold text-dark small">Método de Cálculo de Promedio</label>
+              <select name="tipo_calculo_promedio" class="form-select">
+                <option value="ponderado" {% if periodo.tipo_calculo_promedio == 'ponderado' %}selected{% endif %}>Promedio Ponderado por Coeficientes / Porcentajes</option>
+                <option value="simple" {% if periodo.tipo_calculo_promedio == 'simple' %}selected{% endif %}>Promedio Aritmético Simple</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 4: VISIBILIDAD Y NOTIFICACIONES -->
+        <div class="policy-card">
+          <div class="d-flex align-items-center gap-3 mb-4">
+            <div class="policy-icon text-warning" style="background:#FFFBEB;">
+              <i class="bi bi-bell"></i>
+            </div>
+            <div>
+              <h5 class="fw-bold text-dark mb-1">4. Visibilidad y Alertas Automáticas</h5>
+              <p class="text-muted small mb-0">Controla cuándo los apoderados ven la información y la emisión de notificaciones.</p>
+            </div>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold text-dark small">Publicación de Calificaciones para Apoderados</label>
+              <select name="visibilidad_notas_apoderados" class="form-select">
+                <option value="inmediata" {% if periodo.visibilidad_notas_apoderados == 'inmediata' %}selected{% endif %}>Publicación Inmediata al Guardar Nota</option>
+                <option value="cierre_periodo" {% if periodo.visibilidad_notas_apoderados == 'cierre_periodo' %}selected{% endif %}>Solo al Cierre del Período Académico</option>
+              </select>
+            </div>
+
+            <div class="col-md-6 d-flex flex-column gap-3 justify-content-center">
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" name="notificar_ausencias" id="not_ausencias" {% if periodo.notificar_ausencias %}checked{% endif %}>
+                <label class="form-check-label fw-semibold text-dark small" for="not_ausencias">Notificar ausencias diarias al apoderado automáticamente</label>
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" name="notificar_notas_rojas" id="not_rojas" {% if periodo.notificar_notas_rojas %}checked{% endif %}>
+                <label class="form-check-label fw-semibold text-dark small" for="not_rojas">Alertar calificaciones insuficientes (&lt; 4.0) a la dirección y apoderados</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BOTÓN GUARDAR -->
+        <div class="d-flex justify-content-end mb-5">
+          <button type="submit" class="btn btn-success fw-bold px-4 py-2.5 fs-6 shadow-sm">
+            <i class="bi bi-check2-circle me-2"></i>Guardar Políticas Académicas
+          </button>
+        </div>
+
+      </form>
+
+    </main>
+  </div>
+</div>
+
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+<script>
+  document.getElementById('mobileMenuBtn')?.addEventListener('click', function() {
+    document.getElementById('sidebar')?.classList.toggle('active');
+  });
+</script>
+
+</body>
+</html>

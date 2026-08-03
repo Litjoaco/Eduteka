@@ -1,10 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
-from colegios.models import SeccionCurso, Estudiante
+from colegios.models import SeccionCurso, Estudiante, Asignatura
 
 class RegistroAsistencia(models.Model):
     seccion = models.ForeignKey(SeccionCurso, on_delete=models.CASCADE, related_name='registros_asistencia')
+    asignatura = models.ForeignKey(Asignatura, on_delete=models.CASCADE, null=True, blank=True, related_name='registros_asistencia')
     fecha = models.DateField(default=timezone.now)
     creado_por = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
@@ -13,10 +14,13 @@ class RegistroAsistencia(models.Model):
     class Meta:
         verbose_name = "Registro de Asistencia"
         verbose_name_plural = "Registros de Asistencia"
-        unique_together = ('seccion', 'fecha')
+        unique_together = ('seccion', 'asignatura', 'fecha')
 
     def __str__(self):
+        if self.asignatura:
+            return f"Asistencia {self.seccion.nombre} - {self.asignatura.nombre} - {self.fecha}"
         return f"Asistencia {self.seccion.nombre} - {self.fecha}"
+
 
 class DetalleAsistencia(models.Model):
     ESTADOS = [
