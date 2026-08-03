@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -5,430 +6,515 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Directorio de Colegios Clientes - Super Admin Eduteka</title>
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Bootstrap CSS local static -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
     
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Alpine.js (para interactividad del Slide-over y Dropdowns) -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
-    <!-- Bootstrap Icons -->
+    <!-- Fuentes e Iconos -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
-    <!-- Heroicons -->
-    <script src="https://unpkg.com/heroicons@2.0.18/24/outline/index.js"></script>
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            navy: '#0F172A', // slate-900
-                            teal: '#0D9488', // teal-600
-                            tealLight: '#14B8A6',
-                        }
-                    }
-                }
-            }
+    <style>
+        :root {
+            --primary: #7C5CFC;
+            --primary-soft: rgba(124, 92, 252, 0.08);
+            --primary-hover: #6747E3;
+            --secondary: #65CDBF;
+            --secondary-soft: rgba(101, 205, 191, 0.08);
+            --bg: #F8F9FD;
+            --white: #FFFFFF;
+            --dark: #151A35;
+            --gray-text: #687089;
+            --border: #BCC0CF;
+            --radius-lg: 16px;
+            --radius-md: 10px;
+            --radius-sm: 8px;
         }
-    </script>
+
+        * {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+            margin: 0;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -15%; left: 65%;
+            width: 50vw; height: 50vw;
+            background: radial-gradient(circle, rgba(124, 92, 252, 0.07) 0%, rgba(255,255,255,0) 70%);
+            z-index: -2;
+            pointer-events: none;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            top: 45%; left: -15%;
+            width: 40vw; height: 40vw;
+            background: radial-gradient(circle, rgba(101, 205, 191, 0.06) 0%, rgba(255,255,255,0) 70%);
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        .wrapper {
+            display: flex;
+            width: 100%;
+            align-items: stretch;
+        }
+
+        /* TOPBAR */
+        .topbar {
+            height: 70px;
+            background: rgba(255, 255, 255, 0.85) !important;
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 98;
+        }
+
+        .search-bar {
+            position: relative;
+            width: 320px;
+        }
+
+        .search-bar i {
+            position: absolute;
+            left: 0.85rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-text);
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 0.5rem 1rem 0.5rem 2.4rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            background-color: var(--bg);
+            font-size: 0.85rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .search-bar input:focus {
+            border-color: var(--primary);
+            background-color: var(--white);
+            box-shadow: 0 0 0 3px rgba(124, 92, 252, 0.12);
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--white);
+            padding: 0.35rem 0.85rem 0.35rem 0.4rem;
+            border-radius: 30px;
+            border: 1px solid var(--border);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.88rem;
+            color: var(--dark);
+        }
+
+        .content-area {
+            padding: 1.75rem 2rem;
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+
+        .hero-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 0.25rem;
+        }
+        .hero-subtitle {
+            color: var(--gray-text);
+            font-size: 0.9rem;
+        }
+
+        .dashboard-panel {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.01);
+        }
+
+        /* Filter Pills */
+        .filter-pill {
+            padding: 0.4rem 1rem;
+            border-radius: 30px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            border: 1px solid var(--border);
+            background: var(--white);
+            color: var(--gray-text);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        .filter-pill.active, .filter-pill:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(124, 92, 252, 0.2);
+        }
+
+        /* Table */
+        .table-custom {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+            margin-bottom: 0;
+        }
+
+        .table-custom th {
+            border: none;
+            background: none;
+            color: var(--gray-text);
+            font-weight: 700;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0.5rem 1rem;
+        }
+
+        .table-custom td {
+            background: var(--white);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 0.9rem 1rem;
+            font-size: 0.88rem;
+            vertical-align: middle;
+        }
+
+        .table-custom td:first-child {
+            border-left: 1px solid var(--border);
+            border-top-left-radius: var(--radius-md);
+            border-bottom-left-radius: var(--radius-md);
+        }
+
+        .table-custom td:last-child {
+            border-right: 1px solid var(--border);
+            border-top-right-radius: var(--radius-md);
+            border-bottom-right-radius: var(--radius-md);
+        }
+
+        .table-custom tbody tr:hover td {
+            background-color: #FAF9FF !important;
+            border-color: #D6CFFE;
+        }
+
+        .school-icon-badge {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: var(--primary-soft);
+            color: var(--primary);
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.3rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .pill-green { background-color: #ECFDF5; color: #10B981; }
+        .pill-yellow { background-color: #FFFBEB; color: #D97706; }
+        .pill-red { background-color: #FEF2F2; color: #EF4444; }
+
+        .btn-purple {
+            background-color: var(--primary);
+            color: white;
+            font-weight: 600;
+            border-radius: var(--radius-md);
+            padding: 0.5rem 1.25rem;
+            border: none;
+            transition: all 0.2s;
+        }
+        .btn-purple:hover {
+            background-color: var(--primary-hover);
+            color: white;
+            box-shadow: 0 4px 12px rgba(124, 92, 252, 0.3);
+        }
+    </style>
 </head>
-<body class="bg-slate-50 font-sans text-slate-800 antialiased" x-data="{ slideOverOpen: false }">
+<body>
 
-    <!-- Wrapper -->
-    <div class="flex h-screen overflow-hidden">
-        
-        <!-- SIDEBAR -->
-        <aside class="w-64 bg-slate-900 text-slate-300 flex-shrink-0 flex flex-col transition-all duration-300">
-            <div class="px-6 py-6 border-b border-slate-700/50 mb-6">
-                <div class="flex items-center gap-3 mb-1">
-                    <i class="bi bi-mortarboard-fill text-teal-600 text-[32px]"></i>
-                    <span class="text-2xl font-bold text-white tracking-tight">Eduteka</span>
-                </div>
-                <div class="text-xs font-semibold text-teal-600 tracking-widest">SUPER ADMIN</div>
-            </div>
+    <div class="wrapper">
+        <!-- Sidebar -->
+        {% include '_sidebar_superadmin.html' with active_page='colegios' %}
 
-            <nav class="flex-1 px-4 space-y-1 overflow-y-auto">
-                <a href="{% url 'dashboard_superadmin' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
-                    Dashboard
-                </a>
-                <a href="{% url 'dashboard_superadmin_colegios' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium bg-teal-600 text-white shadow-sm">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
-                    Colegios Clientes
-                </a>
-                <a href="{% url 'dashboard_superadmin_planes' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
-                    Planes y Suscripciones
-                </a>
-                <a href="{% url 'dashboard_superadmin_facturacion' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                    Facturación y SII
-                </a>
-                <a href="{% url 'dashboard_superadmin_ordenes' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" /></svg>
-                    Órdenes de Compra
-                </a>
-                <a href="{% url 'dashboard_superadmin_modulos_erp' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                    Módulos ERP
-                </a>
-                <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                    Mercado Público MP
-                </a>
-                <a href="{% url 'dashboard_superadmin_estadisticas' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
-                    Estadísticas Globales
-                </a>
-                <a href="{% url 'dashboard_superadmin_configuracion' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                    Configuración
-                </a>
-            </nav>
-        </aside>
-
-        <!-- MAIN CONTENT AREA -->
-        <div class="flex-1 flex flex-col h-screen overflow-hidden">
-            
-            <!-- TOPBAR -->
-            <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-8 shrink-0">
-                <!-- Search -->
-                <div class="relative w-96">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                    </div>
-                    <input type="text" placeholder="Buscar colegios, órdenes, planes..." class="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-full leading-5 bg-slate-50 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-teal-500 focus:border-teal-500 sm:text-sm transition-colors">
-                </div>
-
-                <!-- Right Menu -->
-                <div class="flex items-center gap-6">
-                    <!-- Notifications -->
-                    <button class="relative text-slate-400 hover:text-slate-500 focus:outline-none transition-colors">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
-                        <span class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white">1</span>
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div class="d-flex items-center gap-2">
+                    <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn" style="border:none; background:var(--primary-soft); color:var(--primary);">
+                        <i class="bi bi-list fs-5"></i>
                     </button>
-                    <!-- Profile -->
-                    <div class="flex items-center gap-3 cursor-pointer">
-                        <div class="h-9 w-9 rounded-full bg-slate-900 flex items-center justify-center text-white font-semibold text-sm shadow-sm">
-                            AE
-                        </div>
-                        <span class="text-sm font-semibold text-slate-700">Admin Eduteka</span>
+                    <div class="search-bar">
+                        <i class="bi bi-search"></i>
+                        <input type="text" placeholder="Buscar colegios, órdenes, planes...">
+                    </div>
+                </div>
+
+                <div class="topbar-right">
+                    <div class="user-profile">
+                        <div class="user-avatar">AE</div>
+                        <span class="user-name">Admin Eduteka</span>
                     </div>
                 </div>
             </header>
 
-            <!-- MAIN SCROLLABLE CONTENT -->
-            <main class="flex-1 overflow-y-auto p-8">
+            <!-- Main Content Area -->
+            <div class="content-area">
                 
                 <!-- Django Messages -->
                 {% if messages %}
                     <div class="mb-4">
                         {% for message in messages %}
-                            <div class="p-4 mb-2 rounded-md {% if message.tags == 'success' %}bg-green-100 text-green-800{% elif message.tags == 'error' %}bg-red-100 text-red-800{% else %}bg-blue-100 text-blue-800{% endif %}">
+                            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show rounded-4" role="alert">
                                 {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                             </div>
                         {% endfor %}
                     </div>
                 {% endif %}
 
                 <!-- Page Header -->
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
                     <div>
-                        <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Directorio de Colegios Clientes</h1>
-                        <p class="text-sm text-slate-500 mt-1">Actualizado: Hoy, 16:30</p>
+                        <h1 class="hero-title">Directorio de Colegios Clientes</h1>
+                        <div class="hero-subtitle">Gestión centralizada de establecimientos y suscripciones</div>
                     </div>
-                    <button @click="slideOverOpen = true" class="inline-flex items-center justify-center rounded-md border border-transparent bg-teal-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-colors">
-                        <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-                        Añadir Nuevo Colegio
+                    <button type="button" class="btn btn-purple" data-bs-toggle="modal" data-bs-target="#modalNuevoColegio">
+                        <i class="bi bi-plus-lg me-1"></i> Añadir Nuevo Colegio
                     </button>
                 </div>
 
-                <!-- Filters Bar -->
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
-                    <div class="flex flex-wrap items-center gap-2">
-                        <button class="inline-flex items-center px-4 py-1.5 rounded-full border border-slate-300 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 shadow-sm transition-colors">Todos (215)</button>
-                        <button class="inline-flex items-center px-4 py-1.5 rounded-full border border-slate-300 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 shadow-sm transition-colors">Activos (190)</button>
-                        <button class="inline-flex items-center px-4 py-1.5 rounded-full border border-slate-300 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 shadow-sm transition-colors">En Prueba (15)</button>
-                        <button class="inline-flex items-center px-4 py-1.5 rounded-full border border-slate-300 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 shadow-sm transition-colors">Morosos (10)</button>
+                <!-- Filters -->
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="filter-pill active">Todos</span>
+                        <span class="filter-pill">Activos</span>
+                        <span class="filter-pill">En Prueba</span>
+                        <span class="filter-pill">Morosos</span>
                     </div>
-                    
-                    <div x-data="{ open: false }" class="relative">
-                        <button @click="open = !open" @click.away="open = false" type="button" class="inline-flex items-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none transition-colors">
-                            <svg class="-ml-1 mr-2 h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
-                            Filtrar por Plan
-                            <svg class="-mr-1 ml-2 h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
-                        </button>
-                        
-                        <!-- Dropdown panel -->
-                        <div x-show="open" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="transform opacity-0 scale-95" x-transition:enter-end="transform opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="transform opacity-100 scale-100" x-transition:leave-end="transform opacity-0 scale-95" class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" style="display: none;">
-                            <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-                                <a href="#" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900" role="menuitem">Plan Básico</a>
-                                <a href="#" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900" role="menuitem">Plan Estándar</a>
-                                <a href="#" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900" role="menuitem">Plan Premium</a>
-                            </div>
-                        </div>
+                    <div>
+                        <select class="form-select form-select-sm rounded-pill px-3 border" style="width: auto;">
+                            <option selected>Filtrar por Plan (Todos)</option>
+                            <option>Plan Básico</option>
+                            <option>Plan Estándar</option>
+                            <option>Plan Premium</option>
+                        </select>
                     </div>
                 </div>
 
-                <!-- Table Card -->
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-slate-200">
-                            <thead class="bg-slate-50">
+                <!-- Table Panel -->
+                <div class="dashboard-panel">
+                    <div class="table-responsive">
+                        <table class="table-custom">
+                            <thead>
                                 <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Nombre del Colegio</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">RUT</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Dimensión (Alum./Prof.)</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Estado Onboarding</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Plan Actual</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Estado</th>
-                                    <th scope="col" class="px-6 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Acciones</th>
+                                    <th>Nombre del Colegio</th>
+                                    <th>RUT</th>
+                                    <th>Dimensión</th>
+                                    <th>Onboarding</th>
+                                    <th>Plan Actual</th>
+                                    <th>Estado</th>
+                                    <th class="text-end">Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white divide-y divide-slate-200">
+                            <tbody>
                                 {% for colegio in colegios %}
-                                <tr class="hover:bg-slate-50 transition-colors">
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            <div class="flex-shrink-0 h-10 w-10 rounded bg-teal-100 flex items-center justify-center text-teal-700 font-bold uppercase">
-                                                {{ colegio.nombre|slice:":2" }}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="school-icon-badge">
+                                                {{ colegio.nombre|slice:":2"|upper }}
                                             </div>
-                                            <div class="ml-4">
-                                                <div class="text-sm font-medium text-slate-900">{{ colegio.nombre }}</div>
-                                                <div class="text-sm text-slate-500">{{ colegio.ciudad_comuna }}</div>
+                                            <div>
+                                                <div class="fw-bold text-dark">{{ colegio.nombre }}</div>
+                                                <div class="text-muted small">{{ colegio.ciudad_comuna|default:"Sin comuna" }}</div>
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">{{ colegio.nombre_corto|default:"Sin RUT" }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">
-                                        {{ colegio.get_cantidad_alumnos_display }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                    <td class="text-muted fw-semibold">{{ colegio.nombre_corto|default:"Sin RUT" }}</td>
+                                    <td>{{ colegio.get_cantidad_alumnos_display }}</td>
+                                    <td>
                                         {% if colegio.configuracion_completa %}
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                            Completado
-                                        </span>
+                                        <span class="pill pill-green"><i class="bi bi-check-circle-fill"></i> Completado</span>
                                         {% else %}
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                            Pendiente
-                                        </span>
+                                        <span class="pill pill-yellow"><i class="bi bi-clock-history"></i> Pendiente</span>
                                         {% endif %}
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
-                                        {% if colegio.suscripcion %}
-                                            {{ colegio.suscripcion.plan.nombre }}
-                                        {% else %}
-                                            Sin Plan
-                                        {% endif %}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            {% if colegio.estado == 'activo' %}
-                                                <span class="h-2.5 w-2.5 rounded-full bg-green-500 mr-2"></span>
-                                            {% elif colegio.estado == 'inactivo' or colegio.estado == 'suspendido' %}
-                                                <span class="h-2.5 w-2.5 rounded-full bg-red-500 mr-2"></span>
+                                    <td>
+                                        <span class="fw-bold text-dark">
+                                            {% if colegio.suscripcion %}
+                                                {{ colegio.suscripcion.plan.nombre }}
                                             {% else %}
-                                                <span class="h-2.5 w-2.5 rounded-full bg-yellow-400 mr-2"></span>
+                                                Sin Plan
                                             {% endif %}
-                                            <span class="text-sm text-slate-700">{{ colegio.get_estado_display }}</span>
-                                        </div>
+                                        </span>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <div class="flex items-center justify-end gap-3">
-                                            <button class="text-slate-400 hover:text-teal-600 transition-colors" title="Ver Detalles">
-                                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                                            </button>
-                                            <button class="text-slate-400 hover:text-teal-600 transition-colors" title="Editar">
-                                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                                            </button>
-                                        </div>
+                                    <td>
+                                        {% if colegio.estado == 'activo' %}
+                                            <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">Activo</span>
+                                        {% elif colegio.estado == 'inactivo' or colegio.estado == 'suspendido' %}
+                                            <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2">Inactivo</span>
+                                        {% else %}
+                                            <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">{{ colegio.get_estado_display }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-outline-primary rounded-pill me-1" title="Ver Detalles">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-light border rounded-pill" title="Editar">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
                                     </td>
                                 </tr>
                                 {% empty %}
                                 <tr>
-                                    <td colspan="7" class="px-6 py-4 text-center text-sm text-slate-500">
-                                        No hay colegios registrados en el sistema.
+                                    <td colspan="7" class="text-center py-4 text-muted">
+                                        <i class="bi bi-info-circle me-1"></i> No hay colegios registrados en el sistema.
                                     </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
-                    <!-- Pagination (dummy) -->
-                    <div class="bg-white px-4 py-3 border-t border-slate-200 flex items-center justify-between sm:px-6">
-                        <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                            <div>
-                                <p class="text-sm text-slate-700">
-                                    Mostrando <span class="font-medium">1</span> a <span class="font-medium">3</span> de <span class="font-medium">215</span> resultados
-                                </p>
-                            </div>
-                            <div>
-                                <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                                    <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-slate-300 bg-white text-sm font-medium text-slate-500 hover:bg-slate-50">
-                                        Anterior
-                                    </a>
-                                    <a href="#" aria-current="page" class="z-10 bg-teal-50 border-teal-500 text-teal-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium">1</a>
-                                    <a href="#" class="bg-white border-slate-300 text-slate-500 hover:bg-slate-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">2</a>
-                                    <a href="#" class="bg-white border-slate-300 text-slate-500 hover:bg-slate-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">3</a>
-                                    <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-slate-300 bg-white text-sm font-medium text-slate-500 hover:bg-slate-50">
-                                        Siguiente
-                                    </a>
-                                </nav>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
-            </main>
-        </div>
-        
-        <!-- SLIDE-OVER / DRAWER PARA NUEVO COLEGIO -->
-        <div x-show="slideOverOpen" class="relative z-50" aria-labelledby="slide-over-title" role="dialog" aria-modal="true" style="display: none;">
-            
-            <!-- Fondo oscuro transparente -->
-            <div x-show="slideOverOpen" 
-                 x-transition:enter="ease-in-out duration-500" 
-                 x-transition:enter-start="opacity-0" 
-                 x-transition:enter-end="opacity-100" 
-                 x-transition:leave="ease-in-out duration-500" 
-                 x-transition:leave-start="opacity-100" 
-                 x-transition:leave-end="opacity-0" 
-                 class="fixed inset-0 bg-slate-900 bg-opacity-40 transition-opacity"></div>
-
-            <div class="fixed inset-0 overflow-hidden">
-                <div class="absolute inset-0 overflow-hidden">
-                    <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10 sm:pl-16">
-                        
-                        <!-- Panel de contenido -->
-                        <div x-show="slideOverOpen" 
-                             @click.away="slideOverOpen = false"
-                             x-transition:enter="transform transition ease-in-out duration-500 sm:duration-700" 
-                             x-transition:enter-start="translate-x-full" 
-                             x-transition:enter-end="translate-x-0" 
-                             x-transition:leave="transform transition ease-in-out duration-500 sm:duration-700" 
-                             x-transition:leave-start="translate-x-0" 
-                             x-transition:leave-end="translate-x-full" 
-                             class="pointer-events-auto w-screen max-w-md">
-                            
-                            <div class="flex h-full flex-col overflow-y-scroll bg-white shadow-2xl">
-                                <!-- Cabecera del panel -->
-                                <div class="bg-slate-50 px-4 py-6 sm:px-6 border-b border-slate-200">
-                                    <div class="flex items-center justify-between">
-                                        <h2 class="text-lg font-semibold text-slate-900" id="slide-over-title">Nuevo Registro de Colegio</h2>
-                                        <div class="ml-3 flex h-7 items-center">
-                                            <button @click="slideOverOpen = false" type="button" class="rounded-md bg-transparent text-slate-400 hover:text-slate-500 focus:outline-none">
-                                                <span class="sr-only">Cerrar panel</span>
-                                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="mt-1">
-                                        <p class="text-sm text-slate-500">Completa la información para ingresar una nueva institución al sistema.</p>
-                                    </div>
-                                </div>
-                                
-                                <!-- Formulario -->
-                                <div class="relative flex-1 px-4 py-6 sm:px-6">
-                                    <form method="POST" action="{% url 'dashboard_superadmin_colegios' %}" class="space-y-5">
-                                        {% csrf_token %}
-                                        
-                                        <div>
-                                            <label for="nombre" class="block text-sm font-medium text-slate-700">Nombre del Establecimiento</label>
-                                            <div class="mt-1">
-                                                <input type="text" name="nombre" id="nombre" class="block w-full rounded-md border-slate-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm border p-2.5" placeholder="Ej: Colegio San Alberto">
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <label for="rut" class="block text-sm font-medium text-slate-700">RUT <span class="text-xs text-slate-400 font-normal ml-1">(sin puntos y con guión)</span></label>
-                                            <div class="mt-1">
-                                                <input type="text" name="rut" id="rut" class="block w-full rounded-md border-slate-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm border p-2.5" placeholder="Ej: 76123456-K">
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <label for="direccion" class="block text-sm font-medium text-slate-700">Dirección</label>
-                                            <div class="mt-1">
-                                                <input type="text" name="direccion" id="direccion" class="block w-full rounded-md border-slate-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm border p-2.5">
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <label for="cp" class="block text-sm font-medium text-slate-700">Código Postal</label>
-                                            <div class="mt-1">
-                                                <input type="text" name="cp" id="cp" class="block w-full rounded-md border-slate-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm border p-2.5">
-                                            </div>
-                                        </div>
-
-                                        <hr class="border-slate-200">
-
-                                        <div>
-                                            <label for="contacto" class="block text-sm font-medium text-slate-700">Persona de Contacto</label>
-                                            <div class="mt-1">
-                                                <input type="text" name="contacto" id="contacto" class="block w-full rounded-md border-slate-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm border p-2.5" placeholder="Nombre completo">
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <label for="email" class="block text-sm font-medium text-slate-700">Email Administrativo</label>
-                                            <div class="mt-1">
-                                                <input type="email" name="email" id="email" class="block w-full rounded-md border-slate-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm border p-2.5" placeholder="admin@colegio.cl">
-                                            </div>
-                                        </div>
-
-                                        <div class="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <label for="alumnos" class="block text-sm font-medium text-slate-700">N° Alumnos</label>
-                                                <div class="mt-1">
-                                                    <input type="number" name="alumnos" id="alumnos" class="block w-full rounded-md border-slate-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm border p-2.5">
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <label for="profesores" class="block text-sm font-medium text-slate-700">N° Profes/Inspectores</label>
-                                                <div class="mt-1">
-                                                    <input type="number" name="profesores" id="profesores" class="block w-full rounded-md border-slate-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm border p-2.5">
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <label for="plan" class="block text-sm font-medium text-slate-700">Plan de Suscripción</label>
-                                            <div class="mt-1">
-                                                <select id="plan" name="plan" class="block w-full rounded-md border-slate-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm border p-2.5 bg-white">
-                                                    <option>Plan Básico (hasta 500 alumnos)</option>
-                                                    <option>Plan Estándar (hasta 1500 alumnos)</option>
-                                                    <option>Plan Premium (Ilimitado)</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                <!-- Botones de acción del panel -->
-                                <div class="flex flex-shrink-0 justify-end px-4 py-4 border-t border-slate-200">
-                                    <button @click="slideOverOpen = false" type="button" class="rounded-md border border-slate-300 bg-white py-2 px-4 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none transition-colors">
-                                        Cancelar
-                                    </button>
-                                    <button type="submit" class="ml-4 inline-flex justify-center rounded-md border border-transparent bg-teal-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-teal-700 focus:outline-none transition-colors">
-                                        Registrar Nuevo Colegio
-                                    </button>
-                                </div>
-                            </form>                </div>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
-        </div>
-
+        </main>
     </div>
 
+    <!-- MODAL NUEVO COLEGIO -->
+    <div class="modal fade" id="modalNuevoColegio" tabindex="-1" aria-labelledby="modalNuevoColegioLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: var(--radius-lg);">
+                <div class="modal-header border-bottom-0 pb-0" style="padding: 1.5rem 1.5rem 0.5rem;">
+                    <div>
+                        <h5 class="modal-title fw-bold" id="modalNuevoColegioLabel">Nuevo Registro de Colegio</h5>
+                        <p class="text-muted small mb-0">Completa la información para ingresar una nueva institución.</p>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="POST" action="{% url 'dashboard_superadmin_colegios' %}">
+                    {% csrf_token %}
+                    <div class="modal-body" style="padding: 1.5rem;">
+                        <div class="row g-3">
+                            <div class="col-12 col-md-8">
+                                <label for="nombre" class="form-label fw-semibold small text-muted">Nombre del Establecimiento</label>
+                                <input type="text" name="nombre" id="nombre" class="form-control rounded-3" placeholder="Ej: Colegio San Alberto" required>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <label for="rut" class="form-label fw-semibold small text-muted">RUT <span class="text-muted font-normal">(sin puntos)</span></label>
+                                <input type="text" name="rut" id="rut" class="form-control rounded-3" placeholder="Ej: 76123456-K">
+                            </div>
+                            <div class="col-12 col-md-8">
+                                <label for="direccion" class="form-label fw-semibold small text-muted">Dirección</label>
+                                <input type="text" name="direccion" id="direccion" class="form-control rounded-3">
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <label for="cp" class="form-label fw-semibold small text-muted">Código Postal</label>
+                                <input type="text" name="cp" id="cp" class="form-control rounded-3">
+                            </div>
+                            <div class="col-12"><hr class="my-2"></div>
+                            <div class="col-12 col-md-6">
+                                <label for="contacto" class="form-label fw-semibold small text-muted">Persona de Contacto</label>
+                                <input type="text" name="contacto" id="contacto" class="form-control rounded-3" placeholder="Nombre completo">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label for="email" class="form-label fw-semibold small text-muted">Email Administrativo</label>
+                                <input type="email" name="email" id="email" class="form-control rounded-3" placeholder="admin@colegio.cl">
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <label for="alumnos" class="form-label fw-semibold small text-muted">N° Alumnos</label>
+                                <input type="number" name="alumnos" id="alumnos" class="form-control rounded-3">
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <label for="profesores" class="form-label fw-semibold small text-muted">N° Profesores</label>
+                                <input type="number" name="profesores" id="profesores" class="form-control rounded-3">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label for="plan" class="form-label fw-semibold small text-muted">Plan de Suscripción</label>
+                                <select id="plan" name="plan" class="form-select rounded-3">
+                                    <option>Plan Básico (hasta 500 alumnos)</option>
+                                    <option>Plan Estándar (hasta 1500 alumnos)</option>
+                                    <option>Plan Premium (Ilimitado)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-top-0" style="padding: 1rem 1.5rem 1.5rem;">
+                        <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-purple rounded-pill px-4">Registrar Nuevo Colegio</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const mobileBtn = document.getElementById('mobileMenuBtn');
+            const sidebar = document.getElementById('sidebar');
+            if (mobileBtn && sidebar) {
+                mobileBtn.addEventListener('click', function () {
+                    sidebar.classList.toggle('active');
+                });
+            }
+        });
+    </script>
 </body>
 </html>

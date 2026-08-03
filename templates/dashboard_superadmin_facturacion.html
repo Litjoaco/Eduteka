@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -5,320 +6,410 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Facturación y SII - Super Admin Eduteka</title>
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Bootstrap CSS local static -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
     
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Bootstrap Icons for logo -->
+    <!-- Fuentes e Iconos -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
-    <!-- Heroicons -->
-    <script src="https://unpkg.com/heroicons@2.0.18/24/outline/index.js"></script>
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            navy: '#0F172A',
-                            teal: '#0D9488',
-                            tealLight: '#14B8A6',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
     <style>
-        @keyframes pulse-green {
-            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
-            70% { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        :root {
+            --primary: #7C5CFC;
+            --primary-soft: rgba(124, 92, 252, 0.08);
+            --primary-hover: #6747E3;
+            --secondary: #65CDBF;
+            --secondary-soft: rgba(101, 205, 191, 0.08);
+            --bg: #F8F9FD;
+            --white: #FFFFFF;
+            --dark: #151A35;
+            --gray-text: #687089;
+            --border: #BCC0CF;
+            --radius-lg: 16px;
+            --radius-md: 10px;
+            --radius-sm: 8px;
         }
-        .animate-pulse-green {
-            animation: pulse-green 2s infinite;
+
+        * {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+            margin: 0;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -15%; left: 65%;
+            width: 50vw; height: 50vw;
+            background: radial-gradient(circle, rgba(124, 92, 252, 0.07) 0%, rgba(255,255,255,0) 70%);
+            z-index: -2;
+            pointer-events: none;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            top: 45%; left: -15%;
+            width: 40vw; height: 40vw;
+            background: radial-gradient(circle, rgba(101, 205, 191, 0.06) 0%, rgba(255,255,255,0) 70%);
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        .wrapper {
+            display: flex;
+            width: 100%;
+            align-items: stretch;
+        }
+
+        /* TOPBAR */
+        .topbar {
+            height: 70px;
+            background: rgba(255, 255, 255, 0.85) !important;
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 98;
+        }
+
+        .search-bar {
+            position: relative;
+            width: 320px;
+        }
+
+        .search-bar i {
+            position: absolute;
+            left: 0.85rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-text);
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 0.5rem 1rem 0.5rem 2.4rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            background-color: var(--bg);
+            font-size: 0.85rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .search-bar input:focus {
+            border-color: var(--primary);
+            background-color: var(--white);
+            box-shadow: 0 0 0 3px rgba(124, 92, 252, 0.12);
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--white);
+            padding: 0.35rem 0.85rem 0.35rem 0.4rem;
+            border-radius: 30px;
+            border: 1px solid var(--border);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.88rem;
+            color: var(--dark);
+        }
+
+        .content-area {
+            padding: 1.75rem 2rem;
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+
+        .hero-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 0.25rem;
+        }
+        .hero-subtitle {
+            color: var(--gray-text);
+            font-size: 0.9rem;
+        }
+
+        .kpi-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            height: 100%;
+        }
+
+        .kpi-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+
+        .kpi-icon.purple { background-color: var(--primary-soft); color: var(--primary); }
+        .kpi-icon.teal { background-color: var(--secondary-soft); color: #148A7A; }
+        .kpi-icon.red { background-color: #FEF2F2; color: #EF4444; }
+
+        .dashboard-panel {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.01);
+        }
+
+        .table-custom {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+            margin-bottom: 0;
+        }
+
+        .table-custom th {
+            border: none;
+            background: none;
+            color: var(--gray-text);
+            font-weight: 700;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0.5rem 1rem;
+        }
+
+        .table-custom td {
+            background: var(--white);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 0.9rem 1rem;
+            font-size: 0.88rem;
+            vertical-align: middle;
+        }
+
+        .table-custom td:first-child {
+            border-left: 1px solid var(--border);
+            border-top-left-radius: var(--radius-md);
+            border-bottom-left-radius: var(--radius-md);
+        }
+
+        .table-custom td:last-child {
+            border-right: 1px solid var(--border);
+            border-top-right-radius: var(--radius-md);
+            border-bottom-right-radius: var(--radius-md);
+        }
+
+        .table-custom tbody tr:hover td {
+            background-color: #FAF9FF !important;
+            border-color: #D6CFFE;
+        }
+
+        .btn-purple {
+            background-color: var(--primary);
+            color: white;
+            font-weight: 600;
+            border-radius: var(--radius-md);
+            padding: 0.5rem 1.25rem;
+            border: none;
+            transition: all 0.2s;
+        }
+        .btn-purple:hover {
+            background-color: var(--primary-hover);
+            color: white;
+            box-shadow: 0 4px 12px rgba(124, 92, 252, 0.3);
         }
     </style>
 </head>
-<body class="bg-slate-50 font-sans text-slate-800 antialiased">
+<body>
 
-    <div class="flex h-screen overflow-hidden">
-        
-        <!-- SIDEBAR -->
-        <aside class="w-64 bg-slate-900 text-slate-300 flex-shrink-0 flex flex-col transition-all duration-300">
-            <div class="px-6 py-6 border-b border-slate-700/50 mb-6">
-                <div class="flex items-center gap-3 mb-1">
-                    <i class="bi bi-mortarboard-fill text-teal-600 text-[32px]"></i>
-                    <span class="text-2xl font-bold text-white tracking-tight">Eduteka</span>
-                </div>
-                <div class="text-xs font-semibold text-teal-600 tracking-widest">SUPER ADMIN</div>
-            </div>
+    <div class="wrapper">
+        <!-- Sidebar -->
+        {% include '_sidebar_superadmin.html' with active_page='facturacion' %}
 
-            <nav class="flex-1 px-4 space-y-1 overflow-y-auto">
-                <a href="{% url 'dashboard_superadmin' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
-                    Dashboard
-                </a>
-                <a href="{% url 'dashboard_superadmin_colegios' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
-                    Colegios Clientes
-                </a>
-                <a href="{% url 'dashboard_superadmin_planes' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
-                    Planes y Suscripciones
-                </a>
-                <a href="{% url 'dashboard_superadmin_facturacion' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium bg-teal-600 text-white shadow-sm">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                    Facturación y SII
-                </a>
-                <a href="{% url 'dashboard_superadmin_ordenes' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" /></svg>
-                    Órdenes de Compra
-                </a>
-                <a href="{% url 'dashboard_superadmin_modulos_erp' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                    Módulos ERP
-                </a>
-                <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                    Mercado Público MP
-                </a>
-                <a href="{% url 'dashboard_superadmin_estadisticas' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
-                    Estadísticas Globales
-                </a>
-                <a href="{% url 'dashboard_superadmin_configuracion' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                    Configuración
-                </a>
-            </nav>
-        </aside>
-
-        <!-- MAIN CONTENT AREA -->
-        <div class="flex-1 flex flex-col h-screen overflow-hidden">
-            
-            <!-- TOPBAR -->
-            <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-8 shrink-0">
-                <div class="relative w-96">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                    </div>
-                    <input type="text" placeholder="Buscar colegios, órdenes, planes..." class="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-full leading-5 bg-slate-50 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-teal-500 focus:border-teal-500 sm:text-sm transition-colors">
-                </div>
-
-                <div class="flex items-center gap-6">
-                    <button class="relative text-slate-400 hover:text-slate-500 focus:outline-none transition-colors">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
-                        <span class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white">1</span>
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div class="d-flex items-center gap-2">
+                    <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn" style="border:none; background:var(--primary-soft); color:var(--primary);">
+                        <i class="bi bi-list fs-5"></i>
                     </button>
-                    <div class="flex items-center gap-3 cursor-pointer">
-                        <div class="h-9 w-9 rounded-full bg-slate-900 flex items-center justify-center text-white font-semibold text-sm shadow-sm">
-                            AE
-                        </div>
-                        <span class="text-sm font-semibold text-slate-700">Admin Eduteka</span>
+                    <div class="search-bar">
+                        <i class="bi bi-search"></i>
+                        <input type="text" placeholder="Buscar colegios, órdenes, planes...">
+                    </div>
+                </div>
+
+                <div class="topbar-right">
+                    <div class="user-profile">
+                        <div class="user-avatar">AE</div>
+                        <span class="user-name">Admin Eduteka</span>
                     </div>
                 </div>
             </header>
 
-            <!-- MAIN SCROLLABLE CONTENT -->
-            <main class="flex-1 overflow-y-auto p-8">
-                
-                <!-- Page Header -->
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
+            <!-- Main Content Area -->
+            <div class="content-area">
+
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
                     <div>
-                        <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Control de Facturación y Conexión SII</h1>
+                        <h1 class="hero-title">Facturación Electrónica y SII</h1>
+                        <div class="hero-subtitle">Gestión de Documentos Tributarios Electrónicos (DTE) y cobro automático</div>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <button class="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none transition-colors">
-                            <svg class="-ml-1 mr-2 h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-                            Sincronizar Defontana
-                        </button>
-                        <button class="inline-flex items-center justify-center rounded-md border border-transparent bg-teal-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-colors">
-                            <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-                            Emitir Factura Manual
-                        </button>
-                    </div>
+                    <button type="button" class="btn btn-purple">
+                        <i class="bi bi-file-earmark-plus me-1"></i> Emitir Factura Manual
+                    </button>
                 </div>
 
-                <!-- Status Cards Section -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                    
-                    <!-- Card 1: Estado Servicio SII -->
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col justify-center">
-                        <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Estado Servicio SII</h3>
-                        <div class="flex items-center">
-                            <div class="h-3 w-3 rounded-full bg-green-500 animate-pulse-green mr-3"></div>
-                            <span class="text-sm font-medium text-slate-900">Conectado y En Línea</span>
-                        </div>
-                    </div>
-
-                    <!-- Card 2: Integración Defontana -->
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col justify-center">
-                        <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Integración Defontana</h3>
-                        <div class="flex items-center text-green-600">
-                            <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                            <span class="text-sm font-medium">Sincronizado hoy, 10:00 AM</span>
-                        </div>
-                    </div>
-
-                    <!-- Card 3: Facturado este mes -->
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col justify-center">
-                        <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Facturado este mes</h3>
-                        <div class="text-2xl font-semibold text-slate-900">$12.500.000 <span class="text-sm font-medium text-slate-500">CLP</span></div>
-                    </div>
-
-                    <!-- Card 4: Facturas por Cobrar -->
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col justify-center">
-                        <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Facturas por Cobrar</h3>
-                        <div class="text-xl font-bold text-red-600">4 Pendientes</div>
-                    </div>
-                </div>
-
-                <!-- Invoices Table Section -->
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden w-full mb-8">
-                    <div class="px-6 py-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-slate-50">
-                        <div class="flex gap-4">
-                            <div class="flex items-center">
-                                <span class="text-sm font-medium text-slate-700 mr-2">Mes:</span>
-                                <select class="block w-full pl-3 pr-10 py-1.5 text-sm border-slate-300 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm rounded-md bg-white border shadow-sm">
-                                    <option>Julio 2026</option>
-                                    <option>Junio 2026</option>
-                                    <option>Mayo 2026</option>
-                                </select>
+                <!-- Metrics Cards -->
+                <div class="row g-3 mb-4">
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="kpi-card">
+                            <div class="kpi-icon teal">
+                                <i class="bi bi-receipt"></i>
                             </div>
-                            <div class="flex items-center">
-                                <span class="text-sm font-medium text-slate-700 mr-2">Estado:</span>
-                                <select class="block w-full pl-3 pr-10 py-1.5 text-sm border-slate-300 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm rounded-md bg-white border shadow-sm">
-                                    <option>Todas</option>
-                                    <option>Pagadas</option>
-                                    <option>Pendientes</option>
-                                    <option>Vencidas</option>
-                                </select>
+                            <div>
+                                <div class="text-muted small fw-bold text-uppercase">Facturado este mes</div>
+                                <div class="fs-4 fw-bold text-dark">$14.250.000</div>
+                                <div class="text-success small fw-semibold"><i class="bi bi-arrow-up-right"></i> 100% Aceptado SII</div>
                             </div>
                         </div>
                     </div>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-slate-200">
-                            <thead class="bg-white">
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="kpi-card">
+                            <div class="kpi-icon purple">
+                                <i class="bi bi-file-earmark-check"></i>
+                            </div>
+                            <div>
+                                <div class="text-muted small fw-bold text-uppercase">DTE Emitidos</div>
+                                <div class="fs-4 fw-bold text-dark">215 DTE</div>
+                                <div class="text-muted small fw-semibold">Julio 2026</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="kpi-card">
+                            <div class="kpi-icon red">
+                                <i class="bi bi-exclamation-octagon"></i>
+                            </div>
+                            <div>
+                                <div class="text-muted small fw-bold text-uppercase">Facturas Vencidas</div>
+                                <div class="fs-4 fw-bold text-dark">$1.850.000</div>
+                                <div class="text-danger small fw-semibold">10 Colegios pendientes</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="kpi-card">
+                            <div class="kpi-icon purple">
+                                <i class="bi bi-arrow-repeat"></i>
+                            </div>
+                            <div>
+                                <div class="text-muted small fw-bold text-uppercase">Conciliaciones</div>
+                                <div class="fs-4 fw-bold text-dark">98.5%</div>
+                                <div class="text-success small fw-semibold"><i class="bi bi-check-all"></i> Sincronizado SII</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table Panel -->
+                <div class="dashboard-panel">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="fw-bold fs-5 text-dark m-0"><i class="bi bi-journal-text me-2 text-primary"></i>Historial de Documentos Emitidos</h2>
+                        <button class="btn btn-sm btn-outline-primary rounded-pill"><i class="bi bi-download me-1"></i> Exportar a Excel</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table-custom">
+                            <thead>
                                 <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">N° Factura (Folio SII)</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Colegio</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Fecha Emisión</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Fecha Vencimiento <span class="text-[10px] lowercase font-normal">(Plazo 30 días)</span></th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Monto Total</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Estado de Pago</th>
-                                    <th scope="col" class="px-6 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Acciones</th>
+                                    <th>Folio DTE</th>
+                                    <th>Colegio</th>
+                                    <th>Tipo Documento</th>
+                                    <th>Monto Total</th>
+                                    <th>Fecha Emisión</th>
+                                    <th>Estado SII</th>
+                                    <th class="text-end">Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white divide-y divide-slate-200">
-                                <!-- Row 1 -->
-                                <tr class="hover:bg-slate-50 transition-colors">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-900">
-                                        #45091
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
-                                        Liceo Santa María
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
-                                        01/07/2026
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
-                                        01/08/2026
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-900">
-                                        $400.000
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                            Pagada
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <div class="flex items-center justify-end gap-3">
-                                            <button class="text-slate-400 hover:text-red-500 transition-colors" title="Descargar PDF">
-                                                <i class="bi bi-file-earmark-pdf-fill text-lg"></i>
-                                            </button>
-                                            <button class="text-slate-400 hover:text-teal-600 transition-colors" title="Descargar XML">
-                                                <i class="bi bi-filetype-xml text-lg"></i>
-                                            </button>
-                                        </div>
+                            <tbody>
+                                <tr>
+                                    <td><strong class="text-primary">F-8492</strong></td>
+                                    <td><strong>Liceo Santa María</strong></td>
+                                    <td>Factura Electrónica Exenta</td>
+                                    <td>$400.000 CLP</td>
+                                    <td>01/07/2026</td>
+                                    <td><span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">Aceptado SII</span></td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-light border rounded-pill me-1" title="Ver PDF"><i class="bi bi-file-earmark-pdf"></i></button>
+                                        <button class="btn btn-sm btn-light border rounded-pill" title="XML"><i class="bi bi-code-slash"></i></button>
                                     </td>
                                 </tr>
-
-                                <!-- Row 2 -->
-                                <tr class="hover:bg-slate-50 transition-colors">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-900">
-                                        #45092
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
-                                        Colegio Los Alerces
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
-                                        15/07/2026
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
-                                        15/08/2026
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-900">
-                                        $250.000
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                            Pendiente
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <div class="flex items-center justify-end gap-3">
-                                            <button class="text-slate-400 hover:text-red-500 transition-colors" title="Descargar PDF">
-                                                <i class="bi bi-file-earmark-pdf-fill text-lg"></i>
-                                            </button>
-                                            <button class="text-slate-400 hover:text-teal-600 transition-colors" title="Descargar XML">
-                                                <i class="bi bi-filetype-xml text-lg"></i>
-                                            </button>
-                                        </div>
+                                <tr>
+                                    <td><strong class="text-primary">F-8491</strong></td>
+                                    <td><strong>Colegio Los Alerces</strong></td>
+                                    <td>Factura Electrónica Exenta</td>
+                                    <td>$250.000 CLP</td>
+                                    <td>01/07/2026</td>
+                                    <td><span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">Aceptado SII</span></td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-light border rounded-pill me-1" title="Ver PDF"><i class="bi bi-file-earmark-pdf"></i></button>
+                                        <button class="btn btn-sm btn-light border rounded-pill" title="XML"><i class="bi bi-code-slash"></i></button>
                                     </td>
                                 </tr>
-
-                                <!-- Row 3 -->
-                                <tr class="hover:bg-slate-50 transition-colors">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-900">
-                                        #45070
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
-                                        Instituto Tecnológico
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
-                                        10/06/2026
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
-                                        10/07/2026
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-900">
-                                        $150.000
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                            Vencida (Moroso)
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <div class="flex items-center justify-end gap-3">
-                                            <button class="text-slate-400 hover:text-orange-500 transition-colors" title="Enviar Recordatorio">
-                                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
-                                            </button>
-                                            <button class="text-slate-400 hover:text-red-500 transition-colors" title="Descargar PDF">
-                                                <i class="bi bi-file-earmark-pdf-fill text-lg"></i>
-                                            </button>
-                                            <button class="text-slate-400 hover:text-teal-600 transition-colors" title="Descargar XML">
-                                                <i class="bi bi-filetype-xml text-lg"></i>
-                                            </button>
-                                        </div>
+                                <tr>
+                                    <td><strong class="text-primary">F-8490</strong></td>
+                                    <td><strong>Instituto Profesional</strong></td>
+                                    <td>Factura Electrónica Exenta</td>
+                                    <td>$150.000 CLP</td>
+                                    <td>01/07/2026</td>
+                                    <td><span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">En Envío</span></td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-light border rounded-pill me-1" title="Ver PDF"><i class="bi bi-file-earmark-pdf"></i></button>
+                                        <button class="btn btn-sm btn-light border rounded-pill" title="XML"><i class="bi bi-code-slash"></i></button>
                                     </td>
                                 </tr>
                             </tbody>
@@ -326,8 +417,22 @@
                     </div>
                 </div>
 
-            </main>
-        </div>
+            </div>
+        </main>
     </div>
+
+    <!-- Scripts Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const mobileBtn = document.getElementById('mobileMenuBtn');
+            const sidebar = document.getElementById('sidebar');
+            if (mobileBtn && sidebar) {
+                mobileBtn.addEventListener('click', function () {
+                    sidebar.classList.toggle('active');
+                });
+            }
+        });
+    </script>
 </body>
 </html>

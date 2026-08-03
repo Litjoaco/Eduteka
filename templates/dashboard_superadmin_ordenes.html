@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -5,281 +6,402 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Órdenes de Compra - Super Admin Eduteka</title>
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Bootstrap CSS local static -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
     
-    <!-- Alpine.js for interactive modal/slide-over -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Bootstrap Icons for logo -->
+    <!-- Fuentes e Iconos -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
-    <!-- Heroicons -->
-    <script src="https://unpkg.com/heroicons@2.0.18/24/outline/index.js"></script>
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            navy: '#0F172A',
-                            teal: '#0D9488',
-                            tealLight: '#14B8A6',
-                        }
-                    }
-                }
-            }
+    <style>
+        :root {
+            --primary: #7C5CFC;
+            --primary-soft: rgba(124, 92, 252, 0.08);
+            --primary-hover: #6747E3;
+            --secondary: #65CDBF;
+            --secondary-soft: rgba(101, 205, 191, 0.08);
+            --bg: #F8F9FD;
+            --white: #FFFFFF;
+            --dark: #151A35;
+            --gray-text: #687089;
+            --border: #BCC0CF;
+            --radius-lg: 16px;
+            --radius-md: 10px;
+            --radius-sm: 8px;
         }
-    </script>
+
+        * {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+            margin: 0;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -15%; left: 65%;
+            width: 50vw; height: 50vw;
+            background: radial-gradient(circle, rgba(124, 92, 252, 0.07) 0%, rgba(255,255,255,0) 70%);
+            z-index: -2;
+            pointer-events: none;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            top: 45%; left: -15%;
+            width: 40vw; height: 40vw;
+            background: radial-gradient(circle, rgba(101, 205, 191, 0.06) 0%, rgba(255,255,255,0) 70%);
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        .wrapper {
+            display: flex;
+            width: 100%;
+            align-items: stretch;
+        }
+
+        /* TOPBAR */
+        .topbar {
+            height: 70px;
+            background: rgba(255, 255, 255, 0.85) !important;
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 98;
+        }
+
+        .search-bar {
+            position: relative;
+            width: 320px;
+        }
+
+        .search-bar i {
+            position: absolute;
+            left: 0.85rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-text);
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 0.5rem 1rem 0.5rem 2.4rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            background-color: var(--bg);
+            font-size: 0.85rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .search-bar input:focus {
+            border-color: var(--primary);
+            background-color: var(--white);
+            box-shadow: 0 0 0 3px rgba(124, 92, 252, 0.12);
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--white);
+            padding: 0.35rem 0.85rem 0.35rem 0.4rem;
+            border-radius: 30px;
+            border: 1px solid var(--border);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.88rem;
+            color: var(--dark);
+        }
+
+        .content-area {
+            padding: 1.75rem 2rem;
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+
+        .hero-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 0.25rem;
+        }
+        .hero-subtitle {
+            color: var(--gray-text);
+            font-size: 0.9rem;
+        }
+
+        .kpi-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            height: 100%;
+        }
+
+        .kpi-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+
+        .kpi-icon.purple { background-color: var(--primary-soft); color: var(--primary); }
+        .kpi-icon.teal { background-color: var(--secondary-soft); color: #148A7A; }
+        .kpi-icon.amber { background-color: #FFFBEB; color: #D97706; }
+
+        .dashboard-panel {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.01);
+        }
+
+        .table-custom {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+            margin-bottom: 0;
+        }
+
+        .table-custom th {
+            border: none;
+            background: none;
+            color: var(--gray-text);
+            font-weight: 700;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0.5rem 1rem;
+        }
+
+        .table-custom td {
+            background: var(--white);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 0.9rem 1rem;
+            font-size: 0.88rem;
+            vertical-align: middle;
+        }
+
+        .table-custom td:first-child {
+            border-left: 1px solid var(--border);
+            border-top-left-radius: var(--radius-md);
+            border-bottom-left-radius: var(--radius-md);
+        }
+
+        .table-custom td:last-child {
+            border-right: 1px solid var(--border);
+            border-top-right-radius: var(--radius-md);
+            border-bottom-right-radius: var(--radius-md);
+        }
+
+        .table-custom tbody tr:hover td {
+            background-color: #FAF9FF !important;
+            border-color: #D6CFFE;
+        }
+
+        .btn-purple {
+            background-color: var(--primary);
+            color: white;
+            font-weight: 600;
+            border-radius: var(--radius-md);
+            padding: 0.5rem 1.25rem;
+            border: none;
+            transition: all 0.2s;
+        }
+        .btn-purple:hover {
+            background-color: var(--primary-hover);
+            color: white;
+            box-shadow: 0 4px 12px rgba(124, 92, 252, 0.3);
+        }
+    </style>
 </head>
-<body class="bg-slate-50 font-sans text-slate-800 antialiased" x-data="{ isSlideOverOpen: false }">
+<body>
 
-    <div class="flex h-screen overflow-hidden relative">
-        
-        <!-- SIDEBAR -->
-        <aside class="w-64 bg-slate-900 text-slate-300 flex-shrink-0 flex flex-col transition-all duration-300 z-10">
-            <div class="px-6 py-6 border-b border-slate-700/50 mb-6">
-                <div class="flex items-center gap-3 mb-1">
-                    <i class="bi bi-mortarboard-fill text-teal-600 text-[32px]"></i>
-                    <span class="text-2xl font-bold text-white tracking-tight">Eduteka</span>
-                </div>
-                <div class="text-xs font-semibold text-teal-600 tracking-widest">SUPER ADMIN</div>
-            </div>
+    <div class="wrapper">
+        <!-- Sidebar -->
+        {% include '_sidebar_superadmin.html' with active_page='ordenes' %}
 
-            <nav class="flex-1 px-4 space-y-1 overflow-y-auto">
-                <a href="{% url 'dashboard_superadmin' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
-                    Dashboard
-                </a>
-                <a href="{% url 'dashboard_superadmin_colegios' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
-                    Colegios Clientes
-                </a>
-                <a href="{% url 'dashboard_superadmin_planes' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
-                    Planes y Suscripciones
-                </a>
-                <a href="{% url 'dashboard_superadmin_facturacion' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                    Facturación y SII
-                </a>
-                <a href="{% url 'dashboard_superadmin_ordenes' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium bg-teal-600 text-white shadow-sm">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" /></svg>
-                    Órdenes de Compra
-                </a>
-                <a href="{% url 'dashboard_superadmin_modulos_erp' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                    Módulos ERP
-                </a>
-                <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                    Mercado Público MP
-                </a>
-                <a href="{% url 'dashboard_superadmin_estadisticas' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
-                    Estadísticas Globales
-                </a>
-                <a href="{% url 'dashboard_superadmin_configuracion' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                    Configuración
-                </a>
-            </nav>
-        </aside>
-
-        <!-- MAIN CONTENT AREA -->
-        <div class="flex-1 flex flex-col h-screen overflow-hidden">
-            
-            <!-- TOPBAR -->
-            <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-8 shrink-0">
-                <div class="relative w-96">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                    </div>
-                    <input type="text" placeholder="Buscar colegios, órdenes, planes..." class="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-full leading-5 bg-slate-50 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-teal-500 focus:border-teal-500 sm:text-sm transition-colors">
-                </div>
-
-                <div class="flex items-center gap-6">
-                    <button class="relative text-slate-400 hover:text-slate-500 focus:outline-none transition-colors">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
-                        <span class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white">1</span>
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div class="d-flex items-center gap-2">
+                    <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn" style="border:none; background:var(--primary-soft); color:var(--primary);">
+                        <i class="bi bi-list fs-5"></i>
                     </button>
-                    <div class="flex items-center gap-3 cursor-pointer">
-                        <div class="h-9 w-9 rounded-full bg-slate-900 flex items-center justify-center text-white font-semibold text-sm shadow-sm">
-                            AE
-                        </div>
-                        <span class="text-sm font-semibold text-slate-700">Admin Eduteka</span>
+                    <div class="search-bar">
+                        <i class="bi bi-search"></i>
+                        <input type="text" placeholder="Buscar órdenes o licitaciones Mercado Público...">
+                    </div>
+                </div>
+
+                <div class="topbar-right">
+                    <div class="user-profile">
+                        <div class="user-avatar">AE</div>
+                        <span class="user-name">Admin Eduteka</span>
                     </div>
                 </div>
             </header>
 
-            <!-- MAIN SCROLLABLE CONTENT -->
-            <main class="flex-1 overflow-y-auto p-8 relative">
-                
-                <!-- Page Header -->
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
+            <!-- Main Content Area -->
+            <div class="content-area">
+
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
                     <div>
-                        <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Bandeja de Órdenes de Compra (OC)</h1>
+                        <h1 class="hero-title">Órdenes de Compra y Mercado Público</h1>
+                        <div class="hero-subtitle">Revisión de OC estatales, convenio marco y validación de órdenes</div>
                     </div>
-                    <div class="flex items-center">
-                        <select class="block w-full pl-3 pr-10 py-2.5 text-sm font-medium border-slate-300 focus:outline-none focus:ring-teal-500 focus:border-teal-500 rounded-md bg-white border shadow-sm cursor-pointer">
-                            <option>Filtrar por Mes: Julio 2026</option>
-                            <option>Filtrar por Mes: Junio 2026</option>
-                            <option>Filtrar por Mes: Mayo 2026</option>
-                        </select>
+                    <button type="button" class="btn btn-purple">
+                        <i class="bi bi-plus-lg me-1"></i> Registrar Órden MP
+                    </button>
+                </div>
+
+                <!-- Metrics Cards -->
+                <div class="row g-3 mb-4">
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="kpi-card">
+                            <div class="kpi-icon amber">
+                                <i class="bi bi-folder-symlink"></i>
+                            </div>
+                            <div>
+                                <div class="text-muted small fw-bold text-uppercase">Pendientes de Aprobación</div>
+                                <div class="fs-4 fw-bold text-dark">9 Solicitudes</div>
+                                <div class="text-warning small fw-semibold">Requieren revisión</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="kpi-card">
+                            <div class="kpi-icon purple">
+                                <i class="bi bi-building-gear"></i>
+                            </div>
+                            <div>
+                                <div class="text-muted small fw-bold text-uppercase">Licitaciones Activas</div>
+                                <div class="fs-4 fw-bold text-dark">14 En Proceso</div>
+                                <div class="text-muted small fw-semibold">Mercado Público MP</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="kpi-card">
+                            <div class="kpi-icon teal">
+                                <i class="bi bi-trophy"></i>
+                            </div>
+                            <div>
+                                <div class="text-muted small fw-bold text-uppercase">Monto Adjudicado 2026</div>
+                                <div class="fs-4 fw-bold text-dark">$48.5M CLP</div>
+                                <div class="text-success small fw-semibold"><i class="bi bi-graph-up-arrow"></i> +14% vs 2025</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="kpi-card">
+                            <div class="kpi-icon purple">
+                                <i class="bi bi-check-all"></i>
+                            </div>
+                            <div>
+                                <div class="text-muted small fw-bold text-uppercase">Aprobadas este mes</div>
+                                <div class="fs-4 fw-bold text-dark">28 Órdenes</div>
+                                <div class="text-success small fw-semibold">100% procesadas</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Metrics Cards Section -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    
-                    <!-- Card 1 -->
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col justify-center transition-shadow hover:shadow-md">
-                        <h3 class="text-sm font-medium text-slate-500 mb-2">OC Pendientes de Revisión</h3>
-                        <div class="text-4xl font-bold text-yellow-600">9</div>
+                <!-- Table Panel -->
+                <div class="dashboard-panel">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="fw-bold fs-5 text-dark m-0"><i class="bi bi-card-checklist me-2 text-primary"></i>Solicitudes de Órdenes de Compra</h2>
+                        <div class="d-flex gap-2">
+                            <span class="btn btn-sm btn-outline-secondary rounded-pill">Todas</span>
+                            <span class="btn btn-sm btn-primary rounded-pill">Pendientes</span>
+                            <span class="btn btn-sm btn-outline-secondary rounded-pill">Aprobadas</span>
+                        </div>
                     </div>
-
-                    <!-- Card 2 -->
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col justify-center transition-shadow hover:shadow-md">
-                        <h3 class="text-sm font-medium text-slate-500 mb-2">OC Aprobadas (Mes)</h3>
-                        <div class="text-4xl font-bold text-teal-600">45</div>
-                    </div>
-
-                    <!-- Card 3 -->
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col justify-center transition-shadow hover:shadow-md">
-                        <h3 class="text-sm font-medium text-slate-500 mb-2">Monto Total Aprobado</h3>
-                        <div class="text-3xl font-bold text-slate-900">$18.500.000 <span class="text-base font-medium text-slate-500">CLP</span></div>
-                    </div>
-                </div>
-
-                <!-- Inbox Table Section -->
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden w-full mb-8">
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-slate-200">
-                            <thead class="bg-slate-50">
+                    <div class="table-responsive">
+                        <table class="table-custom">
+                            <thead>
                                 <tr>
-                                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">ID Orden (Folio)</th>
-                                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Colegio</th>
-                                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Archivo Adjunto</th>
-                                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Fecha de Carga</th>
-                                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Monto OC</th>
-                                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Estado</th>
-                                    <th scope="col" class="px-6 py-4 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Acciones</th>
+                                    <th>ID Órden</th>
+                                    <th>Colegio / Entidad MP</th>
+                                    <th>Modalidad Adquisición</th>
+                                    <th>Monto Total</th>
+                                    <th>Fecha Solicitud</th>
+                                    <th>Estado</th>
+                                    <th class="text-end">Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white divide-y divide-slate-200">
-                                
-                                <!-- Row 1: Pendiente -->
-                                <tr class="hover:bg-slate-50 transition-colors">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-900">
-                                        OC-88901
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
-                                        Colegio Arturo Prat
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <a href="#" class="flex items-center text-blue-600 hover:text-blue-800 transition-colors group">
-                                            <i class="bi bi-file-earmark-pdf-fill text-red-500 mr-2 text-lg group-hover:text-red-600"></i>
-                                            <span class="text-sm underline-offset-2 hover:underline">oc_arturoprat_julio.pdf</span>
-                                        </a>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
-                                        31/07/2026 14:30
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-900">
-                                        $400.000
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 border border-yellow-200">
-                                            Pendiente de Revisión
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <div class="flex items-center justify-end gap-2">
-                                            <button @click="isSlideOverOpen = true" class="inline-flex items-center justify-center h-8 w-8 rounded-md bg-white border border-slate-300 text-slate-500 hover:text-teal-600 hover:border-teal-600 hover:bg-teal-50 transition-colors" title="Ver Detalle">
-                                                <i class="bi bi-eye"></i>
-                                            </button>
-                                            <button class="inline-flex items-center justify-center h-8 w-8 rounded-md bg-green-50 text-green-600 hover:bg-green-100 transition-colors" title="Aprobar">
-                                                <i class="bi bi-check-lg text-lg"></i>
-                                            </button>
-                                            <button class="inline-flex items-center justify-center h-8 w-8 rounded-md bg-red-50 text-red-600 hover:bg-red-100 transition-colors" title="Rechazar">
-                                                <i class="bi bi-x-lg text-lg"></i>
-                                            </button>
-                                        </div>
+                            <tbody>
+                                <tr>
+                                    <td><strong class="text-primary">OC-2026-089</strong></td>
+                                    <td><strong>Liceo Bicentenario Valparaíso</strong></td>
+                                    <td>Mercado Público (Convenio Marco)</td>
+                                    <td>$4.800.000 CLP</td>
+                                    <td>02/07/2026</td>
+                                    <td><span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">Pendiente Revisión</span></td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-success rounded-pill me-1 px-3">Aprobar</button>
+                                        <button class="btn btn-sm btn-light border rounded-pill">Detalles</button>
                                     </td>
                                 </tr>
-
-                                <!-- Row 2: Aprobada -->
-                                <tr class="hover:bg-slate-50 transition-colors">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-900">
-                                        OC-88855
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
-                                        Liceo Santa María
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <a href="#" class="flex items-center text-blue-600 hover:text-blue-800 transition-colors group">
-                                            <i class="bi bi-file-earmark-pdf-fill text-red-500 mr-2 text-lg group-hover:text-red-600"></i>
-                                            <span class="text-sm underline-offset-2 hover:underline">orden_santamaria.pdf</span>
-                                        </a>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
-                                        29/07/2026 09:15
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-900">
-                                        $250.000
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
-                                            Aprobada
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <div class="flex items-center justify-end gap-2">
-                                            <button @click="isSlideOverOpen = true" class="inline-flex items-center justify-center h-8 w-8 rounded-md bg-white border border-slate-300 text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors" title="Ver Detalle">
-                                                <i class="bi bi-eye"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-
-                                <!-- Row 3: Rechazada -->
-                                <tr class="hover:bg-slate-50 transition-colors">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-900">
-                                        OC-88712
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
-                                        Instituto Tecnológico
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <a href="#" class="flex items-center text-blue-600 hover:text-blue-800 transition-colors group">
-                                            <i class="bi bi-file-earmark-pdf-fill text-red-500 mr-2 text-lg group-hover:text-red-600"></i>
-                                            <span class="text-sm underline-offset-2 hover:underline">oc_erronea.pdf</span>
-                                        </a>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
-                                        25/07/2026 11:00
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-900">
-                                        $150.000
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200">
-                                            Rechazada
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <div class="flex items-center justify-end gap-2">
-                                            <button @click="isSlideOverOpen = true" class="inline-flex items-center justify-center h-8 w-8 rounded-md bg-white border border-slate-300 text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors" title="Ver Detalle">
-                                                <i class="bi bi-eye"></i>
-                                            </button>
-                                        </div>
+                                <tr>
+                                    <td><strong class="text-primary">OC-2026-088</strong></td>
+                                    <td><strong>Colegio San Agustín</strong></td>
+                                    <td>Compra Directa Especial</td>
+                                    <td>$2.500.000 CLP</td>
+                                    <td>01/07/2026</td>
+                                    <td><span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">Aprobada</span></td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-light border rounded-pill me-1"><i class="bi bi-eye"></i></button>
+                                        <button class="btn btn-sm btn-light border rounded-pill"><i class="bi bi-file-earmark-pdf"></i></button>
                                     </td>
                                 </tr>
                             </tbody>
@@ -287,108 +409,22 @@
                     </div>
                 </div>
 
-            </main>
-        </div>
-
-        <!-- SLIDE-OVER PANEL: Revisión de Orden de Compra -->
-        <div x-show="isSlideOverOpen" class="relative z-50" aria-labelledby="slide-over-title" role="dialog" aria-modal="true" style="display: none;">
-            <!-- Background backdrop -->
-            <div x-show="isSlideOverOpen" 
-                 x-transition:enter="ease-in-out duration-300" 
-                 x-transition:enter-start="opacity-0" 
-                 x-transition:enter-end="opacity-100" 
-                 x-transition:leave="ease-in-out duration-300" 
-                 x-transition:leave-start="opacity-100" 
-                 x-transition:leave-end="opacity-0" 
-                 class="fixed inset-0 bg-slate-900 bg-opacity-75 transition-opacity" 
-                 @click="isSlideOverOpen = false"></div>
-
-            <div class="fixed inset-0 overflow-hidden">
-                <div class="absolute inset-0 overflow-hidden">
-                    <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10 sm:pl-16">
-                        
-                        <!-- Slide-over panel -->
-                        <div x-show="isSlideOverOpen" 
-                             x-transition:enter="transform transition ease-in-out duration-300 sm:duration-400" 
-                             x-transition:enter-start="translate-x-full" 
-                             x-transition:enter-end="translate-x-0" 
-                             x-transition:leave="transform transition ease-in-out duration-300 sm:duration-400" 
-                             x-transition:leave-start="translate-x-0" 
-                             x-transition:leave-end="translate-x-full" 
-                             class="pointer-events-auto w-screen max-w-2xl">
-                            
-                            <div class="flex h-full flex-col overflow-y-scroll bg-white shadow-xl">
-                                
-                                <!-- Header -->
-                                <div class="px-4 py-6 sm:px-6 bg-slate-50 border-b border-slate-200">
-                                    <div class="flex items-start justify-between">
-                                        <h2 class="text-xl font-bold text-slate-900" id="slide-over-title">Revisión de Orden de Compra</h2>
-                                        <div class="ml-3 flex h-7 items-center">
-                                            <button @click="isSlideOverOpen = false" type="button" class="rounded-md bg-white text-slate-400 hover:text-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
-                                                <span class="sr-only">Cerrar panel</span>
-                                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="mt-1">
-                                        <p class="text-sm text-slate-500">Foliada como: <span class="font-semibold text-slate-700">OC-88901</span></p>
-                                    </div>
-                                </div>
-
-                                <!-- Body -->
-                                <div class="relative flex-1 px-4 py-6 sm:px-6 flex flex-col gap-6">
-                                    
-                                    <!-- PDF Viewer Simulation -->
-                                    <div class="flex-1 w-full bg-slate-200 rounded-lg border-2 border-dashed border-slate-300 flex items-center justify-center min-h-[400px]">
-                                        <div class="text-center">
-                                            <i class="bi bi-file-earmark-pdf-fill text-slate-400 text-6xl mb-3"></i>
-                                            <p class="text-sm text-slate-500 font-medium">Visor de PDF</p>
-                                            <p class="text-xs text-slate-400">oc_arturoprat_julio.pdf</p>
-                                        </div>
-                                    </div>
-
-                                    <!-- Extracted Details -->
-                                    <div class="bg-slate-50 rounded-lg border border-slate-200 p-5">
-                                        <h3 class="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Detalles Extraídos</h3>
-                                        <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
-                                            <div>
-                                                <dt class="text-xs font-medium text-slate-500">Colegio</dt>
-                                                <dd class="mt-1 text-sm font-semibold text-slate-900">Colegio Arturo Prat</dd>
-                                            </div>
-                                            <div>
-                                                <dt class="text-xs font-medium text-slate-500">RUT Colegio</dt>
-                                                <dd class="mt-1 text-sm font-semibold text-slate-900">71.234.567-8</dd>
-                                            </div>
-                                            <div>
-                                                <dt class="text-xs font-medium text-slate-500">Plan Solicitado</dt>
-                                                <dd class="mt-1 text-sm font-semibold text-teal-700">Plan Premium</dd>
-                                            </div>
-                                            <div>
-                                                <dt class="text-xs font-medium text-slate-500">Monto Declarado</dt>
-                                                <dd class="mt-1 text-sm font-semibold text-slate-900">$400.000 CLP</dd>
-                                            </div>
-                                        </dl>
-                                    </div>
-
-                                </div>
-
-                                <!-- Footer Buttons -->
-                                <div class="flex flex-col gap-3 border-t border-slate-200 px-4 py-5 sm:px-6 bg-white">
-                                    <button type="button" class="w-full inline-flex justify-center rounded-md border border-transparent bg-teal-600 px-4 py-3 text-sm font-medium text-white shadow-sm hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-colors">
-                                        <i class="bi bi-check-circle mr-2"></i> Aprobar y Generar Factura
-                                    </button>
-                                    <button type="button" @click="isSlideOverOpen = false" class="w-full inline-flex justify-center rounded-md border border-transparent bg-red-600 px-4 py-3 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors">
-                                        <i class="bi bi-x-circle mr-2"></i> Rechazar OC
-                                    </button>
-                                </div>
-                                
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
-        </div>
-
+        </main>
     </div>
+
+    <!-- Scripts Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const mobileBtn = document.getElementById('mobileMenuBtn');
+            const sidebar = document.getElementById('sidebar');
+            if (mobileBtn && sidebar) {
+                mobileBtn.addEventListener('click', function () {
+                    sidebar.classList.toggle('active');
+                });
+            }
+        });
+    </script>
 </body>
 </html>

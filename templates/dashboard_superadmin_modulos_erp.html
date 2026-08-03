@@ -1,983 +1,380 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Super Admin Dashboard - Eduteka</title>
-
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
+    <title>Módulos ERP - Super Admin Eduteka</title>
+    
+    <!-- Bootstrap CSS local static -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    
     <!-- Fuentes e Iconos -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-
-    <!-- Chart.js para el gráfico -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         :root {
-            /* Paleta de colores solicitada */
-            --navy-teal: #0F172A;
-            /* Dark navy-teal para sidebar */
-            --teal-accent: #0D9488;
-            /* Vibrant teal-green */
-            --teal-light: #14B8A6;
-            --metric-green: #10B981;
-            /* Positive metric green */
-            --alert-red: #EF4444;
-            /* Alert red */
-            --alert-yellow: #F59E0B;
-            /* Alert yellow */
-            --bg-light: #F8FAFC;
-            /* Light gray background */
-            --text-dark: #1E293B;
-            --text-muted: #64748B;
-            --border-color: #E2E8F0;
+            --primary: #7C5CFC;
+            --primary-soft: rgba(124, 92, 252, 0.08);
+            --primary-hover: #6747E3;
+            --secondary: #65CDBF;
+            --secondary-soft: rgba(101, 205, 191, 0.08);
+            --bg: #F8F9FD;
+            --white: #FFFFFF;
+            --dark: #151A35;
+            --gray-text: #687089;
+            --border: #BCC0CF;
+            --radius-lg: 16px;
+            --radius-md: 10px;
+            --radius-sm: 8px;
+        }
+
+        * {
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-light);
-            color: var(--text-dark);
-            margin: 0;
-            overflow-x: hidden;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            width: 280px;
-            background-color: var(--navy-teal);
-            color: #ffffff;
-            position: fixed;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            z-index: 1000;
-            padding: 1.5rem 0;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .sidebar-header {
-            padding: 0 1.5rem 2rem 1.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 1.5rem;
-        }
-
-        .sidebar-logo {
-            font-size: 1.75rem;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            color: #ffffff;
-            margin-bottom: 0.25rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .sidebar-subtitle {
-            font-size: 0.75rem;
-            font-weight: 600;
-            letter-spacing: 1.5px;
-            color: var(--teal-accent);
-            text-transform: uppercase;
-        }
-
-        .sidebar-menu {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            flex-grow: 1;
-        }
-
-        .sidebar-menu li {
-            margin-bottom: 0.25rem;
-        }
-
-        .sidebar-menu a {
-            display: flex;
-            align-items: center;
-            padding: 0.85rem 1.5rem;
-            color: rgba(255, 255, 255, 0.7);
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.95rem;
-            transition: all 0.2s ease;
-            gap: 1rem;
-        }
-
-        .sidebar-menu a:hover,
-        .sidebar-menu a.active {
-            color: #ffffff;
-            background-color: var(--teal-accent);
-        }
-
-        .sidebar-menu a i {
-            font-size: 1.1rem;
-        }
-
-        /* Main Content */
-        .main-content {
-            margin-left: 280px;
+            background-color: var(--bg);
+            color: var(--dark);
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            overflow-x: hidden;
+            margin: 0;
         }
 
-        /* Topbar */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -15%; left: 65%;
+            width: 50vw; height: 50vw;
+            background: radial-gradient(circle, rgba(124, 92, 252, 0.07) 0%, rgba(255,255,255,0) 70%);
+            z-index: -2;
+            pointer-events: none;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            top: 45%; left: -15%;
+            width: 40vw; height: 40vw;
+            background: radial-gradient(circle, rgba(101, 205, 191, 0.06) 0%, rgba(255,255,255,0) 70%);
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        .wrapper {
+            display: flex;
+            width: 100%;
+            align-items: stretch;
+        }
+
+        /* TOPBAR */
         .topbar {
             height: 70px;
-            background-color: #ffffff;
+            background: rgba(255, 255, 255, 0.85) !important;
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
+            border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 2rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             position: sticky;
             top: 0;
-            z-index: 900;
+            z-index: 98;
         }
 
         .search-bar {
             position: relative;
-            width: 400px;
+            width: 320px;
         }
 
         .search-bar i {
             position: absolute;
-            left: 1rem;
+            left: 0.85rem;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--text-muted);
+            color: var(--gray-text);
         }
 
         .search-bar input {
             width: 100%;
-            padding: 0.6rem 1rem 0.6rem 2.5rem;
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            background-color: var(--bg-light);
-            font-size: 0.9rem;
+            padding: 0.5rem 1rem 0.5rem 2.4rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            background-color: var(--bg);
+            font-size: 0.85rem;
+            outline: none;
             transition: all 0.2s;
         }
 
         .search-bar input:focus {
-            outline: none;
-            border-color: var(--teal-accent);
-            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+            border-color: var(--primary);
+            background-color: var(--white);
+            box-shadow: 0 0 0 3px rgba(124, 92, 252, 0.12);
         }
 
         .topbar-right {
             display: flex;
             align-items: center;
-            gap: 1.5rem;
-        }
-
-        .notification-bell {
-            position: relative;
-            color: var(--text-muted);
-            font-size: 1.25rem;
-            cursor: pointer;
-        }
-
-        .notification-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background-color: var(--alert-red);
-            color: white;
-            font-size: 0.65rem;
-            font-weight: 700;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid #ffffff;
+            gap: 1.25rem;
         }
 
         .user-profile {
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            cursor: pointer;
+            background: var(--white);
+            padding: 0.35rem 0.85rem 0.35rem 0.4rem;
+            border-radius: 30px;
+            border: 1px solid var(--border);
         }
 
         .user-avatar {
-            width: 36px;
-            height: 36px;
-            background-color: var(--navy-teal);
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
             color: white;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 600;
-            font-size: 0.9rem;
+            font-weight: 700;
+            font-size: 0.85rem;
         }
 
         .user-name {
             font-weight: 600;
-            font-size: 0.9rem;
-            color: var(--text-dark);
+            font-size: 0.88rem;
+            color: var(--dark);
         }
 
-        /* Dashboard Container */
-        .dashboard-container {
-            padding: 2rem;
-            flex-grow: 1;
+        .content-area {
+            padding: 1.75rem 2rem;
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            box-sizing: border-box;
         }
 
-        .global-header {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            color: var(--navy-teal);
-        }
-
-        /* Metric Cards */
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .metric-card {
-            background-color: #ffffff;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-            border: 1px solid rgba(226, 232, 240, 0.6);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .metric-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
-        }
-
-        .metric-title {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 0.75rem;
-        }
-
-        .metric-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--navy-teal);
+        .hero-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--dark);
             margin-bottom: 0.25rem;
-            line-height: 1;
         }
-
-        .metric-sub {
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
-
-        .text-teal {
-            color: var(--teal-accent);
-        }
-
-        .text-red {
-            color: var(--alert-red);
-        }
-
-        /* Middle Section (Table + Chart) */
-        .middle-grid {
-            display: grid;
-            grid-template-columns: 3fr 2fr;
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .card {
-            background-color: #ffffff;
-            border-radius: 12px;
-            border: 1px solid rgba(226, 232, 240, 0.6);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-            overflow: hidden;
-        }
-
-        .card-header {
-            background-color: #ffffff;
-            padding: 1.25rem 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .card-title {
+        .hero-subtitle {
+            color: var(--gray-text);
             font-size: 0.9rem;
-            font-weight: 700;
-            color: var(--navy-teal);
-            margin: 0;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .card-actions i {
-            color: var(--text-muted);
-            cursor: pointer;
-            margin-left: 0.5rem;
-            transition: color 0.2s;
-        }
-
-        .card-actions i:hover {
-            color: var(--navy-teal);
-        }
-
-        .card-body {
-            padding: 1.5rem;
-        }
-
-        /* Tables */
-        .table {
-            margin-bottom: 0;
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-        }
-
-        .table th {
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            border-bottom: 1px solid var(--border-color);
-            padding: 0.75rem 1rem;
-            white-space: nowrap;
-        }
-
-        .table td {
-            font-size: 0.9rem;
-            vertical-align: middle;
-            padding: 1rem;
-            border-bottom: 1px solid var(--border-color);
-            color: var(--text-dark);
-            font-weight: 500;
-        }
-
-        .table tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        .table tbody tr:hover {
-            background-color: rgba(248, 250, 252, 0.8);
-        }
-
-        /* Pills and Badges */
-        .pill {
-            display: inline-block;
-            padding: 0.35rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-align: center;
-            white-space: nowrap;
-        }
-
-        .pill-red {
-            background-color: rgba(239, 68, 68, 0.1);
-            color: var(--alert-red);
-        }
-
-        .pill-yellow {
-            background-color: rgba(245, 158, 11, 0.1);
-            color: var(--alert-yellow);
-        }
-
-        .pill-green {
-            background-color: rgba(16, 185, 129, 0.1);
-            color: var(--metric-green);
-        }
-
-        .pill-gray {
-            background-color: rgba(100, 116, 139, 0.1);
-            color: var(--text-muted);
-        }
-
-        /* Buttons */
-        .btn-action {
-            padding: 0.4rem 1rem;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .btn-solid-red {
-            background-color: var(--alert-red);
-            color: white;
-        }
-
-        .btn-solid-red:hover {
-            background-color: #dc2626;
-            color: white;
-        }
-
-        .btn-solid-yellow {
-            background-color: var(--alert-yellow);
-            color: white;
-        }
-
-        .btn-solid-yellow:hover {
-            background-color: #d97706;
-            color: white;
-        }
-
-        .btn-outline-teal {
-            border: 1px solid var(--teal-accent);
-            color: var(--teal-accent);
-            background: transparent;
-        }
-
-        .btn-outline-teal:hover {
-            background-color: var(--teal-accent);
-            color: white;
-        }
-
-        .btn-solid-teal {
-            background-color: var(--teal-accent);
-            color: white;
-            padding: 0.75rem 1.5rem;
-            font-size: 0.9rem;
-        }
-
-        .btn-solid-teal:hover {
-            background-color: #0f766e;
-            color: white;
-        }
-
-        .btn-icon {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            font-size: 1.1rem;
-            padding: 0.2rem;
-        }
-
-        .btn-icon:hover {
-            color: var(--navy-teal);
-        }
-
-        .text-center-btn {
-            display: flex;
-            justify-content: center;
-            padding-top: 1rem;
-            border-top: 1px solid var(--border-color);
-        }
-
-        /* Chart Area */
-        .chart-container {
-            position: relative;
-            height: 250px;
-            width: 100%;
-            background: linear-gradient(180deg, rgba(13, 148, 136, 0.05) 0%, rgba(13, 148, 136, 0.15) 100%);
-            border-radius: 8px;
-            padding: 1rem;
-        }
-
-        /* Warning Icon */
-        .warning-icon {
-            color: var(--alert-red);
-            margin-right: 0.5rem;
-            font-size: 1.1rem;
-        }
-
-        /* Toggle Switch iOS Style */
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 28px;
-        }
-
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #cbd5e1;
-            transition: .4s;
-            border-radius: 34px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 20px;
-            width: 20px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        input:checked + .slider {
-            background-color: var(--metric-green);
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(22px);
-        }
-
-        /* Modules Grid */
-        .modules-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        @media (max-width: 1200px) {
-            .modules-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 768px) {
-            .modules-grid {
-                grid-template-columns: 1fr;
-            }
         }
 
         .module-card {
-            background-color: #ffffff;
-            border-radius: 12px;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
             padding: 1.5rem;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.01);
+            transition: all 0.3s;
+            height: 100%;
             display: flex;
-            align-items: flex-start;
-            gap: 1rem;
-            transition: transform 0.2s, box-shadow 0.2s;
+            flex-direction: column;
         }
 
         .module-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 25px rgba(124, 92, 252, 0.1);
         }
 
         .module-icon {
             width: 48px;
             height: 48px;
-            border-radius: 12px;
-            background-color: rgba(13, 148, 136, 0.1);
-            color: var(--teal-accent);
+            border-radius: var(--radius-md);
+            background: var(--primary-soft);
+            color: var(--primary);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.5rem;
-            flex-shrink: 0;
-        }
-
-        .module-info {
-            flex-grow: 1;
-        }
-
-        .module-title {
-            font-size: 1.05rem;
-            font-weight: 700;
-            color: var(--navy-teal);
-            margin-bottom: 0.25rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        .module-desc {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            line-height: 1.4;
             margin-bottom: 1rem;
         }
-        
-        .module-toggle {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-        }
 
-        /* Selector Card */
-        .selector-card {
-            background-color: #ffffff;
-            border-radius: 12px;
-            padding: 1.25rem 1.5rem;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-            margin-bottom: 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .selector-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .selector-label {
+        .btn-purple {
+            background-color: var(--primary);
+            color: white;
             font-weight: 600;
-            color: var(--navy-teal);
-            font-size: 0.95rem;
+            border-radius: var(--radius-md);
+            padding: 0.5rem 1.25rem;
+            border: none;
+            transition: all 0.2s;
         }
-
-        .selector-dropdown {
-            padding: 0.6rem 1rem;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.95rem;
-            color: var(--text-dark);
-            background-color: var(--bg-light);
-            min-width: 320px;
-            cursor: pointer;
-            font-weight: 500;
-        }
-        
-        .selector-dropdown:focus {
-            outline: none;
-            border-color: var(--teal-accent);
-        }
-
-        .selector-help {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-left: 1rem;
-        }
-
-        /* Footer Action */
-        .footer-action {
-            display: flex;
-            justify-content: flex-end;
-            padding-top: 1.5rem;
-            border-top: 1px solid var(--border-color);
-            margin-top: 1rem;
-        }
-        
-        .badge-addon {
-            background-color: rgba(239, 68, 68, 0.1);
-            color: var(--alert-red);
-            font-size: 0.65rem;
-            padding: 0.25rem 0.5rem;
-            border-radius: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .header-sub {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            margin-bottom: 1.5rem;
-            margin-top: -1rem;
+        .btn-purple:hover {
+            background-color: var(--primary-hover);
+            color: white;
+            box-shadow: 0 4px 12px rgba(124, 92, 252, 0.3);
         }
     </style>
 </head>
-
 <body>
 
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <div class="sidebar-logo">
-                <i class="bi bi-mortarboard-fill" style="color: var(--teal-accent);"></i> Eduteka
-            </div>
-            <div class="sidebar-subtitle">SUPER ADMIN</div>
-        </div>
-        <ul class="sidebar-menu">
-            <li><a href="{% url 'dashboard_superadmin' %}"><i class="bi bi-bar-chart-fill"></i>
-                    Dashboard</a></li>
-            <li><a href="{% url 'dashboard_superadmin_colegios' %}"><i class="bi bi-building"></i> Colegios Clientes</a>
-            </li>
-            <li><a href="{% url 'dashboard_superadmin_planes' %}"><i class="bi bi-credit-card"></i> Planes y
-                    Suscripciones</a></li>
-            <li><a href="{% url 'dashboard_superadmin_facturacion' %}"><i class="bi bi-receipt"></i> Facturación y
-                    SII</a></li>
-            <li><a href="{% url 'dashboard_superadmin_ordenes' %}"><i class="bi bi-folder2-open"></i> Órdenes de
-                    Compra</a></li>
-            <li><a href="{% url 'dashboard_superadmin_modulos_erp' %}" class="active"><i class="bi bi-tools"></i> Módulos ERP</a></li>
-            <li><a href="#"><i class="bi bi-briefcase"></i> Mercado Público MP</a></li>
-            <li><a href="{% url 'dashboard_superadmin_estadisticas' %}"><i class="bi bi-graph-up"></i> Estadísticas
-                    Globales</a></li>
-            <li><a href="{% url 'dashboard_superadmin_configuracion' %}"><i class="bi bi-gear"></i> Configuración</a>
-            </li>
-        </ul>
-    </aside>
+    <div class="wrapper">
+        <!-- Sidebar -->
+        {% include '_sidebar_superadmin.html' with active_page='modulos' %}
 
-    <!-- Main Content -->
-    <main class="main-content">
-
-        <!-- Topbar -->
-        <header class="topbar">
-            <div class="search-bar">
-                <i class="bi bi-search"></i>
-                <input type="text" placeholder="Buscar colegios, órdenes, planes...">
-            </div>
-            <div class="topbar-right">
-                <div class="notification-bell">
-                    <i class="bi bi-bell"></i>
-                    <span class="notification-badge">1</span>
-                </div>
-                <div class="user-profile">
-                    <div class="user-avatar">AE</div>
-                    <span class="user-name">Admin Eduteka</span>
-                </div>
-            </div>
-        </header>
-
-        <!-- Dashboard Container -->
-        <div class="dashboard-container">
-
-            <h1 class="global-header">Gestión de Accesos y Módulos</h1>
-            <p class="header-sub">Habilita o deshabilita funcionalidades específicas para cada establecimiento.</p>
-
-            <!-- Selector Card -->
-            <div class="selector-card">
-                <div class="selector-info">
-                    <span class="selector-label">Establecimiento a configurar:</span>
-                    <select class="selector-dropdown">
-                        <option value="1" selected>Liceo Santa María (Plan Premium)</option>
-                        <option value="2">Colegio Los Alerces (Plan Estándar)</option>
-                        <option value="3">Instituto Profesional (Plan Básico)</option>
-                    </select>
-                    <span class="selector-help">Selecciona un colegio para modificar sus accesos.</span>
-                </div>
-            </div>
-
-            <!-- Modules Grid -->
-            <div class="modules-grid">
-                
-                <!-- Card 1 -->
-                <div class="module-card">
-                    <div class="module-icon">
-                        <i class="bi bi-book"></i>
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div class="d-flex items-center gap-2">
+                    <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn" style="border:none; background:var(--primary-soft); color:var(--primary);">
+                        <i class="bi bi-list fs-5"></i>
+                    </button>
+                    <div class="search-bar">
+                        <i class="bi bi-search"></i>
+                        <input type="text" placeholder="Buscar módulos ERP...">
                     </div>
-                    <div class="module-info">
-                        <div class="module-title">Libro de Clases Digital</div>
-                        <div class="module-desc">Asistencia, notas, anotaciones y perfil del alumno.</div>
-                        <div class="module-toggle">
-                            <label class="toggle-switch">
-                                <input type="checkbox" checked>
-                                <span class="slider"></span>
-                            </label>
+                </div>
+
+                <div class="topbar-right">
+                    <div class="user-profile">
+                        <div class="user-avatar">AE</div>
+                        <span class="user-name">Admin Eduteka</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content Area -->
+            <div class="content-area">
+
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+                    <div>
+                        <h1 class="hero-title">Módulos ERP del Sistema</h1>
+                        <div class="hero-subtitle">Habilita y administra las funcionalidades activas por cliente</div>
+                    </div>
+                    <button type="button" class="btn btn-purple">
+                        <i class="bi bi-plus-lg me-1"></i> Crear Módulo Personalizado
+                    </button>
+                </div>
+
+                <!-- Grid de Módulos -->
+                <div class="row g-4 mb-4">
+
+                    <!-- Módulo 1 -->
+                    <div class="col-12 col-md-6 col-xl-4">
+                        <div class="module-card">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="module-icon">
+                                    <i class="bi bi-journal-bookmark-fill"></i>
+                                </div>
+                                <div class="form-check form-switch fs-4">
+                                    <input class="form-check-input" type="checkbox" checked>
+                                </div>
+                            </div>
+                            <h3 class="fw-bold text-dark fs-5 mb-1">Libro de Clases Digital</h3>
+                            <p class="text-muted small mb-3 flex-grow-1">Control de asistencia, notas, planificaciones y libro de clases oficial MINEDUC.</p>
+                            <div class="pt-3 border-top d-flex justify-content-between align-items-center">
+                                <span class="badge bg-success-subtle text-success rounded-pill px-3 py-1">215 Colegios Activos</span>
+                                <button class="btn btn-sm btn-light border rounded-pill">Ajustes</button>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Card 2 -->
-                <div class="module-card">
-                    <div class="module-icon">
-                        <i class="bi bi-calculator"></i>
-                    </div>
-                    <div class="module-info">
-                        <div class="module-title">Gestión Contable</div>
-                        <div class="module-desc">Control de fondos disponibles y estados de cuenta.</div>
-                        <div class="module-toggle">
-                            <label class="toggle-switch">
-                                <input type="checkbox" checked>
-                                <span class="slider"></span>
-                            </label>
+                    <!-- Módulo 2 -->
+                    <div class="col-12 col-md-6 col-xl-4">
+                        <div class="module-card">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="module-icon" style="background:var(--secondary-soft); color:#148A7A;">
+                                    <i class="bi bi-shield-check"></i>
+                                </div>
+                                <div class="form-check form-switch fs-4">
+                                    <input class="form-check-input" type="checkbox" checked>
+                                </div>
+                            </div>
+                            <h3 class="fw-bold text-dark fs-5 mb-1">Convivencia Escolar</h3>
+                            <p class="text-muted small mb-3 flex-grow-1">Gestión de anotaciones, protocolos de convivencia y registro de medidas disciplinarias.</p>
+                            <div class="pt-3 border-top d-flex justify-content-between align-items-center">
+                                <span class="badge bg-success-subtle text-success rounded-pill px-3 py-1">180 Colegios Activos</span>
+                                <button class="btn btn-sm btn-light border rounded-pill">Ajustes</button>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Card 3 -->
-                <div class="module-card">
-                    <div class="module-icon">
-                        <i class="bi bi-truck"></i>
-                    </div>
-                    <div class="module-info">
-                        <div class="module-title">Módulo de Proveedores</div>
-                        <div class="module-desc">Catálogo y gestión de compras a terceros.</div>
-                        <div class="module-toggle">
-                            <label class="toggle-switch">
-                                <input type="checkbox">
-                                <span class="slider"></span>
-                            </label>
+                    <!-- Módulo 3 -->
+                    <div class="col-12 col-md-6 col-xl-4">
+                        <div class="module-card">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="module-icon" style="background:#FFFBEB; color:#D97706;">
+                                    <i class="bi bi-wallet2"></i>
+                                </div>
+                                <div class="form-check form-switch fs-4">
+                                    <input class="form-check-input" type="checkbox" checked>
+                                </div>
+                            </div>
+                            <h3 class="fw-bold text-dark fs-5 mb-1">Contabilidad y Finanzas</h3>
+                            <p class="text-muted small mb-3 flex-grow-1">Pagos de colegiaturas, presupuestos, flujo de caja y rendición de cuentas.</p>
+                            <div class="pt-3 border-top d-flex justify-content-between align-items-center">
+                                <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-1">120 Colegios Activos</span>
+                                <button class="btn btn-sm btn-light border rounded-pill">Ajustes</button>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Card 4 -->
-                <div class="module-card">
-                    <div class="module-icon" style="background-color: rgba(239, 68, 68, 0.1); color: var(--alert-red);">
-                        <i class="bi bi-star"></i>
-                    </div>
-                    <div class="module-info">
-                        <div class="module-title">
-                            Preparación SIMCE
-                            <span class="badge-addon">Add-on Avanzado</span>
+                    <!-- Módulo 4 -->
+                    <div class="col-12 col-md-6 col-xl-4">
+                        <div class="module-card">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="module-icon">
+                                    <i class="bi bi-award"></i>
+                                </div>
+                                <div class="form-check form-switch fs-4">
+                                    <input class="form-check-input" type="checkbox" checked>
+                                </div>
+                            </div>
+                            <h3 class="fw-bold text-dark fs-5 mb-1">SIMCE y Ensayos</h3>
+                            <p class="text-muted small mb-3 flex-grow-1">Evaluación de contenidos pedagógicos y ensayos SIMCE estandarizados.</p>
+                            <div class="pt-3 border-top d-flex justify-content-between align-items-center">
+                                <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1">50 Colegios (Premium)</span>
+                                <button class="btn btn-sm btn-light border rounded-pill">Ajustes</button>
+                            </div>
                         </div>
-                        <div class="module-desc">Módulo avanzado de ensayos y resultados.</div>
-                        <div class="module-toggle">
-                            <label class="toggle-switch">
-                                <input type="checkbox">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
                     </div>
-                </div>
 
-                <!-- Card 5 -->
-                <div class="module-card">
-                    <div class="module-icon">
-                        <i class="bi bi-briefcase"></i>
-                    </div>
-                    <div class="module-info">
-                        <div class="module-title">Licitaciones Mercado Público</div>
-                        <div class="module-desc">Acompañamiento y postulación a fondos.</div>
-                        <div class="module-toggle">
-                            <label class="toggle-switch">
-                                <input type="checkbox" checked>
-                                <span class="slider"></span>
-                            </label>
+                    <!-- Módulo 5 -->
+                    <div class="col-12 col-md-6 col-xl-4">
+                        <div class="module-card">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="module-icon" style="background:#FEF2F2; color:#EF4444;">
+                                    <i class="bi bi-building-add"></i>
+                                </div>
+                                <div class="form-check form-switch fs-4">
+                                    <input class="form-check-input" type="checkbox">
+                                </div>
+                            </div>
+                            <h3 class="fw-bold text-dark fs-5 mb-1">Mercado Público Integración</h3>
+                            <p class="text-muted small mb-3 flex-grow-1">Sincronización directa con órdenes de compra y licitaciones del estado.</p>
+                            <div class="pt-3 border-top d-flex justify-content-between align-items-center">
+                                <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-1">En Beta</span>
+                                <button class="btn btn-sm btn-light border rounded-pill">Ajustes</button>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Card 6 -->
-                <div class="module-card">
-                    <div class="module-icon">
-                        <i class="bi bi-people"></i>
-                    </div>
-                    <div class="module-info">
-                        <div class="module-title">Red Social Eduteka</div>
-                        <div class="module-desc">Hitos, fotos y experiencias de la comunidad.</div>
-                        <div class="module-toggle">
-                            <label class="toggle-switch">
-                                <input type="checkbox" checked>
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                    </div>
                 </div>
 
             </div>
+        </main>
+    </div>
 
-            <!-- Footer Action -->
-            <div class="footer-action">
-                <button class="btn-action btn-solid-teal" style="font-size: 1rem; padding: 0.85rem 2rem;">
-                    Guardar Configuración de Módulos
-                </button>
-            </div>
-
-        </div>
-    </main>
-
-    <!-- Script para inicializar Chart.js -->
+    <!-- Scripts Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const ctx = document.getElementById('revenueChart').getContext('2d');
-
-            // Datos ilustrativos mostrando crecimiento constante
-            const data = {
-                labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-                datasets: [{
-                    label: 'Ingresos (Millones CLP)',
-                    data: [2, 4, 5, 8, 9, 11, 12.5, 14, 16, 19, 22, 25], // Crecimiento simulado de 0 a 25M
-                    borderColor: '#0D9488', // Teal
-                    backgroundColor: 'transparent',
-                    borderWidth: 3,
-                    pointBackgroundColor: '#ffffff',
-                    pointBorderColor: '#0D9488',
-                    pointBorderWidth: 2,
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                    tension: 0.3 // Curva suave
-                }]
-            };
-
-            const config = {
-                type: 'line',
-                data: data,
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            backgroundColor: '#0F172A',
-                            padding: 10,
-                            titleFont: { family: 'Inter', size: 13 },
-                            bodyFont: { family: 'Inter', size: 14, weight: 'bold' },
-                            displayColors: false,
-                            callbacks: {
-                                label: function (context) {
-                                    return '$' + context.parsed.y + 'M CLP';
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 25,
-                            grid: {
-                                color: 'rgba(226, 232, 240, 0.4)',
-                                drawBorder: false,
-                            },
-                            ticks: {
-                                font: { family: 'Inter', size: 11 },
-                                color: '#64748B',
-                                callback: function (value) {
-                                    return value + 'M';
-                                }
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false,
-                                drawBorder: false,
-                            },
-                            ticks: {
-                                font: { family: 'Inter', size: 11 },
-                                color: '#64748B'
-                            }
-                        }
-                    },
-                    interaction: {
-                        intersect: false,
-                        mode: 'index',
-                    },
-                }
-            };
-
-            new Chart(ctx, config);
+            const mobileBtn = document.getElementById('mobileMenuBtn');
+            const sidebar = document.getElementById('sidebar');
+            if (mobileBtn && sidebar) {
+                mobileBtn.addEventListener('click', function () {
+                    sidebar.classList.toggle('active');
+                });
+            }
         });
     </script>
 </body>
-
 </html>

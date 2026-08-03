@@ -7,188 +7,149 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Super Admin Dashboard - Eduteka</title>
 
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap CSS desde local static -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
 
     <!-- Fuentes e Iconos -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
-    <!-- Chart.js para el gráfico -->
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         :root {
-            /* Paleta de colores solicitada */
-            --navy-teal: #0F172A;
-            /* Dark navy-teal para sidebar */
-            --teal-accent: #0D9488;
-            /* Vibrant teal-green */
-            --teal-light: #14B8A6;
-            --metric-green: #10B981;
-            /* Positive metric green */
-            --alert-red: #EF4444;
-            /* Alert red */
-            --alert-yellow: #F59E0B;
-            /* Alert yellow */
-            --bg-light: #F8FAFC;
-            /* Light gray background */
-            --text-dark: #1E293B;
-            --text-muted: #64748B;
-            --border-color: #E2E8F0;
+            --primary: #7C5CFC;
+            --primary-soft: rgba(124, 92, 252, 0.08);
+            --primary-hover: #6747E3;
+            --secondary: #65CDBF;
+            --secondary-soft: rgba(101, 205, 191, 0.08);
+            --bg: #F8F9FD;
+            --white: #FFFFFF;
+            --dark: #151A35;
+            --gray-text: #687089;
+            --border: #BCC0CF;
+            --radius-lg: 16px;
+            --radius-md: 10px;
+            --radius-sm: 8px;
+        }
+
+        * {
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-light);
-            color: var(--text-dark);
-            margin: 0;
-            overflow-x: hidden;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            width: 280px;
-            background-color: var(--navy-teal);
-            color: #ffffff;
-            position: fixed;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            z-index: 1000;
-            padding: 1.5rem 0;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .sidebar-header {
-            padding: 0 1.5rem 2rem 1.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 1.5rem;
-        }
-
-        .sidebar-logo {
-            font-size: 1.75rem;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            color: #ffffff;
-            margin-bottom: 0.25rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .sidebar-subtitle {
-            font-size: 0.75rem;
-            font-weight: 600;
-            letter-spacing: 1.5px;
-            color: var(--teal-accent);
-            text-transform: uppercase;
-        }
-
-        .sidebar-menu {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            flex-grow: 1;
-        }
-
-        .sidebar-menu li {
-            margin-bottom: 0.25rem;
-        }
-
-        .sidebar-menu a {
-            display: flex;
-            align-items: center;
-            padding: 0.85rem 1.5rem;
-            color: rgba(255, 255, 255, 0.7);
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.95rem;
-            transition: all 0.2s ease;
-            gap: 1rem;
-        }
-
-        .sidebar-menu a:hover,
-        .sidebar-menu a.active {
-            color: #ffffff;
-            background-color: var(--teal-accent);
-        }
-
-        .sidebar-menu a i {
-            font-size: 1.1rem;
-        }
-
-        /* Main Content */
-        .main-content {
-            margin-left: 280px;
+            background-color: var(--bg);
+            color: var(--dark);
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            overflow-x: hidden;
+            margin: 0;
         }
 
-        /* Topbar */
+        /* Ambient Blobs */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -15%; left: 65%;
+            width: 50vw; height: 50vw;
+            background: radial-gradient(circle, rgba(124, 92, 252, 0.07) 0%, rgba(255,255,255,0) 70%);
+            z-index: -2;
+            pointer-events: none;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            top: 45%; left: -15%;
+            width: 40vw; height: 40vw;
+            background: radial-gradient(circle, rgba(101, 205, 191, 0.06) 0%, rgba(255,255,255,0) 70%);
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        .wrapper {
+            display: flex;
+            width: 100%;
+            align-items: stretch;
+        }
+
+        /* TOPBAR */
         .topbar {
             height: 70px;
-            background-color: #ffffff;
+            background: rgba(255, 255, 255, 0.85) !important;
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
+            border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 2rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             position: sticky;
             top: 0;
-            z-index: 900;
+            z-index: 98;
         }
 
         .search-bar {
             position: relative;
-            width: 400px;
+            width: 320px;
         }
 
         .search-bar i {
             position: absolute;
-            left: 1rem;
+            left: 0.85rem;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--text-muted);
+            color: var(--gray-text);
         }
 
         .search-bar input {
             width: 100%;
-            padding: 0.6rem 1rem 0.6rem 2.5rem;
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            background-color: var(--bg-light);
-            font-size: 0.9rem;
+            padding: 0.5rem 1rem 0.5rem 2.4rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            background-color: var(--bg);
+            font-size: 0.85rem;
+            outline: none;
             transition: all 0.2s;
         }
 
         .search-bar input:focus {
-            outline: none;
-            border-color: var(--teal-accent);
-            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+            border-color: var(--primary);
+            background-color: var(--white);
+            box-shadow: 0 0 0 3px rgba(124, 92, 252, 0.12);
         }
 
         .topbar-right {
             display: flex;
             align-items: center;
-            gap: 1.5rem;
+            gap: 1.25rem;
         }
 
         .notification-bell {
             position: relative;
-            color: var(--text-muted);
-            font-size: 1.25rem;
+            color: var(--gray-text);
+            font-size: 1.2rem;
             cursor: pointer;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+        }
+
+        .notification-bell:hover {
+            color: var(--primary);
+            border-color: var(--primary);
         }
 
         .notification-badge {
             position: absolute;
-            top: -5px;
-            right: -5px;
-            background-color: var(--alert-red);
+            top: -2px;
+            right: -2px;
+            background-color: #EF4444;
             color: white;
             font-size: 0.65rem;
             font-weight: 700;
@@ -198,546 +159,481 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 2px solid #ffffff;
+            border: 2px solid var(--white);
         }
 
         .user-profile {
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            cursor: pointer;
+            background: var(--white);
+            padding: 0.35rem 0.85rem 0.35rem 0.4rem;
+            border-radius: 30px;
+            border: 1px solid var(--border);
         }
 
         .user-avatar {
-            width: 36px;
-            height: 36px;
-            background-color: var(--navy-teal);
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
             color: white;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 600;
-            font-size: 0.9rem;
+            font-weight: 700;
+            font-size: 0.85rem;
         }
 
         .user-name {
             font-weight: 600;
-            font-size: 0.9rem;
-            color: var(--text-dark);
+            font-size: 0.88rem;
+            color: var(--dark);
         }
 
         /* Dashboard Container */
-        .dashboard-container {
-            padding: 2rem;
-            flex-grow: 1;
+        .content-area {
+            padding: 1.75rem 2rem;
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            box-sizing: border-box;
         }
 
-        .global-header {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            color: var(--navy-teal);
-        }
-
-        /* Metric Cards */
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .metric-card {
-            background-color: #ffffff;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-            border: 1px solid rgba(226, 232, 240, 0.6);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .metric-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
-        }
-
-        .metric-title {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 0.75rem;
-        }
-
-        .metric-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--navy-teal);
+        .hero-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--dark);
             margin-bottom: 0.25rem;
-            line-height: 1;
         }
-
-        .metric-sub {
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
-
-        .text-teal {
-            color: var(--teal-accent);
-        }
-
-        .text-red {
-            color: var(--alert-red);
-        }
-
-        /* Middle Section (Table + Chart) */
-        .middle-grid {
-            display: grid;
-            grid-template-columns: 3fr 2fr;
-            gap: 1.5rem;
+        .hero-subtitle {
+            color: var(--gray-text);
+            font-size: 0.9rem;
             margin-bottom: 1.5rem;
         }
 
-        .card {
-            background-color: #ffffff;
-            border-radius: 12px;
-            border: 1px solid rgba(226, 232, 240, 0.6);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-            overflow: hidden;
-        }
-
-        .card-header {
-            background-color: #ffffff;
-            padding: 1.25rem 1.5rem;
-            border-bottom: 1px solid var(--border-color);
+        /* KPI Cards */
+        .kpi-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            gap: 1rem;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            height: 100%;
         }
 
-        .card-title {
-            font-size: 0.9rem;
+        .kpi-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 25px rgba(124, 92, 252, 0.1) !important;
+        }
+
+        .kpi-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+
+        .kpi-icon.purple { background-color: var(--primary-soft); color: var(--primary); }
+        .kpi-icon.teal { background-color: var(--secondary-soft); color: #148A7A; }
+        .kpi-icon.red { background-color: #FEF2F2; color: #EF4444; }
+        .kpi-icon.amber { background-color: #FFFBEB; color: #D97706; }
+
+        .kpi-title {
+            font-size: 0.72rem;
+            color: var(--gray-text);
             font-weight: 700;
-            color: var(--navy-teal);
-            margin: 0;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+        }
+
+        .kpi-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--dark);
+            line-height: 1.2;
+        }
+
+        .kpi-sub {
+            font-size: 0.78rem;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        /* Dashboard Panels */
+        .dashboard-panel {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.01);
+            margin-bottom: 1.5rem;
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.25rem;
+        }
+
+        .panel-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--dark);
+            margin: 0;
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
 
-        .card-actions i {
-            color: var(--text-muted);
-            cursor: pointer;
-            margin-left: 0.5rem;
-            transition: color 0.2s;
-        }
-
-        .card-actions i:hover {
-            color: var(--navy-teal);
-        }
-
-        .card-body {
-            padding: 1.5rem;
-        }
-
         /* Tables */
-        .table {
-            margin-bottom: 0;
+        .table-custom {
             width: 100%;
             border-collapse: separate;
-            border-spacing: 0;
+            border-spacing: 0 8px;
+            margin-bottom: 0;
         }
 
-        .table th {
-            font-size: 0.75rem;
-            font-weight: 600;
+        .table-custom th {
+            border: none;
+            background: none;
+            color: var(--gray-text);
+            font-weight: 700;
+            font-size: 0.78rem;
             text-transform: uppercase;
-            color: var(--text-muted);
-            border-bottom: 1px solid var(--border-color);
-            padding: 0.75rem 1rem;
-            white-space: nowrap;
+            letter-spacing: 0.5px;
+            padding: 0.5rem 1rem;
         }
 
-        .table td {
-            font-size: 0.9rem;
+        .table-custom td {
+            background: var(--white);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 0.85rem 1rem;
+            font-size: 0.88rem;
             vertical-align: middle;
-            padding: 1rem;
-            border-bottom: 1px solid var(--border-color);
-            color: var(--text-dark);
-            font-weight: 500;
         }
 
-        .table tbody tr:last-child td {
-            border-bottom: none;
+        .table-custom td:first-child {
+            border-left: 1px solid var(--border);
+            border-top-left-radius: var(--radius-md);
+            border-bottom-left-radius: var(--radius-md);
         }
 
-        .table tbody tr:hover {
-            background-color: rgba(248, 250, 252, 0.8);
+        .table-custom td:last-child {
+            border-right: 1px solid var(--border);
+            border-top-right-radius: var(--radius-md);
+            border-bottom-right-radius: var(--radius-md);
         }
 
-        /* Pills and Badges */
+        .table-custom tbody tr:hover td {
+            background-color: #FAF9FF !important;
+            border-color: #D6CFFE;
+        }
+
+        /* Pills */
         .pill {
-            display: inline-block;
-            padding: 0.35rem 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.3rem 0.75rem;
             border-radius: 20px;
             font-size: 0.75rem;
-            font-weight: 600;
-            text-align: center;
-            white-space: nowrap;
+            font-weight: 700;
         }
 
-        .pill-red {
-            background-color: rgba(239, 68, 68, 0.1);
-            color: var(--alert-red);
-        }
-
-        .pill-yellow {
-            background-color: rgba(245, 158, 11, 0.1);
-            color: var(--alert-yellow);
-        }
-
-        .pill-green {
-            background-color: rgba(16, 185, 129, 0.1);
-            color: var(--metric-green);
-        }
-
-        .pill-gray {
-            background-color: rgba(100, 116, 139, 0.1);
-            color: var(--text-muted);
-        }
-
-        /* Buttons */
-        .btn-action {
-            padding: 0.4rem 1rem;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .btn-solid-red {
-            background-color: var(--alert-red);
-            color: white;
-        }
-
-        .btn-solid-red:hover {
-            background-color: #dc2626;
-            color: white;
-        }
-
-        .btn-solid-yellow {
-            background-color: var(--alert-yellow);
-            color: white;
-        }
-
-        .btn-solid-yellow:hover {
-            background-color: #d97706;
-            color: white;
-        }
-
-        .btn-outline-teal {
-            border: 1px solid var(--teal-accent);
-            color: var(--teal-accent);
-            background: transparent;
-        }
-
-        .btn-outline-teal:hover {
-            background-color: var(--teal-accent);
-            color: white;
-        }
-
-        .btn-solid-teal {
-            background-color: var(--teal-accent);
-            color: white;
-            padding: 0.75rem 1.5rem;
-            font-size: 0.9rem;
-        }
-
-        .btn-solid-teal:hover {
-            background-color: #0f766e;
-            color: white;
-        }
-
-        .btn-icon {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            font-size: 1.1rem;
-            padding: 0.2rem;
-        }
-
-        .btn-icon:hover {
-            color: var(--navy-teal);
-        }
-
-        .text-center-btn {
-            display: flex;
-            justify-content: center;
-            padding-top: 1rem;
-            border-top: 1px solid var(--border-color);
-        }
+        .pill-red { background-color: #FEF2F2; color: #EF4444; }
+        .pill-yellow { background-color: #FFFBEB; color: #D97706; }
+        .pill-green { background-color: #ECFDF5; color: #10B981; }
+        .pill-purple { background-color: var(--primary-soft); color: var(--primary); }
+        .pill-gray { background-color: #F3F4F6; color: var(--gray-text); }
 
         /* Chart Area */
         .chart-container {
             position: relative;
             height: 250px;
             width: 100%;
-            background: linear-gradient(180deg, rgba(13, 148, 136, 0.05) 0%, rgba(13, 148, 136, 0.15) 100%);
-            border-radius: 8px;
-            padding: 1rem;
         }
 
-        /* Warning Icon */
-        .warning-icon {
-            color: var(--alert-red);
-            margin-right: 0.5rem;
-            font-size: 1.1rem;
+        .btn-purple {
+            background-color: var(--primary);
+            color: white;
+            font-weight: 600;
+            border-radius: var(--radius-md);
+            padding: 0.45rem 1rem;
+            border: none;
+            transition: all 0.2s;
+        }
+        .btn-purple:hover {
+            background-color: var(--primary-hover);
+            color: white;
+            box-shadow: 0 4px 12px rgba(124, 92, 252, 0.3);
         }
     </style>
 </head>
 
 <body>
 
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <div class="sidebar-logo">
-                <i class="bi bi-mortarboard-fill" style="color: var(--teal-accent);"></i> Eduteka
-            </div>
-            <div class="sidebar-subtitle">SUPER ADMIN</div>
-        </div>
-        <ul class="sidebar-menu">
-            <li><a href="{% url 'dashboard_superadmin' %}" class="active"><i class="bi bi-bar-chart-fill"></i>
-                    Dashboard</a></li>
-            <li><a href="{% url 'dashboard_superadmin_colegios' %}"><i class="bi bi-building"></i> Colegios Clientes</a>
-            </li>
-            <li><a href="{% url 'dashboard_superadmin_planes' %}"><i class="bi bi-credit-card"></i> Planes y
-                    Suscripciones</a></li>
-            <li><a href="{% url 'dashboard_superadmin_facturacion' %}"><i class="bi bi-receipt"></i> Facturación y
-                    SII</a></li>
-            <li><a href="{% url 'dashboard_superadmin_ordenes' %}"><i class="bi bi-folder2-open"></i> Órdenes de
-                    Compra</a></li>
-            <li><a href="{% url 'dashboard_superadmin_modulos_erp' %}"><i class="bi bi-tools"></i> Módulos ERP</a></li>
-            <li><a href="#"><i class="bi bi-briefcase"></i> Mercado Público MP</a></li>
-            <li><a href="{% url 'dashboard_superadmin_estadisticas' %}"><i class="bi bi-graph-up"></i> Estadísticas
-                    Globales</a></li>
-            <li><a href="{% url 'dashboard_superadmin_configuracion' %}"><i class="bi bi-gear"></i> Configuración</a>
-            </li>
-        </ul>
-    </aside>
+    <div class="wrapper">
+        <!-- Sidebar Unificado -->
+        {% include '_sidebar_superadmin.html' with active_page='dashboard' %}
 
-    <!-- Main Content -->
-    <main class="main-content">
+        <!-- Main Content -->
+        <main class="main-content">
 
-        <!-- Topbar -->
-        <header class="topbar">
-            <div class="search-bar">
-                <i class="bi bi-search"></i>
-                <input type="text" placeholder="Buscar colegios, órdenes, planes...">
-            </div>
-            <div class="topbar-right">
-                <div class="notification-bell">
-                    <i class="bi bi-bell"></i>
-                    <span class="notification-badge">1</span>
-                </div>
-                <div class="user-profile">
-                    <div class="user-avatar">AE</div>
-                    <span class="user-name">Admin Eduteka</span>
-                </div>
-            </div>
-        </header>
-
-        <!-- Dashboard Container -->
-        <div class="dashboard-container">
-
-            <h1 class="global-header">Resumen Global Eduteka - Julio 2026</h1>
-
-            <!-- Metrics Cards -->
-            <div class="metrics-grid">
-                <div class="metric-card">
-                    <div class="metric-title">COLEGIOS ACTIVOS</div>
-                    <div class="metric-value">215</div>
-                    <div class="metric-sub text-teal">+3.2% vs jun</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-title">MRR (INGRESOS RECURRENTES)</div>
-                    <div class="metric-value">$12.5M <span style="font-size:1.2rem;">CLP</span></div>
-                    <div class="metric-sub text-teal">+5.8%</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-title">PRÓXIMOS VENCIMIENTOS (7 DÍAS)</div>
-                    <div class="metric-value">18 Alertas</div>
-                    <div class="metric-sub text-red">9 Críticos en rojo</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-title">ÓRDENES DE COMPRA PENDIENTES</div>
-                    <div class="metric-value">9 Solicitudes</div>
-                    <div class="metric-sub text-muted">Pendientes de revisión</div>
-                </div>
-            </div>
-
-            <!-- Middle Section -->
-            <div class="middle-grid">
-
-                <!-- Alerts Table -->
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">TABLERO DE ALERTAS DE PAGO (VENCIMIENTO < 30 DÍAS)</h2>
-                                <div class="card-actions">
-                                    <i class="bi bi-file-earmark-spreadsheet"></i>
-                                    <i class="bi bi-three-dots-vertical"></i>
-                                </div>
+            <!-- Topbar -->
+            <header class="topbar">
+                <div class="d-flex items-center gap-2">
+                    <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn" style="border:none; background:var(--primary-soft); color:var(--primary);">
+                        <i class="bi bi-list fs-5"></i>
+                    </button>
+                    <div class="search-bar">
+                        <i class="bi bi-search"></i>
+                        <input type="text" placeholder="Buscar colegios, órdenes, planes...">
                     </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>Colegio</th>
-                                        <th>Plan</th>
-                                        <th>Fecha Emisión</th>
-                                        <th>Días Restantes</th>
-                                        <th>Estado</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Liceo Santa María</td>
-                                        <td>Plan Premium</td>
-                                        <td>01/06/26</td>
-                                        <td><span class="pill pill-red">2 (rojo)</span></td>
-                                        <td><button class="btn-action btn-solid-red">Pagar</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Colegio Los Alerces</td>
-                                        <td>Plan Estándar</td>
-                                        <td>10/06/26</td>
-                                        <td><span class="pill pill-yellow">11 (amarillo)</span></td>
-                                        <td><button class="btn-action btn-solid-yellow">Ver Alerta</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Instituto Profesional</td>
-                                        <td>Plan Básico</td>
-                                        <td>15/06/26</td>
-                                        <td><span class="pill pill-green">16 (verde)</span></td>
-                                        <td><button class="btn-action btn-solid-yellow">Ver Alerta</button></td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                </div>
+
+                <div class="topbar-right">
+                    <div class="notification-bell">
+                        <i class="bi bi-bell"></i>
+                        <span class="notification-badge">1</span>
+                    </div>
+                    <div class="user-profile">
+                        <div class="user-avatar">AE</div>
+                        <span class="user-name">Admin Eduteka</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Container -->
+            <div class="content-area">
+
+                <div class="mb-4">
+                    <h1 class="hero-title">Resumen Global Eduteka</h1>
+                    <div class="hero-subtitle">Métricas clave, estado de suscripciones y facturación global</div>
+                </div>
+
+                <!-- Metrics Cards -->
+                <div class="row g-3 mb-4">
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="kpi-card">
+                            <div class="kpi-icon purple">
+                                <i class="bi bi-building"></i>
+                            </div>
+                            <div>
+                                <div class="kpi-title">Colegios Activos</div>
+                                <div class="kpi-value">215</div>
+                                <div class="kpi-sub text-success"><i class="bi bi-arrow-up-right"></i> +3.2% vs jun</div>
+                            </div>
                         </div>
-                        <div class="card-body text-center-btn">
-                            <button class="btn-action btn-solid-teal">Ver Más Alertas</button>
+                    </div>
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="kpi-card">
+                            <div class="kpi-icon teal">
+                                <i class="bi bi-cash-stack"></i>
+                            </div>
+                            <div>
+                                <div class="kpi-title">MRR (Ingresos Recurrentes)</div>
+                                <div class="kpi-value">$12.5M <span style="font-size:0.85rem; font-weight:600;" class="text-muted">CLP</span></div>
+                                <div class="kpi-sub text-success"><i class="bi bi-arrow-up-right"></i> +5.8%</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="kpi-card">
+                            <div class="kpi-icon red">
+                                <i class="bi bi-exclamation-triangle-fill"></i>
+                            </div>
+                            <div>
+                                <div class="kpi-title">Próximos Vencimientos</div>
+                                <div class="kpi-value">18 Alertas</div>
+                                <div class="kpi-sub text-danger">9 Críticos en rojo</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="kpi-card">
+                            <div class="kpi-icon amber">
+                                <i class="bi bi-folder-check"></i>
+                            </div>
+                            <div>
+                                <div class="kpi-title">Órdenes Pendientes</div>
+                                <div class="kpi-value">9 Solicitudes</div>
+                                <div class="kpi-sub text-muted">Pendientes de revisión</div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Revenue Chart -->
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">CRECIMIENTO MENSUAL DE INGRESOS</h2>
+                <!-- Middle Section -->
+                <div class="row g-3 mb-4">
+
+                    <!-- Alerts Table -->
+                    <div class="col-12 col-lg-7">
+                        <div class="dashboard-panel h-100 mb-0">
+                            <div class="panel-header">
+                                <h2 class="panel-title">
+                                    <i class="bi bi-clock-history text-primary"></i> Tablero de Alertas de Pago
+                                </h2>
+                                <a href="{% url 'dashboard_superadmin_facturacion' %}" class="btn btn-sm btn-outline-primary rounded-pill">Ver Todo</a>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table-custom">
+                                    <thead>
+                                        <tr>
+                                            <th>Colegio</th>
+                                            <th>Plan</th>
+                                            <th>Emisión</th>
+                                            <th>Días Restantes</th>
+                                            <th>Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>Liceo Santa María</strong></td>
+                                            <td><span class="pill pill-purple">Premium</span></td>
+                                            <td>01/06/26</td>
+                                            <td><span class="pill pill-red"><i class="bi bi-alarm"></i> 2 Días</span></td>
+                                            <td><button class="btn btn-sm btn-danger rounded-pill px-3">Pagar</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Colegio Los Alerces</strong></td>
+                                            <td><span class="pill pill-purple">Estándar</span></td>
+                                            <td>10/06/26</td>
+                                            <td><span class="pill pill-yellow"><i class="bi bi-exclamation-circle"></i> 11 Días</span></td>
+                                            <td><button class="btn btn-sm btn-warning text-white rounded-pill px-3">Ver Alerta</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Instituto Profesional</strong></td>
+                                            <td><span class="pill pill-gray">Básico</span></td>
+                                            <td>15/06/26</td>
+                                            <td><span class="pill pill-green"><i class="bi bi-check-circle"></i> 16 Días</span></td>
+                                            <td><button class="btn btn-sm btn-light border rounded-pill px-3">Detalles</button></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <div class="chart-container">
-                            <canvas id="revenueChart"></canvas>
+
+                    <!-- Revenue Chart -->
+                    <div class="col-12 col-lg-5">
+                        <div class="dashboard-panel h-100 mb-0">
+                            <div class="panel-header">
+                                <h2 class="panel-title">
+                                    <i class="bi bi-graph-up text-success"></i> Crecimiento de Ingresos
+                                </h2>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="revenueChart"></canvas>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Recent Clients Table -->
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">RESUMEN DE CLIENTES RECIENTES</h2>
-                    <div class="card-actions">
-                        <i class="bi bi-arrow-clockwise"></i>
-                        <i class="bi bi-three-dots-vertical"></i>
+                <!-- Recent Clients Table -->
+                <div class="dashboard-panel">
+                    <div class="panel-header">
+                        <h2 class="panel-title">
+                            <i class="bi bi-people-fill text-primary"></i> Resumen de Clientes Recientes
+                        </h2>
+                        <a href="{% url 'dashboard_superadmin_colegios' %}" class="btn btn-sm btn-purple rounded-pill">
+                            <i class="bi bi-plus-lg me-1"></i> Ir a Directorio
+                        </a>
                     </div>
-                </div>
-                <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table">
+                        <table class="table-custom">
                             <thead>
                                 <tr>
                                     <th>Colegio</th>
                                     <th>Alumnos</th>
                                     <th>Profesores</th>
-                                    <th>Estado Onboarding</th>
+                                    <th>Onboarding</th>
                                     <th>Plan</th>
-                                    <th>Acciones</th>
+                                    <th class="text-end">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>Colegio Arturo Prat</td>
-                                    <td>1200</td>
+                                    <td><strong>Colegio Arturo Prat</strong></td>
+                                    <td>1,200</td>
                                     <td>65</td>
-                                    <td><i class="bi bi-exclamation-triangle-fill warning-icon"></i> <span
-                                            class="pill pill-yellow">Capacitación Pendiente</span></td>
-                                    <td><strong>Premium</strong></td>
-                                    <td>
-                                        <button class="btn-action btn-outline-teal me-2">Detalles</button>
-                                        <button class="btn-action btn-outline-teal">Ver Ficha</button>
+                                    <td><span class="pill pill-yellow"><i class="bi bi-exclamation-triangle-fill"></i> Capacitación Pendiente</span></td>
+                                    <td><span class="pill pill-purple">Premium</span></td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-outline-primary rounded-pill me-1">Detalles</button>
+                                        <button class="btn btn-sm btn-light border rounded-pill">Ficha</button>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>Escuela Básica Gabriela Mistral</td>
+                                    <td><strong>Escuela Gabriela Mistral</strong></td>
                                     <td>850</td>
                                     <td>42</td>
-                                    <td><span class="pill pill-green">Completado</span></td>
-                                    <td><strong>Estándar</strong></td>
-                                    <td>
-                                        <button class="btn-action btn-outline-teal me-2">Detalles</button>
-                                        <button class="btn-action btn-outline-teal">Ver Ficha</button>
+                                    <td><span class="pill pill-green"><i class="bi bi-check-circle-fill"></i> Completado</span></td>
+                                    <td><span class="pill pill-purple">Estándar</span></td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-outline-primary rounded-pill me-1">Detalles</button>
+                                        <button class="btn btn-sm btn-light border rounded-pill">Ficha</button>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>Liceo Bicentenario</td>
-                                    <td>2100</td>
+                                    <td><strong>Liceo Bicentenario</strong></td>
+                                    <td>2,100</td>
                                     <td>110</td>
-                                    <td><span class="pill pill-gray">En Proceso (Día 2)</span></td>
-                                    <td><strong>Premium</strong></td>
-                                    <td>
-                                        <button class="btn-action btn-outline-teal me-2">Detalles</button>
-                                        <button class="btn-action btn-outline-teal">Ver Ficha</button>
+                                    <td><span class="pill pill-gray"><i class="bi bi-hourglass-split"></i> En Proceso (Día 2)</span></td>
+                                    <td><span class="pill pill-purple">Premium</span></td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-outline-primary rounded-pill me-1">Detalles</button>
+                                        <button class="btn btn-sm btn-light border rounded-pill">Ficha</button>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
+
             </div>
+        </main>
+    </div>
 
-        </div>
-    </main>
-
-    <!-- Script para inicializar Chart.js -->
+    <!-- Script Chart.js y Toggle Móvil -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const ctx = document.getElementById('revenueChart').getContext('2d');
+            // Toggle móvil sidebar
+            const mobileBtn = document.getElementById('mobileMenuBtn');
+            const sidebar = document.getElementById('sidebar');
+            if (mobileBtn && sidebar) {
+                mobileBtn.addEventListener('click', function () {
+                    sidebar.classList.toggle('active');
+                });
+            }
 
-            // Datos ilustrativos mostrando crecimiento constante
+            // Chart.js
+            const ctx = document.getElementById('revenueChart').getContext('2d');
             const data = {
                 labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
                 datasets: [{
-                    label: 'Ingresos (Millones CLP)',
-                    data: [2, 4, 5, 8, 9, 11, 12.5, 14, 16, 19, 22, 25], // Crecimiento simulado de 0 a 25M
-                    borderColor: '#0D9488', // Teal
-                    backgroundColor: 'transparent',
+                    label: 'Ingresos (MM CLP)',
+                    data: [2, 4, 5, 8, 9, 11, 12.5, 14, 16, 19, 22, 25],
+                    borderColor: '#7C5CFC',
+                    backgroundColor: 'rgba(124, 92, 252, 0.08)',
                     borderWidth: 3,
-                    pointBackgroundColor: '#ffffff',
-                    pointBorderColor: '#0D9488',
+                    fill: true,
+                    pointBackgroundColor: '#FFFFFF',
+                    pointBorderColor: '#7C5CFC',
                     pointBorderWidth: 2,
                     pointRadius: 4,
                     pointHoverRadius: 6,
-                    tension: 0.3 // Curva suave
+                    tension: 0.35
                 }]
             };
 
@@ -748,14 +644,12 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: {
-                            display: false
-                        },
+                        legend: { display: false },
                         tooltip: {
-                            backgroundColor: '#0F172A',
+                            backgroundColor: '#151A35',
                             padding: 10,
-                            titleFont: { family: 'Inter', size: 13 },
-                            bodyFont: { family: 'Inter', size: 14, weight: 'bold' },
+                            titleFont: { family: 'Plus Jakarta Sans', size: 12 },
+                            bodyFont: { family: 'Plus Jakarta Sans', size: 13, weight: 'bold' },
                             displayColors: false,
                             callbacks: {
                                 label: function (context) {
@@ -768,33 +662,18 @@
                         y: {
                             beginAtZero: true,
                             max: 25,
-                            grid: {
-                                color: 'rgba(226, 232, 240, 0.4)',
-                                drawBorder: false,
-                            },
+                            grid: { color: 'rgba(188, 192, 207, 0.2)', drawBorder: false },
                             ticks: {
-                                font: { family: 'Inter', size: 11 },
-                                color: '#64748B',
-                                callback: function (value) {
-                                    return value + 'M';
-                                }
+                                font: { family: 'Plus Jakarta Sans', size: 10 },
+                                color: '#687089',
+                                callback: function (value) { return value + 'M'; }
                             }
                         },
                         x: {
-                            grid: {
-                                display: false,
-                                drawBorder: false,
-                            },
-                            ticks: {
-                                font: { family: 'Inter', size: 11 },
-                                color: '#64748B'
-                            }
+                            grid: { display: false, drawBorder: false },
+                            ticks: { font: { family: 'Plus Jakarta Sans', size: 10 }, color: '#687089' }
                         }
-                    },
-                    interaction: {
-                        intersect: false,
-                        mode: 'index',
-                    },
+                    }
                 }
             };
 
