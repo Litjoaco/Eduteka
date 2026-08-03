@@ -134,12 +134,52 @@ class ConfiguracionAcademica(models.Model):
         ('anual', 'Anual'),
     ]
 
+    MODALIDADES_ASISTENCIA = [
+        ('diaria', 'Asistencia Diaria General'),
+        ('asignatura', 'Asistencia por Asignatura / Bloque'),
+    ]
+
+    TIPO_CALIFICACION_CHOICES = [
+        ('numerica', 'Notas Numéricas (1.0 a 7.0)'),
+        ('conceptual', 'Evaluación Conceptual (L, PL, NL)'),
+    ]
+
+    REGLA_REDONDEO_CHOICES = [
+        ('un_decimal', 'Redondear a 1 decimal (ej: 5.65 -> 5.7)'),
+        ('dos_decimales', 'Redondear a 2 decimales (ej: 5.65)'),
+        ('truncado', 'Truncar sin redondear (ej: 5.69 -> 5.6)'),
+    ]
+
+    TIPO_CALCULO_PROMEDIO_CHOICES = [
+        ('ponderado', 'Promedio Ponderado por Coeficientes'),
+        ('simple', 'Promedio Aritmético Simple'),
+    ]
+
+    VISIBILIDAD_NOTAS_CHOICES = [
+        ('inmediata', 'Publicación Inmediata al Guardar Nota'),
+        ('cierre_periodo', 'Solo al Cierre del Período Académico'),
+    ]
+
     colegio = models.OneToOneField(Colegio, on_delete=models.CASCADE, related_name='configuracion_academica')
     anio_academico = models.IntegerField()
     fecha_inicio = models.DateField()
     fecha_termino = models.DateField()
     periodo_academico = models.CharField(max_length=20, choices=PERIODOS, default='semestres')
+    modalidad_asistencia = models.CharField(max_length=20, choices=MODALIDADES_ASISTENCIA, default='asignatura')
     horario_referencial = models.CharField(max_length=100, blank=True)
+
+    # Políticas Académicas y de Evaluación
+    tipo_calificacion = models.CharField(max_length=20, choices=TIPO_CALIFICACION_CHOICES, default='numerica')
+    nota_minima_aprobacion = models.DecimalField(max_digits=3, decimal_places=1, default=4.0)
+    porcentaje_exigencia = models.IntegerField(default=60)
+    regla_redondeo = models.CharField(max_length=20, choices=REGLA_REDONDEO_CHOICES, default='un_decimal')
+    tipo_calculo_promedio = models.CharField(max_length=20, choices=TIPO_CALCULO_PROMEDIO_CHOICES, default='ponderado')
+    porcentaje_asistencia_minima = models.IntegerField(default=85)
+    visibilidad_notas_apoderados = models.CharField(max_length=20, choices=VISIBILIDAD_NOTAS_CHOICES, default='inmediata')
+    notificar_ausencias = models.BooleanField(default=True)
+    notificar_notas_rojas = models.BooleanField(default=True)
+
+
 
     # Niveles educativos activos
     nivel_parvularia = models.BooleanField(default=False)
@@ -196,8 +236,9 @@ class CursoColegio(models.Model):
 class SeccionCurso(models.Model):
     curso = models.ForeignKey(CursoColegio, on_delete=models.CASCADE, related_name='secciones')
     letra = models.CharField(max_length=1)
-    nombre = models.CharField(max_length=20) # Ej: 1° Básico A
+    nombre = models.CharField(max_length=150)
     activo = models.BooleanField(default=True)
+
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -296,3 +337,77 @@ class Asignatura(models.Model):
 
     def __str__(self):
         return f"{self.nombre} - {self.curso.nombre}"
+
+
+class AnotacionEstudiante(models.Model):
+    TIPO_CHOICES = [
+        ('positiva', 'Anotación Positiva / Mérito'),
+        ('negativa', 'Anotación Negativa / Falta'),
+        ('neutra', 'Observación Neutra'),
+        ('citacion', 'Citación a Apoderado'),
+    ]
+
+    GRAVEDAD_CHOICES = [
+        ('leve', 'Leve'),
+        ('grave', 'Grave'),
+        ('gravisima', 'Gravísima'),
+    ]
+
+    colegio = models.ForeignKey(Colegio, on_delete=models.CASCADE, related_name='anotaciones')
+    estudiante = models.ForeignKey(Estudiante, on_delete=models.CASCADE, related_name='anotaciones')
+    asignatura = models.ForeignKey(Asignatura, on_delete=models.SET_NULL, null=True, blank=True, related_name='anotaciones')
+    docente = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+
+    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, default='neutra')
+    gravedad = models.CharField(max_length=20, choices=GRAVEDAD_CHOICES, default='leve')
+    fecha = models.DateField(default=timezone.now)
+    titulo = models.CharField(max_length=150)
+    descripcion = models.TextField()
+
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Anotación de Estudiante"
+        verbose_name_plural = "Anotaciones de Estudiantes"
+        ordering = ['-fecha', '-id']
+
+    def __str__(self):
+        return f"{self.get_tipo_display()} - {self.estudiante.nombre_completo} ({self.fecha})"
+
+
+class EventoAgenda(models.Model):
+    TIPO_CHOICES = [
+        ('clase', 'Clase / Cátedra'),
+        ('evaluacion', 'Prueba / Evaluación'),
+        ('reunion', 'Reunión Directiva / Apoderados'),
+        ('actividad', 'Actividad Institucional'),
+    ]
+
+    colegio = models.ForeignKey(Colegio, on_delete=models.CASCADE, related_name='eventos_agenda')
+    creado_por = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    asignado_a = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='eventos_asignados')
+    es_para_todos = models.BooleanField(default=False)
+    es_recurrente = models.BooleanField(default=False)
+    dia_semana = models.IntegerField(blank=True, null=True)
+    titulo = models.CharField(max_length=200)
+
+
+    descripcion = models.TextField(blank=True, null=True)
+    tipo = models.CharField(max_length=30, choices=TIPO_CHOICES, default='actividad')
+    fecha_inicio = models.DateTimeField(default=timezone.now)
+    fecha_fin = models.DateTimeField(blank=True, null=True)
+    lugar = models.CharField(max_length=150, blank=True, null=True)
+    curso = models.ForeignKey(CursoColegio, on_delete=models.SET_NULL, null=True, blank=True)
+    asignatura = models.ForeignKey(Asignatura, on_delete=models.SET_NULL, null=True, blank=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+
+    class Meta:
+        verbose_name = "Evento de Agenda"
+        verbose_name_plural = "Eventos de Agenda"
+        ordering = ['fecha_inicio', 'id']
+
+    def __str__(self):
+        return f"{self.titulo} ({self.fecha_inicio.strftime('%d/%m/%Y %H:%M')})"
+
+

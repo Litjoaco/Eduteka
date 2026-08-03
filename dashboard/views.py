@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from solicitudes.models import SolicitudAcceso, MiembroColegio
-from colegios.models import Colegio, ColegioModulo, RolColegio
+from colegios.models import Colegio, ColegioModulo, RolColegio, Estudiante, CursoColegio
+
 from django.contrib.auth.models import User
 from django.utils import timezone
 
@@ -30,16 +31,37 @@ def dashboard_view(request):
         from asistencia.utils import calcular_alumnos_en_riesgo
         alumnos_en_riesgo = calcular_alumnos_en_riesgo(colegio)
         alumnos_en_riesgo_count = len(alumnos_en_riesgo)
+        # Total Estudiantes y Cursos
+        total_estudiantes_count = Estudiante.objects.filter(colegio=colegio, activo=True).count()
+        total_cursos_count = CursoColegio.objects.filter(colegio=colegio, activo=True).count()
     else:
         # Si no tiene colegio, redirigir a solicitar acceso o registro
         return redirect('solicitar_acceso')
 
+    from colegios.models import ConfiguracionAcademica
+
+    # Obtener miembro actual (puede ser None si es el administrador directo del colegio)
+    miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
+    periodo = ConfiguracionAcademica.objects.filter(colegio=colegio).first()
+
+    # is_admin: True para administradores del colegio y roles directivos
+    is_admin = (
+        request.user.colegios_administrados.filter(id=colegio.id).exists()
+        or (miembro and miembro.rol and miembro.rol.nombre in ['Administrador', 'Director'])
+    )
+
     context = {
         'colegio': colegio,
+        'miembro': miembro,
+        'periodo': periodo,
+        'is_admin': is_admin,
+        'active_page': 'inicio',
         'suscripcion': suscripcion,
         'solicitudes_pendientes_count': solicitudes_pendientes.count(),
         'modulos_activos_count': modulos_activos_count,
         'usuarios_colegio_count': usuarios_colegio_count,
+        'total_estudiantes_count': total_estudiantes_count,
+        'total_cursos_count': total_cursos_count,
         'solicitudes_pendientes': solicitudes_pendientes,
         'ultimas_solicitudes': ultimas_solicitudes,
         'alumnos_en_riesgo': alumnos_en_riesgo,
@@ -47,6 +69,8 @@ def dashboard_view(request):
         'hoy': timezone.now(),
     }
     return render(request, 'dashboard_profesor.html', context)
+
+
 
 @login_required
 def aprobar_solicitud(request, solicitud_id):

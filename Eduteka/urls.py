@@ -30,8 +30,10 @@ urlpatterns = [
     path('solicitudes/', include('solicitudes.urls')),
     path('dashboard/', include('dashboard.urls')),
     path('asistencia/', include('asistencia.urls')),
+    path('calificaciones/', include('calificaciones.urls')),
     path('api/buscar-colegios/', colegios_views.api_buscar_colegios, name='api_buscar_colegios'),
 ]
+
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

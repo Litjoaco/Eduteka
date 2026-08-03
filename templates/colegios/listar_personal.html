@@ -38,137 +38,18 @@
       margin: 0;
     }
 
-    /* WRAPPER & SIDEBAR */
-    .wrapper {
-      display: flex;
-      flex: 1;
-      position: relative;
-    }
 
-    /* SIDEBAR */
-    .sidebar {
-      width: 260px;
-      background: var(--white);
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      position: fixed;
-      top: 0; bottom: 0; left: 0;
-      z-index: 1040;
-      transition: transform 0.3s ease;
-    }
-
-    @media (max-width: 991.98px) {
-      .sidebar {
-        position: absolute;
-        left: -260px;
-        top: 0;
-        bottom: 0;
-        z-index: 1050;
-      }
-      .sidebar.active {
-        left: 0;
-      }
-    }
-
-    .sidebar-logo {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 1.4rem 1.5rem 1rem;
-    }
-    .sidebar-logo img { max-height: 100px; width: auto; }
-
-    .sidebar-school {
-      margin: 0 .75rem .75rem;
-      background: linear-gradient(135deg, var(--primary-soft) 0%, #E8E2FF 100%);
-      border-radius: var(--radius-lg);
-      padding: .9rem 1rem;
-    }
-    .sidebar-school-name {
-      font-weight: 700;
-      font-size: .85rem;
-      color: var(--primary);
-      margin-bottom: 2px;
-    }
-    .sidebar-school-sub {
-      font-size: .75rem;
-      color: var(--primary-hover);
-      font-weight: 500;
-    }
-
-    .sidebar-nav {
-      flex: 1;
-      overflow-y: auto;
-      padding: .75rem .75rem 0;
-      scrollbar-width: none;
-    }
-    .sidebar-nav::-webkit-scrollbar { display: none; }
-
-    .nav-section-label {
-      font-size: .67rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      color: var(--gray-text);
-      padding: .5rem .75rem .3rem;
-      margin-top: .25rem;
-    }
-
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: .75rem;
-      padding: .6rem .85rem;
-      color: var(--gray-text);
-      font-weight: 500;
-      font-size: .88rem;
-      border-radius: var(--radius-md);
-      text-decoration: none;
-      transition: background .15s, color .15s;
-      margin-bottom: 2px;
-    }
-    .nav-item i { font-size: 1.05rem; flex-shrink: 0; }
-    .nav-item:hover { background: var(--bg); color: var(--dark); }
-    .nav-item.active {
-      background: var(--primary);
-      color: #fff;
-      font-weight: 600;
-      box-shadow: 0 4px 14px rgba(108,79,240,.3);
-    }
-    .nav-item.active i { color: #fff; }
-
-    .sidebar-footer {
-      padding: .75rem;
-      border-top: 1px solid var(--border);
-      margin-top: auto;
-    }
+    /* WRAPPER */
+    .wrapper { display: flex; flex: 1; position: relative; }
 
     /* MAIN CONTENT */
-    .main-content {
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-      margin-left: 248px;
-      width: calc(100% - 248px);
-    }
-
     .topbar {
-      height: 70px;
-      background: var(--white);
+      height: 70px; background: var(--white);
       border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 2rem;
-      z-index: 98;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; position: sticky; top: 0; z-index: 98;
     }
-
-    .content-body {
-      padding: 2rem;
-      flex-grow: 1;
-    }
+    .content-body { padding: 2rem; flex-grow: 1; }
 
     /* DASHBOARD PANEL */
     .dashboard-panel {
@@ -232,45 +113,7 @@
 <body>
 
 <div class="wrapper">
-  <!-- SIDEBAR -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-logo">
-      <img src="{% static 'img/logo.png' %}" alt="Eduteka Logo">
-    </div>
-
-    <div style="padding: 0 .75rem .75rem;">
-      <div class="sidebar-school">
-        <div class="sidebar-school-name">{{ colegio.nombre|default:"Mi Colegio" }}</div>
-        <div class="sidebar-school-sub">Año Escolar {{ periodo.anio_academico|default:"Actual" }}</div>
-      </div>
-    </div>
-
-    <nav class="sidebar-nav">
-      <div class="nav-section-label">Menú Principal</div>
-      <a href="{% url 'dashboard_usuario' %}" class="nav-item"><i class="bi bi-house"></i> Inicio</a>
-      <a href="{% url 'listar_estudiantes' %}" class="nav-item"><i class="bi bi-people"></i> Estudiantes</a>
-      <a href="{% url 'listar_asignaturas' %}" class="nav-item"><i class="bi bi-book"></i> Académico</a>
-      <a href="{% url 'listar_cursos' %}" class="nav-item"><i class="bi bi-diagram-3"></i> Cursos</a>
-      <a href="{% url 'listar_personal' %}" class="nav-item active"><i class="bi bi-person-badge"></i> Personal</a>
-      <a href="{% url 'registrar_asistencia' %}" class="nav-item"><i class="bi bi-calendar-check"></i> Asistencia</a>
-      <a href="#" class="nav-item"><i class="bi bi-calendar3"></i> Calendario</a>
-      <a href="{% url 'historial_asistencia' %}" class="nav-item"><i class="bi bi-bar-chart"></i> Reportes</a>
-
-      <div class="nav-section-label" style="margin-top:.75rem;">Administración</div>
-      <a href="#" class="nav-item"><i class="bi bi-wallet2"></i> Contabilidad</a>
-      <a href="#" class="nav-item"><i class="bi bi-truck"></i> Proveedores</a>
-      <a href="#" class="nav-item"><i class="bi bi-award"></i> SIMCE</a>
-    </nav>
-
-    <div class="sidebar-footer">
-      <a href="#" class="nav-item"><i class="bi bi-gear"></i> Configuración</a>
-      <a href="{% url 'logout' %}" class="nav-item" style="color:#EF4444;">
-        <i class="bi bi-box-arrow-right" style="color:#EF4444;"></i> Cerrar Sesión
-      </a>
-    </div>
-  </aside>
-
-
+  {% include 'colegios/_sidebar.html' with active_page='personal' %}
   <!-- MAIN CONTENT -->
   <div class="main-content">
     <header class="topbar">
@@ -288,15 +131,7 @@
     </header>
 
     <main class="content-body">
-      <!-- Mensajes Django -->
-      {% if messages %}
-        {% for message in messages %}
-          <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show shadow-sm mb-4" role="alert" style="border-radius: var(--radius-md);">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        {% endfor %}
-      {% endif %}
+
 
       <!-- Header -->
       <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
@@ -304,7 +139,15 @@
           <h2 class="fw-bold text-dark mb-0">Gestión de Personal Escolar</h2>
           <p class="text-muted mb-0">Controla los accesos de docentes y administrativos y asigna sus cargos oficiales.</p>
         </div>
+        {% if is_admin %}
+          <div>
+            <button class="btn btn-outline-primary fw-bold px-3 py-2" data-bs-toggle="modal" data-bs-target="#crearRolModal" style="border-radius: var(--radius-md);">
+              <i class="bi bi-shield-plus me-1.5"></i> + Crear Nuevo Rol
+            </button>
+          </div>
+        {% endif %}
       </div>
+
 
       <!-- Tabla del Personal -->
       <div class="dashboard-panel">
@@ -350,16 +193,24 @@
                     {% if is_admin %}
                       <td style="text-align: right;">
                         <div class="d-flex justify-content-end gap-2">
+                          <button class="btn btn-sm btn-outline-success fw-semibold" data-bs-toggle="modal" data-bs-target="#modalAsignarMaterias{{ miembro.id }}">
+                            <i class="bi bi-book me-1"></i> Asignaturas
+                          </button>
                           <button class="btn btn-sm btn-outline-primary fw-semibold" data-bs-toggle="modal" data-bs-target="#modalEditarRol{{ miembro.id }}">
                             <i class="bi bi-shield-lock me-1"></i> Rol
                           </button>
                           
                           {% if miembro.usuario != request.user %}
-                            <a class="btn btn-sm {% if miembro.activo %}btn-outline-danger{% else %}btn-outline-success{% endif %} fw-semibold" href="{% url 'baja_personal' miembro.id %}">
+                            <a class="btn btn-sm {% if miembro.activo %}btn-outline-danger{% else %}btn-outline-success{% endif %} fw-semibold js-confirm-delete" 
+                               data-confirm-title="¿{% if miembro.activo %}Suspender{% else %}Re-activar{% endif %} acceso de {{ miembro.usuario.username }}?"
+                               data-confirm-text="Se actualizará el estado de acceso de este funcionario."
+                               data-confirm-btn="Sí, proceder"
+                               href="{% url 'baja_personal' miembro.id %}">
                               <i class="bi {% if miembro.activo %}bi-slash-circle{% else %}bi-check-circle{% endif %} me-1"></i>
                               {% if miembro.activo %}Suspender{% else %}Re-activar{% endif %}
                             </a>
                           {% endif %}
+
                         </div>
                       </td>
                     {% endif %}
@@ -395,6 +246,46 @@
                     </div>
                   </div>
 
+                  <!-- MODAL ASIGNAR ASIGNATURAS -->
+                  <div class="modal fade" id="modalAsignarMaterias{{ miembro.id }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                      <div class="modal-content" style="border-radius: var(--radius-md); border:none;">
+                        <div class="modal-header border-bottom-0">
+                          <h5 class="fw-bold"><i class="bi bi-book text-primary me-2"></i>Asignar Cursos y Asignaturas</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form method="POST" action="{% url 'asignar_asignaturas_docente' miembro.id %}">
+                          {% csrf_token %}
+                          <div class="modal-body pt-0">
+                            <p class="text-muted small mb-3">Selecciona las materias que imparte el docente <strong>{{ miembro.usuario.get_full_name|default:miembro.usuario.username }}</strong>. Esto limitará su acceso solo a estas materias.</p>
+                            
+                            <div class="d-flex flex-column gap-2" style="max-height: 280px; overflow-y: auto; text-align: left;">
+                              {% for asig in asignaturas_colegio %}
+                                <div class="form-check p-2.5 border rounded bg-light d-flex align-items-center gap-2">
+                                  <input class="form-check-input ms-1" type="checkbox" name="asignaturas" value="{{ asig.id }}" id="asig_{{ miembro.id }}_{{ asig.id }}" {% if asig.docente == miembro.usuario %}checked{% endif %}>
+                                  <label class="form-check-label fw-semibold text-dark mb-0" for="asig_{{ miembro.id }}_{{ asig.id }}">
+                                    {{ asig.nombre }} <span class="text-muted small fw-normal">({{ asig.curso.nombre }} {{ asig.curso.nivel }})</span>
+                                  </label>
+                                </div>
+                              {% empty %}
+                                <div class="alert alert-warning mb-0 small">
+                                  No hay asignaturas registradas en el colegio. Crea asignaturas en el módulo Académico primero.
+                                </div>
+                              {% endfor %}
+                            </div>
+                          </div>
+                          <div class="modal-footer border-top-0">
+                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-success fw-bold px-4">
+                              <i class="bi bi-check2-circle me-1"></i>Guardar Asignaciones
+                            </button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+
+
                 {% endfor %}
               {% else %}
                 <tr>
@@ -403,9 +294,72 @@
               {% endif %}
             </tbody>
           </table>
+
+          {% if personal.has_other_pages %}
+            <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+              <div class="text-muted small">
+                Mostrando registros <strong>{{ personal.start_index }} - {{ personal.end_index }}</strong> de <strong>{{ personal.paginator.count }}</strong>
+              </div>
+              <nav>
+                <ul class="pagination pagination-sm mb-0">
+                  {% if personal.has_previous %}
+                    <li class="page-item"><a class="page-link text-primary fw-bold" href="?page={{ personal.previous_page_number }}">‹ Anterior</a></li>
+                  {% else %}
+                    <li class="page-item disabled"><span class="page-link">‹ Anterior</span></li>
+                  {% endif %}
+
+                  {% for i in personal.paginator.page_range %}
+                    {% if personal.number == i %}
+                      <li class="page-item active"><span class="page-link bg-primary border-primary">{{ i }}</span></li>
+                    {% else %}
+                      <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                    {% endif %}
+                  {% endfor %}
+
+                  {% if personal.has_next %}
+                    <li class="page-item"><a class="page-link text-primary fw-bold" href="?page={{ personal.next_page_number }}">Siguiente ›</a></li>
+                  {% else %}
+                    <li class="page-item disabled"><span class="page-link">Siguiente ›</span></li>
+                  {% endif %}
+                </ul>
+              </nav>
+            </div>
+          {% endif %}
         </div>
       </div>
+
     </main>
+  </div>
+</div>
+
+<!-- MODAL CREAR NUEVO ROL -->
+<div class="modal fade" id="crearRolModal" tabindex="-1" aria-labelledby="crearRolModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius: var(--radius-lg); border: none; overflow: hidden;">
+      <div class="modal-header bg-light">
+        <h5 class="modal-title fw-bold" id="crearRolModalLabel"><i class="bi bi-shield-plus text-primary me-2"></i>Crear Nuevo Rol Personalizado</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <form method="POST" action="{% url 'crear_rol_personalizado' %}">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label fw-semibold text-dark small">Nombre del Rol</label>
+            <input type="text" name="nombre_rol" class="form-control" placeholder="Ej: Jefe de UTP, Coordinador, Orientador..." required style="border-radius: var(--radius-md);">
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold text-dark small">Descripción del Rol / Funciones</label>
+            <textarea name="descripcion" class="form-control" rows="3" placeholder="Describe brevemente las responsabilidades de este cargo..." style="border-radius: var(--radius-md);"></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal" style="border-radius: var(--radius-md);">Cancelar</button>
+          <button type="submit" class="btn btn-primary fw-bold px-4" style="border-radius: var(--radius-md);"><i class="bi bi-check2-circle me-1"></i> Crear Rol</button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 
@@ -423,3 +377,4 @@
 </script>
 </body>
 </html>
+

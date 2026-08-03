@@ -39,39 +39,8 @@
   }
 
   .app-container { display: flex; min-height: 100vh; width: 100vw; overflow-x: hidden; }
-  
-  .sidebar { 
-    width: var(--sidebar-width); 
-    background: var(--white); 
-    border-right: 1px solid var(--border-color); 
-    position: fixed; 
-    top: 0; bottom: 0; left: 0; 
-    display: flex; flex-direction: column; 
-    z-index: 1040; 
-  }
-  .sidebar-logo { display: flex; justify-content: center; align-items: center; padding: 1.4rem 1.5rem 1rem; width: 100%; background: transparent; }
-  .sidebar-logo img { max-height: 100px; width: auto; max-width: 85%; object-fit: contain; }
-  .sidebar-school {
-    margin: 0 .75rem .75rem;
-    background: linear-gradient(135deg, rgba(124, 92, 252, 0.08) 0%, #E8E2FF 100%);
-    border-radius: 12px;
-    padding: .9rem 1rem;
-  }
-  .sidebar-school-name { font-weight: 700; font-size: .85rem; color: #7C5CFC; margin-bottom: 2px; }
-  .sidebar-school-sub { font-size: .75rem; color: #6747E3; font-weight: 500; }
-  
-  .sidebar-menu { padding: .75rem .75rem 0; flex: 1; overflow-y: auto; scrollbar-width: none; }
-  .sidebar-menu::-webkit-scrollbar { display: none; }
-  .menu-label { font-size: .67rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #687089; padding: .5rem .75rem .3rem; margin-top: .25rem; }
-  .menu-item { display: flex; align-items: center; gap: .75rem; padding: .6rem .85rem; color: #687089; font-weight: 500; font-size: .88rem; border-radius: 10px; text-decoration: none; transition: background .15s, color .15s; margin-bottom: 2px; }
-  .menu-item i { font-size: 1.05rem; flex-shrink: 0; }
-  .menu-item:hover { background: #F8F9FD; color: #151A35; transform: none; }
-  .menu-item.active { background: #7C5CFC; color: #fff; font-weight: 600; box-shadow: 0 4px 14px rgba(108,79,240,.3); }
-  .menu-item.active i { color: #fff; }
-  
-  .sidebar-bottom { padding: .75rem; border-top: 1px solid #BCC0CF; margin-top: auto; }
-
-  .main-content { margin-left: var(--sidebar-width); flex: 1; display: flex; flex-direction: column; min-width: 0; width: calc(100% - var(--sidebar-width)); }
+    /* Main Wrapper & Topbar */
+  .main-content { margin-left: 248px; flex: 1; display: flex; flex-direction: column; min-width: 0; transition: margin 0.3s ease; width: calc(100% - 248px); }
   .topbar { height: 64px; background: var(--white); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; position: sticky; top: 0; z-index: 1030; }
 
   .topbar-right { display: flex; align-items: center; gap: 1.5rem; }
@@ -240,40 +209,7 @@
 <body>
 
 <div class="app-container">
-    <!-- SIDEBAR -->
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-logo">
-            <img src="{% static 'img/logo.png' %}" alt="Eduteka Logo">
-        </div>
-        <div style="padding: 0 .75rem .75rem;">
-          <div class="sidebar-school">
-            <div class="sidebar-school-name">{{ colegio.nombre|default:"Mi Colegio" }}</div>
-            <div class="sidebar-school-sub">Año Escolar {{ periodo.anio_academico|default:"Actual" }}</div>
-          </div>
-        </div>
-        
-        <nav class="sidebar-menu">
-            <div class="menu-label">Menú Principal</div>
-            <a href="{% url 'dashboard_usuario' %}" class="menu-item"><i class="bi bi-house"></i> Inicio</a>
-            <a href="{% url 'listar_estudiantes' %}" class="menu-item"><i class="bi bi-people"></i> Estudiantes</a>
-            <a href="{% url 'listar_asignaturas' %}" class="menu-item"><i class="bi bi-book"></i> Académico</a>
-            <a href="{% url 'listar_cursos' %}" class="menu-item"><i class="bi bi-diagram-3"></i> Cursos</a>
-            <a href="{% url 'listar_personal' %}" class="menu-item"><i class="bi bi-person-badge"></i> Personal</a>
-            <a href="{% url 'registrar_asistencia' %}" class="menu-item"><i class="bi bi-calendar-check"></i> Asistencia</a>
-            <a href="#" class="menu-item"><i class="bi bi-calendar3"></i> Calendario</a>
-            <a href="{% url 'historial_asistencia' %}" class="menu-item active"><i class="bi bi-bar-chart"></i> Reportes</a>
-            
-            <div class="menu-label mt-4">Administración</div>
-            <a href="#" class="menu-item"><i class="bi bi-wallet2"></i> Contabilidad</a>
-            <a href="#" class="menu-item"><i class="bi bi-truck"></i> Proveedores</a>
-            <a href="#" class="menu-item"><i class="bi bi-award"></i> SIMCE</a>
-        </nav>
-        
-        <div class="sidebar-bottom">
-            <a href="#" class="menu-item"><i class="bi bi-gear"></i> Configuración</a>
-            <a href="{% url 'logout' %}" class="menu-item text-danger"><i class="bi bi-box-arrow-right"></i> Cerrar Sesión</a>
-        </div>
-    </aside>
+  {% include 'colegios/_sidebar.html' with active_page='reportes' %}
 
     <!-- MAIN CONTENT -->
     <div class="main-content">

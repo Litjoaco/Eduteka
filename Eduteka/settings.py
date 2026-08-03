@@ -47,7 +47,9 @@ INSTALLED_APPS = [
     'solicitudes',
     'dashboard',
     'asistencia',
+    'calificaciones',
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

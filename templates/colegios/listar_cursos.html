@@ -38,176 +38,33 @@
       margin: 0;
     }
 
-    /* WRAPPER & SIDEBAR */
-    .wrapper {
-      display: flex;
-      flex: 1;
-      position: relative;
-    }
-
-    /* SIDEBAR */
-    .sidebar {
-      width: 248px;
-      min-width: 248px;
-      flex-shrink: 0;
-      background: var(--white);
-      border-right: 1px solid var(--border);
-      position: fixed;
-      top: 0; bottom: 0; left: 0;
-      display: flex;
-      flex-direction: column;
-      z-index: 1040;
-      transition: transform .3s ease;
-    }
-
-    @media (max-width: 991.98px) {
-      .sidebar {
-        position: absolute;
-        left: -248px;
-        top: 0;
-        bottom: 0;
-        z-index: 1050;
-      }
-      .sidebar.active {
-        left: 0;
-      }
-    }
-
-    .sidebar-logo {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 1.4rem 1.5rem 1rem;
-    }
-    .sidebar-logo img { max-height: 100px; width: auto; }
-
-    .sidebar-school {
-      margin: 0 1rem .75rem;
-      background: linear-gradient(135deg, var(--primary-soft) 0%, #E8E2FF 100%);
-      border-radius: var(--radius-lg);
-      padding: .9rem 1rem;
-    }
-    .sidebar-school-name {
-      font-weight: 700;
-      font-size: .85rem;
-      color: var(--primary);
-      margin-bottom: 2px;
-    }
-    .sidebar-school-sub {
-      font-size: .75rem;
-      color: var(--primary-hover);
-      font-weight: 500;
-    }
-
-    .sidebar-nav {
-      flex: 1;
-      overflow-y: auto;
-      padding: .75rem .75rem 0;
-      scrollbar-width: none;
-    }
-    .sidebar-nav::-webkit-scrollbar { display: none; }
-
-    .nav-section-label {
-      font-size: .67rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      color: var(--gray-text);
-      padding: .5rem .75rem .3rem;
-      margin-top: .25rem;
-    }
-
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: .75rem;
-      padding: .6rem .85rem;
-      color: var(--gray-text);
-      font-weight: 500;
-      font-size: .88rem;
-      border-radius: var(--radius-md);
-      text-decoration: none;
-      transition: background .15s, color .15s;
-      margin-bottom: 2px;
-    }
-    .nav-item i { font-size: 1.05rem; flex-shrink: 0; }
-    .nav-item:hover { background: var(--bg); color: var(--dark); }
-    .nav-item.active {
-      background: var(--primary);
-      color: #fff;
-      font-weight: 600;
-      box-shadow: 0 4px 14px rgba(108,79,240,.3);
-    }
-    .nav-item.active i { color: #fff; }
-
-    .sidebar-footer {
-      padding: .75rem;
-      border-top: 1px solid var(--border);
-      margin-top: auto;
-    }
+    /* WRAPPER */
+    .wrapper { display: flex; flex: 1; position: relative; }
 
     /* Estilos para letras/secciones */
     .letra-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 34px;
-      height: 34px;
-      border-radius: var(--radius-sm);
-      border: 1.5px solid var(--border);
-      background: var(--white);
-      color: var(--gray-text);
-      font-weight: 700;
-      font-size: 0.82rem;
-      cursor: pointer;
-      transition: all .2s;
-      user-select: none;
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 34px; height: 34px;
+      border-radius: var(--radius-sm); border: 1.5px solid var(--border);
+      background: var(--white); color: var(--gray-text);
+      font-weight: 700; font-size: 0.82rem; cursor: pointer;
+      transition: all .2s; user-select: none;
     }
-    .letra-btn:hover {
-      border-color: var(--primary);
-      color: var(--primary);
-      background: var(--primary-soft);
-    }
+    .letra-btn:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-soft); }
     .letter-checkbox:checked + .letra-btn {
-      background-color: var(--primary);
-      color: #fff;
-      border-color: var(--primary);
+      background-color: var(--primary); color: #fff; border-color: var(--primary);
       box-shadow: 0 3px 10px rgba(124,92,252,.3);
     }
     .letter-checkbox { display: none; }
 
     /* MAIN CONTENT */
-    .main-content {
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-      margin-left: 248px;
-      width: calc(100% - 248px);
-    }
-
-    @media (max-width: 991.98px) {
-      .main-content {
-        margin-left: 0;
-        width: 100%;
-      }
-    }
-
     .topbar {
-      height: 70px;
-      background: var(--white);
+      height: 70px; background: var(--white);
       border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 2rem;
-      z-index: 98;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; position: sticky; top: 0; z-index: 98;
     }
-
-    .content-body {
-      padding: 2rem;
-      flex-grow: 1;
-    }
+    .content-body { padding: 2rem; flex-grow: 1; }
 
     /* DASHBOARD CARDS & TABLE */
     .dashboard-panel {
@@ -256,43 +113,7 @@
 <body>
 
 <div class="wrapper">
-  <!-- SIDEBAR -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-logo">
-      <img src="{% static 'img/logo.png' %}" alt="Eduteka">
-    </div>
-
-    <div style="padding: 0 .75rem .75rem;">
-      <div class="sidebar-school">
-        <div class="sidebar-school-name">{{ colegio.nombre|default:"Mi Colegio" }}</div>
-        <div class="sidebar-school-sub">Año Escolar {{ periodo.anio_academico|default:"Actual" }}</div>
-      </div>
-    </div>
-
-    <nav class="sidebar-nav">
-      <div class="nav-section-label">Menú Principal</div>
-      <a href="{% url 'dashboard_usuario' %}" class="nav-item"><i class="bi bi-house"></i> Inicio</a>
-      <a href="{% url 'listar_estudiantes' %}" class="nav-item"><i class="bi bi-people"></i> Estudiantes</a>
-      <a href="{% url 'listar_asignaturas' %}" class="nav-item"><i class="bi bi-book"></i> Académico</a>
-      <a href="{% url 'listar_cursos' %}" class="nav-item active"><i class="bi bi-diagram-3"></i> Cursos</a>
-      <a href="{% url 'listar_personal' %}" class="nav-item"><i class="bi bi-person-badge"></i> Personal</a>
-      <a href="{% url 'registrar_asistencia' %}" class="nav-item"><i class="bi bi-calendar-check"></i> Asistencia</a>
-      <a href="#" class="nav-item"><i class="bi bi-calendar3"></i> Calendario</a>
-      <a href="{% url 'historial_asistencia' %}" class="nav-item"><i class="bi bi-bar-chart"></i> Reportes</a>
-
-      <div class="nav-section-label" style="margin-top:.75rem;">Administración</div>
-      <a href="#" class="nav-item"><i class="bi bi-wallet2"></i> Contabilidad</a>
-      <a href="#" class="nav-item"><i class="bi bi-truck"></i> Proveedores</a>
-      <a href="#" class="nav-item"><i class="bi bi-award"></i> SIMCE</a>
-    </nav>
-
-    <div class="sidebar-footer">
-      <a href="#" class="nav-item"><i class="bi bi-gear"></i> Configuración</a>
-      <a href="{% url 'logout' %}" class="nav-item" style="color:#EF4444;">
-        <i class="bi bi-box-arrow-right" style="color:#EF4444;"></i> Cerrar Sesión
-      </a>
-    </div>
-  </aside>
+  {% include 'colegios/_sidebar.html' with active_page='cursos' %}
 
   <!-- MAIN CONTENT -->
   <div class="main-content">
@@ -311,15 +132,7 @@
     </header>
 
     <main class="content-body">
-      <!-- Mensajes Django -->
-      {% if messages %}
-        {% for message in messages %}
-          <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show shadow-sm mb-4" role="alert" style="border-radius: var(--radius-md);">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        {% endfor %}
-      {% endif %}
+
 
       <!-- Header & Action -->
       <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
@@ -445,8 +258,40 @@
             </div>
           </div>
         {% endif %}
+
+        {% if cursos_con_secciones.has_other_pages %}
+          <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top w-100">
+            <div class="text-muted small">
+              Mostrando cursos <strong>{{ cursos_con_secciones.start_index }} - {{ cursos_con_secciones.end_index }}</strong> de <strong>{{ cursos_con_secciones.paginator.count }}</strong>
+            </div>
+            <nav>
+              <ul class="pagination pagination-sm mb-0">
+                {% if cursos_con_secciones.has_previous %}
+                  <li class="page-item"><a class="page-link text-primary fw-bold" href="?page={{ cursos_con_secciones.previous_page_number }}">‹ Anterior</a></li>
+                {% else %}
+                  <li class="page-item disabled"><span class="page-link">‹ Anterior</span></li>
+                {% endif %}
+
+                {% for i in cursos_con_secciones.paginator.page_range %}
+                  {% if cursos_con_secciones.number == i %}
+                    <li class="page-item active"><span class="page-link bg-primary border-primary">{{ i }}</span></li>
+                  {% else %}
+                    <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                  {% endif %}
+                {% endfor %}
+
+                {% if cursos_con_secciones.has_next %}
+                  <li class="page-item"><a class="page-link text-primary fw-bold" href="?page={{ cursos_con_secciones.next_page_number }}">Siguiente ›</a></li>
+                {% else %}
+                  <li class="page-item disabled"><span class="page-link">Siguiente ›</span></li>
+                {% endif %}
+              </ul>
+            </nav>
+          </div>
+        {% endif %}
       </div>
     </main>
+
   </div>
 </div>
 

@@ -1,0 +1,492 @@
+{% load static %}
+{% load calificaciones_extras %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Libro de Calificaciones - Eduteka</title>
+
+  <!-- Bootstrap CSS y Fuentes -->
+  <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+  <style>
+    :root {
+      --primary: #7C5CFC;
+      --primary-soft: #F0EDFF;
+      --secondary: #65CDBF;
+      --dark: #151A35;
+      --gray-text: #687089;
+      --bg-color: #F8F9FC;
+      --border-color: #BCC0CF;
+      --white: #FFFFFF;
+    }
+
+    html { font-size: 14px; }
+
+    body {
+
+      background: var(--bg-color);
+      color: var(--dark);
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+
+    .app-container { display: flex; min-height: 100vh; width: 100vw; overflow-x: hidden; }
+    .main-content { margin-left: 248px; flex: 1; display: flex; flex-direction: column; min-width: 0; width: calc(100% - 248px); }
+    .topbar { height: 64px; background: var(--white); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; position: sticky; top: 0; z-index: 1030; }
+
+    .content-area { padding: 1.5rem 2rem; max-width: 1440px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+
+    /* Cards KPI */
+    .kpi-card {
+      background: var(--white);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 1.1rem 1.25rem;
+      display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(124, 92, 252, 0.08); }
+    .kpi-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.25rem;
+    }
+
+    /* Filters bar */
+    .filter-card {
+      background: var(--white);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Matrix Table */
+    .table-container {
+      background: var(--white);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      overflow-x: auto;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    }
+
+    .grade-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin-bottom: 0;
+    }
+
+    .grade-table th {
+      background: #F8F9FD;
+      color: var(--dark);
+      font-weight: 600;
+      font-size: .82rem;
+      padding: .85rem .75rem;
+      border-bottom: 1px solid var(--border-color);
+      border-right: 1px solid #E5E7EB;
+      text-align: center;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+    .grade-table th:first-child, .grade-table td:first-child { text-align: center; width: 40px; }
+    .grade-table th.col-student, .grade-table td.col-student { text-align: left; min-width: 220px; position: sticky; left: 0; background: var(--white); z-index: 10; border-right: 2px solid var(--border-color); }
+    .grade-table th.col-student { background: #F8F9FD; }
+
+    .grade-table td {
+      padding: .5rem .4rem;
+      border-bottom: 1px solid #F1F5F9;
+      border-right: 1px solid #F1F5F9;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    .grade-input {
+      width: 58px;
+      height: 36px;
+      text-align: center;
+      font-weight: 600;
+      font-size: .9rem;
+      border-radius: 8px;
+      border: 1px solid #D1D5DB;
+      outline: none;
+      transition: all .2s;
+    }
+    .grade-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(124, 92, 252, 0.15);
+      background: var(--white) !important;
+    }
+    .grade-input.is-red {
+      background: #FFF1F2;
+      color: #E11D48;
+      border-color: #FECDD3;
+    }
+    .grade-input.is-green {
+      background: #ECFDF5;
+      color: #059669;
+      border-color: #A7F3D0;
+    }
+
+    .promedio-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 48px;
+      height: 32px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: .88rem;
+    }
+    .promedio-badge.approved { background: #ECFDF5; color: #059669; border: 1px solid #A7F3D0; }
+    .promedio-badge.failed { background: #FFF1F2; color: #E11D48; border: 1px solid #FECDD3; }
+    .promedio-badge.empty { background: #F3F4F6; color: #9CA3AF; }
+
+    .ev-header-title { font-weight: 700; font-size: .85rem; color: var(--dark); display: block; }
+    .ev-header-sub { font-size: .72rem; color: var(--gray-text); font-weight: 500; }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  {% include 'colegios/_sidebar.html' with active_page='notas' %}
+
+  <div class="main-content">
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-light d-lg-none" id="mobileMenuBtn">
+          <i class="bi bi-list fs-5"></i>
+        </button>
+        <h4 class="mb-0 fw-bold text-dark"><i class="bi bi-journal-bookmark text-primary me-2"></i>Libro de Calificaciones</h4>
+      </div>
+
+      <div class="d-flex align-items-center gap-3">
+        <span class="badge bg-light text-dark border px-3 py-2" style="font-size:.8rem;">
+          <i class="bi bi-building me-1 text-primary"></i> {{ colegio.nombre }}
+        </span>
+      </div>
+    </header>
+
+    <!-- CONTENT AREA -->
+    <main class="content-area">
+      
+
+
+      <!-- FILTROS Y CONTROLES -->
+      <div class="filter-card shadow-sm">
+        <form method="GET" action="{% url 'libro_calificaciones' %}" id="filterForm" class="row g-3 align-items-end">
+          <div class="col-md-4">
+            <label class="form-label fw-semibold small text-muted mb-1"><i class="bi bi-diagram-3 me-1"></i>Curso / Sección</label>
+            <select name="seccion" class="form-select form-select-sm fw-medium" onchange="document.getElementById('filterForm').submit();">
+              {% for sec in secciones %}
+                <option value="{{ sec.id }}" {% if seccion_seleccionada and seccion_seleccionada.id == sec.id %}selected{% endif %}>
+                  {{ sec.nombre }} ({{ sec.curso.jornada }})
+                </option>
+              {% empty %}
+                <option value="">No hay secciones activas</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label fw-semibold small text-muted mb-1"><i class="bi bi-book me-1"></i>Asignatura</label>
+            <select name="asignatura" class="form-select form-select-sm fw-medium" onchange="document.getElementById('filterForm').submit();">
+              {% for asig in asignaturas %}
+                <option value="{{ asig.id }}" {% if asignatura_seleccionada and asignatura_seleccionada.id == asig.id %}selected{% endif %}>
+                  {{ asig.nombre }}
+                </option>
+              {% empty %}
+                <option value="">Selecciona una sección primero</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-md-4 d-flex gap-2 justify-content-md-end">
+            {% if seccion_seleccionada and asignatura_seleccionada %}
+              <button type="button" class="btn btn-primary btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#crearEvaluacionModal">
+                <i class="bi bi-plus-lg me-1"></i>Nueva Evaluación
+              </button>
+              <a href="{% url 'exportar_notas_excel' seccion_seleccionada.id asignatura_seleccionada.id %}" class="btn btn-outline-success btn-sm fw-semibold">
+                <i class="bi bi-file-earmark-excel me-1"></i>Excel
+              </a>
+            {% endif %}
+          </div>
+        </form>
+      </div>
+
+      <!-- KPI METRICS -->
+      {% if seccion_seleccionada and asignatura_seleccionada %}
+        <div class="row g-3 mb-4">
+          <div class="col-6 col-md-3">
+            <div class="kpi-card">
+              <div>
+                <div class="text-muted small fw-medium">Promedio Curso</div>
+                <div class="fs-4 fw-bold {% if promedio_curso and promedio_curso < 4.0 %}text-danger{% else %}text-dark{% endif %}">
+                  {{ promedio_curso|default:"-" }}
+                </div>
+              </div>
+              <div class="kpi-icon bg-primary-soft text-primary"><i class="bi bi-calculator"></i></div>
+            </div>
+          </div>
+
+          <div class="col-6 col-md-3">
+            <div class="kpi-card">
+              <div>
+                <div class="text-muted small fw-medium">% Aprobación</div>
+                <div class="fs-4 fw-bold text-success">{{ tasa_aprobacion|default:"0" }}%</div>
+              </div>
+              <div class="kpi-icon bg-success-light text-success" style="background:#ECFDF5;"><i class="bi bi-check-circle"></i></div>
+            </div>
+          </div>
+
+          <div class="col-6 col-md-3">
+            <div class="kpi-card">
+              <div>
+                <div class="text-muted small fw-medium">En Riesgo (< 4.0)</div>
+                <div class="fs-4 fw-bold {% if alumnos_riesgo_count > 0 %}text-danger{% else %}text-muted{% endif %}">
+                  {{ alumnos_riesgo_count }}
+                </div>
+              </div>
+              <div class="kpi-icon bg-danger-light text-danger" style="background:#FFF1F2;"><i class="bi bi-exclamation-triangle"></i></div>
+            </div>
+          </div>
+
+          <div class="col-6 col-md-3">
+            <div class="kpi-card">
+              <div>
+                <div class="text-muted small fw-medium">Evaluaciones</div>
+                <div class="fs-4 fw-bold text-dark">{{ evaluaciones_count }}</div>
+              </div>
+              <div class="kpi-icon bg-light text-secondary"><i class="bi bi-card-checklist"></i></div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- MATRIZ DE NOTAS (LIBRO DE CLASES) -->
+      {% if seccion_seleccionada and asignatura_seleccionada %}
+        <form method="POST" action="{% url 'guardar_notas' %}" id="notasForm">
+          {% csrf_token %}
+          <input type="hidden" name="seccion_id" value="{{ seccion_seleccionada.id }}">
+          <input type="hidden" name="asignatura_id" value="{{ asignatura_seleccionada.id }}">
+
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+            <h6 class="fw-bold mb-0 text-dark">
+              <i class="bi bi-table me-2 text-primary"></i>Matriz de Calificaciones — {{ asignatura_seleccionada.nombre }} ({{ seccion_seleccionada.nombre }})
+            </h6>
+
+            <div class="d-flex align-items-center gap-2">
+              <div class="position-relative" style="width: 270px;">
+                <i class="bi bi-search position-absolute text-muted" style="left: .75rem; top: 50%; transform: translateY(-50%); font-size: .85rem;"></i>
+                <input type="text" id="buscarEstudianteInput" class="form-control form-control-sm ps-4" placeholder="Buscar por nombre o RUT..." style="font-size: .83rem; border-radius: 8px;">
+              </div>
+              <button type="submit" class="btn btn-success btn-sm fw-semibold px-3">
+                <i class="bi bi-check2-circle me-1"></i>Guardar Notas
+              </button>
+            </div>
+          </div>
+
+
+          <div class="table-container">
+            <table class="grade-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th class="col-student">Estudiante</th>
+                  {% for ev in evaluaciones %}
+                    <th>
+                      <div class="d-flex flex-column align-items-center">
+                        <span class="ev-header-title">{{ ev.nombre }}</span>
+                        <span class="ev-header-sub">{{ ev.fecha|date:"d/m" }} · Coef {{ ev.ponderacion }}</span>
+                        <a href="{% url 'eliminar_evaluacion' ev.id %}" 
+                           class="text-danger mt-1 text-decoration-none js-confirm-delete" 
+                           data-confirm-title="¿Eliminar evaluación {{ ev.nombre }}?"
+                           data-confirm-text="Se eliminarán todas las notas registradas para esta evaluación."
+                           data-confirm-btn="Sí, eliminar"
+                           title="Eliminar evaluación" style="font-size:.7rem;">
+                          <i class="bi bi-trash"></i>
+                        </a>
+
+                      </div>
+                    </th>
+                  {% empty %}
+                    <th class="text-muted italic">Aún no hay evaluaciones creadas. Haz clic en "Nueva Evaluación".</th>
+                  {% endfor %}
+                  <th style="min-width: 90px; background:#F8F9FD; border-left: 2px solid var(--border-color);">Promedio</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in matriz_notas %}
+                  <tr>
+                    <td class="text-muted small fw-medium">{{ forloop.counter }}</td>
+                    <td class="col-student">
+                      <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                          <div class="fw-semibold text-dark fs-6" style="font-size:.88rem;">{{ item.estudiante.nombre_completo }}</div>
+                          <div class="text-muted small" style="font-size:.72rem;">RUT: {{ item.estudiante.rut|default:"-" }}</div>
+                        </div>
+                        <a href="{% url 'boletin_estudiante' item.estudiante.id %}" target="_blank" class="btn btn-light btn-sm text-primary py-0.5 px-2 border" title="Ver Boletín de Notas" style="font-size:.75rem;">
+                          <i class="bi bi-file-earmark-text me-1"></i>Boletín
+                        </a>
+                      </div>
+                    </td>
+
+
+                    {% for ev in evaluaciones %}
+                      {% with nota_info=item.notas|get_item:ev.id %}
+                        <td>
+                          <input type="number" 
+                                 step="0.1" min="1.0" max="7.0" 
+                                 name="nota_{{ ev.id }}_{{ item.estudiante.id }}"
+                                 value="{% if nota_info %}{{ nota_info.valor }}{% endif %}"
+                                 class="grade-input {% if nota_info %}{% if nota_info.rojo %}is-red{% else %}is-green{% endif %}{% endif %}"
+                                 placeholder="-"
+                                 oninput="actualizarColorNota(this)">
+                        </td>
+                      {% endwith %}
+                    {% endfor %}
+
+                    <td style="border-left: 2px solid var(--border-color);">
+                      {% if item.promedio %}
+                        <span class="promedio-badge {% if item.es_rojo %}failed{% else %}approved{% endif %}">
+                          {{ item.promedio }}
+                        </span>
+                      {% else %}
+                        <span class="promedio-badge empty">-</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="10" class="text-center py-4 text-muted">
+                      No hay estudiantes matriculados en esta sección.
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="mt-3 text-end">
+            <button type="submit" class="btn btn-success fw-semibold px-4">
+              <i class="bi bi-check-lg me-1"></i>Guardar Calificaciones
+            </button>
+          </div>
+        </form>
+      {% else %}
+        <div class="text-center py-5 bg-white rounded-3 border">
+          <i class="bi bi-journal-x text-muted" style="font-size:3rem;"></i>
+          <h5 class="fw-bold mt-3">Selecciona un Curso y una Asignatura</h5>
+          <p class="text-muted small">Elige los filtros arriba para visualizar y gestionar el Libro de Clases.</p>
+        </div>
+      {% endif %}
+
+    </main>
+  </div>
+</div>
+
+<!-- MODAL CREAR EVALUACIÓN -->
+{% if seccion_seleccionada and asignatura_seleccionada %}
+<div class="modal fade" id="crearEvaluacionModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg" style="border-radius:16px;">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold text-dark"><i class="bi bi-plus-circle text-primary me-2"></i>Nueva Evaluación</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <form method="POST" action="{% url 'crear_evaluacion' %}">
+        {% csrf_token %}
+        <input type="hidden" name="seccion_id" value="{{ seccion_seleccionada.id }}">
+        <input type="hidden" name="asignatura_id" value="{{ asignatura_seleccionada.id }}">
+
+        <div class="modal-body py-3">
+          <div class="mb-3">
+            <label class="form-label fw-semibold small text-muted">Nombre de la Evaluación</label>
+            <input type="text" name="nombre" class="form-class form-control" placeholder="Ej: Prueba Coef 1, Control 2" required>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-6">
+              <label class="form-label fw-semibold small text-muted">Fecha</label>
+              <input type="date" name="fecha" class="form-control" value="{{ hoy|date:'Y-m-d' }}" required>
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-semibold small text-muted">Coeficiente / Ponderación</label>
+              <select name="ponderacion" class="form-select">
+                <option value="1.0">Coef 1 (1.0)</option>
+                <option value="2.0">Coef 2 (2.0)</option>
+                <option value="0.5">Coef 0.5 (0.5)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="mt-3">
+            <label class="form-label fw-semibold small text-muted">Periodo Académico</label>
+            <select name="periodo_nombre" class="form-select">
+              <option value="1° Semestre">1° Semestre</option>
+              <option value="2° Semestre">2° Semestre</option>
+              <option value="1° Trimestre">1° Trimestre</option>
+              <option value="2° Trimestre">2° Trimestre</option>
+              <option value="3° Trimestre">3° Trimestre</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer border-0 pt-0">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary fw-semibold px-4">Crear Evaluación</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- JS de Bootstrap -->
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+
+<script>
+  // Dynamic color updating for grade inputs
+  function actualizarColorNota(input) {
+    let val = parseFloat(input.value);
+    input.classList.remove('is-red', 'is-green');
+    if (!isNaN(val)) {
+      if (val < 4.0) {
+        input.classList.add('is-red');
+      } else {
+        input.classList.add('is-green');
+      }
+    }
+  }
+
+  // Real-time student search filter
+  document.getElementById('buscarEstudianteInput')?.addEventListener('keyup', function() {
+    let q = this.value.toLowerCase().trim();
+    let rows = document.querySelectorAll('.grade-table tbody tr');
+    rows.forEach(function(row) {
+      let text = row.querySelector('.col-student')?.textContent.toLowerCase() || '';
+      if (!q || text.includes(q)) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  });
+
+  // Mobile menu toggle
+  document.getElementById('mobileMenuBtn')?.addEventListener('click', function() {
+    document.getElementById('sidebar')?.classList.toggle('active');
+  });
+</script>
+
+
+</body>
+</html>
