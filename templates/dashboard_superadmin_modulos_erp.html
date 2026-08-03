@@ -501,6 +501,207 @@
             margin-right: 0.5rem;
             font-size: 1.1rem;
         }
+
+        /* Toggle Switch iOS Style */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 28px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #cbd5e1;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        input:checked + .slider {
+            background-color: var(--metric-green);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+
+        /* Modules Grid */
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 1200px) {
+            .modules-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .modules-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .module-card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .module-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+        }
+
+        .module-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background-color: rgba(13, 148, 136, 0.1);
+            color: var(--teal-accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .module-info {
+            flex-grow: 1;
+        }
+
+        .module-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--navy-teal);
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .module-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+            margin-bottom: 1rem;
+        }
+        
+        .module-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        /* Selector Card */
+        .selector-card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 1.25rem 1.5rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .selector-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .selector-label {
+            font-weight: 600;
+            color: var(--navy-teal);
+            font-size: 0.95rem;
+        }
+
+        .selector-dropdown {
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            background-color: var(--bg-light);
+            min-width: 320px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .selector-dropdown:focus {
+            outline: none;
+            border-color: var(--teal-accent);
+        }
+
+        .selector-help {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-left: 1rem;
+        }
+
+        /* Footer Action */
+        .footer-action {
+            display: flex;
+            justify-content: flex-end;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: 1rem;
+        }
+        
+        .badge-addon {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--alert-red);
+            font-size: 0.65rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .header-sub {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            margin-top: -1rem;
+        }
     </style>
 </head>
 
@@ -515,7 +716,7 @@
             <div class="sidebar-subtitle">SUPER ADMIN</div>
         </div>
         <ul class="sidebar-menu">
-            <li><a href="{% url 'dashboard_superadmin' %}" class="active"><i class="bi bi-bar-chart-fill"></i>
+            <li><a href="{% url 'dashboard_superadmin' %}"><i class="bi bi-bar-chart-fill"></i>
                     Dashboard</a></li>
             <li><a href="{% url 'dashboard_superadmin_colegios' %}"><i class="bi bi-building"></i> Colegios Clientes</a>
             </li>
@@ -525,7 +726,7 @@
                     SII</a></li>
             <li><a href="{% url 'dashboard_superadmin_ordenes' %}"><i class="bi bi-folder2-open"></i> Órdenes de
                     Compra</a></li>
-            <li><a href="{% url 'dashboard_superadmin_modulos_erp' %}"><i class="bi bi-tools"></i> Módulos ERP</a></li>
+            <li><a href="{% url 'dashboard_superadmin_modulos_erp' %}" class="active"><i class="bi bi-tools"></i> Módulos ERP</a></li>
             <li><a href="#"><i class="bi bi-briefcase"></i> Mercado Público MP</a></li>
             <li><a href="{% url 'dashboard_superadmin_estadisticas' %}"><i class="bi bi-graph-up"></i> Estadísticas
                     Globales</a></li>
@@ -558,161 +759,137 @@
         <!-- Dashboard Container -->
         <div class="dashboard-container">
 
-            <h1 class="global-header">Resumen Global Eduteka - Julio 2026</h1>
+            <h1 class="global-header">Gestión de Accesos y Módulos</h1>
+            <p class="header-sub">Habilita o deshabilita funcionalidades específicas para cada establecimiento.</p>
 
-            <!-- Metrics Cards -->
-            <div class="metrics-grid">
-                <div class="metric-card">
-                    <div class="metric-title">COLEGIOS ACTIVOS</div>
-                    <div class="metric-value">215</div>
-                    <div class="metric-sub text-teal">+3.2% vs jun</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-title">MRR (INGRESOS RECURRENTES)</div>
-                    <div class="metric-value">$12.5M <span style="font-size:1.2rem;">CLP</span></div>
-                    <div class="metric-sub text-teal">+5.8%</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-title">PRÓXIMOS VENCIMIENTOS (7 DÍAS)</div>
-                    <div class="metric-value">18 Alertas</div>
-                    <div class="metric-sub text-red">9 Críticos en rojo</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-title">ÓRDENES DE COMPRA PENDIENTES</div>
-                    <div class="metric-value">9 Solicitudes</div>
-                    <div class="metric-sub text-muted">Pendientes de revisión</div>
+            <!-- Selector Card -->
+            <div class="selector-card">
+                <div class="selector-info">
+                    <span class="selector-label">Establecimiento a configurar:</span>
+                    <select class="selector-dropdown">
+                        <option value="1" selected>Liceo Santa María (Plan Premium)</option>
+                        <option value="2">Colegio Los Alerces (Plan Estándar)</option>
+                        <option value="3">Instituto Profesional (Plan Básico)</option>
+                    </select>
+                    <span class="selector-help">Selecciona un colegio para modificar sus accesos.</span>
                 </div>
             </div>
 
-            <!-- Middle Section -->
-            <div class="middle-grid">
-
-                <!-- Alerts Table -->
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">TABLERO DE ALERTAS DE PAGO (VENCIMIENTO < 30 DÍAS)</h2>
-                                <div class="card-actions">
-                                    <i class="bi bi-file-earmark-spreadsheet"></i>
-                                    <i class="bi bi-three-dots-vertical"></i>
-                                </div>
+            <!-- Modules Grid -->
+            <div class="modules-grid">
+                
+                <!-- Card 1 -->
+                <div class="module-card">
+                    <div class="module-icon">
+                        <i class="bi bi-book"></i>
                     </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>Colegio</th>
-                                        <th>Plan</th>
-                                        <th>Fecha Emisión</th>
-                                        <th>Días Restantes</th>
-                                        <th>Estado</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Liceo Santa María</td>
-                                        <td>Plan Premium</td>
-                                        <td>01/06/26</td>
-                                        <td><span class="pill pill-red">2 (rojo)</span></td>
-                                        <td><button class="btn-action btn-solid-red">Pagar</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Colegio Los Alerces</td>
-                                        <td>Plan Estándar</td>
-                                        <td>10/06/26</td>
-                                        <td><span class="pill pill-yellow">11 (amarillo)</span></td>
-                                        <td><button class="btn-action btn-solid-yellow">Ver Alerta</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Instituto Profesional</td>
-                                        <td>Plan Básico</td>
-                                        <td>15/06/26</td>
-                                        <td><span class="pill pill-green">16 (verde)</span></td>
-                                        <td><button class="btn-action btn-solid-yellow">Ver Alerta</button></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="card-body text-center-btn">
-                            <button class="btn-action btn-solid-teal">Ver Más Alertas</button>
+                    <div class="module-info">
+                        <div class="module-title">Libro de Clases Digital</div>
+                        <div class="module-desc">Asistencia, notas, anotaciones y perfil del alumno.</div>
+                        <div class="module-toggle">
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
                         </div>
                     </div>
                 </div>
 
-                <!-- Revenue Chart -->
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">CRECIMIENTO MENSUAL DE INGRESOS</h2>
+                <!-- Card 2 -->
+                <div class="module-card">
+                    <div class="module-icon">
+                        <i class="bi bi-calculator"></i>
                     </div>
-                    <div class="card-body">
-                        <div class="chart-container">
-                            <canvas id="revenueChart"></canvas>
+                    <div class="module-info">
+                        <div class="module-title">Gestión Contable</div>
+                        <div class="module-desc">Control de fondos disponibles y estados de cuenta.</div>
+                        <div class="module-toggle">
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
                         </div>
                     </div>
                 </div>
+
+                <!-- Card 3 -->
+                <div class="module-card">
+                    <div class="module-icon">
+                        <i class="bi bi-truck"></i>
+                    </div>
+                    <div class="module-info">
+                        <div class="module-title">Módulo de Proveedores</div>
+                        <div class="module-desc">Catálogo y gestión de compras a terceros.</div>
+                        <div class="module-toggle">
+                            <label class="toggle-switch">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="module-card">
+                    <div class="module-icon" style="background-color: rgba(239, 68, 68, 0.1); color: var(--alert-red);">
+                        <i class="bi bi-star"></i>
+                    </div>
+                    <div class="module-info">
+                        <div class="module-title">
+                            Preparación SIMCE
+                            <span class="badge-addon">Add-on Avanzado</span>
+                        </div>
+                        <div class="module-desc">Módulo avanzado de ensayos y resultados.</div>
+                        <div class="module-toggle">
+                            <label class="toggle-switch">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 5 -->
+                <div class="module-card">
+                    <div class="module-icon">
+                        <i class="bi bi-briefcase"></i>
+                    </div>
+                    <div class="module-info">
+                        <div class="module-title">Licitaciones Mercado Público</div>
+                        <div class="module-desc">Acompañamiento y postulación a fondos.</div>
+                        <div class="module-toggle">
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 6 -->
+                <div class="module-card">
+                    <div class="module-icon">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <div class="module-info">
+                        <div class="module-title">Red Social Eduteka</div>
+                        <div class="module-desc">Hitos, fotos y experiencias de la comunidad.</div>
+                        <div class="module-toggle">
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
-            <!-- Recent Clients Table -->
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">RESUMEN DE CLIENTES RECIENTES</h2>
-                    <div class="card-actions">
-                        <i class="bi bi-arrow-clockwise"></i>
-                        <i class="bi bi-three-dots-vertical"></i>
-                    </div>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Colegio</th>
-                                    <th>Alumnos</th>
-                                    <th>Profesores</th>
-                                    <th>Estado Onboarding</th>
-                                    <th>Plan</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Colegio Arturo Prat</td>
-                                    <td>1200</td>
-                                    <td>65</td>
-                                    <td><i class="bi bi-exclamation-triangle-fill warning-icon"></i> <span
-                                            class="pill pill-yellow">Capacitación Pendiente</span></td>
-                                    <td><strong>Premium</strong></td>
-                                    <td>
-                                        <button class="btn-action btn-outline-teal me-2">Detalles</button>
-                                        <button class="btn-action btn-outline-teal">Ver Ficha</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Escuela Básica Gabriela Mistral</td>
-                                    <td>850</td>
-                                    <td>42</td>
-                                    <td><span class="pill pill-green">Completado</span></td>
-                                    <td><strong>Estándar</strong></td>
-                                    <td>
-                                        <button class="btn-action btn-outline-teal me-2">Detalles</button>
-                                        <button class="btn-action btn-outline-teal">Ver Ficha</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Liceo Bicentenario</td>
-                                    <td>2100</td>
-                                    <td>110</td>
-                                    <td><span class="pill pill-gray">En Proceso (Día 2)</span></td>
-                                    <td><strong>Premium</strong></td>
-                                    <td>
-                                        <button class="btn-action btn-outline-teal me-2">Detalles</button>
-                                        <button class="btn-action btn-outline-teal">Ver Ficha</button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+            <!-- Footer Action -->
+            <div class="footer-action">
+                <button class="btn-action btn-solid-teal" style="font-size: 1rem; padding: 0.85rem 2rem;">
+                    Guardar Configuración de Módulos
+                </button>
             </div>
 
         </div>

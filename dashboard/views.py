@@ -148,3 +148,6 @@ def dashboard_superadmin_configuracion_view(request):
 def dashboard_superadmin_estadisticas_view(request):
     return render(request, 'dashboard_superadmin_estadisticas.html')
 
+def dashboard_superadmin_modulos_erp_view(request):
+    return render(request, 'dashboard_superadmin_modulos_erp.html')
+
