@@ -1,17 +1,18 @@
+import json
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.http import JsonResponse
+from django.views.decorators.http import require_POST
 
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
-import json
 from django.contrib import messages
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from usuarios.models import PerfilUsuario
 
-from .models import Colegio, Suscripcion, ColegioModulo, ConfiguracionAcademica, RolColegio, Permiso, RolPermiso, CursoColegio, SeccionCurso, Asignatura
+from .models import Colegio, Suscripcion, ColegioModulo, ConfiguracionAcademica, RolColegio, Permiso, RolPermiso, CursoColegio, SeccionCurso, Asignatura, ConfiguracionModulos
 
 from .forms import RegistroColegioPaso1Form, RegistroColegioPaso2Form
 from solicitudes.models import MiembroColegio
@@ -1667,6 +1668,104 @@ def eliminar_evento_agenda_view(request, evento_id):
     evento.delete()
     messages.success(request, "Evento eliminado de la agenda.")
     return redirect('calendario_escolar')
+
+
+@require_POST
+def actualizar_modulo_colegio(request):
+    try:
+        data = json.loads(request.body)
+        colegio_id = data.get('colegio_id')
+        modulo = data.get('modulo')
+        estado = data.get('estado')
+
+        colegio = Colegio.objects.get(id=colegio_id)
+        config, created = ConfiguracionModulos.objects.get_or_create(colegio=colegio)
+
+        setattr(config, modulo, estado)
+        config.save()
+
+        return JsonResponse({'status': 'ok', 'message': f'Módulo {modulo} actualizado'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+
+@login_required
+def ver_detalle_colegio(request, pk):
+    colegio = get_object_or_404(Colegio, pk=pk)
+    suscripcion = getattr(colegio, 'suscripcion', None)
+    config_modulos, _ = ConfiguracionModulos.objects.get_or_create(colegio=colegio)
+    context = {
+        'colegio': colegio,
+        'suscripcion': suscripcion,
+        'config_modulos': config_modulos,
+    }
+    return render(request, 'colegios/detalle_colegio.html', context)
+
+
+@login_required
+def editar_colegio(request, pk):
+    colegio = get_object_or_404(Colegio, pk=pk)
+
+    if request.method == 'POST':
+        colegio.nombre = request.POST.get('nombre', colegio.nombre).strip()
+        colegio.nombre_corto = request.POST.get('nombre_corto', colegio.nombre_corto)
+        colegio.correo_institucional = request.POST.get('correo_institucional', colegio.correo_institucional).strip()
+        colegio.telefono = request.POST.get('telefono', colegio.telefono).strip()
+        colegio.direccion = request.POST.get('direccion', colegio.direccion)
+        colegio.ciudad_comuna = request.POST.get('ciudad_comuna', colegio.ciudad_comuna).strip()
+        colegio.tipo_institucion = request.POST.get('tipo_institucion', colegio.tipo_institucion)
+        colegio.cantidad_alumnos = request.POST.get('cantidad_alumnos', colegio.cantidad_alumnos)
+        colegio.estado = request.POST.get('estado', colegio.estado)
+
+        if 'logo' in request.FILES:
+            colegio.logo = request.FILES['logo']
+
+        colegio.save()
+        messages.success(request, f"Datos de {colegio.nombre} actualizados con éxito.")
+        return redirect('dashboard_superadmin_colegios')
+
+    return render(request, 'colegios/editar_colegio.html', {'colegio': colegio})
+
+
+@login_required
+def editar_suscripcion_colegio(request, colegio_id):
+    from planes.models import Plan
+    colegio = get_object_or_404(Colegio, id=colegio_id)
+    suscripcion = getattr(colegio, 'suscripcion', None)
+    planes = Plan.objects.filter(activo=True)
+
+    if request.method == 'POST':
+        plan_id = request.POST.get('plan_id')
+        tipo_facturacion = request.POST.get('tipo_facturacion', 'mensual')
+        estado = request.POST.get('estado', 'activa')
+
+        if plan_id:
+            plan_obj = get_object_or_404(Plan, id=plan_id)
+            monto = plan_obj.precio_anual if tipo_facturacion == 'anual' else plan_obj.precio_mensual
+
+            Suscripcion.objects.update_or_create(
+                colegio=colegio,
+                defaults={
+                    'plan': plan_obj,
+                    'tipo_facturacion': tipo_facturacion,
+                    'monto': monto,
+                    'estado': estado,
+                }
+            )
+            messages.success(request, f"Plan y suscripción de {colegio.nombre} actualizados con éxito.")
+            return redirect('ver_detalle_colegio', pk=colegio.id)
+        else:
+            messages.error(request, "Debe seleccionar un plan de suscripción.")
+
+    context = {
+        'colegio': colegio,
+        'suscripcion': suscripcion,
+        'planes': planes,
+    }
+    return render(request, 'colegios/editar_suscripcion.html', context)
+
+
+
 
 
 

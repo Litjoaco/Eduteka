@@ -281,87 +281,47 @@
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
                     <div>
                         <h1 class="hero-title">Gestión de Planes y Suscripciones</h1>
-                        <div class="hero-subtitle">Configura los paquetes de funcionalidades y tarifario SaaS</div>
+                        <div class="hero-subtitle">Configura los paquetes de funcionalidades y tarifarios</div>
                     </div>
-                    <button type="button" class="btn btn-purple">
+                    <a href="{% url 'crear_plan' %}" class="btn btn-purple">
                         <i class="bi bi-plus-lg me-1"></i> Crear Nuevo Plan
-                    </button>
+                    </a>
+
                 </div>
 
                 <!-- Pricing Cards -->
                 <div class="row g-4 mb-4">
-
-                    <!-- Plan Básico -->
+                    {% for plan in planes %}
                     <div class="col-12 col-md-4">
-                        <div class="plan-card">
-                            <h3 class="fw-bold text-dark mb-2">Plan Básico</h3>
-                            <div class="d-flex align-items-baseline mb-3">
-                                <span class="plan-price">$150.000</span>
-                                <span class="text-muted ms-1 small fw-semibold">CLP / mes</span>
-                            </div>
-                            
-                            <ul class="plan-feature-list">
-                                <li><i class="bi bi-check-circle-fill text-success"></i> Libro de Clases Digital</li>
-                                <li><i class="bi bi-check-circle-fill text-success"></i> Asistencia en Tiempo Real</li>
-                                <li><i class="bi bi-check-circle-fill text-success"></i> Registro de Anotaciones</li>
-                                <li><i class="bi bi-check-circle-fill text-success"></i> Perfil del Alumno</li>
-                            </ul>
-
-                            <div class="pt-3 border-top d-flex align-items-center justify-content-between">
-                                <span class="text-muted small fw-semibold"><i class="bi bi-building me-1"></i> 45 Colegios</span>
-                                <button class="btn btn-sm btn-outline-primary rounded-pill px-3">Editar Plan</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Plan Estándar -->
-                    <div class="col-12 col-md-4">
-                        <div class="plan-card featured">
+                        <div class="plan-card {% if plan.recomendado %}featured{% endif %}">
+                            {% if plan.recomendado %}
                             <span class="featured-badge">Más Popular</span>
-                            <h3 class="fw-bold text-dark mb-2">Plan Estándar</h3>
+                            {% endif %}
+                            <h3 class="fw-bold text-dark mb-2">{{ plan.nombre }}</h3>
                             <div class="d-flex align-items-baseline mb-3">
-                                <span class="plan-price">$250.000</span>
+                                <span class="plan-price">${{ plan.precio_mensual }}</span>
                                 <span class="text-muted ms-1 small fw-semibold">CLP / mes</span>
                             </div>
                             
-                            <ul class="plan-feature-list">
-                                <li class="fw-bold text-primary"><i class="bi bi-stars"></i> Todo lo del Básico +</li>
-                                <li><i class="bi bi-check-circle-fill text-success"></i> Módulo de Contabilidad</li>
-                                <li><i class="bi bi-check-circle-fill text-success"></i> Calendario Escolar Compartido</li>
-                                <li><i class="bi bi-check-circle-fill text-success"></i> Centro de Reportes Básico</li>
+                            <p class="text-muted small mb-3">{{ plan.descripcion|default:"Sin descripción" }}</p>
+
+                            <ul class="plan-feature-list mb-4">
+                                {% for modulo in plan.modulos.all %}
+                                <li><i class="bi bi-check-circle-fill text-success"></i> {{ modulo.nombre }}</li>
+                                {% empty %}
+                                <li><i class="bi bi-check-circle-fill text-success"></i> Módulos según configuración</li>
+                                {% endfor %}
                             </ul>
 
                             <div class="pt-3 border-top d-flex align-items-center justify-content-between">
-                                <span class="text-primary small fw-bold"><i class="bi bi-building me-1"></i> 120 Colegios</span>
-                                <button class="btn btn-sm btn-purple rounded-pill px-3">Editar Plan</button>
+                                <span class="text-muted small fw-semibold"><i class="bi bi-building me-1"></i> {{ plan.suscripcion_set.count }} Colegios</span>
+                                <a href="{% url 'editar_plan' plan.id %}" class="btn btn-sm {% if plan.recomendado %}btn-purple{% else %}btn-outline-primary{% endif %} rounded-pill px-3">Editar Plan</a>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Plan Premium -->
-                    <div class="col-12 col-md-4">
-                        <div class="plan-card">
-                            <h3 class="fw-bold text-dark mb-2">Plan Premium</h3>
-                            <div class="d-flex align-items-baseline mb-3">
-                                <span class="plan-price">$400.000</span>
-                                <span class="text-muted ms-1 small fw-semibold">CLP / mes</span>
-                            </div>
-                            
-                            <ul class="plan-feature-list">
-                                <li class="fw-bold text-primary"><i class="bi bi-stars"></i> Todo lo del Estándar +</li>
-                                <li><i class="bi bi-check-circle-fill text-success"></i> Módulo SIMCE Evaluaciones</li>
-                                <li><i class="bi bi-check-circle-fill text-success"></i> Módulo de Proveedores</li>
-                                <li><i class="bi bi-check-circle-fill text-success"></i> Mercado Público MP Integración</li>
-                            </ul>
-
-                            <div class="pt-3 border-top d-flex align-items-center justify-content-between">
-                                <span class="text-muted small fw-semibold"><i class="bi bi-building me-1"></i> 50 Colegios</span>
-                                <button class="btn btn-sm btn-outline-primary rounded-pill px-3">Editar Plan</button>
-                            </div>
-                        </div>
-                    </div>
-
+                    {% endfor %}
                 </div>
+
 
             </div>
         </main>

@@ -411,14 +411,14 @@
                                             <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">{{ colegio.get_estado_display }}</span>
                                         {% endif %}
                                     </td>
-                                    <td class="text-end">
-                                        <button class="btn btn-sm btn-outline-primary rounded-pill me-1" title="Ver Detalles">
-                                            <i class="bi bi-eye"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-light border rounded-pill" title="Editar">
-                                            <i class="bi bi-pencil"></i>
-                                        </button>
-                                    </td>
+                                     <td class="text-end">
+                                         <a href="{% url 'ver_detalle_colegio' colegio.id %}" class="btn btn-sm btn-outline-primary rounded-pill me-1" title="Ver Detalles">
+                                             <i class="bi bi-eye"></i>
+                                         </a>
+                                         <a href="{% url 'editar_colegio' colegio.id %}" class="btn btn-sm btn-light border rounded-pill" title="Editar">
+                                             <i class="bi bi-pencil"></i>
+                                         </a>
+                                     </td>
                                 </tr>
                                 {% empty %}
                                 <tr>

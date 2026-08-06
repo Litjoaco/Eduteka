@@ -125,6 +125,24 @@ class ColegioModulo(models.Model):
         return f"{self.colegio.nombre} - {self.modulo.nombre}"
 
 
+class ConfiguracionModulos(models.Model):
+    colegio = models.OneToOneField(Colegio, on_delete=models.CASCADE, related_name='configuracion_modulos')
+    libro_clases = models.BooleanField(default=False)
+    contabilidad = models.BooleanField(default=False)
+    proveedores = models.BooleanField(default=False)
+    simce = models.BooleanField(default=False)
+    mercado_publico = models.BooleanField(default=False)
+    comunidad = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name = "Configuración de Módulos"
+        verbose_name_plural = "Configuraciones de Módulos"
+
+    def __str__(self):
+        return f"Módulos de {self.colegio.nombre}"
+
+
+
 # --- CONFIGURACIÓN ACADÉMICA ---
 
 class ConfiguracionAcademica(models.Model):

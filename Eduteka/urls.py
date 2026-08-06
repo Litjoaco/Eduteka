@@ -31,8 +31,10 @@ urlpatterns = [
     path('dashboard/', include('dashboard.urls')),
     path('asistencia/', include('asistencia.urls')),
     path('calificaciones/', include('calificaciones.urls')),
+    path('planes/', include('planes.urls')),
     path('api/buscar-colegios/', colegios_views.api_buscar_colegios, name='api_buscar_colegios'),
 ]
+
 
 
 if settings.DEBUG:

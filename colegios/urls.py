@@ -56,7 +56,18 @@ urlpatterns = [
     path('calendario/api/eventos/', views.api_eventos_calendario_view, name='api_eventos_calendario'),
     path('calendario/exportar-ical/', views.exportar_ical_agenda_view, name='exportar_ical_agenda'),
     path('calendario/eliminar/<int:evento_id>/', views.eliminar_evento_agenda_view, name='eliminar_evento_agenda'),
+
+    # Configuración de Módulos
+    path('actualizar-modulo/', views.actualizar_modulo_colegio, name='actualizar_modulo_colegio'),
+
+    # Detalles y Edición de Colegio (Superadmin)
+    path('colegios/detalle/<int:pk>/', views.ver_detalle_colegio, name='ver_detalle_colegio'),
+    path('colegios/editar/<int:pk>/', views.editar_colegio, name='editar_colegio'),
+    path('colegios/<int:colegio_id>/suscripcion/editar/', views.editar_suscripcion_colegio, name='editar_suscripcion_colegio'),
 ]
+
+
+
 
 
 

@@ -265,7 +265,7 @@
                                     <i class="bi bi-journal-bookmark-fill"></i>
                                 </div>
                                 <div class="form-check form-switch fs-4">
-                                    <input class="form-check-input" type="checkbox" checked>
+                                    <input class="form-check-input toggle-modulo" type="checkbox" name="libro_clases" data-colegio-id="{{ colegio.id }}" checked>
                                 </div>
                             </div>
                             <h3 class="fw-bold text-dark fs-5 mb-1">Libro de Clases Digital</h3>
@@ -285,10 +285,10 @@
                                     <i class="bi bi-shield-check"></i>
                                 </div>
                                 <div class="form-check form-switch fs-4">
-                                    <input class="form-check-input" type="checkbox" checked>
+                                    <input class="form-check-input toggle-modulo" type="checkbox" name="comunidad" data-colegio-id="{{ colegio.id }}" checked>
                                 </div>
                             </div>
-                            <h3 class="fw-bold text-dark fs-5 mb-1">Convivencia Escolar</h3>
+                            <h3 class="fw-bold text-dark fs-5 mb-1">Convivencia Escolar / Comunidad</h3>
                             <p class="text-muted small mb-3 flex-grow-1">Gestión de anotaciones, protocolos de convivencia y registro de medidas disciplinarias.</p>
                             <div class="pt-3 border-top d-flex justify-content-between align-items-center">
                                 <span class="badge bg-success-subtle text-success rounded-pill px-3 py-1">180 Colegios Activos</span>
@@ -305,7 +305,7 @@
                                     <i class="bi bi-wallet2"></i>
                                 </div>
                                 <div class="form-check form-switch fs-4">
-                                    <input class="form-check-input" type="checkbox" checked>
+                                    <input class="form-check-input toggle-modulo" type="checkbox" name="contabilidad" data-colegio-id="{{ colegio.id }}" checked>
                                 </div>
                             </div>
                             <h3 class="fw-bold text-dark fs-5 mb-1">Contabilidad y Finanzas</h3>
@@ -325,7 +325,7 @@
                                     <i class="bi bi-award"></i>
                                 </div>
                                 <div class="form-check form-switch fs-4">
-                                    <input class="form-check-input" type="checkbox" checked>
+                                    <input class="form-check-input toggle-modulo" type="checkbox" name="simce" data-colegio-id="{{ colegio.id }}" checked>
                                 </div>
                             </div>
                             <h3 class="fw-bold text-dark fs-5 mb-1">SIMCE y Ensayos</h3>
@@ -345,13 +345,33 @@
                                     <i class="bi bi-building-add"></i>
                                 </div>
                                 <div class="form-check form-switch fs-4">
-                                    <input class="form-check-input" type="checkbox">
+                                    <input class="form-check-input toggle-modulo" type="checkbox" name="mercado_publico" data-colegio-id="{{ colegio.id }}">
                                 </div>
                             </div>
                             <h3 class="fw-bold text-dark fs-5 mb-1">Mercado Público Integración</h3>
                             <p class="text-muted small mb-3 flex-grow-1">Sincronización directa con órdenes de compra y licitaciones del estado.</p>
                             <div class="pt-3 border-top d-flex justify-content-between align-items-center">
                                 <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-1">En Beta</span>
+                                <button class="btn btn-sm btn-light border rounded-pill">Ajustes</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Módulo 6 -->
+                    <div class="col-12 col-md-6 col-xl-4">
+                        <div class="module-card">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="module-icon" style="background:#F0FDF4; color:#16A34A;">
+                                    <i class="bi bi-box-seam"></i>
+                                </div>
+                                <div class="form-check form-switch fs-4">
+                                    <input class="form-check-input toggle-modulo" type="checkbox" name="proveedores" data-colegio-id="{{ colegio.id }}">
+                                </div>
+                            </div>
+                            <h3 class="fw-bold text-dark fs-5 mb-1">Proveedores y Compras</h3>
+                            <p class="text-muted small mb-3 flex-grow-1">Gestión de órdenes de compra, catálogo de proveedores y cotizaciones.</p>
+                            <div class="pt-3 border-top d-flex justify-content-between align-items-center">
+                                <span class="badge bg-success-subtle text-success rounded-pill px-3 py-1">Módulo Adicional</span>
                                 <button class="btn btn-sm btn-light border rounded-pill">Ajustes</button>
                             </div>
                         </div>
@@ -366,6 +386,21 @@
     <!-- Scripts Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
             const mobileBtn = document.getElementById('mobileMenuBtn');
             const sidebar = document.getElementById('sidebar');
@@ -374,6 +409,40 @@
                     sidebar.classList.toggle('active');
                 });
             }
+
+            const toggles = document.querySelectorAll('.toggle-modulo');
+            toggles.forEach(toggle => {
+                toggle.addEventListener('change', function () {
+                    const colegioId = this.dataset.colegioId;
+                    const moduloNombre = this.name;
+                    const nuevoEstado = this.checked;
+
+                    fetch("{% url 'actualizar_modulo_colegio' %}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        body: JSON.stringify({
+                            colegio_id: colegioId,
+                            modulo: moduloNombre,
+                            estado: nuevoEstado
+                        })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('✅ Estado del módulo actualizado:', data);
+                    })
+                    .catch(error => {
+                        console.error('❌ Error al actualizar el módulo:', error);
+                    });
+                });
+            });
         });
     </script>
 </body>

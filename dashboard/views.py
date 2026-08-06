@@ -158,7 +158,15 @@ def dashboard_superadmin_colegios_view(request):
     return render(request, 'dashboard_superadmin_colegios.html', {'colegios': colegios})
 
 def dashboard_superadmin_planes_view(request):
-    return render(request, 'dashboard_superadmin_planes.html')
+    from planes.models import Plan
+    planes = Plan.objects.all()
+    if not planes.exists():
+        Plan.objects.create(nombre="Plan Básico", precio_mensual=150000, precio_anual=1500000, descripcion="Libro de Clases, Asistencia y Anotaciones.")
+        Plan.objects.create(nombre="Plan Estándar", precio_mensual=250000, precio_anual=2500000, recomendado=True, descripcion="Incluye Contabilidad y Reportes.")
+        Plan.objects.create(nombre="Plan Premium", precio_mensual=400000, precio_anual=4000000, descripcion="Acceso Total con SIMCE y Mercado Público.")
+        planes = Plan.objects.all()
+    return render(request, 'dashboard_superadmin_planes.html', {'planes': planes})
+
 
 def dashboard_superadmin_facturacion_view(request):
     return render(request, 'dashboard_superadmin_facturacion.html')
