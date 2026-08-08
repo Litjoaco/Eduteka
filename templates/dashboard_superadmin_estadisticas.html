@@ -4,15 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estadísticas Globales - Super Admin Eduteka</title>
-    
-    <!-- Bootstrap CSS local static -->
+    <title>Estadísticas Globales — Business Intelligence · Eduteka</title>
+
+    <!-- Bootstrap CSS -->
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-    
     <!-- Fuentes e Iconos -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -32,281 +30,993 @@
             --radius-md: 10px;
             --radius-sm: 8px;
         }
+        * { font-family: 'Plus Jakarta Sans', sans-serif; }
 
-        * {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-
-        body {
-            background-color: var(--bg);
-            color: var(--dark);
-            min-height: 100vh;
-            overflow-x: hidden;
-            margin: 0;
-        }
+        body { background: var(--bg); color: var(--dark); min-height: 100vh; overflow-x: hidden; margin: 0; }
 
         body::before {
-            content: '';
-            position: fixed;
-            top: -15%; left: 65%;
+            content: ''; position: fixed; top: -15%; left: 65%;
             width: 50vw; height: 50vw;
-            background: radial-gradient(circle, rgba(124, 92, 252, 0.07) 0%, rgba(255,255,255,0) 70%);
-            z-index: -2;
-            pointer-events: none;
+            background: radial-gradient(circle, rgba(124,92,252,.07) 0%, rgba(255,255,255,0) 70%);
+            z-index: -2; pointer-events: none;
         }
         body::after {
-            content: '';
-            position: fixed;
-            top: 45%; left: -15%;
+            content: ''; position: fixed; top: 45%; left: -15%;
             width: 40vw; height: 40vw;
-            background: radial-gradient(circle, rgba(101, 205, 191, 0.06) 0%, rgba(255,255,255,0) 70%);
-            z-index: -2;
-            pointer-events: none;
+            background: radial-gradient(circle, rgba(101,205,191,.06) 0%, rgba(255,255,255,0) 70%);
+            z-index: -2; pointer-events: none;
         }
 
-        .wrapper {
-            display: flex;
-            width: 100%;
-            align-items: stretch;
-        }
+        .wrapper { display: flex; width: 100%; align-items: stretch; }
 
-        /* TOPBAR */
+        /* ── Topbar ── */
         .topbar {
             height: 70px;
-            background: rgba(255, 255, 255, 0.85) !important;
+            background: rgba(255,255,255,.85) !important;
             backdrop-filter: blur(12px) !important;
-            -webkit-backdrop-filter: blur(12px) !important;
             border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 2rem;
-            position: sticky;
-            top: 0;
-            z-index: 98;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 2rem; position: sticky; top: 0; z-index: 98;
         }
-
-        .search-bar {
-            position: relative;
-            width: 320px;
-        }
-
-        .search-bar i {
-            position: absolute;
-            left: 0.85rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gray-text);
-        }
-
+        .search-bar { position: relative; width: 320px; }
+        .search-bar i { position: absolute; left: .85rem; top: 50%; transform: translateY(-50%); color: var(--gray-text); }
         .search-bar input {
-            width: 100%;
-            padding: 0.5rem 1rem 0.5rem 2.4rem;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            background-color: var(--bg);
-            font-size: 0.85rem;
-            outline: none;
-            transition: all 0.2s;
+            width: 100%; padding: .5rem 1rem .5rem 2.4rem;
+            border: 1px solid var(--border); border-radius: var(--radius-md);
+            background: var(--bg); font-size: .85rem; outline: none; transition: all .2s;
         }
+        .search-bar input:focus { border-color: var(--primary); background: var(--white); box-shadow: 0 0 0 3px rgba(124,92,252,.12); }
+        .topbar-right { display: flex; align-items: center; gap: 1.25rem; }
+        .user-profile { display: flex; align-items: center; gap: .75rem; background: var(--white); padding: .35rem .85rem .35rem .4rem; border-radius: 30px; border: 1px solid var(--border); }
+        .user-avatar { width: 32px; height: 32px; background: linear-gradient(135deg, var(--primary), var(--primary-hover)); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .85rem; }
+        .user-name { font-weight: 600; font-size: .88rem; color: var(--dark); }
 
-        .search-bar input:focus {
-            border-color: var(--primary);
-            background-color: var(--white);
-            box-shadow: 0 0 0 3px rgba(124, 92, 252, 0.12);
-        }
+        /* ── Layout ── */
+        .content-area { padding: 1.75rem 2rem; max-width: 1400px; width: 100%; margin: 0 auto; box-sizing: border-box; }
+        .hero-title { font-size: 1.6rem; font-weight: 800; color: var(--dark); margin-bottom: .25rem; }
+        .hero-subtitle { color: var(--gray-text); font-size: .9rem; }
 
-        .topbar-right {
-            display: flex;
-            align-items: center;
-            gap: 1.25rem;
-        }
-
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            background: var(--white);
-            padding: 0.35rem 0.85rem 0.35rem 0.4rem;
-            border-radius: 30px;
-            border: 1px solid var(--border);
-        }
-
-        .user-avatar {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 0.85rem;
-        }
-
-        .user-name {
-            font-weight: 600;
-            font-size: 0.88rem;
-            color: var(--dark);
-        }
-
-        .content-area {
-            padding: 1.75rem 2rem;
-            max-width: 1400px;
-            width: 100%;
-            margin: 0 auto;
-            box-sizing: border-box;
-        }
-
-        .hero-title {
-            font-size: 1.6rem;
-            font-weight: 800;
-            color: var(--dark);
-            margin-bottom: 0.25rem;
-        }
-        .hero-subtitle {
-            color: var(--gray-text);
-            font-size: 0.9rem;
-        }
-
-        .dashboard-panel {
+        /* ── Filter bar ── */
+        .filter-bar {
             background: var(--white);
             border: 1px solid var(--border);
             border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.01);
-            height: 100%;
+            padding: 1rem 1.25rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,.018);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: flex-end;
         }
+        .filter-group { display: flex; flex-direction: column; gap: .3rem; min-width: 130px; }
+        .filter-group label { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--gray-text); }
+        .filter-control {
+            border: 1px solid var(--border); border-radius: var(--radius-md);
+            font-size: .83rem; padding: .42rem .75rem;
+            background: var(--bg); color: var(--dark);
+            transition: all .2s; height: 36px;
+        }
+        .filter-control:focus { border-color: var(--primary); background: var(--white); box-shadow: 0 0 0 3px rgba(124,92,252,.12); outline: none; }
+        .filter-separator { width: 1px; background: var(--border); align-self: stretch; margin: 0 .25rem; }
 
-        .chart-container {
-            position: relative;
-            height: 280px;
-            width: 100%;
+        /* ── Tab Navigation ── */
+        .tab-nav {
+            display: flex;
+            gap: 0;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
         }
+        .tab-btn {
+            padding: .65rem 1.25rem;
+            font-size: .88rem;
+            font-weight: 600;
+            color: var(--gray-text);
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+            transition: all .2s;
+            white-space: nowrap;
+        }
+        .tab-btn:hover { color: var(--primary); }
+        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* ── KPI Cards ── */
+        .kpi-card {
+            background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg);
+            padding: 1.25rem 1.5rem; display: flex; align-items: center; gap: 1rem;
+            transition: all .3s; box-shadow: 0 4px 15px rgba(0,0,0,.02);
+        }
+        .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.06); }
+        .kpi-icon { width: 52px; height: 52px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 1.45rem; flex-shrink: 0; }
+        .kpi-icon.purple { background: var(--primary-soft); color: var(--primary); }
+        .kpi-icon.teal   { background: var(--secondary-soft); color: #148A7A; }
+        .kpi-icon.amber  { background: #FFFBEB; color: #B45309; }
+        .kpi-icon.red    { background: #FEF2F2; color: #EF4444; }
+        .kpi-label { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--gray-text); }
+        .kpi-value { font-size: 1.6rem; font-weight: 800; color: var(--dark); line-height: 1.1; }
+        .kpi-sub   { font-size: .78rem; font-weight: 600; margin-top: .1rem; }
+
+        /* ── Dashboard Panel ── */
+        .dashboard-panel {
+            background: var(--white); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,.01); height: 100%;
+        }
+        .panel-title { font-size: .95rem; font-weight: 700; color: var(--dark); margin-bottom: 1.25rem; display: flex; align-items: center; gap: .5rem; }
+
+        .chart-container    { position: relative; height: 260px; width: 100%; }
+        .chart-container-sm { position: relative; height: 210px; width: 100%; }
+        .chart-container-md { position: relative; height: 300px; width: 100%; }
+        .chart-container-lg { position: relative; height: 340px; width: 100%; }
+
+        /* ── Storage bar ── */
+        .storage-bar-wrap { background: var(--bg); border-radius: 999px; height: 10px; overflow: hidden; margin: .6rem 0 .35rem; }
+        .storage-bar-fill  { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--primary), var(--secondary)); transition: width 1s ease; }
+
+        /* ── Mini Table ── */
+        .mini-table { width: 100%; border-collapse: collapse; font-size: .83rem; }
+        .mini-table th { color: var(--gray-text); font-weight: 700; font-size: .71rem; text-transform: uppercase; letter-spacing: .5px; padding: .4rem .5rem; border-bottom: 1px solid var(--border); }
+        .mini-table td { padding: .55rem .5rem; border-bottom: 1px solid #F1F3F9; vertical-align: middle; }
+        .mini-table tbody tr:last-child td { border-bottom: none; }
+        .mini-table tbody tr:hover td { background: #FAFAFE; }
+        .rank-badge { width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: .7rem; font-weight: 700; background: var(--primary-soft); color: var(--primary); }
+        .rank-badge.gold   { background: #FEF9C3; color: #92400E; }
+        .rank-badge.silver { background: #F1F5F9; color: #475569; }
+        .rank-badge.bronze { background: #FEF3E2; color: #92400E; }
+
+        /* ── Heatmap (CSS-based) ── */
+        .heatmap-grid { display: grid; grid-template-columns: 40px repeat(7, 1fr); gap: 3px; font-size: .68rem; }
+        .heatmap-grid .h-label { color: var(--gray-text); font-weight: 600; display: flex; align-items: center; justify-content: flex-end; padding-right: 6px; height: 22px; }
+        .heatmap-grid .d-label { color: var(--gray-text); font-weight: 700; text-align: center; padding-bottom: 4px; }
+        .heatmap-cell {
+            height: 22px; border-radius: 4px;
+            background: var(--bg);
+            transition: transform .15s;
+            cursor: default;
+        }
+        .heatmap-cell:hover { transform: scale(1.15); }
+        .hm-0  { background: #F1F3F9; }
+        .hm-1  { background: rgba(124,92,252,.15); }
+        .hm-2  { background: rgba(124,92,252,.30); }
+        .hm-3  { background: rgba(124,92,252,.50); }
+        .hm-4  { background: rgba(124,92,252,.70); }
+        .hm-5  { background: rgba(124,92,252,.90); }
+
+        /* ── Stat badge inline ── */
+        .stat-inline { display: flex; justify-content: space-between; align-items: center; padding: .55rem 0; border-bottom: 1px solid #F1F3F9; font-size: .83rem; }
+        .stat-inline:last-child { border-bottom: none; }
+
+        /* ── Performance dots ── */
+        .perf-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+
+        /* ── Cohort Table ── */
+        .cohort-table { width: 100%; border-collapse: collapse; font-size: .76rem; }
+        .cohort-table th { font-weight: 700; color: var(--gray-text); font-size: .69rem; text-transform: uppercase; letter-spacing: .5px; padding: .4rem .6rem; border-bottom: 1px solid var(--border); text-align: center; }
+        .cohort-table td { padding: .4rem .6rem; text-align: center; font-weight: 600; border-bottom: 1px solid #F1F3F9; }
+        .cohort-table td:first-child { text-align: left; color: var(--dark); font-weight: 700; }
+        .cohort-cell { border-radius: 5px; display: inline-block; padding: .15rem .45rem; min-width: 40px; font-size: .73rem; }
+
+        /* ── Buttons ── */
+        .btn-primary-custom { background: var(--primary); color: #fff; font-weight: 600; border-radius: var(--radius-md); padding: .45rem 1rem; border: none; transition: all .2s; font-size: .85rem; height: 36px; display: inline-flex; align-items: center; gap: .4rem; }
+        .btn-primary-custom:hover { background: var(--primary-hover); box-shadow: 0 4px 12px rgba(124,92,252,.3); color: #fff; }
+        .btn-outline-custom { background: transparent; color: var(--dark); font-weight: 600; border-radius: var(--radius-md); padding: .45rem 1rem; border: 1px solid var(--border); transition: all .2s; font-size: .85rem; height: 36px; display: inline-flex; align-items: center; gap: .4rem; }
+        .btn-outline-custom:hover { background: var(--bg); border-color: var(--primary); color: var(--primary); }
     </style>
 </head>
 <body>
 
-    <div class="wrapper">
-        <!-- Sidebar -->
-        {% include '_sidebar_superadmin.html' with active_page='estadisticas' %}
+<div class="wrapper">
+    <!-- Sidebar -->
+    {% include '_sidebar_superadmin.html' with active_page='estadisticas' %}
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Topbar -->
-            <header class="topbar">
-                <div class="d-flex items-center gap-2">
-                    <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn" style="border:none; background:var(--primary-soft); color:var(--primary);">
-                        <i class="bi bi-list fs-5"></i>
-                    </button>
-                    <div class="search-bar">
-                        <i class="bi bi-search"></i>
-                        <input type="text" placeholder="Buscar reportes o analíticas...">
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="d-flex items-center gap-2">
+                <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn" style="border:none;background:var(--primary-soft);color:var(--primary);">
+                    <i class="bi bi-list fs-5"></i>
+                </button>
+                <div class="search-bar">
+                    <i class="bi bi-search"></i>
+                    <input type="text" placeholder="Buscar reportes o analíticas...">
+                </div>
+            </div>
+            <div class="topbar-right">
+                <div class="user-profile">
+                    <div class="user-avatar">AE</div>
+                    <span class="user-name">Admin Eduteka</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div class="content-area">
+
+            <!-- Page Header -->
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+                <div>
+                    <h1 class="hero-title">Centro de Inteligencia de Negocios</h1>
+                    <div class="hero-subtitle">Analítica profunda · Adopción · Rendimiento Financiero · Cohortes</div>
+                </div>
+                <button type="button" class="btn btn-outline-primary rounded-pill">
+                    <i class="bi bi-download me-1"></i> Generar Reporte PDF
+                </button>
+            </div>
+
+            <!-- ╔══════════════════════════════════════════╗
+                 ║  BARRA DE CONTROLES AVANZADOS            ║
+                 ╚══════════════════════════════════════════╝ -->
+            <form method="GET" action="" id="filtroForm">
+            <div class="filter-bar mb-4">
+                <!-- Desde -->
+                <div class="filter-group">
+                    <label><i class="bi bi-calendar3 me-1"></i>Desde</label>
+                    <input type="date" class="filter-control" id="fDesde" name="fecha_desde" value="{{ filtros.fecha_desde }}">
+                </div>
+                <!-- Hasta -->
+                <div class="filter-group">
+                    <label><i class="bi bi-calendar3-fill me-1"></i>Hasta</label>
+                    <input type="date" class="filter-control" id="fHasta" name="fecha_hasta" value="{{ filtros.fecha_hasta }}">
+                </div>
+
+                <div class="filter-separator d-none d-md-block"></div>
+
+                <!-- Plan -->
+                <div class="filter-group">
+                    <label><i class="bi bi-layers me-1"></i>Filtrar por Plan</label>
+                    <select class="filter-control" id="fPlan" name="plan">
+                        <option value="">Todos los Planes</option>
+                        {% for p in planes %}
+                            <option value="{{ p.id }}" {% if filtros.plan == p.id|stringformat:"s" or filtros.plan == p.nombre %}selected{% endif %}>{{ p.nombre }}</option>
+                        {% empty %}
+                            <option value="basico" {% if filtros.plan == 'basico' or filtros.plan == 'Básico' %}selected{% endif %}>Básico</option>
+                            <option value="estandar" {% if filtros.plan == 'estandar' or filtros.plan == 'Estándar' %}selected{% endif %}>Estándar</option>
+                            <option value="premium" {% if filtros.plan == 'premium' or filtros.plan == 'Premium' %}selected{% endif %}>Premium</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <!-- Región -->
+                <div class="filter-group">
+                    <label><i class="bi bi-geo-alt me-1"></i>Región / Ciudad</label>
+                    <select class="filter-control" id="fRegion" name="region">
+                        <option value="">Todas las Regiones</option>
+                        {% for reg in regiones %}
+                            <option value="{{ reg }}" {% if filtros.region == reg %}selected{% endif %}>{{ reg }}</option>
+                        {% empty %}
+                            <option value="Región Metropolitana" {% if filtros.region == "Región Metropolitana" %}selected{% endif %}>Región Metropolitana</option>
+                            <option value="Valparaíso" {% if filtros.region == "Valparaíso" %}selected{% endif %}>Valparaíso</option>
+                            <option value="Biobío" {% if filtros.region == "Biobío" %}selected{% endif %}>Biobío</option>
+                            <option value="Araucanía" {% if filtros.region == "Araucanía" %}selected{% endif %}>Araucanía</option>
+                            <option value="Los Lagos" {% if filtros.region == "Los Lagos" %}selected{% endif %}>Los Lagos</option>
+                            <option value="Antofagasta" {% if filtros.region == "Antofagasta" %}selected{% endif %}>Antofagasta</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="filter-separator d-none d-md-block"></div>
+
+                <!-- Acciones -->
+                <div class="filter-group" style="min-width:auto;">
+                    <label>&nbsp;</label>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn-primary-custom" id="btnAplicar">
+                            <i class="bi bi-funnel-fill"></i> Aplicar Filtros
+                        </button>
+                        <button type="submit" name="exportar" value="true" class="btn-outline-custom" id="btnExportar">
+                            <i class="bi bi-file-earmark-spreadsheet"></i> Exportar CSV
+                        </button>
+                    </div>
+                </div>
+            </div>
+            </form>
+
+            <!-- ╔══════════════════════════════════════════╗
+                 ║  SISTEMA DE PESTAÑAS                     ║
+                 ╚══════════════════════════════════════════╝ -->
+            <nav class="tab-nav" id="tabNav">
+                <button class="tab-btn active" data-tab="general">
+                    <i class="bi bi-grid-1x2"></i> General
+                </button>
+                <button class="tab-btn" data-tab="trafico">
+                    <i class="bi bi-activity"></i> Adopción y Tráfico
+                </button>
+                <button class="tab-btn" data-tab="financiero">
+                    <i class="bi bi-cash-coin"></i> Rendimiento Financiero
+                </button>
+                <button class="tab-btn" data-tab="cohortes">
+                    <i class="bi bi-people"></i> Cohortes y Retención
+                </button>
+            </nav>
+
+            <!-- ══════════════════════════════════════════════
+                 TAB 1: GENERAL
+            ══════════════════════════════════════════════ -->
+            <div id="tab-general" class="tab-content active">
+
+                <!-- KPIs -->
+                <div class="row g-3 mb-4">
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="kpi-card">
+                            <div class="kpi-icon purple"><i class="bi bi-buildings"></i></div>
+                            <div>
+                                <div class="kpi-label">Colegios Activos</div>
+                                <div class="kpi-value">{{ kpis.colegios_activos|default:"215" }}</div>
+                                <div class="kpi-sub text-success"><i class="bi bi-arrow-up-right"></i> +12 este mes</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="kpi-card">
+                            <div class="kpi-icon teal"><i class="bi bi-mortarboard"></i></div>
+                            <div>
+                                <div class="kpi-label">Alumnos en el Sistema</div>
+                                <div class="kpi-value">{{ kpis.alumnos_total|default:"86.430" }}</div>
+                                <div class="kpi-sub text-success"><i class="bi bi-arrow-up-right"></i> +3.4% MoM</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="kpi-card">
+                            <div class="kpi-icon amber"><i class="bi bi-graph-up-arrow"></i></div>
+                            <div>
+                                <div class="kpi-label">MRR Proyectado</div>
+                                <div class="kpi-value">{{ kpis.mrr_proyectado|default:"$68,2M" }}</div>
+                                <div class="kpi-sub text-success"><i class="bi bi-arrow-up-right"></i> +8.4% vs julio</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="kpi-card" style="border-left:3px solid #EF4444;">
+                            <div class="kpi-icon red"><i class="bi bi-person-dash"></i></div>
+                            <div>
+                                <div class="kpi-label">Tasa de Abandono (Churn)</div>
+                                <div class="kpi-value" style="color:#EF4444;">{{ kpis.tasa_churn|default:"2.3%" }}</div>
+                                <div class="kpi-sub text-danger"><i class="bi bi-arrow-up-right"></i> +0.4 pp vs mes anterior</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="topbar-right">
-                    <div class="user-profile">
-                        <div class="user-avatar">AE</div>
-                        <span class="user-name">Admin Eduteka</span>
-                    </div>
-                </div>
-            </header>
-
-            <!-- Main Content Area -->
-            <div class="content-area">
-
-                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
-                    <div>
-                        <h1 class="hero-title">Estadísticas Globales y Reportes</h1>
-                        <div class="hero-subtitle">Métricas de adopción de la plataforma, tráfico y uso por módulo</div>
-                    </div>
-                    <button type="button" class="btn btn-outline-primary rounded-pill">
-                        <i class="bi bi-download me-1"></i> Generar Reporte PDF
-                    </button>
-                </div>
-
-                <!-- Secciones de Gráficos -->
+                <!-- Uso Diario + Distribución Planes -->
                 <div class="row g-4 mb-4">
-                    
                     <div class="col-12 col-lg-8">
                         <div class="dashboard-panel">
                             <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h3 class="fw-bold fs-5 text-dark m-0"><i class="bi bi-activity text-primary me-2"></i>Uso Diario del Sistema (Usuarios Concurridos)</h3>
+                                <h3 class="panel-title m-0"><i class="bi bi-activity text-primary"></i> Uso Diario del Sistema (Usuarios Concurrentes)</h3>
                                 <span class="badge bg-primary-subtle text-primary rounded-pill px-3">Julio 2026</span>
                             </div>
-                            <div class="chart-container">
-                                <canvas id="usageChart"></canvas>
-                            </div>
+                            <div class="chart-container"><canvas id="usageChart"></canvas></div>
                         </div>
                     </div>
-
                     <div class="col-12 col-lg-4">
                         <div class="dashboard-panel">
-                            <h3 class="fw-bold fs-5 text-dark mb-3"><i class="bi bi-pie-chart text-secondary me-2"></i>Distribución de Planes</h3>
-                            <div class="chart-container">
-                                <canvas id="plansPieChart"></canvas>
+                            <h3 class="panel-title"><i class="bi bi-pie-chart" style="color:var(--secondary);"></i> Distribución de Planes</h3>
+                            <div class="chart-container"><canvas id="plansPieChart"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Módulos + Almacenamiento & Top 5 -->
+                <div class="row g-4">
+                    <div class="col-12 col-lg-6">
+                        <div class="dashboard-panel">
+                            <h3 class="panel-title"><i class="bi bi-bar-chart-line text-primary"></i> Módulos Más Utilizados</h3>
+                            <div class="chart-container-sm"><canvas id="modulosChart"></canvas></div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <div class="dashboard-panel">
+                            <h3 class="panel-title mb-2"><i class="bi bi-hdd-stack" style="color:var(--secondary);"></i> Consumo de Almacenamiento AWS / Servidor</h3>
+                            <div class="d-flex justify-content-between align-items-baseline mb-1">
+                                <span class="small text-muted">Usado: <strong class="text-dark">347 GB</strong> de 500 GB</span>
+                                <span class="small fw-bold" style="color:var(--primary);">69.4%</span>
+                            </div>
+                            <div class="storage-bar-wrap">
+                                <div class="storage-bar-fill" id="storageBar" style="width:0%;"></div>
+                            </div>
+                            <div class="d-flex justify-content-between mt-1 mb-4">
+                                <small class="text-muted">S3 + RDS + EC2 combinado</small>
+                                <small class="text-warning fw-semibold"><i class="bi bi-exclamation-triangle-fill me-1"></i>Quedan 153 GB libres</small>
+                            </div>
+                            <h3 class="panel-title mb-2" style="font-size:.88rem;"><i class="bi bi-trophy text-warning"></i> Top 5 Colegios Más Activos (sesiones / mes)</h3>
+                            <table class="mini-table">
+                                <thead><tr><th>#</th><th>Colegio</th><th>Plan</th><th class="text-end">Alumnos</th></tr></thead>
+                                <tbody>
+                                    {% for col in top_colegios %}
+                                    <tr>
+                                        <td>
+                                            {% if forloop.counter == 1 %}<span class="rank-badge gold">1</span>
+                                            {% elif forloop.counter == 2 %}<span class="rank-badge silver">2</span>
+                                            {% elif forloop.counter == 3 %}<span class="rank-badge bronze">3</span>
+                                            {% else %}<span class="rank-badge">{{ forloop.counter }}</span>{% endif %}
+                                        </td>
+                                        <td><strong>{{ col.nombre }}</strong></td>
+                                        <td>
+                                            {% if col.suscripcion and col.suscripcion.plan %}
+                                                <span class="badge bg-success-subtle text-success rounded-pill px-2">{{ col.suscripcion.plan.nombre }}</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary-subtle text-secondary rounded-pill px-2">Básico</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-end fw-semibold">{{ col.estudiantes_count|default:"0" }}</td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr><td><span class="rank-badge gold">1</span></td><td><strong>Liceo Santa María</strong></td><td><span class="badge bg-success-subtle text-success rounded-pill px-2">Premium</span></td><td class="text-end fw-semibold">8.421</td></tr>
+                                    <tr><td><span class="rank-badge silver">2</span></td><td><strong>Colegio Los Alerces</strong></td><td><span class="badge bg-primary-subtle text-primary rounded-pill px-2">Estándar</span></td><td class="text-end fw-semibold">7.103</td></tr>
+                                    <tr><td><span class="rank-badge bronze">3</span></td><td><strong>Instituto Prof. del Norte</strong></td><td><span class="badge bg-success-subtle text-success rounded-pill px-2">Premium</span></td><td class="text-end fw-semibold">6.889</td></tr>
+                                    <tr><td><span class="rank-badge">4</span></td><td><strong>Colegio San Agustín</strong></td><td><span class="badge bg-primary-subtle text-primary rounded-pill px-2">Estándar</span></td><td class="text-end fw-semibold">5.214</td></tr>
+                                    <tr><td><span class="rank-badge">5</span></td><td><strong>Escuela Básica El Porvenir</strong></td><td><span class="badge bg-secondary-subtle text-secondary rounded-pill px-2">Básico</span></td><td class="text-end fw-semibold">4.677</td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /tab-general -->
+
+            <!-- ══════════════════════════════════════════════
+                 TAB 2: ADOPCIÓN Y TRÁFICO
+            ══════════════════════════════════════════════ -->
+            <div id="tab-trafico" class="tab-content">
+
+                <!-- KPIs de tráfico -->
+                <div class="row g-3 mb-4">
+                    <div class="col-6 col-lg-3">
+                        <div class="kpi-card">
+                            <div class="kpi-icon purple"><i class="bi bi-cursor-fill"></i></div>
+                            <div>
+                                <div class="kpi-label">Sesiones totales / mes</div>
+                                <div class="kpi-value">1,24M</div>
+                                <div class="kpi-sub text-success"><i class="bi bi-arrow-up-right"></i> +15.2%</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-3">
+                        <div class="kpi-card">
+                            <div class="kpi-icon teal"><i class="bi bi-clock-history"></i></div>
+                            <div>
+                                <div class="kpi-label">Tiempo medio en sesión</div>
+                                <div class="kpi-value">24 min</div>
+                                <div class="kpi-sub text-success"><i class="bi bi-arrow-up-right"></i> +2 min MoM</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-3">
+                        <div class="kpi-card">
+                            <div class="kpi-icon amber"><i class="bi bi-phone"></i></div>
+                            <div>
+                                <div class="kpi-label">Acceso desde móvil</div>
+                                <div class="kpi-value">38.4%</div>
+                                <div class="kpi-sub text-muted">61.6% desktop</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-3">
+                        <div class="kpi-card">
+                            <div class="kpi-icon red"><i class="bi bi-door-closed"></i></div>
+                            <div>
+                                <div class="kpi-label">Tasa de rebote</div>
+                                <div class="kpi-value">8.1%</div>
+                                <div class="kpi-sub text-success"><i class="bi bi-arrow-down-right"></i> -1.3 pp</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Heatmap + Performance -->
+                <div class="row g-4 mb-4">
+                    <!-- Heatmap CSS -->
+                    <div class="col-12 col-lg-7">
+                        <div class="dashboard-panel">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h3 class="panel-title m-0"><i class="bi bi-grid-3x3-gap text-primary"></i> Mapa de Calor — Uso por Hora y Día</h3>
+                                <span class="badge bg-success-subtle text-success rounded-pill px-2 small">Tiempo real</span>
+                            </div>
+                            <!-- Leyenda -->
+                            <div class="d-flex align-items-center gap-2 mb-3" style="font-size:.72rem;color:var(--gray-text);">
+                                <span>Bajo</span>
+                                <div style="width:18px;height:12px;border-radius:3px;background:rgba(124,92,252,.15);"></div>
+                                <div style="width:18px;height:12px;border-radius:3px;background:rgba(124,92,252,.35);"></div>
+                                <div style="width:18px;height:12px;border-radius:3px;background:rgba(124,92,252,.55);"></div>
+                                <div style="width:18px;height:12px;border-radius:3px;background:rgba(124,92,252,.80);"></div>
+                                <div style="width:18px;height:12px;border-radius:3px;background:rgba(124,92,252,.95);"></div>
+                                <span>Alto</span>
+                            </div>
+                            <div class="heatmap-grid" id="heatmapGrid">
+                                <!-- Se genera por JS -->
                             </div>
                         </div>
                     </div>
 
+                    <!-- Tiempos de carga por módulo -->
+                    <div class="col-12 col-lg-5">
+                        <div class="dashboard-panel">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h3 class="panel-title m-0"><i class="bi bi-speedometer2 text-warning"></i> Tiempos de Carga por Módulo</h3>
+                                <span class="badge bg-warning-subtle text-warning rounded-pill px-2 small">Promedio 7 días</span>
+                            </div>
+                            <div class="chart-container-md"><canvas id="loadTimeChart"></canvas></div>
+                        </div>
+                    </div>
                 </div>
 
+                <!-- Nuevas inscripciones por mes (area stacked) -->
+                <div class="row g-4">
+                    <div class="col-12">
+                        <div class="dashboard-panel">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h3 class="panel-title m-0"><i class="bi bi-person-plus text-primary"></i> Nuevas Suscripciones vs Cancelaciones por Mes</h3>
+                                <div class="d-flex gap-3 small">
+                                    <span><span class="perf-dot" style="background:var(--primary);"></span>Nuevas</span>
+                                    <span><span class="perf-dot" style="background:#EF4444;"></span>Cancelaciones</span>
+                                    <span><span class="perf-dot" style="background:var(--secondary);"></span>Neto</span>
+                                </div>
+                            </div>
+                            <div class="chart-container"><canvas id="subscChart"></canvas></div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </main>
-    </div>
+            <!-- /tab-trafico -->
 
-    <!-- Scripts Bootstrap y Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const mobileBtn = document.getElementById('mobileMenuBtn');
-            const sidebar = document.getElementById('sidebar');
-            if (mobileBtn && sidebar) {
-                mobileBtn.addEventListener('click', function () {
-                    sidebar.classList.toggle('active');
-                });
-            }
+            <!-- ══════════════════════════════════════════════
+                 TAB 3: RENDIMIENTO FINANCIERO
+            ══════════════════════════════════════════════ -->
+            <div id="tab-financiero" class="tab-content">
 
-            // Usage Line Chart
-            const usageCtx = document.getElementById('usageChart').getContext('2d');
-            new Chart(usageCtx, {
-                type: 'line',
-                data: {
-                    labels: ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4'],
-                    datasets: [{
-                        label: 'Usuarios Activos',
-                        data: [14200, 18500, 22100, 26800],
-                        borderColor: '#7C5CFC',
-                        backgroundColor: 'rgba(124, 92, 252, 0.08)',
-                        fill: true,
-                        tension: 0.3
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false
-                }
-            });
+                <!-- KPIs financieros -->
+                <div class="row g-3 mb-4">
+                    <div class="col-6 col-lg-3">
+                        <div class="kpi-card">
+                            <div class="kpi-icon purple"><i class="bi bi-currency-dollar"></i></div>
+                            <div>
+                                <div class="kpi-label">ARR (Anual)</div>
+                                <div class="kpi-value">$818M</div>
+                                <div class="kpi-sub text-success"><i class="bi bi-arrow-up-right"></i> +24% YoY</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-3">
+                        <div class="kpi-card">
+                            <div class="kpi-icon teal"><i class="bi bi-wallet2"></i></div>
+                            <div>
+                                <div class="kpi-label">ARPU (por colegio)</div>
+                                <div class="kpi-value">$317K</div>
+                                <div class="kpi-sub text-success"><i class="bi bi-arrow-up-right"></i> +5.2% MoM</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-3">
+                        <div class="kpi-card">
+                            <div class="kpi-icon amber"><i class="bi bi-hourglass-split"></i></div>
+                            <div>
+                                <div class="kpi-label">Período recupero (CAC)</div>
+                                <div class="kpi-value">4.2 m</div>
+                                <div class="kpi-sub text-muted">LTV / CAC: 8.3×</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-3">
+                        <div class="kpi-card">
+                            <div class="kpi-icon red"><i class="bi bi-exclamation-octagon"></i></div>
+                            <div>
+                                <div class="kpi-label">Deuda (facturas vencidas)</div>
+                                <div class="kpi-value" style="color:#EF4444;">$11.8M</div>
+                                <div class="kpi-sub text-danger">10 colegios en mora</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-            // Plans Pie Chart
-            const pieCtx = document.getElementById('plansPieChart').getContext('2d');
-            new Chart(pieCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Básico', 'Estándar', 'Premium'],
-                    datasets: [{
-                        data: [45, 120, 50],
-                        backgroundColor: ['#BCC0CF', '#7C5CFC', '#65CDBF']
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false
-                }
+                <div class="row g-4">
+                    <!-- MRR acumulado -->
+                    <div class="col-12 col-lg-8">
+                        <div class="dashboard-panel">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h3 class="panel-title m-0"><i class="bi bi-graph-up text-primary"></i> Evolución MRR (últimos 12 meses)</h3>
+                                <span class="badge bg-success-subtle text-success rounded-pill px-2">+8.4% este mes</span>
+                            </div>
+                            <div class="chart-container-md"><canvas id="mrrChart"></canvas></div>
+                        </div>
+                    </div>
+
+                    <!-- Ingresos por plan -->
+                    <div class="col-12 col-lg-4">
+                        <div class="dashboard-panel">
+                            <h3 class="panel-title"><i class="bi bi-bar-chart text-primary"></i> Ingresos por Plan</h3>
+                            <div class="chart-container-md"><canvas id="revenueByPlanChart"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /tab-financiero -->
+
+            <!-- ══════════════════════════════════════════════
+                 TAB 4: COHORTES Y RETENCIÓN
+            ══════════════════════════════════════════════ -->
+            <div id="tab-cohortes" class="tab-content">
+
+                <!-- KPIs retención -->
+                <div class="row g-3 mb-4">
+                    <div class="col-6 col-lg-3">
+                        <div class="kpi-card">
+                            <div class="kpi-icon teal"><i class="bi bi-shield-check"></i></div>
+                            <div>
+                                <div class="kpi-label">Retención Mes 1</div>
+                                <div class="kpi-value">94.2%</div>
+                                <div class="kpi-sub text-success">↑ vs 91% benchmark</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-3">
+                        <div class="kpi-card">
+                            <div class="kpi-icon purple"><i class="bi bi-arrow-repeat"></i></div>
+                            <div>
+                                <div class="kpi-label">Retención Mes 6</div>
+                                <div class="kpi-value">78.5%</div>
+                                <div class="kpi-sub text-success">↑ Tendencia positiva</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-3">
+                        <div class="kpi-card">
+                            <div class="kpi-icon amber"><i class="bi bi-calendar-check"></i></div>
+                            <div>
+                                <div class="kpi-label">Colegios con +12 meses</div>
+                                <div class="kpi-value">142</div>
+                                <div class="kpi-sub text-success">66% del total</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-3">
+                        <div class="kpi-card" style="border-left:3px solid #EF4444;">
+                            <div class="kpi-icon red"><i class="bi bi-exclamation-circle"></i></div>
+                            <div>
+                                <div class="kpi-label">En riesgo de abandono</div>
+                                <div class="kpi-value" style="color:#EF4444;">18</div>
+                                <div class="kpi-sub text-danger">Requieren acción</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <!-- Tabla de Cohortes -->
+                    <div class="col-12 col-lg-8">
+                        <div class="dashboard-panel">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h3 class="panel-title m-0"><i class="bi bi-table text-primary"></i> Análisis de Cohortes — Retención Mensual</h3>
+                                <span class="small text-muted">% de colegios que siguen activos</span>
+                            </div>
+                            <div style="overflow-x:auto;">
+                            <table class="cohort-table" id="cohortTable">
+                                <thead>
+                                    <tr>
+                                        <th>Cohorte</th>
+                                        <th>Mes 0</th><th>Mes 1</th><th>Mes 2</th><th>Mes 3</th>
+                                        <th>Mes 4</th><th>Mes 5</th><th>Mes 6</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cohortBody"><!-- generado por JS --></tbody>
+                            </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Funnel de activación -->
+                    <div class="col-12 col-lg-4">
+                        <div class="dashboard-panel">
+                            <h3 class="panel-title"><i class="bi bi-funnel text-primary"></i> Embudo de Activación</h3>
+                            <div class="chart-container-md"><canvas id="funnelChart"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /tab-cohortes -->
+
+        </div><!-- /content-area -->
+    </main>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    // ── Mobile Sidebar ──
+    const mobileBtn = document.getElementById('mobileMenuBtn');
+    const sidebar   = document.getElementById('sidebar');
+    if (mobileBtn && sidebar) mobileBtn.addEventListener('click', () => sidebar.classList.toggle('active'));
+
+    // ══════════════════════════════════════
+    // TAB SYSTEM
+    // ══════════════════════════════════════
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    function activateTab(tabId) {
+        tabBtns.forEach(b => b.classList.toggle('active', b.dataset.tab === tabId));
+        tabContents.forEach(c => {
+            const isActive = c.id === 'tab-' + tabId;
+            c.classList.toggle('active', isActive);
+            // Inicializar gráficos de esa pestaña si aún no se han creado
+            if (isActive) initTabCharts(tabId);
+        });
+    }
+
+    tabBtns.forEach(btn => btn.addEventListener('click', () => activateTab(btn.dataset.tab)));
+
+    // ══════════════════════════════════════
+    // Helpers Chart.js
+    // ══════════════════════════════════════
+    Chart.defaults.font = { family: 'Plus Jakarta Sans', size: 12 };
+    const tooltipDefaults = { backgroundColor: '#151A35', titleColor: '#BCC0CF', bodyColor: '#fff', padding: 10, cornerRadius: 8 };
+    const initialized = {};
+
+    function initTabCharts(tabId) {
+        if (initialized[tabId]) return;
+        initialized[tabId] = true;
+
+        if (tabId === 'general')     initGeneral();
+        if (tabId === 'trafico')     initTrafico();
+        if (tabId === 'financiero')  initFinanciero();
+        if (tabId === 'cohortes')    initCohortes();
+    }
+
+    // ── Inicializar General al arrancar ──
+    initTabCharts('general');
+
+    // ══════════════════════════════════════════════════════
+    // TAB: GENERAL
+    // ══════════════════════════════════════════════════════
+    function initGeneral() {
+        setTimeout(() => { document.getElementById('storageBar').style.width = '69.4%'; }, 300);
+
+        // Usage Line
+        new Chart(document.getElementById('usageChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: ['1 Jul','5 Jul','10 Jul','15 Jul','20 Jul','25 Jul','31 Jul'],
+                datasets: [{
+                    label: 'Usuarios Activos',
+                    data: [11200, 14500, 18100, 22800, 19400, 24600, 26800],
+                    borderColor: '#7C5CFC', backgroundColor: 'rgba(124,92,252,.08)',
+                    fill: true, tension: 0.4, pointBackgroundColor: '#7C5CFC',
+                    pointRadius: 4, pointHoverRadius: 6, borderWidth: 2.5
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: {display: false}, tooltip: tooltipDefaults }, scales: { y: { grid: {color:'#F1F3F9'}, ticks:{color:'#687089'} }, x: { grid:{display:false}, ticks:{color:'#687089'} } } }
+        });
+
+        // Plans Doughnut
+        new Chart(document.getElementById('plansPieChart').getContext('2d'), {
+            type: 'doughnut',
+            data: { labels: ['Básico','Estándar','Premium'], datasets: [{ data: [45,120,50], backgroundColor: ['#BCC0CF','#7C5CFC','#65CDBF'], borderWidth: 0, hoverOffset: 6 }] },
+            options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position:'bottom', labels:{padding:16,color:'#687089',usePointStyle:true,pointStyleWidth:8} }, tooltip: tooltipDefaults } }
+        });
+
+        // Módulos Horizontal Bar
+        new Chart(document.getElementById('modulosChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['Libro de Clases','Asistencia','Calificaciones','Anotaciones','Reportes','Comunicados'],
+                datasets: [{ label: 'Sesiones', data: [24800,21500,18900,15300,12600,9400],
+                    backgroundColor: ['rgba(124,92,252,.85)','rgba(101,205,191,.85)','rgba(124,92,252,.65)','rgba(101,205,191,.65)','rgba(188,192,207,.8)','rgba(188,192,207,.6)'],
+                    borderRadius: 6, borderSkipped: false }]
+            },
+            options: { indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false},tooltip:tooltipDefaults}, scales:{x:{grid:{color:'#F1F3F9'},ticks:{color:'#687089'}},y:{grid:{display:false},ticks:{color:'#151A35',font:{weight:'600'}}}} }
+        });
+    }
+
+    // ══════════════════════════════════════════════════════
+    // TAB: ADOPCIÓN Y TRÁFICO
+    // ══════════════════════════════════════════════════════
+    function initTrafico() {
+        // ── Heatmap CSS ──
+        const heatmapData = {
+            days: ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'],
+            hours: ['00h','02h','04h','06h','08h','10h','12h','14h','16h','18h','20h','22h'],
+            values: [
+                [0,0,0,0,0,0,0],[0,0,0,0,0,0,0],[0,0,0,0,0,0,0],
+                [1,1,0,1,1,0,0],[3,3,2,3,3,1,1],[5,5,4,5,5,2,1],
+                [4,4,3,4,5,2,1],[5,5,4,5,5,2,1],[5,5,5,5,5,3,2],
+                [4,5,4,5,4,2,1],[3,4,3,4,3,1,0],[1,2,1,2,2,1,0]
+            ]
+        };
+        const grid = document.getElementById('heatmapGrid');
+        grid.innerHTML = '';
+        // Day headers
+        grid.appendChild(Object.assign(document.createElement('div'), {className: 'h-label'}));
+        heatmapData.days.forEach(d => {
+            const el = document.createElement('div');
+            el.className = 'd-label'; el.textContent = d;
+            grid.appendChild(el);
+        });
+        // Rows
+        heatmapData.hours.forEach((h, hi) => {
+            const lbl = document.createElement('div');
+            lbl.className = 'h-label'; lbl.textContent = h;
+            grid.appendChild(lbl);
+            heatmapData.days.forEach((_, di) => {
+                const v = heatmapData.values[hi][di];
+                const cell = document.createElement('div');
+                cell.className = `heatmap-cell hm-${v}`;
+                const labels = ['Sin actividad','Muy bajo','Bajo','Medio','Alto','Muy alto'];
+                cell.title = `${h} · ${heatmapData.days[di]} — ${labels[v]}`;
+                grid.appendChild(cell);
             });
         });
-    </script>
+
+        // ── Tiempos de Carga (Radar / Bar horizontal) ──
+        new Chart(document.getElementById('loadTimeChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['Libro de Clases','Asistencia','Calificaciones','Dashboard','Reportes','Configuración'],
+                datasets: [
+                    { label: 'Promedio (ms)', data: [420, 310, 680, 290, 850, 230], backgroundColor: 'rgba(124,92,252,.75)', borderRadius: 5, borderSkipped: false },
+                    { label: 'P95 (ms)',       data: [820, 590, 1240, 540, 1680, 440], backgroundColor: 'rgba(239,68,68,.35)',   borderRadius: 5, borderSkipped: false }
+                ]
+            },
+            options: {
+                indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position:'bottom', labels:{color:'#687089',usePointStyle:true,padding:12} }, tooltip: tooltipDefaults },
+                scales: {
+                    x: { grid:{color:'#F1F3F9'}, ticks:{color:'#687089'}, title:{display:true,text:'Milisegundos (ms)',color:'#687089',font:{size:11}} },
+                    y: { grid:{display:false}, ticks:{color:'#151A35',font:{weight:'600'}} }
+                }
+            }
+        });
+
+        // ── Nuevas Suscripciones vs Cancelaciones ──
+        new Chart(document.getElementById('subscChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['Ago 25','Sep 25','Oct 25','Nov 25','Dic 25','Ene 26','Feb 26','Mar 26','Abr 26','May 26','Jun 26','Jul 26'],
+                datasets: [
+                    { label: 'Nuevas',        data: [22,18,25,30,15,28,32,26,35,29,38,42], backgroundColor: 'rgba(124,92,252,.8)', borderRadius: 4 },
+                    { label: 'Cancelaciones', data: [-4,-3,-5,-6,-2,-4,-5,-3,-6,-4,-5,-3],  backgroundColor: 'rgba(239,68,68,.7)',   borderRadius: 4 },
+                    { type: 'line', label: 'Neto acumulado', data: [18,33,53,77,90,114,141,164,193,218,251,290],
+                      borderColor: '#65CDBF', backgroundColor: 'transparent', tension: 0.4, pointRadius: 3, yAxisID: 'y1', borderWidth: 2 }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend:{position:'bottom',labels:{color:'#687089',usePointStyle:true,padding:14}}, tooltip: tooltipDefaults },
+                scales: {
+                    y:  { grid:{color:'#F1F3F9'}, ticks:{color:'#687089'}, title:{display:true,text:'Colegios',color:'#687089',font:{size:11}} },
+                    y1: { position:'right', grid:{display:false}, ticks:{color:'#65CDBF'}, title:{display:true,text:'Acumulado',color:'#65CDBF',font:{size:11}} },
+                    x:  { grid:{display:false}, ticks:{color:'#687089'} }
+                }
+            }
+        });
+    }
+
+    // ══════════════════════════════════════════════════════
+    // TAB: RENDIMIENTO FINANCIERO
+    // ══════════════════════════════════════════════════════
+    function initFinanciero() {
+        // MRR Acumulado (Area + Line)
+        new Chart(document.getElementById('mrrChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: ['Ago 25','Sep 25','Oct 25','Nov 25','Dic 25','Ene 26','Feb 26','Mar 26','Abr 26','May 26','Jun 26','Jul 26'],
+                datasets: [
+                    { label: 'MRR Real ($M)', data: [41,44,47,52,49,55,57,60,62,64,63,68],
+                      borderColor: '#7C5CFC', backgroundColor: 'rgba(124,92,252,.09)', fill: true, tension: 0.4, pointRadius: 4, borderWidth: 2.5 },
+                    { label: 'Objetivo MRR',  data: [42,45,48,51,54,57,59,62,64,65,66,67],
+                      borderColor: '#BCC0CF', backgroundColor: 'transparent', borderDash:[6,4], tension: 0.2, pointRadius: 0, borderWidth: 1.8 }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend:{position:'bottom',labels:{color:'#687089',usePointStyle:true,padding:14}}, tooltip: tooltipDefaults },
+                scales: {
+                    y: { grid:{color:'#F1F3F9'}, ticks:{color:'#687089',callback: v => '$'+v+'M'} },
+                    x: { grid:{display:false}, ticks:{color:'#687089'} }
+                }
+            }
+        });
+
+        // Ingresos por Plan (donut)
+        new Chart(document.getElementById('revenueByPlanChart').getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Básico (12%)','Estándar (41%)','Premium (47%)'],
+                datasets: [{ data: [8.2,27.9,32.1], backgroundColor: ['#BCC0CF','#7C5CFC','#65CDBF'], borderWidth: 0, hoverOffset: 6 }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false, cutout: '60%',
+                plugins: { legend:{position:'bottom',labels:{color:'#687089',usePointStyle:true,padding:12,font:{size:11}}}, tooltip:{...tooltipDefaults,callbacks:{label: ctx => ` $${ctx.raw}M`}} }
+            }
+        });
+    }
+
+    // ══════════════════════════════════════════════════════
+    // TAB: COHORTES Y RETENCIÓN
+    // ══════════════════════════════════════════════════════
+    function initCohortes() {
+        // ── Cohort Table ──
+        const cohorts = [
+            { name: 'Feb 2026', vals: [100, 94, 91, 88, 85, 83, 80] },
+            { name: 'Mar 2026', vals: [100, 95, 92, 89, 86, 84, null] },
+            { name: 'Abr 2026', vals: [100, 93, 90, 87, 84, null, null] },
+            { name: 'May 2026', vals: [100, 96, 93, 91, null, null, null] },
+            { name: 'Jun 2026', vals: [100, 95, 92, null, null, null, null] },
+            { name: 'Jul 2026', vals: [100, 94, null, null, null, null, null] },
+        ];
+
+        function retentionColor(v) {
+            if (v === null) return 'background:#F8F9FD;color:#BCC0CF;';
+            if (v >= 90) return 'background:rgba(101,205,191,.25);color:#147A6A;';
+            if (v >= 80) return 'background:rgba(124,92,252,.18);color:#5B35D4;';
+            if (v >= 70) return 'background:rgba(255,193,7,.25);color:#856404;';
+            return 'background:rgba(239,68,68,.18);color:#B91C1C;';
+        }
+
+        const tbody = document.getElementById('cohortBody');
+        cohorts.forEach(c => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td>${c.name}</td>` + c.vals.map(v =>
+                `<td><span class="cohort-cell" style="${retentionColor(v)}">${v !== null ? v+'%' : '—'}</span></td>`
+            ).join('');
+            tbody.appendChild(tr);
+        });
+
+        // ── Funnel de activación (Bar invertido) ──
+        new Chart(document.getElementById('funnelChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['Registro', 'Configuración', '1ra sesión activa', 'Módulo cargado', 'Usuarios invitados', 'Renovación'],
+                datasets: [{
+                    label: 'Colegios',
+                    data: [215, 204, 198, 190, 172, 156],
+                    backgroundColor: [
+                        'rgba(124,92,252,.90)', 'rgba(124,92,252,.75)', 'rgba(124,92,252,.60)',
+                        'rgba(101,205,191,.80)', 'rgba(101,205,191,.60)', 'rgba(101,205,191,.40)'
+                    ],
+                    borderRadius: 6, borderSkipped: false
+                }]
+            },
+            options: {
+                indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+                plugins: { legend:{display:false}, tooltip:{...tooltipDefaults,callbacks:{label: ctx => ` ${ctx.raw} colegios (${Math.round(ctx.raw/215*100)}%)`}} },
+                scales: {
+                    x: { min: 0, max: 240, grid:{color:'#F1F3F9'}, ticks:{color:'#687089'} },
+                    y: { grid:{display:false}, ticks:{color:'#151A35',font:{weight:'600'},font:{size:11}} }
+                }
+            }
+        });
+    }
+
+    // ══════════════════════════════════════════════════════
+    // FILTER BAR — Feedback visual
+    // ══════════════════════════════════════════════════════
+    document.getElementById('btnAplicar').addEventListener('click', function() {
+        this.innerHTML = '<i class="bi bi-check-lg"></i> Filtros aplicados';
+        this.style.background = '#148A7A';
+        setTimeout(() => {
+            this.innerHTML = '<i class="bi bi-funnel-fill"></i> Aplicar Filtros';
+            this.style.background = '';
+        }, 2000);
+    });
+
+    document.getElementById('btnExportar').addEventListener('click', function() {
+        this.innerHTML = '<i class="bi bi-hourglass-split"></i> Preparando…';
+        setTimeout(() => {
+            this.innerHTML = '<i class="bi bi-file-earmark-spreadsheet"></i> Exportar CSV';
+        }, 1800);
+    });
+});
+</script>
 </body>
 </html>
