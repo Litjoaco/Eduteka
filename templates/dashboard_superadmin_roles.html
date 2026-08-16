@@ -1,0 +1,876 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roles y Permisos - Super Admin Eduteka</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <!-- Fuentes e Iconos -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        /* ══ DESIGN TOKENS (idénticos al resto del Super Admin) ═══════════════ */
+        :root {
+            --primary:        #7C5CFC;
+            --primary-soft:   rgba(124, 92, 252, 0.08);
+            --primary-hover:  #6747E3;
+            --secondary:      #65CDBF;
+            --secondary-soft: rgba(101, 205, 191, 0.08);
+            --bg:             #F8F9FD;
+            --white:          #FFFFFF;
+            --dark:           #151A35;
+            --gray-text:      #687089;
+            --border:         #BCC0CF;
+            --radius-lg:      16px;
+            --radius-md:      10px;
+            --radius-sm:      8px;
+        }
+
+        * { font-family: 'Plus Jakarta Sans', sans-serif; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+            margin: 0;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -15%; left: 65%;
+            width: 50vw; height: 50vw;
+            background: radial-gradient(circle, rgba(124, 92, 252, 0.07) 0%, rgba(255,255,255,0) 70%);
+            z-index: -2; pointer-events: none;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            top: 45%; left: -15%;
+            width: 40vw; height: 40vw;
+            background: radial-gradient(circle, rgba(101, 205, 191, 0.06) 0%, rgba(255,255,255,0) 70%);
+            z-index: -2; pointer-events: none;
+        }
+
+        .wrapper { display: flex; width: 100%; align-items: stretch; }
+
+        /* ── TOPBAR */
+        .topbar {
+            height: 70px;
+            background: rgba(255, 255, 255, 0.85) !important;
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 2rem;
+            position: sticky; top: 0; z-index: 98;
+        }
+        .search-bar { position: relative; width: 320px; }
+        .search-bar i { position: absolute; left: .85rem; top: 50%; transform: translateY(-50%); color: var(--gray-text); }
+        .search-bar input {
+            width: 100%; padding: .5rem 1rem .5rem 2.4rem;
+            border: 1px solid var(--border); border-radius: var(--radius-md);
+            background: var(--bg); font-size: .85rem; outline: none; transition: all .2s;
+        }
+        .search-bar input:focus { border-color: var(--primary); background: var(--white); box-shadow: 0 0 0 3px rgba(124,92,252,.12); }
+
+        .topbar-right { display: flex; align-items: center; gap: 1.25rem; }
+        .user-profile {
+            display: flex; align-items: center; gap: .75rem;
+            background: var(--white); padding: .35rem .85rem .35rem .4rem;
+            border-radius: 30px; border: 1px solid var(--border);
+        }
+        .user-avatar {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+            color: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: .85rem;
+        }
+        .user-name { font-weight: 600; font-size: .88rem; color: var(--dark); }
+
+        /* ── CONTENT AREA */
+        .content-area { padding: 1.75rem 2rem; max-width: 1400px; width: 100%; margin: 0 auto; }
+
+        /* ── HERO */
+        .hero-title   { font-size: 1.6rem; font-weight: 800; color: var(--dark); margin-bottom: .25rem; }
+        .hero-subtitle { color: var(--gray-text); font-size: .9rem; }
+
+        /* ── STAT CARDS */
+        .stat-card {
+            background: var(--white); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 1.25rem 1.5rem;
+            display: flex; align-items: center; gap: 1rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,.04);
+            transition: box-shadow .2s, transform .2s;
+        }
+        .stat-card:hover { box-shadow: 0 6px 24px rgba(124,92,252,.1); transform: translateY(-2px); }
+        .stat-icon {
+            width: 46px; height: 46px; border-radius: var(--radius-md);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem; flex-shrink: 0;
+        }
+        .stat-icon.purple { background: rgba(124,92,252,.1); color: var(--primary); }
+        .stat-icon.teal   { background: rgba(101,205,191,.15); color: #0A9F8C; }
+        .stat-icon.amber  { background: rgba(245,158,11,.12); color: #D97706; }
+        .stat-icon.rose   { background: rgba(236,72,153,.1); color: #DB2777; }
+        .stat-value { font-size: 1.55rem; font-weight: 800; color: var(--dark); line-height: 1; }
+        .stat-label { font-size: .76rem; color: var(--gray-text); font-weight: 500; margin-top: .2rem; }
+
+        /* ── PANEL */
+        .panel { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: 0 4px 20px rgba(0,0,0,.03); overflow: hidden; }
+        .panel-header { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); }
+        .panel-title { font-size: 1rem; font-weight: 700; color: var(--dark); }
+        .panel-subtitle { font-size: .78rem; color: var(--gray-text); margin-top: .1rem; }
+
+        /* ── TABLE */
+        .roles-table { width: 100%; border-collapse: collapse; }
+        .roles-table thead th {
+            padding: .75rem 1.5rem;
+            font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+            color: var(--gray-text); background: #FAFBFF; border-bottom: 1px solid var(--border); white-space: nowrap;
+        }
+        .roles-table tbody tr { border-bottom: 1px solid rgba(188,192,207,.4); transition: background .15s; }
+        .roles-table tbody tr:last-child { border-bottom: none; }
+        .roles-table tbody tr:hover { background: rgba(124,92,252,.03); }
+        .roles-table tbody td { padding: 1rem 1.5rem; vertical-align: middle; }
+
+        /* ── ROLE CHIPS */
+        .role-chip {
+            display: inline-flex; align-items: center; gap: .45rem;
+            padding: .3rem .75rem; border-radius: 999px;
+            font-size: .78rem; font-weight: 700;
+        }
+        .role-chip .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+        .chip-director  { background: rgba(124,92,252,.1);  color: #6944E0; }
+        .chip-director .dot  { background: #6944E0; }
+        .chip-profesor  { background: rgba(59,130,246,.1);  color: #2563EB; }
+        .chip-profesor .dot  { background: #2563EB; }
+        .chip-utp       { background: rgba(16,185,129,.1);  color: #059669; }
+        .chip-utp .dot       { background: #059669; }
+        .chip-alumno    { background: rgba(245,158,11,.12); color: #B45309; }
+        .chip-alumno .dot    { background: #B45309; }
+        .chip-apoderado { background: rgba(236,72,153,.1);  color: #BE185D; }
+        .chip-apoderado .dot { background: #BE185D; }
+        .chip-inspector { background: rgba(139,92,246,.1);  color: #7C3AED; }
+        .chip-inspector .dot { background: #7C3AED; }
+        .chip-admin     { background: rgba(239,68,68,.1);   color: #DC2626; }
+        .chip-admin .dot     { background: #DC2626; }
+
+        /* ── PERM BADGES */
+        .perm-badges { display: flex; flex-wrap: wrap; gap: .3rem; }
+        .perm-badge {
+            display: inline-flex; align-items: center; gap: .3rem;
+            padding: .2rem .6rem; border-radius: var(--radius-sm);
+            font-size: .7rem; font-weight: 600; white-space: nowrap;
+        }
+        .perm-badge i { font-size: .7rem; }
+        .pb-ver      { background: #EEF2FF; color: #4338CA; }
+        .pb-crear    { background: #D1FAE5; color: #065F46; }
+        .pb-editar   { background: #FEF3C7; color: #92400E; }
+        .pb-eliminar { background: #FEE2E2; color: #991B1B; }
+        .pb-aprobar  { background: #E0E7FF; color: #3730A3; }
+        .pb-exportar { background: #F0FDF4; color: #166534; }
+        .pb-mensajes { background: #FFF7ED; color: #9A3412; }
+        .pb-admin    { background: rgba(124,92,252,.1); color: #5B21B6; }
+        .pb-extra    {
+            background: var(--bg); color: var(--gray-text);
+            border: 1px dashed var(--border); cursor: pointer; transition: background .15s;
+        }
+        .pb-extra:hover { background: #EEF2FF; color: var(--primary); }
+
+        /* ── BASE BADGE */
+        .base-badge {
+            display: inline-flex; align-items: center; gap: .3rem;
+            padding: .15rem .55rem;
+            background: rgba(124,92,252,.08); border: 1px solid rgba(124,92,252,.2);
+            color: var(--primary); border-radius: 999px;
+            font-size: .67rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+        }
+
+        /* ── ACTION BUTTONS */
+        .action-btn {
+            width: 32px; height: 32px;
+            display: inline-flex; align-items: center; justify-content: center;
+            border-radius: var(--radius-sm); border: 1px solid var(--border);
+            background: var(--white); color: var(--gray-text);
+            font-size: .85rem; text-decoration: none; transition: all .18s; cursor: pointer;
+        }
+        .action-btn:hover { color: var(--dark); border-color: var(--dark); background: var(--bg); }
+        .action-btn.edit:hover { color: var(--primary); border-color: var(--primary); background: var(--primary-soft); }
+        .action-btn.del:hover  { color: #DC2626; border-color: #FCA5A5; background: #FEF2F2; }
+        .action-btn.view:hover { color: #2563EB; border-color: #93C5FD; background: #EFF6FF; }
+
+        /* ── BUTTONS */
+        .btn-primary-custom {
+            display: inline-flex; align-items: center; gap: .45rem;
+            padding: .55rem 1.25rem; background: var(--primary); color: #fff;
+            border: none; border-radius: var(--radius-md); font-weight: 600; font-size: .85rem;
+            cursor: pointer; transition: all .2s; text-decoration: none;
+        }
+        .btn-primary-custom:hover { background: var(--primary-hover); color: #fff; box-shadow: 0 6px 18px rgba(108,79,240,.3); transform: translateY(-1px); }
+        .btn-outline-custom {
+            display: inline-flex; align-items: center; gap: .4rem;
+            padding: .5rem 1rem; background: var(--white); border: 1px solid var(--border);
+            border-radius: var(--radius-md); font-weight: 600; font-size: .82rem; color: var(--dark);
+            cursor: pointer; transition: all .18s; text-decoration: none;
+        }
+        .btn-outline-custom:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-soft); }
+
+        /* ── TABLE SEARCH */
+        .table-search { position: relative; width: 220px; }
+        .table-search i { position: absolute; left: .75rem; top: 50%; transform: translateY(-50%); color: var(--gray-text); font-size: .85rem; }
+        .table-search input {
+            width: 100%; padding: .45rem .9rem .45rem 2.1rem;
+            border: 1px solid var(--border); border-radius: var(--radius-md);
+            background: var(--bg); font-size: .82rem; outline: none; transition: all .2s;
+        }
+        .table-search input:focus { border-color: var(--primary); background: var(--white); box-shadow: 0 0 0 3px rgba(124,92,252,.1); }
+
+        /* ── FORM CONTROLS */
+        .form-label-custom { font-size: .78rem; font-weight: 700; color: var(--gray-text); margin-bottom: .35rem; display: block; text-transform: uppercase; letter-spacing: .05em; }
+        .form-control-custom {
+            width: 100%; padding: .55rem .9rem; border: 1px solid var(--border);
+            border-radius: var(--radius-md); font-size: .88rem; outline: none; transition: all .2s;
+        }
+        .form-control-custom:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(124,92,252,.12); }
+
+        /* ── PERM CHECKBOX GRID */
+        .perm-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: .6rem; }
+        .perm-check {
+            display: flex; align-items: center; gap: .6rem;
+            padding: .6rem .85rem; border: 1px solid var(--border);
+            border-radius: var(--radius-md); cursor: pointer; transition: all .18s;
+            font-size: .83rem; font-weight: 600; user-select: none;
+        }
+        .perm-check:hover { border-color: var(--primary); background: var(--primary-soft); }
+        .perm-check input[type=checkbox] { accent-color: var(--primary); width: 15px; height: 15px; flex-shrink: 0; }
+        .perm-check.checked { border-color: var(--primary); background: var(--primary-soft); color: var(--primary); }
+
+        /* ── MODAL */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(21,26,53,.45); backdrop-filter: blur(4px);
+            z-index: 2000; align-items: center; justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-box {
+            background: var(--white); border-radius: var(--radius-lg); padding: 2rem;
+            width: 560px; max-width: calc(100vw - 2rem);
+            box-shadow: 0 24px 64px rgba(0,0,0,.15);
+            animation: modal-in .25s ease;
+        }
+        @keyframes modal-in { from { opacity:0; transform:scale(.95) translateY(12px); } to { opacity:1; transform:scale(1) translateY(0); } }
+        .modal-title   { font-size: 1.1rem; font-weight: 800; color: var(--dark); margin-bottom: .25rem; }
+        .modal-subtitle { font-size: .82rem; color: var(--gray-text); margin-bottom: 1.5rem; }
+
+        /* ── TOOLTIP */
+        [data-tooltip] { position: relative; }
+        [data-tooltip]::after {
+            content: attr(data-tooltip); position: absolute; bottom: calc(100% + 6px); left: 50%;
+            transform: translateX(-50%); background: var(--dark); color: #fff;
+            font-size: .7rem; padding: .3rem .6rem; border-radius: 6px; white-space: nowrap;
+            pointer-events: none; opacity: 0; transition: opacity .2s; z-index: 99;
+        }
+        [data-tooltip]:hover::after { opacity: 1; }
+
+        @media (max-width: 991.98px) {
+            .content-area { padding: 1.25rem 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    {% include '_sidebar_superadmin.html' with active_page='roles' %}
+
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <div class="d-flex align-items-center gap-2">
+                <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn"
+                    style="border:none;background:var(--primary-soft);color:var(--primary);">
+                    <i class="bi bi-list fs-5"></i>
+                </button>
+                <div class="search-bar">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="globalSearch" placeholder="Buscar roles, permisos...">
+                </div>
+            </div>
+            <div class="topbar-right">
+                <button style="background:none;border:none;color:var(--gray-text);font-size:1.1rem;position:relative;cursor:pointer;">
+                    <i class="bi bi-bell"></i>
+                    <span style="position:absolute;top:0;right:0;width:7px;height:7px;background:#F76F7A;border-radius:50%;border:2px solid white;"></span>
+                </button>
+                <div class="user-profile">
+                    <div class="user-avatar">AE</div>
+                    <span class="user-name">Admin Eduteka</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="content-area">
+
+            <!-- HERO HEADER -->
+            <div class="d-flex align-items-start justify-content-between mb-4 flex-wrap gap-3">
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <div style="width:34px;height:34px;background:var(--primary-soft);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;">
+                            <i class="bi bi-key-fill" style="color:var(--primary);font-size:1rem;"></i>
+                        </div>
+                        <h1 class="hero-title mb-0">Gestión Global de Roles y Permisos</h1>
+                    </div>
+                    <p class="hero-subtitle ms-1">
+                        Define los roles base del sistema que se heredan en cada institución cliente.
+                        Los cambios aquí afectan a todos los colegios que usen este rol como plantilla.
+                    </p>
+                </div>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="#" class="btn-outline-custom">
+                        <i class="bi bi-upload"></i> Importar Roles
+                    </a>
+                    <button class="btn-primary-custom" onclick="openCreateModal()">
+                        <i class="bi bi-plus-lg"></i> Crear Nuevo Rol Base
+                    </button>
+                </div>
+            </div>
+
+            <!-- STAT CARDS -->
+            <div class="row g-3 mb-4">
+                <div class="col-6 col-xl-3">
+                    <div class="stat-card">
+                        <div class="stat-icon purple"><i class="bi bi-shield-check"></i></div>
+                        <div>
+                            <div class="stat-value">7</div>
+                            <div class="stat-label">Roles Base del Sistema</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-xl-3">
+                    <div class="stat-card">
+                        <div class="stat-icon teal"><i class="bi bi-toggles"></i></div>
+                        <div>
+                            <div class="stat-value">34</div>
+                            <div class="stat-label">Permisos Disponibles</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-xl-3">
+                    <div class="stat-card">
+                        <div class="stat-icon amber"><i class="bi bi-building"></i></div>
+                        <div>
+                            <div class="stat-value">12</div>
+                            <div class="stat-label">Colegios con Roles Activos</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-xl-3">
+                    <div class="stat-card">
+                        <div class="stat-icon rose"><i class="bi bi-people"></i></div>
+                        <div>
+                            <div class="stat-value">248</div>
+                            <div class="stat-label">Usuarios con Rol Asignado</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ROLES TABLE PANEL -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div>
+                        <div class="panel-title">
+                            <i class="bi bi-list-ul me-1" style="color:var(--primary);"></i>
+                            Roles del Sistema
+                        </div>
+                        <div class="panel-subtitle">
+                            Los roles con
+                            <span class="base-badge" style="vertical-align:middle;">
+                                <i class="bi bi-star-fill" style="font-size:.55rem;"></i> Rol Base
+                            </span>
+                            son plantillas globales clonadas a cada colegio en onboarding.
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <div class="table-search">
+                            <i class="bi bi-search"></i>
+                            <input type="text" id="tableSearch" placeholder="Filtrar roles..." oninput="filterTable()">
+                        </div>
+                        <select id="filterModule" class="form-control-custom"
+                            style="width:auto;padding:.45rem .85rem;font-size:.82rem;" onchange="filterTable()">
+                            <option value="">Todos los módulos</option>
+                            <option value="notas">Notas / Calificaciones</option>
+                            <option value="asistencia">Asistencia</option>
+                            <option value="comunicaciones">Comunicaciones</option>
+                            <option value="contabilidad">Contabilidad</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="overflow-x:auto;">
+                    <table class="roles-table" id="rolesTable">
+                        <thead>
+                            <tr>
+                                <th style="width:180px;">Nombre del Rol</th>
+                                <th>Descripción</th>
+                                <th>Módulo Principal</th>
+                                <th style="min-width:340px;">Permisos Asignados</th>
+                                <th style="width:120px;">Usuarios</th>
+                                <th style="width:110px;text-align:center;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rolesBody">
+
+                            <!-- Director -->
+                            <tr data-role="director" data-module="">
+                                <td>
+                                    <div class="d-flex flex-column gap-1">
+                                        <span class="role-chip chip-director"><span class="dot"></span>Director</span>
+                                        <span class="base-badge"><i class="bi bi-star-fill" style="font-size:.55rem;"></i> Rol Base</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="font-size:.84rem;font-weight:500;">Director o Rector del Establecimiento</div>
+                                    <div style="font-size:.74rem;color:var(--gray-text);margin-top:.15rem;">Acceso total a todas las secciones del colegio.</div>
+                                </td>
+                                <td><span style="font-size:.78rem;color:var(--gray-text);">Administración General</span></td>
+                                <td>
+                                    <div class="perm-badges">
+                                        <span class="perm-badge pb-ver"><i class="bi bi-eye"></i>Ver Todo</span>
+                                        <span class="perm-badge pb-crear"><i class="bi bi-plus"></i>Crear</span>
+                                        <span class="perm-badge pb-editar"><i class="bi bi-pencil"></i>Editar</span>
+                                        <span class="perm-badge pb-aprobar"><i class="bi bi-check2-circle"></i>Aprobar</span>
+                                        <span class="perm-badge pb-admin"><i class="bi bi-shield"></i>Administrar</span>
+                                        <span class="perm-badge pb-extra" data-tooltip="Exportar, Enviar mensajes, Eliminar">+3 más</span>
+                                    </div>
+                                </td>
+                                <td><span style="font-size:.82rem;color:var(--gray-text);">7 usuarios</span></td>
+                                <td>
+                                    <div class="d-flex align-items-center justify-content-center gap-1">
+                                        <button class="action-btn view" title="Ver detalle" onclick="openEditModal('Director')"><i class="bi bi-eye"></i></button>
+                                        <button class="action-btn edit" title="Editar rol" onclick="openEditModal('Director')"><i class="bi bi-pencil"></i></button>
+                                        <button class="action-btn del" title="Eliminar" onclick="confirmDelete('Director')"><i class="bi bi-trash3"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Profesor — fila destacada con el ejemplo explícito pedido -->
+                            <tr data-role="profesor" data-module="notas asistencia" style="background:rgba(59,130,246,.025);">
+                                <td>
+                                    <div class="d-flex flex-column gap-1">
+                                        <span class="role-chip chip-profesor"><span class="dot"></span>Profesor</span>
+                                        <span class="base-badge"><i class="bi bi-star-fill" style="font-size:.55rem;"></i> Rol Base</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="font-size:.84rem;font-weight:500;">Docente de Aula / Asignatura</div>
+                                    <div style="font-size:.74rem;color:var(--gray-text);margin-top:.15rem;">Gestiona asistencia, notas y anotaciones de sus cursos asignados.</div>
+                                </td>
+                                <td><span style="font-size:.78rem;color:var(--gray-text);">Libro de Clases / Notas</span></td>
+                                <td>
+                                    <div class="perm-badges">
+                                        <!-- Badge explícito requerido en el brief -->
+                                        <span class="perm-badge pb-ver" style="border:1px solid #C7D2FE;font-weight:700;">
+                                            <i class="bi bi-eye"></i>Ver Notas del Curso
+                                        </span>
+                                        <span class="perm-badge pb-crear"><i class="bi bi-plus"></i>Crear Evaluaciones</span>
+                                        <span class="perm-badge pb-editar"><i class="bi bi-pencil"></i>Editar Notas</span>
+                                        <span class="perm-badge pb-ver"><i class="bi bi-calendar-check"></i>Ver Asistencia</span>
+                                        <span class="perm-badge pb-crear"><i class="bi bi-calendar-plus"></i>Registrar Asistencia</span>
+                                        <span class="perm-badge pb-extra" data-tooltip="Exportar Libro de Clases, Crear Anotaciones">+2 más</span>
+                                    </div>
+                                </td>
+                                <td><span style="font-size:.82rem;color:var(--gray-text);">42 usuarios</span></td>
+                                <td>
+                                    <div class="d-flex align-items-center justify-content-center gap-1">
+                                        <button class="action-btn view" title="Ver detalle" onclick="openEditModal('Profesor')"><i class="bi bi-eye"></i></button>
+                                        <button class="action-btn edit" title="Editar rol" onclick="openEditModal('Profesor')"><i class="bi bi-pencil"></i></button>
+                                        <button class="action-btn del" title="Eliminar" onclick="confirmDelete('Profesor')"><i class="bi bi-trash3"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- UTP -->
+                            <tr data-role="utp" data-module="notas">
+                                <td>
+                                    <div class="d-flex flex-column gap-1">
+                                        <span class="role-chip chip-utp"><span class="dot"></span>UTP</span>
+                                        <span class="base-badge"><i class="bi bi-star-fill" style="font-size:.55rem;"></i> Rol Base</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="font-size:.84rem;font-weight:500;">Unidad Técnica Pedagógica</div>
+                                    <div style="font-size:.74rem;color:var(--gray-text);margin-top:.15rem;">Supervisa currículo, evaluaciones y calificaciones del establecimiento.</div>
+                                </td>
+                                <td><span style="font-size:.78rem;color:var(--gray-text);">Calificaciones / Reportes</span></td>
+                                <td>
+                                    <div class="perm-badges">
+                                        <span class="perm-badge pb-ver"><i class="bi bi-eye"></i>Ver Notas Globales</span>
+                                        <span class="perm-badge pb-editar"><i class="bi bi-pencil"></i>Editar Evaluaciones</span>
+                                        <span class="perm-badge pb-aprobar"><i class="bi bi-check2-circle"></i>Aprobar Períodos</span>
+                                        <span class="perm-badge pb-exportar"><i class="bi bi-download"></i>Exportar Reportes</span>
+                                    </div>
+                                </td>
+                                <td><span style="font-size:.82rem;color:var(--gray-text);">6 usuarios</span></td>
+                                <td>
+                                    <div class="d-flex align-items-center justify-content-center gap-1">
+                                        <button class="action-btn view" onclick="openEditModal('UTP')"><i class="bi bi-eye"></i></button>
+                                        <button class="action-btn edit" onclick="openEditModal('UTP')"><i class="bi bi-pencil"></i></button>
+                                        <button class="action-btn del" onclick="confirmDelete('UTP')"><i class="bi bi-trash3"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Inspector -->
+                            <tr data-role="inspector" data-module="asistencia comunicaciones">
+                                <td>
+                                    <div class="d-flex flex-column gap-1">
+                                        <span class="role-chip chip-inspector"><span class="dot"></span>Inspector</span>
+                                        <span class="base-badge"><i class="bi bi-star-fill" style="font-size:.55rem;"></i> Rol Base</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="font-size:.84rem;font-weight:500;">Inspector General / Convivencia</div>
+                                    <div style="font-size:.74rem;color:var(--gray-text);margin-top:.15rem;">Gestiona asistencia, anotaciones disciplinarias y citaciones.</div>
+                                </td>
+                                <td><span style="font-size:.78rem;color:var(--gray-text);">Asistencia / Convivencia</span></td>
+                                <td>
+                                    <div class="perm-badges">
+                                        <span class="perm-badge pb-ver"><i class="bi bi-calendar-check"></i>Ver Asistencia</span>
+                                        <span class="perm-badge pb-editar"><i class="bi bi-pencil"></i>Editar Anotaciones</span>
+                                        <span class="perm-badge pb-mensajes"><i class="bi bi-chat"></i>Enviar Mensajes</span>
+                                        <span class="perm-badge pb-extra" data-tooltip="Registrar Citaciones, Exportar Asistencia">+2 más</span>
+                                    </div>
+                                </td>
+                                <td><span style="font-size:.82rem;color:var(--gray-text);">9 usuarios</span></td>
+                                <td>
+                                    <div class="d-flex align-items-center justify-content-center gap-1">
+                                        <button class="action-btn view" onclick="openEditModal('Inspector')"><i class="bi bi-eye"></i></button>
+                                        <button class="action-btn edit" onclick="openEditModal('Inspector')"><i class="bi bi-pencil"></i></button>
+                                        <button class="action-btn del" onclick="confirmDelete('Inspector')"><i class="bi bi-trash3"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Alumno -->
+                            <tr data-role="alumno" data-module="">
+                                <td>
+                                    <div class="d-flex flex-column gap-1">
+                                        <span class="role-chip chip-alumno"><span class="dot"></span>Alumno</span>
+                                        <span class="base-badge"><i class="bi bi-star-fill" style="font-size:.55rem;"></i> Rol Base</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="font-size:.84rem;font-weight:500;">Estudiante del Establecimiento</div>
+                                    <div style="font-size:.74rem;color:var(--gray-text);margin-top:.15rem;">Solo consulta sus propias notas, asistencia y comunicados.</div>
+                                </td>
+                                <td><span style="font-size:.78rem;color:var(--gray-text);">Portal del Estudiante</span></td>
+                                <td>
+                                    <div class="perm-badges">
+                                        <span class="perm-badge pb-ver"><i class="bi bi-eye"></i>Ver Mis Notas</span>
+                                        <span class="perm-badge pb-ver"><i class="bi bi-calendar-check"></i>Ver Mi Asistencia</span>
+                                        <span class="perm-badge pb-ver"><i class="bi bi-megaphone"></i>Ver Comunicados</span>
+                                    </div>
+                                </td>
+                                <td><span style="font-size:.82rem;color:var(--gray-text);">184 usuarios</span></td>
+                                <td>
+                                    <div class="d-flex align-items-center justify-content-center gap-1">
+                                        <button class="action-btn view" onclick="openEditModal('Alumno')"><i class="bi bi-eye"></i></button>
+                                        <button class="action-btn edit" onclick="openEditModal('Alumno')"><i class="bi bi-pencil"></i></button>
+                                        <button class="action-btn del" onclick="confirmDelete('Alumno')"><i class="bi bi-trash3"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Apoderado -->
+                            <tr data-role="apoderado" data-module="comunicaciones">
+                                <td>
+                                    <div class="d-flex flex-column gap-1">
+                                        <span class="role-chip chip-apoderado"><span class="dot"></span>Apoderado</span>
+                                        <span class="base-badge"><i class="bi bi-star-fill" style="font-size:.55rem;"></i> Rol Base</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="font-size:.84rem;font-weight:500;">Apoderado / Tutor del Estudiante</div>
+                                    <div style="font-size:.74rem;color:var(--gray-text);margin-top:.15rem;">Accede a notas, asistencia y comunicaciones de su pupilo.</div>
+                                </td>
+                                <td><span style="font-size:.78rem;color:var(--gray-text);">Portal de Apoderados</span></td>
+                                <td>
+                                    <div class="perm-badges">
+                                        <span class="perm-badge pb-ver"><i class="bi bi-eye"></i>Ver Notas de Pupilo</span>
+                                        <span class="perm-badge pb-ver"><i class="bi bi-calendar-check"></i>Ver Asistencia</span>
+                                        <span class="perm-badge pb-mensajes"><i class="bi bi-chat"></i>Mensajería</span>
+                                    </div>
+                                </td>
+                                <td><span style="font-size:.82rem;color:var(--gray-text);">—</span></td>
+                                <td>
+                                    <div class="d-flex align-items-center justify-content-center gap-1">
+                                        <button class="action-btn view" onclick="openEditModal('Apoderado')"><i class="bi bi-eye"></i></button>
+                                        <button class="action-btn edit" onclick="openEditModal('Apoderado')"><i class="bi bi-pencil"></i></button>
+                                        <button class="action-btn del" onclick="confirmDelete('Apoderado')"><i class="bi bi-trash3"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Administrador (no base) -->
+                            <tr data-role="admin" data-module="">
+                                <td>
+                                    <div class="d-flex flex-column gap-1">
+                                        <span class="role-chip chip-admin"><span class="dot"></span>Administrador</span>
+                                        <span style="font-size:.68rem;color:var(--gray-text);font-weight:600;">Personalizable por colegio</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="font-size:.84rem;font-weight:500;">Administrador del Establecimiento</div>
+                                    <div style="font-size:.74rem;color:var(--gray-text);margin-top:.15rem;">Gestiona usuarios, suscripción y configuración del colegio.</div>
+                                </td>
+                                <td><span style="font-size:.78rem;color:var(--gray-text);">Administración / ERP</span></td>
+                                <td>
+                                    <div class="perm-badges">
+                                        <span class="perm-badge pb-ver"><i class="bi bi-eye"></i>Ver Todo</span>
+                                        <span class="perm-badge pb-crear"><i class="bi bi-plus"></i>Crear Usuarios</span>
+                                        <span class="perm-badge pb-admin"><i class="bi bi-shield"></i>Administrar</span>
+                                        <span class="perm-badge pb-exportar"><i class="bi bi-download"></i>Exportar</span>
+                                        <span class="perm-badge pb-extra" data-tooltip="Editar Config, Aprobar Solicitudes, Enviar Mensajes">+3 más</span>
+                                    </div>
+                                </td>
+                                <td><span style="font-size:.82rem;color:var(--gray-text);">—</span></td>
+                                <td>
+                                    <div class="d-flex align-items-center justify-content-center gap-1">
+                                        <button class="action-btn view" onclick="openEditModal('Administrador')"><i class="bi bi-eye"></i></button>
+                                        <button class="action-btn edit" onclick="openEditModal('Administrador')"><i class="bi bi-pencil"></i></button>
+                                        <button class="action-btn del" onclick="confirmDelete('Administrador')"><i class="bi bi-trash3"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Table Footer -->
+                <div style="padding:.85rem 1.5rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;">
+                    <span style="font-size:.78rem;color:var(--gray-text);" id="tableCount">
+                        Mostrando <strong>7</strong> roles en total
+                    </span>
+                    <div class="d-flex gap-2">
+                        <a href="#" class="btn-outline-custom" style="font-size:.78rem;padding:.35rem .85rem;">
+                            <i class="bi bi-download"></i> Exportar Roles
+                        </a>
+                        <a href="#" class="btn-outline-custom" style="font-size:.78rem;padding:.35rem .85rem;">
+                            <i class="bi bi-arrow-clockwise"></i> Sincronizar Colegios
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INFO CALLOUT -->
+            <div style="margin-top:1.5rem;padding:1.1rem 1.4rem;background:rgba(124,92,252,.05);border:1px solid rgba(124,92,252,.18);border-radius:var(--radius-md);display:flex;align-items:flex-start;gap:.85rem;">
+                <i class="bi bi-info-circle-fill" style="color:var(--primary);font-size:1.1rem;margin-top:.05rem;flex-shrink:0;"></i>
+                <div>
+                    <div style="font-size:.83rem;font-weight:700;color:var(--dark);margin-bottom:.2rem;">¿Cómo funcionan los Roles Base?</div>
+                    <div style="font-size:.78rem;color:var(--gray-text);line-height:1.6;">
+                        Al completar el onboarding, el sistema clona automáticamente los roles marcados como <strong>Rol Base</strong>
+                        usando el modelo
+                        <code style="background:rgba(124,92,252,.1);padding:.1rem .35rem;border-radius:4px;font-size:.76rem;">RolColegio (es_base=True)</code>.
+                        Cada institución puede personalizar sus propios roles sin afectar esta plantilla global.
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /content-area -->
+    </main>
+</div><!-- /wrapper -->
+
+
+<!-- ════ MODAL: CREAR / EDITAR ROL ════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalCrear">
+    <div class="modal-box">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <div>
+                <div class="modal-title" id="modalCrearTitle">Crear Nuevo Rol Base</div>
+                <div class="modal-subtitle" id="modalCrearSubtitle">Este rol se clonará automáticamente a todos los colegios en onboarding.</div>
+            </div>
+            <button onclick="closeModal('modalCrear')"
+                style="background:none;border:none;font-size:1.3rem;color:var(--gray-text);cursor:pointer;line-height:1;">&times;</button>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label-custom">Nombre del Rol</label>
+            <input type="text" class="form-control-custom" id="inputRolNombre" placeholder="Ej: Coordinador de Ciclo">
+        </div>
+        <div class="mb-3">
+            <label class="form-label-custom">Descripción</label>
+            <textarea class="form-control-custom" rows="2" placeholder="Breve descripción del rol y sus responsabilidades..."></textarea>
+        </div>
+        <div class="mb-3">
+            <label class="form-label-custom">Módulo Principal</label>
+            <select class="form-control-custom">
+                <option value="">Seleccionar módulo...</option>
+                <option>Libro de Clases / Notas</option>
+                <option>Asistencia</option>
+                <option>Administración General</option>
+                <option>Comunicaciones</option>
+                <option>Contabilidad / ERP</option>
+                <option>Portal del Estudiante</option>
+                <option>Portal de Apoderados</option>
+            </select>
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label-custom">Permisos del Rol</label>
+            <div class="perm-grid">
+                <label class="perm-check" onclick="toggleCheck(this)">
+                    <input type="checkbox"> Ver registros
+                </label>
+                <label class="perm-check" onclick="toggleCheck(this)">
+                    <input type="checkbox"> Crear registros
+                </label>
+                <label class="perm-check" onclick="toggleCheck(this)">
+                    <input type="checkbox"> Editar registros
+                </label>
+                <label class="perm-check" onclick="toggleCheck(this)">
+                    <input type="checkbox"> Eliminar registros
+                </label>
+                <label class="perm-check" onclick="toggleCheck(this)">
+                    <input type="checkbox"> Exportar datos
+                </label>
+                <label class="perm-check" onclick="toggleCheck(this)">
+                    <input type="checkbox"> Aprobar solicitudes
+                </label>
+                <label class="perm-check" onclick="toggleCheck(this)">
+                    <input type="checkbox"> Enviar mensajes
+                </label>
+                <label class="perm-check" onclick="toggleCheck(this)">
+                    <input type="checkbox"> Administrar módulo
+                </label>
+            </div>
+        </div>
+
+        <div class="mb-3 d-flex align-items-center gap-2">
+            <input type="checkbox" id="esBaseCheck" style="accent-color:var(--primary);width:15px;height:15px;">
+            <label for="esBaseCheck" style="font-size:.83rem;font-weight:600;color:var(--dark);cursor:pointer;">
+                Marcar como <strong>Rol Base</strong> (se heredará en todos los colegios nuevos)
+            </label>
+        </div>
+
+        <div class="d-flex gap-2 justify-content-end pt-2" style="border-top:1px solid var(--border);">
+            <button onclick="closeModal('modalCrear')" class="btn-outline-custom">Cancelar</button>
+            <button class="btn-primary-custom"><i class="bi bi-floppy"></i> Guardar Rol</button>
+        </div>
+    </div>
+</div>
+
+<!-- ════ MODAL: CONFIRMAR ELIMINAR ═══════════════════════════════════════ -->
+<div class="modal-overlay" id="modalDelete">
+    <div class="modal-box" style="width:440px;text-align:center;">
+        <div style="width:56px;height:56px;background:#FEF2F2;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
+            <i class="bi bi-exclamation-triangle-fill" style="color:#EF4444;font-size:1.4rem;"></i>
+        </div>
+        <div class="modal-title" style="margin-bottom:.35rem;">
+            Eliminar Rol <span id="deleteRolName" style="color:#EF4444;"></span>
+        </div>
+        <p style="font-size:.84rem;color:var(--gray-text);line-height:1.6;">
+            Esta acción <strong>no se puede deshacer</strong>. Si existen usuarios con este rol asignado,
+            perderán sus permisos inmediatamente. ¿Deseas continuar?
+        </p>
+        <div class="d-flex gap-2 justify-content-center mt-3">
+            <button onclick="closeModal('modalDelete')" class="btn-outline-custom">Cancelar</button>
+            <button id="btnConfirmDelete"
+                style="display:inline-flex;align-items:center;gap:.45rem;padding:.55rem 1.25rem;background:#EF4444;color:#fff;border:none;border-radius:var(--radius-md);font-weight:600;font-size:.85rem;cursor:pointer;transition:background .2s;">
+                <i class="bi bi-trash3"></i> Sí, eliminar
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // ── Mobile sidebar
+    document.addEventListener('DOMContentLoaded', () => {
+        const btn = document.getElementById('mobileMenuBtn');
+        const sb  = document.getElementById('sidebar');
+        if (btn && sb) btn.addEventListener('click', () => sb.classList.toggle('active'));
+
+        // Hover color delete button
+        const del = document.getElementById('btnConfirmDelete');
+        if (del) {
+            del.addEventListener('mouseenter', () => del.style.background = '#DC2626');
+            del.addEventListener('mouseleave', () => del.style.background = '#EF4444');
+        }
+    });
+
+    // ── Modals
+    function openModal(id)  { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+    document.querySelectorAll('.modal-overlay').forEach(el => {
+        el.addEventListener('click', e => { if (e.target === el) closeModal(el.id); });
+    });
+
+    function openCreateModal() {
+        document.getElementById('modalCrearTitle').textContent    = 'Crear Nuevo Rol Base';
+        document.getElementById('modalCrearSubtitle').textContent = 'Este rol se clonará automáticamente a todos los colegios en onboarding.';
+        document.getElementById('inputRolNombre').value = '';
+        // Desmarcar checkboxes
+        document.querySelectorAll('#modalCrear .perm-check').forEach(el => {
+            el.classList.remove('checked');
+            el.querySelector('input').checked = false;
+        });
+        openModal('modalCrear');
+    }
+
+    function openEditModal(rolName) {
+        document.getElementById('modalCrearTitle').textContent    = 'Editar Rol: ' + rolName;
+        document.getElementById('modalCrearSubtitle').textContent = 'Modifica los permisos asignados a este rol base.';
+        document.getElementById('inputRolNombre').value           = rolName;
+        openModal('modalCrear');
+    }
+
+    function confirmDelete(rolName) {
+        document.getElementById('deleteRolName').textContent = '"' + rolName + '"';
+        openModal('modalDelete');
+    }
+
+    // ── Perm checkbox toggle visual
+    function toggleCheck(label) {
+        const cb = label.querySelector('input[type=checkbox]');
+        setTimeout(() => {
+            label.classList.toggle('checked', cb.checked);
+        }, 0);
+    }
+
+    // ── Filtrado de tabla
+    function filterTable() {
+        const q    = (document.getElementById('tableSearch').value || '').toLowerCase();
+        const mod  = (document.getElementById('filterModule').value || '').toLowerCase();
+        const rows = document.querySelectorAll('#rolesBody tr');
+        let vis    = 0;
+
+        rows.forEach(row => {
+            const matchQ   = !q   || row.innerText.toLowerCase().includes(q);
+            const matchMod = !mod || (row.dataset.module || '').toLowerCase().includes(mod);
+            row.style.display = (matchQ && matchMod) ? '' : 'none';
+            if (matchQ && matchMod) vis++;
+        });
+
+        document.getElementById('tableCount').innerHTML =
+            'Mostrando <strong>' + vis + '</strong> de <strong>' + rows.length + '</strong> roles';
+    }
+
+    // Búsqueda global desde topbar
+    document.getElementById('globalSearch').addEventListener('input', function () {
+        document.getElementById('tableSearch').value = this.value;
+        filterTable();
+    });
+</script>
+
+</body>
+</html>

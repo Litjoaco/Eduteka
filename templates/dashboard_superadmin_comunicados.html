@@ -1,0 +1,783 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centro de Comunicados - Super Admin Eduteka</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <!-- Fuentes e Iconos -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        /* ══ DESIGN TOKENS (idénticos al resto del Super Admin) ═══════════════ */
+        :root {
+            --primary:        #7C5CFC;
+            --primary-soft:   rgba(124, 92, 252, 0.08);
+            --primary-hover:  #6747E3;
+            --secondary:      #65CDBF;
+            --secondary-soft: rgba(101, 205, 191, 0.08);
+            --bg:             #F8F9FD;
+            --white:          #FFFFFF;
+            --dark:           #151A35;
+            --gray-text:      #687089;
+            --border:         #BCC0CF;
+            --radius-lg:      16px;
+            --radius-md:      10px;
+            --radius-sm:      8px;
+        }
+
+        * { font-family: 'Plus Jakarta Sans', sans-serif; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+            margin: 0;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -15%; left: 65%;
+            width: 50vw; height: 50vw;
+            background: radial-gradient(circle, rgba(124, 92, 252, 0.07) 0%, rgba(255,255,255,0) 70%);
+            z-index: -2; pointer-events: none;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            top: 45%; left: -15%;
+            width: 40vw; height: 40vw;
+            background: radial-gradient(circle, rgba(101, 205, 191, 0.06) 0%, rgba(255,255,255,0) 70%);
+            z-index: -2; pointer-events: none;
+        }
+
+        .wrapper { display: flex; width: 100%; align-items: stretch; }
+
+        /* ── TOPBAR */
+        .topbar {
+            height: 70px;
+            background: rgba(255, 255, 255, 0.85) !important;
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 2rem;
+            position: sticky; top: 0; z-index: 98;
+        }
+        .search-bar { position: relative; width: 320px; }
+        .search-bar i { position: absolute; left: .85rem; top: 50%; transform: translateY(-50%); color: var(--gray-text); }
+        .search-bar input {
+            width: 100%; padding: .5rem 1rem .5rem 2.4rem;
+            border: 1px solid var(--border); border-radius: var(--radius-md);
+            background: var(--bg); font-size: .85rem; outline: none; transition: all .2s;
+        }
+        .search-bar input:focus { border-color: var(--primary); background: var(--white); box-shadow: 0 0 0 3px rgba(124,92,252,.12); }
+
+        .topbar-right { display: flex; align-items: center; gap: 1.25rem; }
+        .user-profile {
+            display: flex; align-items: center; gap: .75rem;
+            background: var(--white); padding: .35rem .85rem .35rem .4rem;
+            border-radius: 30px; border: 1px solid var(--border);
+        }
+        .user-avatar {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+            color: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: .85rem;
+        }
+        .user-name { font-weight: 600; font-size: .88rem; color: var(--dark); }
+
+        /* ── CONTENT AREA */
+        .content-area { padding: 1.75rem 2rem; max-width: 1400px; width: 100%; margin: 0 auto; }
+
+        /* ── HERO */
+        .hero-title { font-size: 1.45rem; font-weight: 800; color: var(--dark); letter-spacing: -.02em; }
+        .hero-subtitle { font-size: .86rem; color: var(--gray-text); margin-top: .15rem; }
+
+        /* ── BUTTONS */
+        .btn-primary-custom {
+            background: var(--primary); color: white; border: none;
+            border-radius: var(--radius-md); padding: .55rem 1.25rem;
+            font-weight: 600; font-size: .85rem; display: inline-flex;
+            align-items: center; gap: .5rem; transition: all .2s; text-decoration: none;
+            box-shadow: 0 4px 12px rgba(124, 92, 252, 0.25);
+            cursor: pointer;
+        }
+        .btn-primary-custom:hover { background: var(--primary-hover); color: white; transform: translateY(-1px); }
+
+        .btn-outline-custom {
+            background: var(--white); color: var(--dark);
+            border: 1px solid var(--border); border-radius: var(--radius-md);
+            padding: .55rem 1.1rem; font-weight: 600; font-size: .85rem;
+            display: inline-flex; align-items: center; gap: .5rem;
+            transition: all .2s; text-decoration: none; cursor: pointer;
+        }
+        .btn-outline-custom:hover { background: var(--bg); border-color: var(--primary); color: var(--primary); }
+
+        /* ── STAT CARDS */
+        .stat-card {
+            background: var(--white); border-radius: var(--radius-lg);
+            border: 1px solid var(--border); padding: 1.15rem 1.35rem;
+            display: flex; align-items: center; gap: 1rem;
+            transition: transform .2s, box-shadow .2s;
+        }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.04); }
+        .stat-icon {
+            width: 46px; height: 46px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.25rem; flex-shrink: 0;
+        }
+        .stat-icon.purple { background: rgba(124,92,252,.1); color: var(--primary); }
+        .stat-icon.teal   { background: rgba(101,205,191,.12); color: #0D9488; }
+        .stat-icon.rose   { background: rgba(239,68,68,.1); color: #EF4444; }
+        .stat-icon.amber  { background: rgba(245,158,11,.1); color: #D97706; }
+        .stat-value { font-size: 1.5rem; font-weight: 800; color: var(--dark); line-height: 1.1; }
+        .stat-label { font-size: .78rem; font-weight: 600; color: var(--gray-text); margin-top: .2rem; }
+
+        /* ── PANEL CONTAINER */
+        .panel {
+            background: var(--white); border-radius: var(--radius-lg);
+            border: 1px solid var(--border); overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,0,0,.02);
+            height: 100%;
+        }
+        .panel-header {
+            padding: 1.15rem 1.5rem; border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: .75rem; background: var(--white);
+        }
+        .panel-title { font-size: 1rem; font-weight: 800; color: var(--dark); }
+        .panel-subtitle { font-size: .78rem; color: var(--gray-text); margin-top: .1rem; }
+
+        /* ── FORM CONTROL CUSTOM */
+        .form-control-custom {
+            width: 100%; padding: .55rem .85rem;
+            border: 1px solid var(--border); border-radius: var(--radius-md);
+            background: var(--bg); font-size: .85rem; color: var(--dark);
+            outline: none; transition: all .2s;
+        }
+        .form-control-custom:focus {
+            border-color: var(--primary); background: var(--white);
+            box-shadow: 0 0 0 3px rgba(124,92,252,.12);
+        }
+        .form-label-custom {
+            font-size: .78rem; font-weight: 700; color: var(--dark);
+            margin-bottom: .35rem; display: block;
+        }
+
+        /* ── TABLE STYLING */
+        .comunicados-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+        .comunicados-table th {
+            background: #FAFBFF; padding: .75rem 1rem;
+            font-size: .72rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: .05em; color: var(--gray-text);
+            border-bottom: 1px solid var(--border); white-space: nowrap;
+        }
+        .comunicados-table td {
+            padding: .9rem 1rem; vertical-align: middle;
+            border-bottom: 1px solid rgba(188,192,207,.3); font-size: .84rem;
+        }
+        .comunicados-table tbody tr { transition: background .15s; }
+        .comunicados-table tbody tr:hover { background: rgba(248,249,253,.8); }
+
+        /* ── BADGES & CHIPS */
+        .badge-tipo {
+            display: inline-flex; align-items: center; gap: .35rem;
+            padding: .25rem .6rem; border-radius: 20px;
+            font-size: .72rem; font-weight: 700;
+        }
+        .badge-info { background: rgba(59,130,246,.1); color: #2563EB; }
+        .badge-mantenimiento { background: rgba(245,158,11,.1); color: #D97706; }
+        .badge-urgente { background: rgba(239,68,68,.1); color: #DC2626; }
+
+        .status-badge {
+            display: inline-flex; align-items: center; gap: .35rem;
+            padding: .25rem .65rem; border-radius: 20px;
+            font-size: .73rem; font-weight: 700;
+        }
+        .status-enviado    { background: rgba(16,185,129,.1); color: #059669; }
+        .status-programado { background: rgba(245,158,11,.1); color: #D97706; }
+        .status-borrador   { background: rgba(104,112,137,.1); color: var(--gray-text); }
+
+        /* ── ACTION BUTTONS */
+        .action-btn {
+            width: 30px; height: 30px; border-radius: var(--radius-sm);
+            display: inline-flex; align-items: center; justify-content: justify-center;
+            border: 1px solid var(--border); background: var(--white);
+            color: var(--gray-text); font-size: .85rem; cursor: pointer; transition: all .15s;
+        }
+        .action-btn:hover { background: var(--bg); color: var(--dark); border-color: var(--primary); }
+        .action-btn.view:hover { background: var(--primary-soft); color: var(--primary); }
+        .action-btn.resend:hover { background: rgba(16,185,129,.1); color: #059669; border-color: #10B981; }
+        .action-btn.delete:hover { background: rgba(239,68,68,.1); color: #DC2626; border-color: #EF4444; }
+
+        /* ── MODAL OVERLAY */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(21,26,53,.45); backdrop-filter: blur(4px);
+            z-index: 2000; align-items: center; justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-box {
+            background: var(--white); border-radius: var(--radius-lg); padding: 1.75rem;
+            width: 580px; max-width: calc(100vw - 2rem);
+            box-shadow: 0 24px 64px rgba(0,0,0,.15);
+            animation: modal-in .25s ease;
+        }
+        @keyframes modal-in { from { opacity:0; transform:scale(.95) translateY(12px); } to { opacity:1; transform:scale(1) translateY(0); } }
+        .modal-title   { font-size: 1.1rem; font-weight: 800; color: var(--dark); margin-bottom: .25rem; }
+        .modal-subtitle { font-size: .82rem; color: var(--gray-text); margin-bottom: 1.25rem; }
+
+        @media (max-width: 991.98px) {
+            .content-area { padding: 1.25rem 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    {% include '_sidebar_superadmin.html' with active_page='comunicados' %}
+
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <div class="d-flex align-items-center gap-2">
+                <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn"
+                    style="border:none;background:var(--primary-soft);color:var(--primary);">
+                    <i class="bi bi-list fs-5"></i>
+                </button>
+                <div class="search-bar">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="globalSearch" placeholder="Buscar comunicado por asunto...">
+                </div>
+            </div>
+            <div class="topbar-right">
+                <button style="background:none;border:none;color:var(--gray-text);font-size:1.1rem;position:relative;cursor:pointer;">
+                    <i class="bi bi-bell"></i>
+                    <span style="position:absolute;top:0;right:0;width:7px;height:7px;background:#F76F7A;border-radius:50%;border:2px solid white;"></span>
+                </button>
+                <div class="user-profile">
+                    <div class="user-avatar">AE</div>
+                    <span class="user-name">Admin Eduteka</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="content-area">
+
+            <!-- HERO HEADER -->
+            <div class="d-flex align-items-start justify-content-between mb-4 flex-wrap gap-3">
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <div style="width:34px;height:34px;background:var(--primary-soft);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;">
+                            <i class="bi bi-megaphone-fill" style="color:var(--primary);font-size:1rem;"></i>
+                        </div>
+                        <h1 class="hero-title mb-0">Centro de Comunicados Global</h1>
+                    </div>
+                    <p class="hero-subtitle ms-1">
+                        Envío de notificaciones masivas, alertas de sistema y novedades a colegios clientes.
+                    </p>
+                </div>
+                <div class="d-flex gap-2 flex-wrap">
+                    <button class="btn-outline-custom" onclick="exportHistorial(event)">
+                        <i class="bi bi-download"></i> Exportar Historial
+                    </button>
+                    <button class="btn-primary-custom" onclick="openPlantillasModal()">
+                        <i class="bi bi-file-earmark-text"></i> Plantillas Rápidas
+                    </button>
+                </div>
+            </div>
+
+            <!-- MESSAGES ALERT -->
+            {% if messages %}
+            <div class="mb-3">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} d-flex align-items-center gap-2" style="border-radius:var(--radius-md);font-size:.85rem;">
+                    <i class="bi {% if 'success' in message.tags %}bi-check-circle-fill text-success{% else %}bi-info-circle-fill text-info{% endif %}"></i>
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- STAT CARDS (KPIs) -->
+            <div class="row g-3 mb-4">
+                <div class="col-12 col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-icon purple"><i class="bi bi-send-fill"></i></div>
+                        <div>
+                            <div class="stat-value">{{ comunicados_mes }}</div>
+                            <div class="stat-label">Comunicados Enviados (Mes)</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-icon teal"><i class="bi bi-eye-fill"></i></div>
+                        <div>
+                            <div class="stat-value">{{ tasa_lectura }}%</div>
+                            <div class="stat-label">Tasa de Lectura Promedio</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-icon rose"><i class="bi bi-bell-fill"></i></div>
+                        <div>
+                            <div class="stat-value">{{ alertas_activas }}</div>
+                            <div class="stat-label">Alertas Activas en Plataforma</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LAYOUT EN 2 COLUMNAS (HISTORIAL A LA IZQ / REDACTAR A LA DER) -->
+            <div class="row g-4">
+
+                <!-- COLUMNA IZQUIERDA: HISTORIAL DE COMUNICADOS (7 Cols) -->
+                <div class="col-12 col-xl-7">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div>
+                                <div class="panel-title">
+                                    <i class="bi bi-clock-history me-1" style="color:var(--primary);"></i>
+                                    Historial de Comunicados Emitidos
+                                </div>
+                                <div class="panel-subtitle">
+                                    Registro de notificaciones enviadas y programadas para la plataforma.
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                <div class="table-search" style="position:relative;width:180px;">
+                                    <i class="bi bi-search" style="position:absolute;left:.75rem;top:50%;transform:translateY(-50%);color:var(--gray-text);font-size:.8rem;"></i>
+                                    <input type="text" id="tableSearch" placeholder="Buscar..." oninput="filterTable()"
+                                        style="width:100%;padding:.4rem .6rem .4rem 2.1rem;border:1px solid var(--border);border-radius:var(--radius-md);font-size:.78rem;outline:none;">
+                                </div>
+                                <select id="filterTipo" class="form-control-custom"
+                                    style="width:auto;padding:.4rem .7rem;font-size:.78rem;" onchange="filterTable()">
+                                    <option value="">Tipo de Alerta</option>
+                                    <option value="Informativa">Informativa</option>
+                                    <option value="Mantenimiento">Mantenimiento</option>
+                                    <option value="Urgente">Urgente</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div style="overflow-x:auto;">
+                            <table class="comunicados-table" id="comunicadosTable">
+                                <thead>
+                                    <tr>
+                                        <th>Asunto / Tipo</th>
+                                        <th>Público Objetivo</th>
+                                        <th>Fecha</th>
+                                        <th>Estado</th>
+                                        <th style="width:100px;text-align:center;">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="comunicadosBody">
+
+                                    {% for c in comunicados %}
+                                    <tr data-tipo="{{ c.get_tipo_alerta_display }}" data-estado="{{ c.get_estado_display }}">
+                                        <td>
+                                            <div style="font-size:.86rem;font-weight:700;color:var(--dark);">
+                                                {{ c.asunto }}
+                                            </div>
+                                            <div class="mt-1">
+                                                {% if c.tipo_alerta == 'mantenimiento' %}
+                                                <span class="badge-tipo badge-mantenimiento">
+                                                    <i class="bi bi-tools" style="font-size:.65rem;"></i> Mantenimiento
+                                                </span>
+                                                {% elif c.tipo_alerta == 'urgente' %}
+                                                <span class="badge-tipo badge-urgente">
+                                                    <i class="bi bi-exclamation-triangle-fill" style="font-size:.65rem;"></i> Urgente
+                                                </span>
+                                                {% else %}
+                                                <span class="badge-tipo badge-info">
+                                                    <i class="bi bi-info-circle-fill" style="font-size:.65rem;"></i> Informativa
+                                                </span>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div style="font-size:.82rem;font-weight:600;color:var(--dark);">{{ c.get_publico_objetivo_display }}</div>
+                                            <div style="font-size:.72rem;color:var(--gray-text);">Difusión activa</div>
+                                        </td>
+                                        <td>
+                                            <div style="font-size:.8rem;color:var(--dark);">{{ c.fecha_creacion|date:'d M Y, H:i' }}</div>
+                                            <div style="font-size:.72rem;color:var(--gray-text);">{{ c.fecha_creacion|timesince }} atrás</div>
+                                        </td>
+                                        <td>
+                                            {% if c.estado == 'enviado' %}
+                                            <span class="status-badge status-enviado">
+                                                <i class="bi bi-check-circle-fill" style="font-size:.45rem;"></i> Enviado
+                                            </span>
+                                            {% elif c.estado == 'programado' %}
+                                            <span class="status-badge status-programado">
+                                                <i class="bi bi-clock" style="font-size:.45rem;"></i> Programado
+                                            </span>
+                                            {% else %}
+                                            <span class="status-badge status-borrador">
+                                                <i class="bi bi-file-earmark-text" style="font-size:.45rem;"></i> Borrador
+                                            </span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center justify-content-center gap-1">
+                                                <button class="action-btn view" title="Ver detalle"
+                                                    onclick="openDetailModal('{{ c.asunto|escapejs }}', '{{ c.get_publico_objetivo_display|escapejs }}', '{{ c.get_tipo_alerta_display|escapejs }}', '{{ c.mensaje|escapejs }}', '{{ c.get_estado_display|escapejs }}', '{{ c.tasa_lectura }}%')"><i class="bi bi-eye"></i></button>
+                                                <button class="action-btn resend" title="Reenviar"
+                                                    onclick="submitReenviar({{ c.id }})"><i class="bi bi-arrow-repeat"></i></button>
+                                                <button class="action-btn delete" title="Eliminar"
+                                                    onclick="submitEliminar({{ c.id }})"><i class="bi bi-trash"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="5" style="text-align:center;padding:2.5rem;color:var(--gray-text);font-size:.88rem;">
+                                            <i class="bi bi-inbox" style="font-size:2rem;display:block;margin-bottom:.5rem;opacity:.5;"></i>
+                                            No hay comunicados registrados aún. Publica tu primer mensaje utilizando el formulario.
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Footer de la tabla -->
+                        <div style="padding:.85rem 1.25rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;">
+                            <span style="font-size:.78rem;color:var(--gray-text);" id="tableCount">
+                                Mostrando <strong>{{ total_comunicados }}</strong> comunicado(s)
+                            </span>
+                            <div class="d-flex gap-1">
+                                <button class="btn-outline-custom" style="font-size:.75rem;padding:.25rem .65rem;" disabled>&laquo; Ant</button>
+                                <button class="btn-outline-custom" style="font-size:.75rem;padding:.25rem .65rem;" disabled>Sig &raquo;</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COLUMNA DERECHA: REDACTAR NUEVO COMUNICADO (5 Cols) -->
+                <div class="col-12 col-xl-5">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div>
+                                <div class="panel-title d-flex align-items-center gap-2">
+                                    <div style="width:28px;height:28px;background:var(--primary-soft);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;">
+                                        <i class="bi bi-pencil-fill" style="color:var(--primary);font-size:.85rem;"></i>
+                                    </div>
+                                    Redactar Nuevo Comunicado
+                                </div>
+                                <div class="panel-subtitle">
+                                    Publicación rápida de mensajes masivos o alertas en dashboard.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="padding: 1.35rem 1.5rem;">
+                            <form id="formComunicado" method="POST" action="{% url 'dashboard_superadmin_comunicados' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" id="inputAction" value="publicar">
+
+                                <!-- Asunto -->
+                                <div class="mb-3">
+                                    <label class="form-label-custom">Asunto del Comunicado <span class="text-danger">*</span></label>
+                                    <input type="text" name="asunto" class="form-control-custom" id="inputAsunto" required
+                                        placeholder="Ej: Mantenimiento programado de plataforma...">
+                                </div>
+
+                                <div class="row g-3 mb-3">
+                                    <!-- Público Objetivo -->
+                                    <div class="col-12 col-sm-6">
+                                        <label class="form-label-custom">Público Objetivo <span class="text-danger">*</span></label>
+                                        <select name="publico_objetivo" class="form-control-custom" id="selectPublico" required>
+                                            <option value="todos">Todos los Colegios</option>
+                                            <option value="directores">Solo Directores y Admin</option>
+                                            <option value="premium">Colegios Plan Premium</option>
+                                            <option value="onboarding">Colegios en Onboarding</option>
+                                            <option value="morosos">Colegios con Pagos Pendientes</option>
+                                            <option value="profesores">Profesores y Docentes</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Tipo de Alerta -->
+                                    <div class="col-12 col-sm-6">
+                                        <label class="form-label-custom">Tipo de Alerta <span class="text-danger">*</span></label>
+                                        <select name="tipo_alerta" class="form-control-custom" id="selectTipo" required>
+                                            <option value="informativa">Informativa (Azul)</option>
+                                            <option value="mantenimiento">Mantenimiento (Naranja)</option>
+                                            <option value="urgente">Urgente / Sistema (Rojo)</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Mensaje del Comunicado -->
+                                <div class="mb-3">
+                                    <label class="form-label-custom">Mensaje del Comunicado <span class="text-danger">*</span></label>
+                                    <textarea name="mensaje" class="form-control-custom" id="textMensaje" rows="6" required
+                                        placeholder="Escribe aquí el contenido del mensaje o notificación masiva que verán los usuarios..."></textarea>
+                                </div>
+
+                                <!-- Opciones de Envío / Canales -->
+                                <div class="p-3 mb-4 rounded" style="background:var(--bg);border:1px solid var(--border);">
+                                    <div style="font-size:.78rem;font-weight:700;color:var(--dark);margin-bottom:.5rem;">Canales de Difusión</div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" name="banner_flotante" id="checkBanner" checked>
+                                        <label class="form-check-label" for="checkBanner" style="font-size:.82rem;color:var(--dark);">
+                                            Mostrar Banner Flotante en Dashboard de clientes
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" name="notificar_email" id="checkEmail" checked>
+                                        <label class="form-check-label" for="checkEmail" style="font-size:.82rem;color:var(--dark);">
+                                            Enviar copia por Correo Electrónico a administradores
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="bloquear_popup" id="checkPopup">
+                                        <label class="form-check-label" for="checkPopup" style="font-size:.82rem;color:var(--dark);">
+                                            Bloquear navegación con Popup modal (Solo Urgente)
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Botones de Acción -->
+                                <div class="d-flex align-items-center gap-2 flex-wrap pt-2" style="border-top:1px solid var(--border);">
+                                    <button type="submit" onclick="setAction('publicar')" class="btn-primary-custom" style="flex:1;justify-content:center;">
+                                        <i class="bi bi-paperplane-fill"></i> Publicar Comunicado
+                                    </button>
+                                    <button type="submit" onclick="setAction('borrador')" class="btn-outline-custom">
+                                        <i class="bi bi-bookmark-check"></i> Borrador
+                                    </button>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- /row layout -->
+
+        </div><!-- /content-area -->
+    </main>
+</div><!-- /wrapper -->
+
+
+<!-- ════ MODAL: DETALLE / RESUMEN DE COMUNICADO ═══════════════════════════ -->
+<div class="modal-overlay" id="modalDetail">
+    <div class="modal-box">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <div>
+                <div class="modal-title" id="detailAsunto">Asunto del Comunicado</div>
+                <div class="modal-subtitle" id="detailMeta">Meta info del comunicado</div>
+            </div>
+            <button onclick="closeModal('modalDetail')"
+                style="background:none;border:none;font-size:1.3rem;color:var(--gray-text);cursor:pointer;line-height:1;">&times;</button>
+        </div>
+
+        <div class="p-3 mb-3 rounded" style="background:var(--bg);border:1px solid var(--border);">
+            <div class="row g-2">
+                <div class="col-6">
+                    <span class="form-label-custom">Público Objetivo</span>
+                    <div id="detailPublico" class="fw-bold text-dark small"></div>
+                </div>
+                <div class="col-6">
+                    <span class="form-label-custom">Tasa de Apertura</span>
+                    <div id="detailLectura" class="fw-bold text-success small"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label-custom">Contenido del Mensaje</label>
+            <div id="detailMensaje" class="p-3 rounded" style="background:#FAFBFF;border:1px solid var(--border);font-size:.85rem;color:var(--dark);line-height:1.6;"></div>
+        </div>
+
+        <div class="d-flex gap-2 justify-content-end pt-2" style="border-top:1px solid var(--border);">
+            <button onclick="closeModal('modalDetail')" class="btn-outline-custom">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+
+<!-- ════ MODAL: PLANTILLAS RÁPIDAS ════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalPlantillas">
+    <div class="modal-box" style="width:520px;">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <div>
+                <div class="modal-title">Plantillas Rápidas de Comunicado</div>
+                <div class="modal-subtitle">Selecciona un modelo predefinido para cargar en el formulario.</div>
+            </div>
+            <button onclick="closeModal('modalPlantillas')"
+                style="background:none;border:none;font-size:1.3rem;color:var(--gray-text);cursor:pointer;">&times;</button>
+        </div>
+
+        <div class="d-flex flex-column gap-2 mb-3">
+            <button class="btn-outline-custom justify-content-between w-100 p-3" onclick="usePlantilla('mantenimiento')">
+                <div class="text-start">
+                    <div class="fw-bold text-dark">Mantenimiento Programado</div>
+                    <div class="text-muted small">Notificación de ventana de soporte nocturno</div>
+                </div>
+                <i class="bi bi-chevron-right"></i>
+            </button>
+            <button class="btn-outline-custom justify-content-between w-100 p-3" onclick="usePlantilla('actualizacion')">
+                <div class="text-start">
+                    <div class="fw-bold text-dark">Lanzamiento de Nueva Versión</div>
+                    <div class="text-muted small">Novedades y mejoras del sistema ERP</div>
+                </div>
+                <i class="bi bi-chevron-right"></i>
+            </button>
+            <button class="btn-outline-custom justify-content-between w-100 p-3" onclick="usePlantilla('pago')">
+                <div class="text-start">
+                    <div class="fw-bold text-dark">Aviso de Suscripción / Cobro</div>
+                    <div class="text-muted small">Recordatorio para colegios morosos</div>
+                </div>
+                <i class="bi bi-chevron-right"></i>
+            </button>
+        </div>
+
+        <div class="d-flex justify-content-end">
+            <button onclick="closeModal('modalPlantillas')" class="btn-outline-custom">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // ── Mobile sidebar toggle
+    document.addEventListener('DOMContentLoaded', () => {
+        const btn = document.getElementById('mobileMenuBtn');
+        const sb  = document.getElementById('sidebar');
+        if (btn && sb) btn.addEventListener('click', () => sb.classList.toggle('active'));
+    });
+
+    // ── Modals
+    function openModal(id)  { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+    document.querySelectorAll('.modal-overlay').forEach(el => {
+        el.addEventListener('click', e => { if (e.target === el) closeModal(el.id); });
+    });
+
+    function openDetailModal(asunto, publico, tipo, mensaje, estado, lectura) {
+        document.getElementById('detailAsunto').textContent = asunto;
+        document.getElementById('detailMeta').textContent   = 'Tipo: ' + tipo + ' • Estado: ' + estado;
+        document.getElementById('detailPublico').textContent = publico;
+        document.getElementById('detailLectura').textContent = lectura;
+        document.getElementById('detailMensaje').textContent = mensaje;
+        openModal('modalDetail');
+    }
+
+    function openPlantillasModal() {
+        openModal('modalPlantillas');
+    }
+
+    function usePlantilla(tipo) {
+        closeModal('modalPlantillas');
+        if (tipo === 'mantenimiento') {
+            cargarEnFormulario(
+                'Mantenimiento Programado del Sistema Eduteka',
+                'todos',
+                'mantenimiento',
+                'Estimados usuarios, les informamos que este domingo entre las 02:00 AM y 05:00 AM se realizará una ventana de mantenimiento programada. El servicio experimentará interrupciones breves.'
+            );
+        } else if (tipo === 'actualizacion') {
+            cargarEnFormulario(
+                'Novedades de la Plataforma: Versión 2.5 Disponible',
+                'todos',
+                'informativa',
+                'Nos alegra anunciar la llegada de la nueva versión de Eduteka con mejoras de velocidad en la carga de libros de clases y nuevas opciones de exportación.'
+            );
+        } else if (tipo === 'pago') {
+            cargarEnFormulario(
+                'Aviso Importante: Regularización de Plan SaaS',
+                'morosos',
+                'urgente',
+                'Estimado Administrador, registramos un saldo pendiente en la suscripción de su establecimiento. Le solicitamos regularizar el pago para evitar la suspensión del servicio.'
+            );
+        }
+    }
+
+    function cargarEnFormulario(asunto, publico, tipo, mensaje) {
+        document.getElementById('inputAsunto').value = asunto;
+        document.getElementById('selectPublico').value = publico;
+        document.getElementById('selectTipo').value    = tipo;
+        document.getElementById('textMensaje').value   = mensaje;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function setAction(act) {
+        document.getElementById('inputAction').value = act;
+    }
+
+    function submitReenviar(comunicadoId) {
+        if (confirm('¿Confirmas el reenvío de este comunicado a los destinatarios?')) {
+            document.getElementById('actionFormType').value = 'reenviar';
+            document.getElementById('actionFormId').value   = comunicadoId;
+            document.getElementById('actionForm').submit();
+        }
+    }
+
+    function submitEliminar(comunicadoId) {
+        if (confirm('¿Estás seguro de eliminar este comunicado del sistema?')) {
+            document.getElementById('actionFormType').value = 'eliminar';
+            document.getElementById('actionFormId').value   = comunicadoId;
+            document.getElementById('actionForm').submit();
+        }
+    }
+
+    function exportHistorial(e) {
+        e.preventDefault();
+        alert('Descargando reporte de historial de comunicados en CSV...');
+    }
+
+    // ── Filtrado de tabla en vivo
+    function filterTable() {
+        const q    = (document.getElementById('tableSearch').value || '').toLowerCase();
+        const tipo = (document.getElementById('filterTipo').value || '').toLowerCase();
+
+        const rows = document.querySelectorAll('#comunicadosBody tr');
+        let vis    = 0;
+
+        rows.forEach(row => {
+            const rowTipo = (row.dataset.tipo || '').toLowerCase();
+            const text    = row.innerText.toLowerCase();
+
+            const matchQ    = !q    || text.includes(q);
+            const matchTipo = !tipo || rowTipo === tipo;
+
+            const show = matchQ && matchTipo;
+            row.style.display = show ? '' : 'none';
+            if (show) vis++;
+        });
+
+        document.getElementById('tableCount').innerHTML =
+            'Mostrando <strong>' + vis + '</strong> de <strong>' + rows.length + '</strong> comunicado(s)';
+    }
+
+    // Topbar search sync
+    document.getElementById('globalSearch').addEventListener('input', function () {
+        document.getElementById('tableSearch').value = this.value;
+        filterTable();
+    });
+</script>
+
+<!-- Hidden Form for Reenviar / Eliminar POST actions -->
+<form id="actionForm" method="POST" action="{% url 'dashboard_superadmin_comunicados' %}" style="display:none;">
+    {% csrf_token %}
+    <input type="hidden" name="action" id="actionFormType" value="">
+    <input type="hidden" name="comunicado_id" id="actionFormId" value="">
+</form>
+
+</body>
+</html>

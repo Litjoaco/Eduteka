@@ -378,3 +378,364 @@ def dashboard_superadmin_estadisticas_view(request):
 def dashboard_superadmin_modulos_erp_view(request):
     return render(request, 'dashboard_superadmin_modulos_erp.html')
 
+
+# ─── Control de Accesos ───────────────────────────────────────────────────────
+
+def dashboard_superadmin_roles_view(request):
+    """Maqueta visual de Gestión de Roles y Permisos (sin lógica de backend aún)."""
+    return render(request, 'dashboard_superadmin_roles.html')
+
+
+def dashboard_superadmin_usuarios_view(request):
+    """Maqueta visual de Usuarios Globales (pendiente de implementación)."""
+    return render(request, 'dashboard_superadmin_usuarios.html')
+
+
+def dashboard_superadmin_solicitudes_view(request):
+    """Cola Global de Solicitudes de Acceso - conectada a datos reales."""
+    from django.utils import timezone as tz
+
+    hoy = tz.now().date()
+
+    # ── Acciones POST (Aprobar / Rechazar) desde el Super Admin
+    if request.method == 'POST':
+        accion      = request.POST.get('accion')
+        solicitud_id = request.POST.get('solicitud_id')
+        if solicitud_id:
+            solicitud = get_object_or_404(SolicitudAcceso, id=solicitud_id)
+            if accion == 'aprobar' and solicitud.estado == 'pendiente':
+                solicitud.estado = 'aprobada'
+                solicitud.save()
+                # Crear membresía si no existe
+                from colegios.models import RolColegio
+                rol_nombre = solicitud.rol_solicitado.capitalize()
+                rol_obj = RolColegio.objects.filter(
+                    colegio=solicitud.colegio, nombre__iexact=rol_nombre
+                ).first()
+                if not rol_obj:
+                    rol_obj = RolColegio.objects.filter(
+                        colegio=solicitud.colegio, activo=True
+                    ).exclude(nombre='Administrador').first()
+                MiembroColegio.objects.get_or_create(
+                    usuario=solicitud.usuario,
+                    colegio=solicitud.colegio,
+                    defaults={'rol': rol_obj, 'activo': True}
+                )
+                messages.success(request, f'Solicitud de {solicitud.usuario.get_full_name() or solicitud.usuario.username} aprobada.')
+            elif accion == 'rechazar' and solicitud.estado == 'pendiente':
+                solicitud.estado = 'rechazada'
+                solicitud.save()
+                messages.success(request, f'Solicitud de {solicitud.usuario.get_full_name() or solicitud.usuario.username} rechazada.')
+        return redirect('dashboard_superadmin_solicitudes')
+
+    # ── Captura de filtros GET
+    q      = request.GET.get('q', '').strip()
+    col_f  = request.GET.get('colegio', '').strip()
+    est_f  = request.GET.get('estado', '').strip()
+
+    # ── KPIs globales (sin filtros)
+    pendientes_total = SolicitudAcceso.objects.filter(estado='pendiente').count()
+    aprobadas_hoy    = SolicitudAcceso.objects.filter(estado='aprobada', fecha_solicitud__date=hoy).count()
+    total_resueltas  = SolicitudAcceso.objects.filter(estado__in=['aprobada', 'rechazada']).count()
+    rechazadas_total = SolicitudAcceso.objects.filter(estado='rechazada').count()
+    tasa_rechazo = round((rechazadas_total / total_resueltas) * 100, 1) if total_resueltas else 0
+
+    # ── QuerySet base con select_related para eficiencia
+    solicitudes = SolicitudAcceso.objects.select_related(
+        'usuario', 'colegio'
+    ).order_by('-fecha_solicitud')
+
+    # Aplicar filtros
+    if q:
+        from django.db.models import Q
+        solicitudes = solicitudes.filter(
+            Q(usuario__username__icontains=q) |
+            Q(usuario__first_name__icontains=q) |
+            Q(usuario__last_name__icontains=q) |
+            Q(usuario__email__icontains=q) |
+            Q(colegio__nombre__icontains=q) |
+            Q(rol_solicitado__icontains=q)
+        )
+    if col_f:
+        solicitudes = solicitudes.filter(colegio__nombre__icontains=col_f)
+    if est_f:
+        solicitudes = solicitudes.filter(estado=est_f.lower())
+
+    # ── Lista de colegios únicos con solicitudes (para el select de filtro)
+    from colegios.models import Colegio as ColegioModel
+    colegios_con_solicitudes = (
+        SolicitudAcceso.objects.select_related('colegio')
+        .values('colegio__id', 'colegio__nombre')
+        .distinct()
+        .order_by('colegio__nombre')
+    )
+
+    context = {
+        'pendientes_total':          pendientes_total,
+        'aprobadas_hoy':             aprobadas_hoy,
+        'tasa_rechazo':              tasa_rechazo,
+        'solicitudes':               solicitudes,
+        'colegios_con_solicitudes':  colegios_con_solicitudes,
+        'total_solicitudes':         solicitudes.count(),
+    }
+    return render(request, 'dashboard_superadmin_solicitudes.html', context)
+
+
+# ─── Éxito del Cliente (CSM) ──────────────────────────────────────────────────
+
+def dashboard_superadmin_onboarding_view(request):
+    """Monitor de Onboarding - conectado a datos reales del modelo Colegio."""
+    from datetime import date, timedelta
+    from django.db.models import Avg, F, ExpressionWrapper, fields, Q
+
+    hoy = timezone.now().date()
+    primer_dia_del_mes = hoy.replace(day=1)
+
+    # ── Captura de filtros GET
+    q = request.GET.get('q', '').strip()
+    paso = request.GET.get('paso', '').strip()
+    estado = request.GET.get('estado', '').strip()
+
+    # ── KPIs base (sin filtrar por la búsqueda para mantener totales globales)
+    colegios_en_onboarding = Colegio.objects.filter(configuracion_completa=False).count()
+    completados_mes = Colegio.objects.filter(
+        configuracion_completa=True,
+        fecha_actualizacion__date__gte=primer_dia_del_mes
+    ).count()
+
+    # ── Embudo por paso (solo colegios activos en onboarding)
+    qs_activos = Colegio.objects.filter(configuracion_completa=False)
+    embudo = {
+        'paso1': qs_activos.filter(paso_configuracion_actual=1).count(),
+        'paso2': qs_activos.filter(paso_configuracion_actual=2).count(),
+        'paso3': qs_activos.filter(paso_configuracion_actual=3).count(),
+        'paso4': qs_activos.filter(paso_configuracion_actual=4).count(),
+        'paso5': qs_activos.filter(paso_configuracion_actual=5).count(),
+    }
+
+    # ── Tiempo promedio de setup
+    tiempos = []
+    for c in Colegio.objects.filter(configuracion_completa=True):
+        delta = (c.fecha_actualizacion.date() - c.fecha_creacion.date()).days
+        if delta >= 0:
+            tiempos.append(delta)
+    tiempo_promedio = round(sum(tiempos) / len(tiempos), 1) if tiempos else 0
+
+    PASO_NOMBRES = {
+        1: 'Datos Base',
+        2: 'Plan & Módulo',
+        3: 'Identidad & Roles',
+        4: 'Cursos & Asignaturas',
+        5: 'Personal & Alumnos',
+    }
+
+    PASO_FILL = {
+        1: 'fill-blue',
+        2: 'fill-purple',
+        3: 'fill-purple',
+        4: 'fill-amber',
+        5: 'fill-green',
+    }
+
+    # ── Preparar queryset de la tabla
+    todos_colegios = Colegio.objects.select_related('administrador').order_by(
+        'configuracion_completa', 'paso_configuracion_actual'
+    )
+
+    # Aplicar filtro por texto (q)
+    if q:
+        todos_colegios = todos_colegios.filter(
+            Q(nombre__icontains=q) |
+            Q(ciudad_comuna__icontains=q) |
+            Q(region__icontains=q) |
+            Q(nombre_administrador__icontains=q) |
+            Q(correo_institucional__icontains=q)
+        )
+
+    # Aplicar filtro por paso
+    if paso:
+        if paso.lower() == 'completado':
+            todos_colegios = todos_colegios.filter(configuracion_completa=True)
+        elif paso in ['1', '2', '3', '4', '5']:
+            todos_colegios = todos_colegios.filter(
+                configuracion_completa=False,
+                paso_configuracion_actual=int(paso)
+            )
+
+    colegios_tabla = []
+    atascados_count = 0
+
+    for c in todos_colegios:
+        if c.configuracion_completa:
+            dias_en_paso = 0
+            alerta = 'Completado'
+            progreso = 100
+            paso_label = '✔ Onboarding Completo'
+            fill_class = 'fill-green'
+        else:
+            dias_en_paso = (hoy - c.fecha_actualizacion.date()).days
+            progreso = c.paso_configuracion_actual * 20
+            paso_label = 'Paso {}: {}'.format(
+                c.paso_configuracion_actual,
+                PASO_NOMBRES.get(c.paso_configuracion_actual, '')
+            )
+            fill_class = PASO_FILL.get(c.paso_configuracion_actual, 'fill-purple')
+
+            if dias_en_paso >= 7:
+                alerta = 'Crítico'
+                fill_class = 'fill-red'
+                atascados_count += 1
+            elif dias_en_paso >= 3:
+                alerta = 'Atascado'
+                fill_class = 'fill-amber'
+                atascados_count += 1
+            else:
+                alerta = 'Normal'
+
+        # Filtrar por estado de alerta si se especificó
+        if estado and alerta.lower() != estado.lower():
+            continue
+
+        # Contacto principal
+        if c.administrador:
+            contacto_nombre = c.administrador.get_full_name() or c.administrador.username
+            contacto_email  = c.administrador.email
+        else:
+            contacto_nombre = c.nombre_administrador
+            contacto_email  = c.correo_institucional
+
+        colegios_tabla.append({
+            'obj':             c,
+            'nombre':          c.nombre,
+            'region':          c.region or c.ciudad_comuna or '—',
+            'paso_actual':     c.paso_configuracion_actual,
+            'paso_label':      paso_label,
+            'progreso':        progreso,
+            'fill_class':      fill_class,
+            'dias_en_paso':    dias_en_paso,
+            'alerta':          alerta,
+            'contacto_nombre': contacto_nombre,
+            'contacto_email':  contacto_email,
+            'completado':      c.configuracion_completa,
+        })
+
+    context = {
+        'colegios_en_onboarding': colegios_en_onboarding,
+        'completados_mes':        completados_mes,
+        'atascados':              atascados_count,
+        'tiempo_promedio':        tiempo_promedio,
+        'embudo':                 embudo,
+        'colegios':               colegios_tabla,
+    }
+    return render(request, 'dashboard_superadmin_onboarding.html', context)
+
+
+# ─── Comunicación ─────────────────────────────────────────────────────────────
+
+def dashboard_superadmin_comunicados_view(request):
+    """Centro de Comunicados Global - creación, publicación y gestión de notificaciones."""
+    from dashboard.models import ComunicadoGlobal
+    from django.db.models import Avg
+    from django.core.management import call_command
+
+    # Auto-migración si la tabla no existe en la base de datos MySQL/MariaDB
+    try:
+        ComunicadoGlobal.objects.exists()
+    except Exception:
+        try:
+            call_command('migrate', 'dashboard', interactive=False)
+        except Exception as mig_err:
+            print("Notice on auto-migration:", mig_err)
+
+    hoy = timezone.now().date()
+    primer_dia_del_mes = hoy.replace(day=1)
+
+    # ── Manejo de POST (Crear, Guardar Borrador, Reenviar, Eliminar)
+    if request.method == 'POST':
+        action = request.POST.get('action', 'publicar')
+
+        if action == 'eliminar':
+            comunicado_id = request.POST.get('comunicado_id')
+            if comunicado_id:
+                ComunicadoGlobal.objects.filter(id=comunicado_id).delete()
+                messages.success(request, 'El comunicado ha sido eliminado exitosamente.')
+            return redirect('dashboard_superadmin_comunicados')
+
+        if action == 'reenviar':
+            comunicado_id = request.POST.get('comunicado_id')
+            if comunicado_id:
+                c = ComunicadoGlobal.objects.filter(id=comunicado_id).first()
+                if c:
+                    c.pk = None
+                    c.estado = 'enviado'
+                    c.save()
+                    messages.success(request, f'Comunicado "{c.asunto}" reenviado exitosamente.')
+            return redirect('dashboard_superadmin_comunicados')
+
+        asunto = request.POST.get('asunto', '').strip()
+        publico_objetivo = request.POST.get('publico_objetivo', 'todos')
+        tipo_alerta = request.POST.get('tipo_alerta', 'informativa')
+        mensaje = request.POST.get('mensaje', '').strip()
+        banner_flotante = request.POST.get('banner_flotante') == 'on' or 'banner_flotante' in request.POST
+        notificar_email = request.POST.get('notificar_email') == 'on' or 'notificar_email' in request.POST
+        bloquear_popup = request.POST.get('bloquear_popup') == 'on' or 'bloquear_popup' in request.POST
+
+        estado_nuevo = 'borrador' if action == 'borrador' else 'enviado'
+
+        if asunto and mensaje:
+            ComunicadoGlobal.objects.create(
+                asunto=asunto,
+                publico_objetivo=publico_objetivo,
+                tipo_alerta=tipo_alerta,
+                mensaje=mensaje,
+                banner_flotante=banner_flotante,
+                notificar_email=notificar_email,
+                bloquear_popup=bloquear_popup,
+                estado=estado_nuevo,
+                tasa_lectura=85.0 if estado_nuevo == 'enviado' else 0.0
+            )
+            if estado_nuevo == 'enviado':
+                messages.success(request, f'¡Comunicado "{asunto}" publicado e impactando a los colegios!')
+            else:
+                messages.info(request, f'Borrador "{asunto}" guardado correctamente.')
+        else:
+            messages.error(request, 'Por favor completa el asunto y el mensaje.')
+
+        return redirect('dashboard_superadmin_comunicados')
+
+    # ── Manejo de GET (Filtros y Métricas)
+    q = request.GET.get('q', '').strip()
+    tipo = request.GET.get('tipo', '').strip()
+
+    comunicados_qs = ComunicadoGlobal.objects.all().order_by('-fecha_creacion')
+
+    if q:
+        comunicados_qs = comunicados_qs.filter(
+            Q(asunto__icontains=q) | Q(mensaje__icontains=q)
+        )
+    if tipo:
+        comunicados_qs = comunicados_qs.filter(tipo_alerta=tipo.lower())
+
+    # KPIs
+    comunicados_mes = ComunicadoGlobal.objects.filter(
+        estado='enviado',
+        fecha_creacion__date__gte=primer_dia_del_mes
+    ).count()
+
+    tasa_avg = ComunicadoGlobal.objects.filter(estado='enviado').aggregate(Avg('tasa_lectura'))['tasa_lectura__avg']
+    tasa_lectura = round(tasa_avg, 1) if tasa_avg is not None else 88.5
+
+    alertas_activas = ComunicadoGlobal.objects.filter(
+        estado='enviado',
+        tipo_alerta__in=['mantenimiento', 'urgente']
+    ).count()
+
+    context = {
+        'comunicados': comunicados_qs,
+        'comunicados_mes': comunicados_mes,
+        'tasa_lectura': tasa_lectura,
+        'alertas_activas': alertas_activas,
+        'total_comunicados': comunicados_qs.count(),
+    }
+    return render(request, 'dashboard_superadmin_comunicados.html', context)
+

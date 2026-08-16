@@ -1,0 +1,723 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cola Global de Solicitudes - Super Admin Eduteka</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <!-- Fuentes e Iconos -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        /* ══ DESIGN TOKENS (idénticos al resto del Super Admin) ═══════════════ */
+        :root {
+            --primary:        #7C5CFC;
+            --primary-soft:   rgba(124, 92, 252, 0.08);
+            --primary-hover:  #6747E3;
+            --secondary:      #65CDBF;
+            --secondary-soft: rgba(101, 205, 191, 0.08);
+            --bg:             #F8F9FD;
+            --white:          #FFFFFF;
+            --dark:           #151A35;
+            --gray-text:      #687089;
+            --border:         #BCC0CF;
+            --radius-lg:      16px;
+            --radius-md:      10px;
+            --radius-sm:      8px;
+        }
+
+        * { font-family: 'Plus Jakarta Sans', sans-serif; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+            margin: 0;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -15%; left: 65%;
+            width: 50vw; height: 50vw;
+            background: radial-gradient(circle, rgba(124, 92, 252, 0.07) 0%, rgba(255,255,255,0) 70%);
+            z-index: -2; pointer-events: none;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            top: 45%; left: -15%;
+            width: 40vw; height: 40vw;
+            background: radial-gradient(circle, rgba(101, 205, 191, 0.06) 0%, rgba(255,255,255,0) 70%);
+            z-index: -2; pointer-events: none;
+        }
+
+        .wrapper { display: flex; width: 100%; align-items: stretch; }
+
+        /* ── TOPBAR */
+        .topbar {
+            height: 70px;
+            background: rgba(255, 255, 255, 0.85) !important;
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 2rem;
+            position: sticky; top: 0; z-index: 98;
+        }
+        .search-bar { position: relative; width: 320px; }
+        .search-bar i { position: absolute; left: .85rem; top: 50%; transform: translateY(-50%); color: var(--gray-text); }
+        .search-bar input {
+            width: 100%; padding: .5rem 1rem .5rem 2.4rem;
+            border: 1px solid var(--border); border-radius: var(--radius-md);
+            background: var(--bg); font-size: .85rem; outline: none; transition: all .2s;
+        }
+        .search-bar input:focus { border-color: var(--primary); background: var(--white); box-shadow: 0 0 0 3px rgba(124,92,252,.12); }
+
+        .topbar-right { display: flex; align-items: center; gap: 1.25rem; }
+        .user-profile {
+            display: flex; align-items: center; gap: .75rem;
+            background: var(--white); padding: .35rem .85rem .35rem .4rem;
+            border-radius: 30px; border: 1px solid var(--border);
+        }
+        .user-avatar {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+            color: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: .85rem;
+        }
+        .user-name { font-weight: 600; font-size: .88rem; color: var(--dark); }
+
+        /* ── CONTENT AREA */
+        .content-area { padding: 1.75rem 2rem; max-width: 1400px; width: 100%; margin: 0 auto; }
+
+        /* ── HERO */
+        .hero-title   { font-size: 1.6rem; font-weight: 800; color: var(--dark); margin-bottom: .25rem; }
+        .hero-subtitle { color: var(--gray-text); font-size: .9rem; }
+
+        /* ── STAT CARDS */
+        .stat-card {
+            background: var(--white); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 1.25rem 1.5rem;
+            display: flex; align-items: center; gap: 1rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,.04);
+            transition: box-shadow .2s, transform .2s;
+        }
+        .stat-card:hover { box-shadow: 0 6px 24px rgba(124,92,252,.1); transform: translateY(-2px); }
+        .stat-icon {
+            width: 46px; height: 46px; border-radius: var(--radius-md);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem; flex-shrink: 0;
+        }
+        .stat-icon.amber  { background: rgba(245,158,11,.12); color: #D97706; }
+        .stat-icon.teal   { background: rgba(101,205,191,.15); color: #0A9F8C; }
+        .stat-icon.rose   { background: rgba(239,68,68,.1); color: #EF4444; }
+        .stat-icon.purple { background: rgba(124,92,252,.1); color: var(--primary); }
+        .stat-value { font-size: 1.55rem; font-weight: 800; color: var(--dark); line-height: 1; }
+        .stat-label { font-size: .76rem; color: var(--gray-text); font-weight: 500; margin-top: .2rem; }
+
+        /* ── PANEL */
+        .panel { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: 0 4px 20px rgba(0,0,0,.03); overflow: hidden; }
+        .panel-header { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 1rem; }
+        .panel-title { font-size: 1rem; font-weight: 700; color: var(--dark); }
+        .panel-subtitle { font-size: .78rem; color: var(--gray-text); margin-top: .1rem; }
+
+        /* ── TABLE */
+        .solicitudes-table { width: 100%; border-collapse: collapse; }
+        .solicitudes-table thead th {
+            padding: .75rem 1.5rem;
+            font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+            color: var(--gray-text); background: #FAFBFF; border-bottom: 1px solid var(--border); white-space: nowrap;
+        }
+        .solicitudes-table tbody tr { border-bottom: 1px solid rgba(188,192,207,.4); transition: background .15s; }
+        .solicitudes-table tbody tr:last-child { border-bottom: none; }
+        .solicitudes-table tbody tr:hover { background: rgba(124,92,252,.03); }
+        .solicitudes-table tbody td { padding: 1rem 1.5rem; vertical-align: middle; }
+
+        /* ── USER AVATAR & INFO */
+        .user-cell { display: flex; align-items: center; gap: .75rem; }
+        .user-avatar-circle {
+            width: 38px; height: 38px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: .85rem; color: white; flex-shrink: 0;
+        }
+        .user-name-text { font-size: .88rem; font-weight: 700; color: var(--dark); line-height: 1.2; }
+        .user-subtext { font-size: .75rem; color: var(--gray-text); margin-top: .15rem; }
+
+        /* ── ROLE CHIPS */
+        .role-chip {
+            display: inline-flex; align-items: center; gap: .45rem;
+            padding: .28rem .7rem; border-radius: 999px;
+            font-size: .75rem; font-weight: 700;
+        }
+        .role-chip .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+        .chip-director  { background: rgba(124,92,252,.1);  color: #6944E0; }
+        .chip-director .dot  { background: #6944E0; }
+        .chip-profesor  { background: rgba(59,130,246,.1);  color: #2563EB; }
+        .chip-profesor .dot  { background: #2563EB; }
+        .chip-utp       { background: rgba(16,185,129,.1);  color: #059669; }
+        .chip-utp .dot       { background: #059669; }
+        .chip-alumno    { background: rgba(245,158,11,.12); color: #B45309; }
+        .chip-alumno .dot    { background: #B45309; }
+        .chip-apoderado { background: rgba(236,72,153,.1);  color: #BE185D; }
+        .chip-apoderado .dot { background: #BE185D; }
+        .chip-inspector { background: rgba(139,92,246,.1);  color: #7C3AED; }
+        .chip-inspector .dot { background: #7C3AED; }
+
+        /* ── STATUS BADGES */
+        .status-badge {
+            display: inline-flex; align-items: center; gap: .35rem;
+            padding: .25rem .65rem; border-radius: 999px;
+            font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .03em;
+        }
+        .status-pendiente { background: #FEF3C7; color: #92400E; }
+        .status-aprobada  { background: #D1FAE5; color: #065F46; }
+        .status-rechazada { background: #FEE2E2; color: #991B1B; }
+
+        /* ── ACTION BUTTONS */
+        .action-btn {
+            width: 32px; height: 32px;
+            display: inline-flex; align-items: center; justify-content: center;
+            border-radius: var(--radius-sm); border: 1px solid var(--border);
+            background: var(--white); color: var(--gray-text);
+            font-size: .85rem; text-decoration: none; transition: all .18s; cursor: pointer;
+        }
+        .action-btn:hover { color: var(--dark); border-color: var(--dark); background: var(--bg); }
+        .action-btn.approve:hover { color: #059669; border-color: #6EE7B7; background: #D1FAE5; }
+        .action-btn.reject:hover  { color: #DC2626; border-color: #FCA5A5; background: #FEF2F2; }
+        .action-btn.view:hover    { color: #2563EB; border-color: #93C5FD; background: #EFF6FF; }
+
+        /* ── BUTTONS */
+        .btn-primary-custom {
+            display: inline-flex; align-items: center; gap: .45rem;
+            padding: .55rem 1.25rem; background: var(--primary); color: #fff;
+            border: none; border-radius: var(--radius-md); font-weight: 600; font-size: .85rem;
+            cursor: pointer; transition: all .2s; text-decoration: none;
+        }
+        .btn-primary-custom:hover { background: var(--primary-hover); color: #fff; box-shadow: 0 6px 18px rgba(108,79,240,.3); transform: translateY(-1px); }
+        .btn-outline-custom {
+            display: inline-flex; align-items: center; gap: .4rem;
+            padding: .5rem 1rem; background: var(--white); border: 1px solid var(--border);
+            border-radius: var(--radius-md); font-weight: 600; font-size: .82rem; color: var(--dark);
+            cursor: pointer; transition: all .18s; text-decoration: none;
+        }
+        .btn-outline-custom:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-soft); }
+
+        /* ── SEARCH & FILTERS */
+        .table-search { position: relative; min-width: 220px; }
+        .table-search i { position: absolute; left: .75rem; top: 50%; transform: translateY(-50%); color: var(--gray-text); font-size: .85rem; }
+        .table-search input {
+            width: 100%; padding: .45rem .9rem .45rem 2.1rem;
+            border: 1px solid var(--border); border-radius: var(--radius-md);
+            background: var(--bg); font-size: .82rem; outline: none; transition: all .2s;
+        }
+        .table-search input:focus { border-color: var(--primary); background: var(--white); box-shadow: 0 0 0 3px rgba(124,92,252,.1); }
+
+        .form-label-custom { font-size: .78rem; font-weight: 700; color: var(--gray-text); margin-bottom: .35rem; display: block; text-transform: uppercase; letter-spacing: .05em; }
+        .form-control-custom {
+            width: 100%; padding: .55rem .9rem; border: 1px solid var(--border);
+            border-radius: var(--radius-md); font-size: .88rem; outline: none; transition: all .2s;
+        }
+        .form-control-custom:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(124,92,252,.12); }
+
+        /* ── MODAL */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(21,26,53,.45); backdrop-filter: blur(4px);
+            z-index: 2000; align-items: center; justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-box {
+            background: var(--white); border-radius: var(--radius-lg); padding: 2rem;
+            width: 520px; max-width: calc(100vw - 2rem);
+            box-shadow: 0 24px 64px rgba(0,0,0,.15);
+            animation: modal-in .25s ease;
+        }
+        @keyframes modal-in { from { opacity:0; transform:scale(.95) translateY(12px); } to { opacity:1; transform:scale(1) translateY(0); } }
+        .modal-title   { font-size: 1.1rem; font-weight: 800; color: var(--dark); margin-bottom: .25rem; }
+        .modal-subtitle { font-size: .82rem; color: var(--gray-text); margin-bottom: 1.5rem; }
+
+        @media (max-width: 991.98px) {
+            .content-area { padding: 1.25rem 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    {% include '_sidebar_superadmin.html' with active_page='solicitudes_global' %}
+
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <div class="d-flex align-items-center gap-2">
+                <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn"
+                    style="border:none;background:var(--primary-soft);color:var(--primary);">
+                    <i class="bi bi-list fs-5"></i>
+                </button>
+                <div class="search-bar">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="globalSearch" placeholder="Buscar por usuario o email...">
+                </div>
+            </div>
+            <div class="topbar-right">
+                <button style="background:none;border:none;color:var(--gray-text);font-size:1.1rem;position:relative;cursor:pointer;">
+                    <i class="bi bi-bell"></i>
+                    <span style="position:absolute;top:0;right:0;width:7px;height:7px;background:#F76F7A;border-radius:50%;border:2px solid white;"></span>
+                </button>
+                <div class="user-profile">
+                    <div class="user-avatar">AE</div>
+                    <span class="user-name">Admin Eduteka</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="content-area">
+
+            <!-- HERO HEADER -->
+            <div class="d-flex align-items-start justify-content-between mb-4 flex-wrap gap-3">
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <div style="width:34px;height:34px;background:var(--primary-soft);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;">
+                            <i class="bi bi-clipboard-check-fill" style="color:var(--primary);font-size:1rem;"></i>
+                        </div>
+                        <h1 class="hero-title mb-0">Cola Global de Solicitudes</h1>
+                    </div>
+                    <p class="hero-subtitle ms-1">
+                        Gestión centralizada de peticiones de acceso a instituciones de la plataforma.
+                    </p>
+                </div>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="#" class="btn-outline-custom" onclick="exportSolicitudes(event)">
+                        <i class="bi bi-download"></i> Exportar CSV
+                    </a>
+                    <button class="btn-primary-custom" onclick="openBatchModal()">
+                        <i class="bi bi-check-all"></i> Procesar Pendientes
+                    </button>
+                </div>
+            </div>
+
+            <!-- STAT CARDS (KPIs) -->
+            {% if messages %}
+            <div class="mb-3">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} d-flex align-items-center gap-2" style="border-radius:var(--radius-md);font-size:.85rem;">
+                    <i class="bi {% if 'success' in message.tags %}bi-check-circle-fill text-success{% else %}bi-exclamation-circle-fill text-danger{% endif %}"></i>
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="row g-3 mb-4">
+                <div class="col-6 col-xl-3">
+                    <div class="stat-card">
+                        <div class="stat-icon amber"><i class="bi bi-hourglass-split"></i></div>
+                        <div>
+                            <div class="stat-value">{{ pendientes_total }}</div>
+                            <div class="stat-label">Solicitudes Pendientes</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-xl-3">
+                    <div class="stat-card">
+                        <div class="stat-icon teal"><i class="bi bi-check-circle-fill"></i></div>
+                        <div>
+                            <div class="stat-value">{{ aprobadas_hoy }}</div>
+                            <div class="stat-label">Aprobadas (Hoy)</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-xl-3">
+                    <div class="stat-card">
+                        <div class="stat-icon rose"><i class="bi bi-x-circle-fill"></i></div>
+                        <div>
+                            <div class="stat-value">{{ tasa_rechazo }}%</div>
+                            <div class="stat-label">Tasa de Rechazo</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-xl-3">
+                    <div class="stat-card">
+                        <div class="stat-icon purple"><i class="bi bi-lightning-charge-fill"></i></div>
+                        <div>
+                            <div class="stat-value">{{ solicitudes|length }} <span style="font-size:1rem;font-weight:600;">total</span></div>
+                            <div class="stat-label">Solicitudes (con filtros)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABLE PANEL -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div>
+                        <div class="panel-title">
+                            <i class="bi bi-inbox-fill me-1" style="color:var(--primary);"></i>
+                            Peticiones Recientes
+                        </div>
+                        <div class="panel-subtitle">
+                            Solicitudes de nuevos usuarios que requieren validación de asignación a colegios.
+                        </div>
+                    </div>
+                    <form method="GET" action="" class="d-flex align-items-center gap-2 flex-wrap">
+                        <div class="table-search">
+                            <i class="bi bi-search"></i>
+                            <input type="text" name="q" value="{{ request.GET.q|default:'' }}" id="tableSearch" placeholder="Buscar solicitante o email..." oninput="filterTable()">
+                        </div>
+
+                        <!-- Filtro por Colegio (dinámico desde BD) -->
+                        <select name="colegio" id="filterColegio" class="form-control-custom"
+                            style="width:auto;padding:.45rem .85rem;font-size:.82rem;" onchange="this.form.submit()">
+                            <option value="">Filtrar por Colegio</option>
+                            {% for c in colegios_con_solicitudes %}
+                            <option value="{{ c.colegio__nombre }}" {% if request.GET.colegio == c.colegio__nombre %}selected{% endif %}>{{ c.colegio__nombre }}</option>
+                            {% endfor %}
+                        </select>
+
+                        <!-- Filtro por Estado -->
+                        <select name="estado" id="filterEstado" class="form-control-custom"
+                            style="width:auto;padding:.45rem .85rem;font-size:.82rem;" onchange="this.form.submit()">
+                            <option value="">Estado</option>
+                            <option value="pendiente" {% if request.GET.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
+                            <option value="aprobada" {% if request.GET.estado == 'aprobada' %}selected{% endif %}>Aprobada</option>
+                            <option value="rechazada" {% if request.GET.estado == 'rechazada' %}selected{% endif %}>Rechazada</option>
+                        </select>
+
+                        <button type="submit" class="btn-outline-custom" style="padding:.45rem .85rem;font-size:.82rem;">
+                            <i class="bi bi-funnel"></i> Filtrar
+                        </button>
+                        {% if request.GET.q or request.GET.colegio or request.GET.estado %}
+                        <a href="{% url 'dashboard_superadmin_solicitudes' %}" class="btn-outline-custom" style="padding:.45rem .85rem;font-size:.82rem;color:#DC2626;border-color:#FCA5A5;">
+                            <i class="bi bi-x-circle"></i> Limpiar
+                        </a>
+                        {% endif %}
+                    </form>
+                </div>
+
+                <div style="overflow-x:auto;">
+                    <table class="solicitudes-table" id="solicitudesTable">
+                        <thead>
+                            <tr>
+                                <th>Usuario Solicitante</th>
+                                <th>Colegio Destino</th>
+                                <th>Rol Solicitado</th>
+                                <th>Fecha de Petición</th>
+                                <th>Estado</th>
+                                <th style="width:130px;text-align:center;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="solicitudesBody">
+
+                            {% for s in solicitudes %}
+                            {% with nombre_display=s.usuario.get_full_name|default:s.usuario.username iniciales=s.usuario.first_name|slice:':1' %}
+                            {% with iniciales2=iniciales|add:s.usuario.last_name|slice:':1' %}
+                            <tr data-colegio="{{ s.colegio.nombre }}" data-estado="{{ s.get_estado_display }}">
+                                <!-- Usuario -->
+                                <td>
+                                    <div class="user-cell">
+                                        <div class="user-avatar-circle" style="background:linear-gradient(135deg,#7C5CFC,#5B3FD4);">
+                                            {{ iniciales2|upper|default:s.usuario.username|slice:':2'|upper }}
+                                        </div>
+                                        <div>
+                                            <div class="user-name-text">{{ nombre_display }}</div>
+                                            <div class="user-subtext">{{ s.usuario.email }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <!-- Colegio -->
+                                <td>
+                                    <div style="font-size:.84rem;font-weight:600;color:var(--dark);">{{ s.colegio.nombre }}</div>
+                                    <div style="font-size:.74rem;color:var(--gray-text);">{{ s.colegio.ciudad_comuna|default:s.colegio.region|default:'—' }}</div>
+                                </td>
+
+                                <!-- Rol -->
+                                <td>
+                                    <span class="role-chip chip-profesor"><span class="dot"></span>{{ s.rol_solicitado|capfirst }}</span>
+                                </td>
+
+                                <!-- Fecha -->
+                                <td>
+                                    <div style="font-size:.82rem;color:var(--dark);">{{ s.fecha_solicitud|date:'d M Y, H:i' }}</div>
+                                    <div style="font-size:.72rem;color:var(--gray-text);">{{ s.fecha_solicitud|timesince }} atrás</div>
+                                </td>
+
+                                <!-- Estado Badge -->
+                                <td>
+                                    {% if s.estado == 'pendiente' %}
+                                    <span class="status-badge status-pendiente"><i class="bi bi-clock-history" style="font-size:.45rem;"></i> Pendiente</span>
+                                    {% elif s.estado == 'aprobada' %}
+                                    <span class="status-badge status-aprobada"><i class="bi bi-check-circle-fill" style="font-size:.45rem;"></i> Aprobada</span>
+                                    {% else %}
+                                    <span class="status-badge status-rechazada"><i class="bi bi-x-circle-fill" style="font-size:.45rem;"></i> Rechazada</span>
+                                    {% endif %}
+                                </td>
+
+                                <!-- Acciones -->
+                                <td>
+                                    <div class="d-flex align-items-center justify-content-center gap-1">
+                                        {% if s.estado == 'pendiente' %}
+                                        <button class="action-btn approve" title="Aprobar acceso"
+                                            onclick="confirmApprove('{{ nombre_display|escapejs }}', '{{ s.colegio.nombre|escapejs }}', '{{ s.rol_solicitado|capfirst|escapejs }}', {{ s.id }})">
+                                            <i class="bi bi-check-lg"></i>
+                                        </button>
+                                        <button class="action-btn reject" title="Rechazar acceso"
+                                            onclick="confirmReject('{{ nombre_display|escapejs }}', {{ s.id }})">
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
+                                        {% endif %}
+                                        <button class="action-btn view" title="Ver detalle"
+                                            onclick="openDetailModal('{{ nombre_display|escapejs }}', '{{ s.usuario.email|escapejs }}', '{{ s.colegio.nombre|escapejs }}', '{{ s.rol_solicitado|capfirst|escapejs }}', '{{ s.mensaje|default:'Sin mensaje adicional.'|escapejs }}')"
+                                        ><i class="bi bi-eye"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endwith %}
+                            {% endwith %}
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" style="text-align:center;padding:3rem;color:var(--gray-text);font-size:.9rem;">
+                                    <i class="bi bi-inbox" style="font-size:2.5rem;display:block;margin-bottom:.75rem;opacity:.4;"></i>
+                                    No se encontraron solicitudes con los filtros seleccionados.
+                                </td>
+                            </tr>
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+                </div>
+
+                <!-- Table Footer -->
+                <div style="padding:.85rem 1.5rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;">
+                    <span style="font-size:.78rem;color:var(--gray-text);" id="tableCount">
+                        Mostrando <strong>{{ total_solicitudes }}</strong> solicitud(es)
+                    </span>
+                    <div class="d-flex gap-2">
+                        <a href="#" class="btn-outline-custom" style="font-size:.78rem;padding:.35rem .85rem;" onclick="exportSolicitudes(event)">
+                            <i class="bi bi-download"></i> Exportar Registro
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /content-area -->
+    </main>
+</div><!-- /wrapper -->
+
+
+<!-- ════ MODAL: APROBAR SOLICITUD ═════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalApprove">
+    <div class="modal-box" style="width:460px;text-align:center;">
+        <div style="width:56px;height:56px;background:#D1FAE5;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
+            <i class="bi bi-check-circle-fill" style="color:#059669;font-size:1.5rem;"></i>
+        </div>
+        <div class="modal-title" style="margin-bottom:.35rem;">Aprobar Acceso a la Plataforma</div>
+        <p style="font-size:.84rem;color:var(--gray-text);line-height:1.6;">
+            ¿Confirmas la aprobación para <strong id="approveUserName" style="color:var(--dark);"></strong> en <strong id="approveColegioName" style="color:var(--dark);"></strong> con rol <strong id="approveRolName" style="color:var(--primary);"></strong>?
+        </p>
+        <div class="d-flex gap-2 justify-content-center mt-4">
+            <button onclick="closeModal('modalApprove')" class="btn-outline-custom">Cancelar</button>
+            <button class="btn-primary-custom" style="background:#059669;" onclick="executeApprove()">
+                <i class="bi bi-check-lg"></i> Sí, Aprobar Acceso
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ════ MODAL: RECHAZAR SOLICITUD ═════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalReject">
+    <div class="modal-box" style="width:480px;">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <div>
+                <div class="modal-title">Rechazar Solicitud de Acceso</div>
+                <div class="modal-subtitle">Indica el motivo del rechazo para notificar al solicitante.</div>
+            </div>
+            <button onclick="closeModal('modalReject')" style="background:none;border:none;font-size:1.3rem;color:var(--gray-text);cursor:pointer;">&times;</button>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label-custom">Solicitante</label>
+            <input type="text" class="form-control-custom" id="rejectUserName" readonly>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label-custom">Motivo de Rechazo</label>
+            <select class="form-control-custom">
+                <option>Correo no corresponde al dominio institucional</option>
+                <option>RUT no verificado en nómina del establecimiento</option>
+                <option>Rol solicitado no habilitado para el usuario</option>
+                <option>Solicitud duplicada</option>
+                <option>Otro motivo personalizado...</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label-custom">Observación Adicional</label>
+            <textarea class="form-control-custom" rows="3" placeholder="Mensaje que recibirá el usuario por correo..."></textarea>
+        </div>
+
+        <div class="d-flex gap-2 justify-content-end pt-2" style="border-top:1px solid var(--border);">
+            <button onclick="closeModal('modalReject')" class="btn-outline-custom">Cancelar</button>
+            <button style="display:inline-flex;align-items:center;gap:.45rem;padding:.55rem 1.25rem;background:#EF4444;color:#fff;border:none;border-radius:var(--radius-md);font-weight:600;font-size:.85rem;cursor:pointer;" onclick="executeReject()">
+                <i class="bi bi-x-lg"></i> Confirmar Rechazo
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ════ MODAL: VER DETALLE ═══════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalDetail">
+    <div class="modal-box">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <div>
+                <div class="modal-title">Detalle de Solicitud de Acceso</div>
+                <div class="modal-subtitle">Información completa enviada por el usuario.</div>
+            </div>
+            <button onclick="closeModal('modalDetail')" style="background:none;border:none;font-size:1.3rem;color:var(--gray-text);cursor:pointer;">&times;</button>
+        </div>
+
+        <div class="p-3 mb-3 rounded" style="background:var(--bg);border:1px solid var(--border);">
+            <div class="row g-2">
+                <div class="col-6">
+                    <span class="form-label-custom">Solicitante</span>
+                    <div id="detailNombre" class="fw-bold text-dark"></div>
+                    <div id="detailEmail" class="text-muted small"></div>
+                </div>
+                <div class="col-6">
+                    <span class="form-label-custom">Institución</span>
+                    <div id="detailColegio" class="fw-bold text-dark"></div>
+                    <div id="detailRol" class="text-primary small fw-bold"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label-custom">Mensaje o Justificación</label>
+            <div id="detailMensaje" class="p-3 rounded" style="background:#FAFBFF;border:1px solid var(--border);font-size:.85rem;color:var(--dark);"></div>
+        </div>
+
+        <div class="d-flex gap-2 justify-content-end pt-2" style="border-top:1px solid var(--border);">
+            <button onclick="closeModal('modalDetail')" class="btn-outline-custom">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // ── Mobile sidebar
+    document.addEventListener('DOMContentLoaded', () => {
+        const btn = document.getElementById('mobileMenuBtn');
+        const sb  = document.getElementById('sidebar');
+        if (btn && sb) btn.addEventListener('click', () => sb.classList.toggle('active'));
+    });
+
+    // ── Modals
+    function openModal(id)  { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+    document.querySelectorAll('.modal-overlay').forEach(el => {
+        el.addEventListener('click', e => { if (e.target === el) closeModal(el.id); });
+    });
+
+    let _currentSolicitudId = null;
+
+    function confirmApprove(nombre, colegio, rol, solicitudId) {
+        _currentSolicitudId = solicitudId;
+        document.getElementById('approveUserName').textContent   = nombre;
+        document.getElementById('approveColegioName').textContent = colegio;
+        document.getElementById('approveRolName').textContent     = rol;
+        openModal('modalApprove');
+    }
+
+    function confirmReject(nombre, solicitudId) {
+        _currentSolicitudId = solicitudId;
+        document.getElementById('rejectUserName').value = nombre;
+        openModal('modalReject');
+    }
+
+    function openDetailModal(nombre, email, colegio, rol, mensaje) {
+        document.getElementById('detailNombre').textContent  = nombre;
+        document.getElementById('detailEmail').textContent   = email;
+        document.getElementById('detailColegio').textContent = colegio;
+        document.getElementById('detailRol').textContent     = 'Rol: ' + rol;
+        document.getElementById('detailMensaje').textContent = mensaje;
+        openModal('modalDetail');
+    }
+
+    function executeApprove() {
+        submitAction('aprobar');
+    }
+
+    function executeReject() {
+        submitAction('rechazar');
+    }
+
+    function submitAction(accion) {
+        if (!_currentSolicitudId) return;
+        const form = document.getElementById('actionForm');
+        form.querySelector('[name="accion"]').value       = accion;
+        form.querySelector('[name="solicitud_id"]').value = _currentSolicitudId;
+        form.submit();
+    }
+
+    function openBatchModal() {
+        alert('Procesando peticiones en lote...');
+    }
+
+    function exportSolicitudes(e) {
+        e.preventDefault();
+        alert('Exportando historial de solicitudes a CSV...');
+    }
+
+    // ── Filtrado de tabla
+    function filterTable() {
+        const q       = (document.getElementById('tableSearch').value || '').toLowerCase();
+        const colegio = (document.getElementById('filterColegio').value || '').toLowerCase();
+        const estado  = (document.getElementById('filterEstado').value || '').toLowerCase();
+
+        const rows = document.querySelectorAll('#solicitudesBody tr');
+        let vis    = 0;
+
+        rows.forEach(row => {
+            const rowColegio = (row.dataset.colegio || '').toLowerCase();
+            const rowEstado  = (row.dataset.estado || '').toLowerCase();
+            const text       = row.innerText.toLowerCase();
+
+            const matchQ       = !q       || text.includes(q);
+            const matchColegio = !colegio || rowColegio.includes(colegio);
+            const matchEstado  = !estado  || rowEstado.includes(estado);
+
+            const show = matchQ && matchColegio && matchEstado;
+            row.style.display = show ? '' : 'none';
+            if (show) vis++;
+        });
+
+        document.getElementById('tableCount').innerHTML =
+            'Mostrando <strong>' + vis + '</strong> de <strong>' + rows.length + '</strong> solicitud(es)';
+    }
+
+    // Búsqueda global desde topbar
+    document.getElementById('globalSearch').addEventListener('input', function () {
+        document.getElementById('tableSearch').value = this.value;
+        filterTable();
+    });
+</script>
+<!-- Hidden form for POST approve/reject actions -->
+<form id="actionForm" method="POST" action="{% url 'dashboard_superadmin_solicitudes' %}" style="display:none;">
+    {% csrf_token %}
+    <input type="hidden" name="accion" value="">
+    <input type="hidden" name="solicitud_id" value="">
+</form>
+
+</body>
+</html>

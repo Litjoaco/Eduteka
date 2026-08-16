@@ -1,0 +1,799 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuarios Globales - Super Admin Eduteka</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <!-- Fuentes e Iconos -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        /* ══ DESIGN TOKENS (idénticos al resto del Super Admin) ═══════════════ */
+        :root {
+            --primary:        #7C5CFC;
+            --primary-soft:   rgba(124, 92, 252, 0.08);
+            --primary-hover:  #6747E3;
+            --secondary:      #65CDBF;
+            --secondary-soft: rgba(101, 205, 191, 0.08);
+            --bg:             #F8F9FD;
+            --white:          #FFFFFF;
+            --dark:           #151A35;
+            --gray-text:      #687089;
+            --border:         #BCC0CF;
+            --radius-lg:      16px;
+            --radius-md:      10px;
+            --radius-sm:      8px;
+        }
+
+        * { font-family: 'Plus Jakarta Sans', sans-serif; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+            margin: 0;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -15%; left: 65%;
+            width: 50vw; height: 50vw;
+            background: radial-gradient(circle, rgba(124, 92, 252, 0.07) 0%, rgba(255,255,255,0) 70%);
+            z-index: -2; pointer-events: none;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            top: 45%; left: -15%;
+            width: 40vw; height: 40vw;
+            background: radial-gradient(circle, rgba(101, 205, 191, 0.06) 0%, rgba(255,255,255,0) 70%);
+            z-index: -2; pointer-events: none;
+        }
+
+        .wrapper { display: flex; width: 100%; align-items: stretch; }
+
+        /* ── TOPBAR */
+        .topbar {
+            height: 70px;
+            background: rgba(255, 255, 255, 0.85) !important;
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 2rem;
+            position: sticky; top: 0; z-index: 98;
+        }
+        .search-bar { position: relative; width: 320px; }
+        .search-bar i { position: absolute; left: .85rem; top: 50%; transform: translateY(-50%); color: var(--gray-text); }
+        .search-bar input {
+            width: 100%; padding: .5rem 1rem .5rem 2.4rem;
+            border: 1px solid var(--border); border-radius: var(--radius-md);
+            background: var(--bg); font-size: .85rem; outline: none; transition: all .2s;
+        }
+        .search-bar input:focus { border-color: var(--primary); background: var(--white); box-shadow: 0 0 0 3px rgba(124,92,252,.12); }
+
+        .topbar-right { display: flex; align-items: center; gap: 1.25rem; }
+        .user-profile {
+            display: flex; align-items: center; gap: .75rem;
+            background: var(--white); padding: .35rem .85rem .35rem .4rem;
+            border-radius: 30px; border: 1px solid var(--border);
+        }
+        .user-avatar {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+            color: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: .85rem;
+        }
+        .user-name { font-weight: 600; font-size: .88rem; color: var(--dark); }
+
+        /* ── CONTENT AREA */
+        .content-area { padding: 1.75rem 2rem; max-width: 1400px; width: 100%; margin: 0 auto; }
+
+        /* ── HERO */
+        .hero-title   { font-size: 1.6rem; font-weight: 800; color: var(--dark); margin-bottom: .25rem; }
+        .hero-subtitle { color: var(--gray-text); font-size: .9rem; }
+
+        /* ── STAT CARDS */
+        .stat-card {
+            background: var(--white); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 1.25rem 1.5rem;
+            display: flex; align-items: center; gap: 1rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,.04);
+            transition: box-shadow .2s, transform .2s;
+        }
+        .stat-card:hover { box-shadow: 0 6px 24px rgba(124,92,252,.1); transform: translateY(-2px); }
+        .stat-icon {
+            width: 46px; height: 46px; border-radius: var(--radius-md);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem; flex-shrink: 0;
+        }
+        .stat-icon.purple { background: rgba(124,92,252,.1); color: var(--primary); }
+        .stat-icon.teal   { background: rgba(101,205,191,.15); color: #0A9F8C; }
+        .stat-icon.amber  { background: rgba(245,158,11,.12); color: #D97706; }
+        .stat-icon.rose   { background: rgba(239,68,68,.1); color: #EF4444; }
+        .stat-value { font-size: 1.55rem; font-weight: 800; color: var(--dark); line-height: 1; }
+        .stat-label { font-size: .76rem; color: var(--gray-text); font-weight: 500; margin-top: .2rem; }
+
+        /* ── PANEL */
+        .panel { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: 0 4px 20px rgba(0,0,0,.03); overflow: hidden; }
+        .panel-header { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 1rem; }
+        .panel-title { font-size: 1rem; font-weight: 700; color: var(--dark); }
+        .panel-subtitle { font-size: .78rem; color: var(--gray-text); margin-top: .1rem; }
+
+        /* ── TABLE */
+        .users-table { width: 100%; border-collapse: collapse; }
+        .users-table thead th {
+            padding: .75rem 1.5rem;
+            font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+            color: var(--gray-text); background: #FAFBFF; border-bottom: 1px solid var(--border); white-space: nowrap;
+        }
+        .users-table tbody tr { border-bottom: 1px solid rgba(188,192,207,.4); transition: background .15s; }
+        .users-table tbody tr:last-child { border-bottom: none; }
+        .users-table tbody tr:hover { background: rgba(124,92,252,.03); }
+        .users-table tbody td { padding: 1rem 1.5rem; vertical-align: middle; }
+
+        /* ── USER AVATAR & INFO */
+        .user-cell { display: flex; align-items: center; gap: .75rem; }
+        .user-avatar-circle {
+            width: 38px; height: 38px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: .85rem; color: white; flex-shrink: 0;
+        }
+        .user-name-text { font-size: .88rem; font-weight: 700; color: var(--dark); line-height: 1.2; }
+        .user-subtext { font-size: .75rem; color: var(--gray-text); margin-top: .15rem; }
+
+        /* ── ROLE CHIPS */
+        .role-chip {
+            display: inline-flex; align-items: center; gap: .45rem;
+            padding: .28rem .7rem; border-radius: 999px;
+            font-size: .75rem; font-weight: 700;
+        }
+        .role-chip .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+        .chip-director  { background: rgba(124,92,252,.1);  color: #6944E0; }
+        .chip-director .dot  { background: #6944E0; }
+        .chip-profesor  { background: rgba(59,130,246,.1);  color: #2563EB; }
+        .chip-profesor .dot  { background: #2563EB; }
+        .chip-utp       { background: rgba(16,185,129,.1);  color: #059669; }
+        .chip-utp .dot       { background: #059669; }
+        .chip-alumno    { background: rgba(245,158,11,.12); color: #B45309; }
+        .chip-alumno .dot    { background: #B45309; }
+        .chip-apoderado { background: rgba(236,72,153,.1);  color: #BE185D; }
+        .chip-apoderado .dot { background: #BE185D; }
+        .chip-inspector { background: rgba(139,92,246,.1);  color: #7C3AED; }
+        .chip-inspector .dot { background: #7C3AED; }
+        .chip-admin     { background: rgba(239,68,68,.1);   color: #DC2626; }
+        .chip-admin .dot     { background: #DC2626; }
+
+        /* ── STATUS BADGES */
+        .status-badge {
+            display: inline-flex; align-items: center; gap: .35rem;
+            padding: .25rem .65rem; border-radius: 999px;
+            font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .03em;
+        }
+        .status-activo     { background: #D1FAE5; color: #065F46; }
+        .status-inactivo   { background: #FEF3C7; color: #92400E; }
+        .status-suspendido { background: #FEE2E2; color: #991B1B; }
+
+        /* ── ACTION BUTTONS */
+        .action-btn {
+            width: 32px; height: 32px;
+            display: inline-flex; align-items: center; justify-content: center;
+            border-radius: var(--radius-sm); border: 1px solid var(--border);
+            background: var(--white); color: var(--gray-text);
+            font-size: .85rem; text-decoration: none; transition: all .18s; cursor: pointer;
+        }
+        .action-btn:hover { color: var(--dark); border-color: var(--dark); background: var(--bg); }
+        .action-btn.edit:hover  { color: var(--primary); border-color: var(--primary); background: var(--primary-soft); }
+        .action-btn.del:hover   { color: #DC2626; border-color: #FCA5A5; background: #FEF2F2; }
+        .action-btn.view:hover  { color: #2563EB; border-color: #93C5FD; background: #EFF6FF; }
+        .action-btn.block:hover { color: #D97706; border-color: #FCD34D; background: #FEF3C7; }
+
+        /* ── BUTTONS */
+        .btn-primary-custom {
+            display: inline-flex; align-items: center; gap: .45rem;
+            padding: .55rem 1.25rem; background: var(--primary); color: #fff;
+            border: none; border-radius: var(--radius-md); font-weight: 600; font-size: .85rem;
+            cursor: pointer; transition: all .2s; text-decoration: none;
+        }
+        .btn-primary-custom:hover { background: var(--primary-hover); color: #fff; box-shadow: 0 6px 18px rgba(108,79,240,.3); transform: translateY(-1px); }
+        .btn-outline-custom {
+            display: inline-flex; align-items: center; gap: .4rem;
+            padding: .5rem 1rem; background: var(--white); border: 1px solid var(--border);
+            border-radius: var(--radius-md); font-weight: 600; font-size: .82rem; color: var(--dark);
+            cursor: pointer; transition: all .18s; text-decoration: none;
+        }
+        .btn-outline-custom:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-soft); }
+
+        /* ── TABLE SEARCH & FILTERS */
+        .table-search { position: relative; min-width: 220px; }
+        .table-search i { position: absolute; left: .75rem; top: 50%; transform: translateY(-50%); color: var(--gray-text); font-size: .85rem; }
+        .table-search input {
+            width: 100%; padding: .45rem .9rem .45rem 2.1rem;
+            border: 1px solid var(--border); border-radius: var(--radius-md);
+            background: var(--bg); font-size: .82rem; outline: none; transition: all .2s;
+        }
+        .table-search input:focus { border-color: var(--primary); background: var(--white); box-shadow: 0 0 0 3px rgba(124,92,252,.1); }
+
+        /* ── FORM CONTROLS */
+        .form-label-custom { font-size: .78rem; font-weight: 700; color: var(--gray-text); margin-bottom: .35rem; display: block; text-transform: uppercase; letter-spacing: .05em; }
+        .form-control-custom {
+            width: 100%; padding: .55rem .9rem; border: 1px solid var(--border);
+            border-radius: var(--radius-md); font-size: .88rem; outline: none; transition: all .2s;
+        }
+        .form-control-custom:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(124,92,252,.12); }
+
+        /* ── MODAL */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(21,26,53,.45); backdrop-filter: blur(4px);
+            z-index: 2000; align-items: center; justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-box {
+            background: var(--white); border-radius: var(--radius-lg); padding: 2rem;
+            width: 560px; max-width: calc(100vw - 2rem);
+            box-shadow: 0 24px 64px rgba(0,0,0,.15);
+            animation: modal-in .25s ease;
+        }
+        @keyframes modal-in { from { opacity:0; transform:scale(.95) translateY(12px); } to { opacity:1; transform:scale(1) translateY(0); } }
+        .modal-title   { font-size: 1.1rem; font-weight: 800; color: var(--dark); margin-bottom: .25rem; }
+        .modal-subtitle { font-size: .82rem; color: var(--gray-text); margin-bottom: 1.5rem; }
+
+        @media (max-width: 991.98px) {
+            .content-area { padding: 1.25rem 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    {% include '_sidebar_superadmin.html' with active_page='usuarios' %}
+
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <div class="d-flex align-items-center gap-2">
+                <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn"
+                    style="border:none;background:var(--primary-soft);color:var(--primary);">
+                    <i class="bi bi-list fs-5"></i>
+                </button>
+                <div class="search-bar">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="globalSearch" placeholder="Buscar por nombre, RUT, correo...">
+                </div>
+            </div>
+            <div class="topbar-right">
+                <button style="background:none;border:none;color:var(--gray-text);font-size:1.1rem;position:relative;cursor:pointer;">
+                    <i class="bi bi-bell"></i>
+                    <span style="position:absolute;top:0;right:0;width:7px;height:7px;background:#F76F7A;border-radius:50%;border:2px solid white;"></span>
+                </button>
+                <div class="user-profile">
+                    <div class="user-avatar">AE</div>
+                    <span class="user-name">Admin Eduteka</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="content-area">
+
+            <!-- HERO HEADER -->
+            <div class="d-flex align-items-start justify-content-between mb-4 flex-wrap gap-3">
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <div style="width:34px;height:34px;background:var(--primary-soft);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;">
+                            <i class="bi bi-people-fill" style="color:var(--primary);font-size:1rem;"></i>
+                        </div>
+                        <h1 class="hero-title mb-0">Gestión Global de Usuarios</h1>
+                    </div>
+                    <p class="hero-subtitle ms-1">
+                        Supervisión y control de acceso de todos los usuarios registrados en los colegios clientes.
+                    </p>
+                </div>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="#" class="btn-outline-custom" onclick="exportUsers(event)">
+                        <i class="bi bi-download"></i> Exportar CSV
+                    </a>
+                    <button class="btn-primary-custom" onclick="openCreateUserModal()">
+                        <i class="bi bi-person-plus-fill"></i> + Nuevo Usuario
+                    </button>
+                </div>
+            </div>
+
+            <!-- STAT CARDS -->
+            <div class="row g-3 mb-4">
+                <div class="col-6 col-xl-3">
+                    <div class="stat-card">
+                        <div class="stat-icon purple"><i class="bi bi-people"></i></div>
+                        <div>
+                            <div class="stat-value">248</div>
+                            <div class="stat-label">Total Usuarios</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-xl-3">
+                    <div class="stat-card">
+                        <div class="stat-icon teal"><i class="bi bi-journal-bookmark-fill"></i></div>
+                        <div>
+                            <div class="stat-value">48</div>
+                            <div class="stat-label">Docentes / UTP</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-xl-3">
+                    <div class="stat-card">
+                        <div class="stat-icon amber"><i class="bi bi-mortarboard-fill"></i></div>
+                        <div>
+                            <div class="stat-value">184</div>
+                            <div class="stat-label">Estudiantes y Apoderados</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-xl-3">
+                    <div class="stat-card">
+                        <div class="stat-icon rose"><i class="bi bi-person-x-fill"></i></div>
+                        <div>
+                            <div class="stat-value">3</div>
+                            <div class="stat-label">Cuentas Suspendidas / Inactivas</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- USERS TABLE PANEL -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div>
+                        <div class="panel-title">
+                            <i class="bi bi-person-lines-fill me-1" style="color:var(--primary);"></i>
+                            Directorio General de Usuarios
+                        </div>
+                        <div class="panel-subtitle">
+                            Listado completo de cuentas registradas en la plataforma Eduteka.
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <div class="table-search">
+                            <i class="bi bi-search"></i>
+                            <input type="text" id="tableSearch" placeholder="Buscar nombre, RUT, correo..." oninput="filterTable()">
+                        </div>
+
+                        <!-- Filtro por Colegio -->
+                        <select id="filterColegio" class="form-control-custom"
+                            style="width:auto;padding:.45rem .85rem;font-size:.82rem;" onchange="filterTable()">
+                            <option value="">Filtrar por Colegio</option>
+                            <option value="Liceo Santa María">Liceo Santa María</option>
+                            <option value="Colegio Los Alerces">Colegio Los Alerces</option>
+                            <option value="Instituto Profesional del Norte">Instituto Profesional del Norte</option>
+                            <option value="Colegio San Agustín">Colegio San Agustín</option>
+                            <option value="Escuela Básica El Porvenir">Escuela Básica El Porvenir</option>
+                        </select>
+
+                        <!-- Filtro por Rol -->
+                        <select id="filterRol" class="form-control-custom"
+                            style="width:auto;padding:.45rem .85rem;font-size:.82rem;" onchange="filterTable()">
+                            <option value="">Filtrar por Rol</option>
+                            <option value="Director">Director</option>
+                            <option value="Profesor">Profesor</option>
+                            <option value="UTP">UTP</option>
+                            <option value="Inspector">Inspector</option>
+                            <option value="Alumno">Alumno</option>
+                            <option value="Apoderado">Apoderado</option>
+                            <option value="Administrador">Administrador</option>
+                        </select>
+
+                        <!-- Filtro por Estado -->
+                        <select id="filterEstado" class="form-control-custom"
+                            style="width:auto;padding:.45rem .85rem;font-size:.82rem;" onchange="filterTable()">
+                            <option value="">Estado</option>
+                            <option value="Activo">Activo</option>
+                            <option value="Inactivo">Inactivo</option>
+                            <option value="Suspendido">Suspendido</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="overflow-x:auto;">
+                    <table class="users-table" id="usersTable">
+                        <thead>
+                            <tr>
+                                <th>Usuario</th>
+                                <th>Colegio Asociado</th>
+                                <th>Rol Asignado</th>
+                                <th>Último Acceso</th>
+                                <th>Estado</th>
+                                <th style="width:120px;text-align:center;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersBody">
+
+                            <!-- Usuario 1: Director -->
+                            <tr data-colegio="Liceo Santa María" data-rol="Director" data-estado="Activo">
+                                <td>
+                                    <div class="user-cell">
+                                        <div class="user-avatar-circle" style="background:linear-gradient(135deg,#7C5CFC,#6344CE);">
+                                            CM
+                                        </div>
+                                        <div>
+                                            <div class="user-name-text">Carlos Mendoza Silva</div>
+                                            <div class="user-subtext">RUT: 14.321.654-K • c.mendoza@santamaria.cl</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="font-size:.84rem;font-weight:600;color:var(--dark);">Liceo Santa María</div>
+                                    <div style="font-size:.74rem;color:var(--gray-text);">Región Metropolitana</div>
+                                </td>
+                                <td>
+                                    <span class="role-chip chip-director"><span class="dot"></span>Director</span>
+                                </td>
+                                <td>
+                                    <div style="font-size:.82rem;color:var(--dark);">Hoy, 10:42 AM</div>
+                                    <div style="font-size:.72rem;color:var(--gray-text);">IP: 190.160.45.12</div>
+                                </td>
+                                <td>
+                                    <span class="status-badge status-activo"><i class="bi bi-circle-fill" style="font-size:.45rem;"></i> Activo</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center justify-content-center gap-1">
+                                        <button class="action-btn view" title="Ver perfil" onclick="openDetailModal('Carlos Mendoza Silva', 'Director')"><i class="bi bi-eye"></i></button>
+                                        <button class="action-btn edit" title="Editar usuario" onclick="openEditUserModal('Carlos Mendoza Silva')"><i class="bi bi-pencil"></i></button>
+                                        <button class="action-btn block" title="Bloquear / Suspender" onclick="confirmBlockUser('Carlos Mendoza Silva')"><i class="bi bi-slash-circle"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Usuario 2: Profesor -->
+                            <tr data-colegio="Colegio Los Alerces" data-rol="Profesor" data-estado="Activo">
+                                <td>
+                                    <div class="user-cell">
+                                        <div class="user-avatar-circle" style="background:linear-gradient(135deg,#3B82F6,#1D4ED8);">
+                                            MT
+                                        </div>
+                                        <div>
+                                            <div class="user-name-text">María José Torres</div>
+                                            <div class="user-subtext">RUT: 16.789.123-5 • mj.torres@alerces.cl</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="font-size:.84rem;font-weight:600;color:var(--dark);">Colegio Los Alerces</div>
+                                    <div style="font-size:.74rem;color:var(--gray-text);">Valparaíso</div>
+                                </td>
+                                <td>
+                                    <span class="role-chip chip-profesor"><span class="dot"></span>Profesor</span>
+                                </td>
+                                <td>
+                                    <div style="font-size:.82rem;color:var(--dark);">Hoy, 09:15 AM</div>
+                                    <div style="font-size:.72rem;color:var(--gray-text);">IP: 201.238.10.88</div>
+                                </td>
+                                <td>
+                                    <span class="status-badge status-activo"><i class="bi bi-circle-fill" style="font-size:.45rem;"></i> Activo</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center justify-content-center gap-1">
+                                        <button class="action-btn view" title="Ver perfil" onclick="openDetailModal('María José Torres', 'Profesor')"><i class="bi bi-eye"></i></button>
+                                        <button class="action-btn edit" title="Editar usuario" onclick="openEditUserModal('María José Torres')"><i class="bi bi-pencil"></i></button>
+                                        <button class="action-btn block" title="Bloquear / Suspender" onclick="confirmBlockUser('María José Torres')"><i class="bi bi-slash-circle"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Usuario 3: UTP -->
+                            <tr data-colegio="Instituto Profesional del Norte" data-rol="UTP" data-estado="Activo">
+                                <td>
+                                    <div class="user-cell">
+                                        <div class="user-avatar-circle" style="background:linear-gradient(135deg,#10B981,#047857);">
+                                            RG
+                                        </div>
+                                        <div>
+                                            <div class="user-name-text">Roberto Gómez Lagos</div>
+                                            <div class="user-subtext">RUT: 12.456.789-0 • r.gomez@ipnorte.cl</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="font-size:.84rem;font-weight:600;color:var(--dark);">Instituto Profesional del Norte</div>
+                                    <div style="font-size:.74rem;color:var(--gray-text);">Antofagasta</div>
+                                </td>
+                                <td>
+                                    <span class="role-chip chip-utp"><span class="dot"></span>UTP</span>
+                                </td>
+                                <td>
+                                    <div style="font-size:.82rem;color:var(--dark);">Ayer, 18:30 PM</div>
+                                    <div style="font-size:.72rem;color:var(--gray-text);">IP: 186.105.12.4</div>
+                                </td>
+                                <td>
+                                    <span class="status-badge status-activo"><i class="bi bi-circle-fill" style="font-size:.45rem;"></i> Activo</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center justify-content-center gap-1">
+                                        <button class="action-btn view" title="Ver perfil" onclick="openDetailModal('Roberto Gómez Lagos', 'UTP')"><i class="bi bi-eye"></i></button>
+                                        <button class="action-btn edit" title="Editar usuario" onclick="openEditUserModal('Roberto Gómez Lagos')"><i class="bi bi-pencil"></i></button>
+                                        <button class="action-btn block" title="Bloquear / Suspender" onclick="confirmBlockUser('Roberto Gómez Lagos')"><i class="bi bi-slash-circle"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Usuario 4: Alumno -->
+                            <tr data-colegio="Colegio San Agustín" data-rol="Alumno" data-estado="Inactivo">
+                                <td>
+                                    <div class="user-cell">
+                                        <div class="user-avatar-circle" style="background:linear-gradient(135deg,#F59E0B,#D97706);">
+                                            SV
+                                        </div>
+                                        <div>
+                                            <div class="user-name-text">Sofía Valenzuela</div>
+                                            <div class="user-subtext">RUT: 21.654.987-1 • s.valenzuela@sanagustin.cl</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="font-size:.84rem;font-weight:600;color:var(--dark);">Colegio San Agustín</div>
+                                    <div style="font-size:.74rem;color:var(--gray-text);">Biobío</div>
+                                </td>
+                                <td>
+                                    <span class="role-chip chip-alumno"><span class="dot"></span>Alumno</span>
+                                </td>
+                                <td>
+                                    <div style="font-size:.82rem;color:var(--dark);">Hace 3 días</div>
+                                    <div style="font-size:.72rem;color:var(--gray-text);">IP: 190.45.88.20</div>
+                                </td>
+                                <td>
+                                    <span class="status-badge status-inactivo"><i class="bi bi-clock-history" style="font-size:.45rem;"></i> Inactivo</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center justify-content-center gap-1">
+                                        <button class="action-btn view" title="Ver perfil" onclick="openDetailModal('Sofía Valenzuela', 'Alumno')"><i class="bi bi-eye"></i></button>
+                                        <button class="action-btn edit" title="Editar usuario" onclick="openEditUserModal('Sofía Valenzuela')"><i class="bi bi-pencil"></i></button>
+                                        <button class="action-btn block" title="Bloquear / Suspender" onclick="confirmBlockUser('Sofía Valenzuela')"><i class="bi bi-slash-circle"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Usuario 5: Inspector (Suspendido) -->
+                            <tr data-colegio="Escuela Básica El Porvenir" data-rol="Inspector" data-estado="Suspendido">
+                                <td>
+                                    <div class="user-cell">
+                                        <div class="user-avatar-circle" style="background:linear-gradient(135deg,#EF4444,#DC2626);">
+                                            GU
+                                        </div>
+                                        <div>
+                                            <div class="user-name-text">Gonzalo Ugarte Pizarro</div>
+                                            <div class="user-subtext">RUT: 15.111.222-3 • g.ugarte@porvenir.cl</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="font-size:.84rem;font-weight:600;color:var(--dark);">Escuela Básica El Porvenir</div>
+                                    <div style="font-size:.74rem;color:var(--gray-text);">Maule</div>
+                                </td>
+                                <td>
+                                    <span class="role-chip chip-inspector"><span class="dot"></span>Inspector</span>
+                                </td>
+                                <td>
+                                    <div style="font-size:.82rem;color:var(--dark);">10 Jul 2026</div>
+                                    <div style="font-size:.72rem;color:var(--gray-text);">IP: 200.75.12.1</div>
+                                </td>
+                                <td>
+                                    <span class="status-badge status-suspendido"><i class="bi bi-x-circle-fill" style="font-size:.45rem;"></i> Suspendido</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center justify-content-center gap-1">
+                                        <button class="action-btn view" title="Ver perfil" onclick="openDetailModal('Gonzalo Ugarte Pizarro', 'Inspector')"><i class="bi bi-eye"></i></button>
+                                        <button class="action-btn edit" title="Editar usuario" onclick="openEditUserModal('Gonzalo Ugarte Pizarro')"><i class="bi bi-pencil"></i></button>
+                                        <button class="action-btn block" title="Bloquear / Suspender" onclick="confirmBlockUser('Gonzalo Ugarte Pizarro')"><i class="bi bi-check-circle text-success"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Table Footer -->
+                <div style="padding:.85rem 1.5rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;">
+                    <span style="font-size:.78rem;color:var(--gray-text);" id="tableCount">
+                        Mostrando <strong>5</strong> usuarios en total
+                    </span>
+                    <div class="d-flex gap-2">
+                        <a href="#" class="btn-outline-custom" style="font-size:.78rem;padding:.35rem .85rem;" onclick="exportUsers(event)">
+                            <i class="bi bi-download"></i> Exportar Listado
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /content-area -->
+    </main>
+</div><!-- /wrapper -->
+
+
+<!-- ════ MODAL: CREAR / EDITAR USUARIO ════════════════════════════════════ -->
+<div class="modal-overlay" id="modalUsuario">
+    <div class="modal-box">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <div>
+                <div class="modal-title" id="modalUsuarioTitle">Crear Nuevo Usuario Global</div>
+                <div class="modal-subtitle" id="modalUsuarioSubtitle">Asigna el usuario a un colegio cliente y define su rol de acceso.</div>
+            </div>
+            <button onclick="closeModal('modalUsuario')"
+                style="background:none;border:none;font-size:1.3rem;color:var(--gray-text);cursor:pointer;line-height:1;">&times;</button>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-12 col-md-6">
+                <label class="form-label-custom">Nombre Completo</label>
+                <input type="text" class="form-control-custom" id="inputNombreUsuario" placeholder="Ej: Juan Pérez Soto">
+            </div>
+            <div class="col-12 col-md-6">
+                <label class="form-label-custom">RUT</label>
+                <input type="text" class="form-control-custom" id="inputRutUsuario" placeholder="12.345.678-9">
+            </div>
+            <div class="col-12">
+                <label class="form-label-custom">Correo Institucional</label>
+                <input type="email" class="form-control-custom" id="inputCorreoUsuario" placeholder="correo@colegio.cl">
+            </div>
+            <div class="col-12 col-md-6">
+                <label class="form-label-custom">Colegio Cliente</label>
+                <select class="form-control-custom">
+                    <option value="">Seleccionar colegio...</option>
+                    <option>Liceo Santa María</option>
+                    <option>Colegio Los Alerces</option>
+                    <option>Instituto Profesional del Norte</option>
+                    <option>Colegio San Agustín</option>
+                    <option>Escuela Básica El Porvenir</option>
+                </select>
+            </div>
+            <div class="col-12 col-md-6">
+                <label class="form-label-custom">Rol Asignado</label>
+                <select class="form-control-custom">
+                    <option value="">Seleccionar rol...</option>
+                    <option>Director</option>
+                    <option>Profesor</option>
+                    <option>UTP</option>
+                    <option>Inspector</option>
+                    <option>Alumno</option>
+                    <option>Apoderado</option>
+                    <option>Administrador</option>
+                </select>
+            </div>
+            <div class="col-12 col-md-6">
+                <label class="form-label-custom">Estado Inicial</label>
+                <select class="form-control-custom">
+                    <option>Activo</option>
+                    <option>Inactivo</option>
+                    <option>Suspendido</option>
+                </select>
+            </div>
+            <div class="col-12 col-md-6">
+                <label class="form-label-custom">Contraseña Temporal</label>
+                <input type="password" class="form-control-custom" placeholder="••••••••">
+            </div>
+        </div>
+
+        <div class="d-flex gap-2 justify-content-end pt-3 mt-3" style="border-top:1px solid var(--border);">
+            <button onclick="closeModal('modalUsuario')" class="btn-outline-custom">Cancelar</button>
+            <button class="btn-primary-custom"><i class="bi bi-floppy"></i> Guardar Usuario</button>
+        </div>
+    </div>
+</div>
+
+<!-- ════ MODAL: CONFIRMAR BLOQUEO / SUSPENSIÓN ════════════════════════════ -->
+<div class="modal-overlay" id="modalBlock">
+    <div class="modal-box" style="width:440px;text-align:center;">
+        <div style="width:56px;height:56px;background:#FEF3C7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
+            <i class="bi bi-slash-circle-fill" style="color:#D97706;font-size:1.4rem;"></i>
+        </div>
+        <div class="modal-title" style="margin-bottom:.35rem;">
+            Cambiar Estado de Acceso
+        </div>
+        <p style="font-size:.84rem;color:var(--gray-text);line-height:1.6;">
+            ¿Deseas modificar el acceso para el usuario <strong id="blockUserName" style="color:var(--dark);"></strong>?
+            Al suspenderlo no podrá iniciar sesión en la plataforma.
+        </p>
+        <div class="d-flex gap-2 justify-content-center mt-3">
+            <button onclick="closeModal('modalBlock')" class="btn-outline-custom">Cancelar</button>
+            <button id="btnConfirmBlock"
+                style="display:inline-flex;align-items:center;gap:.45rem;padding:.55rem 1.25rem;background:#D97706;color:#fff;border:none;border-radius:var(--radius-md);font-weight:600;font-size:.85rem;cursor:pointer;transition:background .2s;">
+                <i class="bi bi-slash-circle"></i> Suspender Acceso
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // ── Mobile sidebar
+    document.addEventListener('DOMContentLoaded', () => {
+        const btn = document.getElementById('mobileMenuBtn');
+        const sb  = document.getElementById('sidebar');
+        if (btn && sb) btn.addEventListener('click', () => sb.classList.toggle('active'));
+    });
+
+    // ── Modals
+    function openModal(id)  { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+    document.querySelectorAll('.modal-overlay').forEach(el => {
+        el.addEventListener('click', e => { if (e.target === el) closeModal(el.id); });
+    });
+
+    function openCreateUserModal() {
+        document.getElementById('modalUsuarioTitle').textContent    = 'Crear Nuevo Usuario Global';
+        document.getElementById('modalUsuarioSubtitle').textContent = 'Asigna el usuario a un colegio cliente y define su rol de acceso.';
+        document.getElementById('inputNombreUsuario').value = '';
+        document.getElementById('inputRutUsuario').value    = '';
+        document.getElementById('inputCorreoUsuario').value = '';
+        openModal('modalUsuario');
+    }
+
+    function openEditUserModal(nombre) {
+        document.getElementById('modalUsuarioTitle').textContent    = 'Editar Usuario: ' + nombre;
+        document.getElementById('modalUsuarioSubtitle').textContent = 'Modifica los datos y permisos de este usuario.';
+        document.getElementById('inputNombreUsuario').value = nombre;
+        openModal('modalUsuario');
+    }
+
+    function openDetailModal(nombre, rol) {
+        openEditUserModal(nombre);
+    }
+
+    function confirmBlockUser(nombre) {
+        document.getElementById('blockUserName').textContent = nombre;
+        openModal('modalBlock');
+    }
+
+    function exportUsers(e) {
+        e.preventDefault();
+        alert('Generando reporte CSV de usuarios globales...');
+    }
+
+    // ── Filtrado de tabla
+    function filterTable() {
+        const q       = (document.getElementById('tableSearch').value || '').toLowerCase();
+        const colegio = (document.getElementById('filterColegio').value || '').toLowerCase();
+        const rol     = (document.getElementById('filterRol').value || '').toLowerCase();
+        const estado  = (document.getElementById('filterEstado').value || '').toLowerCase();
+
+        const rows = document.querySelectorAll('#usersBody tr');
+        let vis    = 0;
+
+        rows.forEach(row => {
+            const rowColegio = (row.dataset.colegio || '').toLowerCase();
+            const rowRol     = (row.dataset.rol || '').toLowerCase();
+            const rowEstado  = (row.dataset.estado || '').toLowerCase();
+            const text       = row.innerText.toLowerCase();
+
+            const matchQ       = !q       || text.includes(q);
+            const matchColegio = !colegio || rowColegio.includes(colegio);
+            const matchRol     = !rol     || rowRol.includes(rol);
+            const matchEstado  = !estado  || rowEstado.includes(estado);
+
+            const show = matchQ && matchColegio && matchRol && matchEstado;
+            row.style.display = show ? '' : 'none';
+            if (show) vis++;
+        });
+
+        document.getElementById('tableCount').innerHTML =
+            'Mostrando <strong>' + vis + '</strong> de <strong>' + rows.length + '</strong> usuarios';
+    }
+
+    // Búsqueda global desde topbar
+    document.getElementById('globalSearch').addEventListener('input', function () {
+        document.getElementById('tableSearch').value = this.value;
+        filterTable();
+    });
+</script>
+
+</body>
+</html>

@@ -5,34 +5,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Configuración General - Super Admin Eduteka</title>
-    
-    <!-- Bootstrap CSS local static -->
+
+    <!-- Bootstrap CSS -->
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-    
+
     <!-- Fuentes e Iconos -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
     <style>
+        /* ══ DESIGN TOKENS (idénticos al resto del Super Admin) ═══════════════ */
         :root {
-            --primary: #7C5CFC;
-            --primary-soft: rgba(124, 92, 252, 0.08);
-            --primary-hover: #6747E3;
-            --secondary: #65CDBF;
+            --primary:        #7C5CFC;
+            --primary-soft:   rgba(124, 92, 252, 0.08);
+            --primary-hover:  #6747E3;
+            --secondary:      #65CDBF;
             --secondary-soft: rgba(101, 205, 191, 0.08);
-            --bg: #F8F9FD;
-            --white: #FFFFFF;
-            --dark: #151A35;
-            --gray-text: #687089;
-            --border: #BCC0CF;
-            --radius-lg: 16px;
-            --radius-md: 10px;
-            --radius-sm: 8px;
+            --bg:             #F8F9FD;
+            --white:          #FFFFFF;
+            --dark:           #151A35;
+            --gray-text:      #687089;
+            --border:         #BCC0CF;
+            --radius-lg:      16px;
+            --radius-md:      10px;
+            --radius-sm:      8px;
         }
 
-        * {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
+        * { font-family: 'Plus Jakarta Sans', sans-serif; box-sizing: border-box; }
 
         body {
             background-color: var(--bg);
@@ -48,8 +47,7 @@
             top: -15%; left: 65%;
             width: 50vw; height: 50vw;
             background: radial-gradient(circle, rgba(124, 92, 252, 0.07) 0%, rgba(255,255,255,0) 70%);
-            z-index: -2;
-            pointer-events: none;
+            z-index: -2; pointer-events: none;
         }
         body::after {
             content: '';
@@ -57,237 +55,702 @@
             top: 45%; left: -15%;
             width: 40vw; height: 40vw;
             background: radial-gradient(circle, rgba(101, 205, 191, 0.06) 0%, rgba(255,255,255,0) 70%);
-            z-index: -2;
-            pointer-events: none;
+            z-index: -2; pointer-events: none;
         }
 
-        .wrapper {
-            display: flex;
-            width: 100%;
-            align-items: stretch;
-        }
+        .wrapper { display: flex; width: 100%; align-items: stretch; }
 
-        /* TOPBAR */
+        /* ── TOPBAR */
         .topbar {
             height: 70px;
             background: rgba(255, 255, 255, 0.85) !important;
-            backdrop-filter: blur(12px) !important;
-            -webkit-backdrop-filter: blur(12px) !important;
+            backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            display: flex; align-items: center; justify-content: space-between;
             padding: 0 2rem;
-            position: sticky;
-            top: 0;
-            z-index: 98;
+            position: sticky; top: 0; z-index: 98;
         }
-
-        .search-bar {
-            position: relative;
-            width: 320px;
-        }
-
-        .search-bar i {
-            position: absolute;
-            left: 0.85rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gray-text);
-        }
-
+        .search-bar { position: relative; width: 320px; }
+        .search-bar i { position: absolute; left: .85rem; top: 50%; transform: translateY(-50%); color: var(--gray-text); }
         .search-bar input {
-            width: 100%;
-            padding: 0.5rem 1rem 0.5rem 2.4rem;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            background-color: var(--bg);
-            font-size: 0.85rem;
-            outline: none;
-            transition: all 0.2s;
+            width: 100%; padding: .5rem 1rem .5rem 2.4rem;
+            border: 1px solid var(--border); border-radius: var(--radius-md);
+            background: var(--bg); font-size: .85rem; outline: none; transition: all .2s;
         }
+        .search-bar input:focus { border-color: var(--primary); background: var(--white); box-shadow: 0 0 0 3px rgba(124,92,252,.12); }
 
-        .search-bar input:focus {
-            border-color: var(--primary);
-            background-color: var(--white);
-            box-shadow: 0 0 0 3px rgba(124, 92, 252, 0.12);
-        }
-
-        .topbar-right {
-            display: flex;
-            align-items: center;
-            gap: 1.25rem;
-        }
-
+        .topbar-right { display: flex; align-items: center; gap: 1.25rem; }
         .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            background: var(--white);
-            padding: 0.35rem 0.85rem 0.35rem 0.4rem;
-            border-radius: 30px;
-            border: 1px solid var(--border);
+            display: flex; align-items: center; gap: .75rem;
+            background: var(--white); padding: .35rem .85rem .35rem .4rem;
+            border-radius: 30px; border: 1px solid var(--border);
         }
-
         .user-avatar {
-            width: 32px;
-            height: 32px;
+            width: 32px; height: 32px;
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 0.85rem;
+            color: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: .85rem;
+        }
+        .user-name { font-weight: 600; font-size: .88rem; color: var(--dark); }
+
+        /* ── CONTENT AREA */
+        .content-area { padding: 1.75rem 2rem; max-width: 1400px; width: 100%; margin: 0 auto; }
+
+        /* ── HERO */
+        .hero-title { font-size: 1.45rem; font-weight: 800; color: var(--dark); letter-spacing: -.02em; }
+        .hero-subtitle { font-size: .86rem; color: var(--gray-text); margin-top: .15rem; }
+
+        /* ── BUTTONS */
+        .btn-primary-custom {
+            background: var(--primary); color: white; border: none;
+            border-radius: var(--radius-md); padding: .6rem 1.35rem;
+            font-weight: 600; font-size: .85rem; display: inline-flex;
+            align-items: center; gap: .5rem; transition: all .2s; text-decoration: none;
+            box-shadow: 0 4px 14px rgba(124, 92, 252, 0.25); cursor: pointer;
+        }
+        .btn-primary-custom:hover { background: var(--primary-hover); color: white; transform: translateY(-1px); }
+
+        .btn-danger-custom {
+            background: #EF4444; color: white; border: none;
+            border-radius: var(--radius-md); padding: .6rem 1.35rem;
+            font-weight: 600; font-size: .85rem; display: inline-flex;
+            align-items: center; gap: .5rem; transition: all .2s; cursor: pointer;
+            box-shadow: 0 4px 14px rgba(239, 68, 68, 0.25);
+        }
+        .btn-danger-custom:hover { background: #DC2626; color: white; transform: translateY(-1px); }
+
+        /* ── VERTICAL TABS NAV */
+        .config-nav {
+            background: var(--white); border-radius: var(--radius-lg);
+            border: 1px solid var(--border); padding: .75rem;
+            display: flex; flex-direction: column; gap: .35rem;
+        }
+        .config-tab-btn {
+            display: flex; align-items: center; gap: .8rem;
+            padding: .85rem 1rem; border-radius: var(--radius-md);
+            color: var(--gray-text); font-weight: 600; font-size: .86rem;
+            border: none; background: transparent; text-align: left;
+            width: 100%; transition: all .2s; cursor: pointer;
+        }
+        .config-tab-btn i { font-size: 1.1rem; color: var(--gray-text); transition: color .2s; }
+        .config-tab-btn:hover { background: var(--bg); color: var(--dark); }
+        .config-tab-btn.active {
+            background: var(--primary-soft); color: var(--primary); font-weight: 700;
+            border-left: 3px solid var(--primary); border-radius: 4px var(--radius-md) var(--radius-md) 4px;
+        }
+        .config-tab-btn.active i { color: var(--primary); }
+
+        .config-tab-btn.danger-tab:hover { background: #FEF2F2; color: #DC2626; }
+        .config-tab-btn.danger-tab.active {
+            background: rgba(239,68,68,.08); color: #DC2626; font-weight: 700;
+            border-left: 3px solid #EF4444;
+        }
+        .config-tab-btn.danger-tab.active i { color: #DC2626; }
+
+        /* ── PANEL BOX */
+        .panel-box {
+            background: var(--white); border-radius: var(--radius-lg);
+            border: 1px solid var(--border); padding: 1.75rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,.02); margin-bottom: 1.5rem;
+        }
+        .panel-box-header {
+            display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid var(--border); padding-bottom: 1rem; margin-bottom: 1.5rem;
+        }
+        .panel-box-title { font-size: 1.05rem; font-weight: 800; color: var(--dark); margin: 0; }
+        .panel-box-desc  { font-size: .82rem; color: var(--gray-text); margin-top: .15rem; }
+
+        /* ── FORM CONTROLS */
+        .form-control-custom {
+            width: 100%; padding: .6rem .85rem;
+            border: 1px solid var(--border); border-radius: var(--radius-md);
+            background: var(--bg); font-size: .85rem; color: var(--dark);
+            outline: none; transition: all .2s;
+        }
+        .form-control-custom:focus {
+            border-color: var(--primary); background: var(--white);
+            box-shadow: 0 0 0 3px rgba(124,92,252,.12);
+        }
+        .form-label-custom {
+            font-size: .8rem; font-weight: 700; color: var(--dark);
+            margin-bottom: .35rem; display: block;
         }
 
-        .user-name {
-            font-weight: 600;
-            font-size: 0.88rem;
-            color: var(--dark);
+        /* ── FEATURE FLAG CARDS */
+        .flag-card {
+            background: var(--bg); border: 1px solid var(--border);
+            border-radius: var(--radius-md); padding: 1.1rem 1.25rem;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 1rem; transition: all .2s;
+        }
+        .flag-card:hover { background: var(--white); border-color: var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,.03); }
+        .flag-title { font-size: .88rem; font-weight: 700; color: var(--dark); }
+        .flag-desc  { font-size: .78rem; color: var(--gray-text); margin-top: .15rem; }
+
+        /* ── DANGER ZONE */
+        .danger-panel {
+            background: #FFF5F5; border: 1px solid #FCA5A5;
+            border-radius: var(--radius-lg); padding: 1.75rem;
         }
 
-        .content-area {
-            padding: 1.75rem 2rem;
-            max-width: 1400px;
-            width: 100%;
-            margin: 0 auto;
-            box-sizing: border-box;
-        }
-
-        .hero-title {
-            font-size: 1.6rem;
-            font-weight: 800;
-            color: var(--dark);
-            margin-bottom: 0.25rem;
-        }
-        .hero-subtitle {
-            color: var(--gray-text);
-            font-size: 0.9rem;
-        }
-
-        .dashboard-panel {
-            background: var(--white);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: 1.75rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.01);
-            margin-bottom: 1.5rem;
-        }
-
-        .btn-purple {
-            background-color: var(--primary);
-            color: white;
-            font-weight: 600;
-            border-radius: var(--radius-md);
-            padding: 0.55rem 1.5rem;
-            border: none;
-            transition: all 0.2s;
-        }
-        .btn-purple:hover {
-            background-color: var(--primary-hover);
-            color: white;
-            box-shadow: 0 4px 12px rgba(124, 92, 252, 0.3);
+        @media (max-width: 991.98px) {
+            .content-area { padding: 1.25rem 1rem; }
         }
     </style>
 </head>
 <body>
 
-    <div class="wrapper">
-        <!-- Sidebar -->
-        {% include '_sidebar_superadmin.html' with active_page='configuracion' %}
+<div class="wrapper">
+    {% include '_sidebar_superadmin.html' with active_page='configuracion' %}
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Topbar -->
-            <header class="topbar">
-                <div class="d-flex items-center gap-2">
-                    <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn" style="border:none; background:var(--primary-soft); color:var(--primary);">
-                        <i class="bi bi-list fs-5"></i>
-                    </button>
-                    <div class="search-bar">
-                        <i class="bi bi-search"></i>
-                        <input type="text" placeholder="Buscar parámetros de configuración...">
-                    </div>
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <div class="d-flex align-items-center gap-2">
+                <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn"
+                    style="border:none;background:var(--primary-soft);color:var(--primary);">
+                    <i class="bi bi-list fs-5"></i>
+                </button>
+                <div class="search-bar">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="configSearch" placeholder="Buscar parámetros de configuración...">
                 </div>
-
-                <div class="topbar-right">
-                    <div class="user-profile">
-                        <div class="user-avatar">AE</div>
-                        <span class="user-name">Admin Eduteka</span>
-                    </div>
-                </div>
-            </header>
-
-            <!-- Main Content Area -->
-            <div class="content-area">
-
-                <div class="mb-4">
-                    <h1 class="hero-title">Configuración General del Sistema</h1>
-                    <div class="hero-subtitle">Parámetros globales de Eduteka SaaS, integraciones y notificaciones</div>
-                </div>
-
-                <!-- Form Panel -->
-                <div class="dashboard-panel">
-                    <h3 class="fw-bold fs-5 text-dark mb-3"><i class="bi bi-sliders text-primary me-2"></i>Integración SII (Servicio de Impuestos Internos)</h3>
-                    <form class="row g-3">
-                        <div class="col-12 col-md-6">
-                            <label class="form-label fw-semibold text-muted small">RUT Emisor de la Empresa</label>
-                            <input type="text" class="form-control rounded-3" value="77.123.456-K">
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <label class="form-label fw-semibold text-muted small">Razón Social</label>
-                            <input type="text" class="form-control rounded-3" value="Eduteka SpA">
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <label class="form-label fw-semibold text-muted small">Ambiente SII</label>
-                            <select class="form-select rounded-3">
-                                <option selected>Producción</option>
-                                <option>Certificación (Testing)</option>
-                            </select>
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <label class="form-label fw-semibold text-muted small">Token API Facturación</label>
-                            <input type="password" class="form-control rounded-3" value="************************">
-                        </div>
-
-                        <div class="col-12"><hr class="my-3"></div>
-
-                        <h3 class="fw-bold fs-5 text-dark mb-2"><i class="bi bi-bell text-secondary me-2"></i>Notificaciones Automatizadas</h3>
-                        <div class="col-12">
-                            <div class="form-check form-switch mb-2">
-                                <input class="form-check-input" type="checkbox" id="switch1" checked>
-                                <label class="form-check-label fw-semibold text-dark" for="switch1">Enviar alerta automática de facturas vencidas (email a sostenedores)</label>
-                            </div>
-                            <div class="form-check form-switch mb-2">
-                                <input class="form-check-input" type="checkbox" id="switch2" checked>
-                                <label class="form-check-label fw-semibold text-dark" for="switch2">Notificar cuando un colegio complete el onboarding inicial</label>
-                            </div>
-                        </div>
-
-                        <div class="col-12 pt-3">
-                            <button type="button" class="btn btn-purple"><i class="bi bi-save me-1"></i> Guardar Configuración</button>
-                        </div>
-                    </form>
-                </div>
-
             </div>
-        </main>
-    </div>
+            <div class="topbar-right">
+                <button style="background:none;border:none;color:var(--gray-text);font-size:1.1rem;position:relative;cursor:pointer;">
+                    <i class="bi bi-bell"></i>
+                    <span style="position:absolute;top:0;right:0;width:7px;height:7px;background:#F76F7A;border-radius:50%;border:2px solid white;"></span>
+                </button>
+                <div class="user-profile">
+                    <div class="user-avatar">AE</div>
+                    <span class="user-name">Admin Eduteka</span>
+                </div>
+            </div>
+        </header>
 
-    <!-- Scripts Bootstrap -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const mobileBtn = document.getElementById('mobileMenuBtn');
-            const sidebar = document.getElementById('sidebar');
-            if (mobileBtn && sidebar) {
-                mobileBtn.addEventListener('click', function () {
-                    sidebar.classList.toggle('active');
-                });
+        <div class="content-area">
+
+            <!-- HERO HEADER -->
+            <div class="d-flex align-items-start justify-content-between mb-4 flex-wrap gap-3">
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <div style="width:34px;height:34px;background:var(--primary-soft);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;">
+                            <i class="bi bi-sliders" style="color:var(--primary);font-size:1.1rem;"></i>
+                        </div>
+                        <h1 class="hero-title mb-0">Configuración General del Sistema</h1>
+                    </div>
+                    <p class="hero-subtitle ms-1">
+                        Parámetros globales de Eduteka SaaS, integraciones, políticas de seguridad y módulos.
+                    </p>
+                </div>
+            </div>
+
+            <!-- LAYOUT EN 2 COLUMNAS (NAVEGACIÓN VERTICAL PESTAÑAS + CONTENIDO) -->
+            <div class="row g-4">
+
+                <!-- NAVEGACIÓN DE PESTAÑAS LATERAL (3 Cols en desktop) -->
+                <div class="col-12 col-lg-3">
+                    <div class="config-nav">
+                        <button class="config-tab-btn active" onclick="switchTab('integraciones', this)">
+                            <i class="bi bi-cpu-fill"></i>
+                            <div>
+                                <div>Integraciones y APIs</div>
+                                <div style="font-size:.7rem;font-weight:400;opacity:.8;">SII, MercadoPago, SendGrid</div>
+                            </div>
+                        </button>
+
+                        <button class="config-tab-btn" onclick="switchTab('seguridad', this)">
+                            <i class="bi bi-shield-lock-fill"></i>
+                            <div>
+                                <div>Seguridad y Accesos</div>
+                                <div style="font-size:.7rem;font-weight:400;opacity:.8;">2FA, Sesiones, Políticas</div>
+                            </div>
+                        </button>
+
+                        <button class="config-tab-btn" onclick="switchTab('features', this)">
+                            <i class="bi bi-toggle-on"></i>
+                            <div>
+                                <div>Feature Flags</div>
+                                <div style="font-size:.7rem;font-weight:400;opacity:.8;">Módulos y Betas SaaS</div>
+                            </div>
+                        </button>
+
+                        <button class="config-tab-btn danger-tab" onclick="switchTab('sistema', this)">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            <div>
+                                <div>Estado del Sistema</div>
+                                <div style="font-size:.7rem;font-weight:400;opacity:.8;">Mantenimiento y Alertas</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CONTENIDO DE LAS PESTAÑAS (9 Cols en desktop) -->
+                <div class="col-12 col-lg-9">
+
+                    <!-- ═════ PESTAÑA 1: INTEGRACIONES Y APIS (ACTIVA POR DEFECTO) ═════ -->
+                    <div id="tab-integraciones" class="tab-panel">
+
+                        <!-- Sección 1: Integración SII -->
+                        <div class="panel-box">
+                            <div class="panel-box-header">
+                                <div>
+                                    <h2 class="panel-box-title d-flex align-items-center gap-2">
+                                        <i class="bi bi-receipt text-primary"></i>
+                                        Integración SII (Servicio de Impuestos Internos)
+                                    </h2>
+                                    <div class="panel-box-desc">Emisión automática de boletas y facturas electrónicas de los clientes.</div>
+                                </div>
+                                <span class="badge" style="background:rgba(16,185,129,.1);color:#059669;font-weight:700;padding:.4rem .75rem;border-radius:20px;font-size:.75rem;">
+                                    <i class="bi bi-circle-fill me-1" style="font-size:.45rem;"></i> Conectado
+                                </span>
+                            </div>
+
+                            <form onsubmit="handleSaveConfig(event, 'Integración SII')">
+                                <div class="row g-3">
+                                    <div class="col-12 col-md-6">
+                                        <label class="form-label-custom">RUT Emisor de la Empresa</label>
+                                        <input type="text" class="form-control-custom" value="77.123.456-K">
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <label class="form-label-custom">Razón Social Registrada</label>
+                                        <input type="text" class="form-control-custom" value="Eduteka SpA">
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <label class="form-label-custom">Ambiente SII</label>
+                                        <select class="form-control-custom">
+                                            <option selected>Producción (Oficial)</option>
+                                            <option>Certificación / Staging (Testing)</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <label class="form-label-custom">Token API Facturación Electrónica</label>
+                                        <input type="password" class="form-control-custom" value="sii_live_token_9938102938472910">
+                                    </div>
+                                </div>
+                                <div class="mt-3 text-end">
+                                    <button type="submit" class="btn-primary-custom">
+                                        <i class="bi bi-save"></i> Guardar Credenciales SII
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Sección 2: Pasarela de Pagos -->
+                        <div class="panel-box">
+                            <div class="panel-box-header">
+                                <div>
+                                    <h2 class="panel-box-title d-flex align-items-center gap-2">
+                                        <i class="bi bi-credit-card-2-front text-primary"></i>
+                                        Pasarela de Pagos (MercadoPago / Transbank Webpay)
+                                    </h2>
+                                    <div class="panel-box-desc">Procesamiento automatizado de cobros recurrentes y suscripciones SaaS.</div>
+                                </div>
+                                <span class="badge" style="background:rgba(16,185,129,.1);color:#059669;font-weight:700;padding:.4rem .75rem;border-radius:20px;font-size:.75rem;">
+                                    <i class="bi bi-circle-fill me-1" style="font-size:.45rem;"></i> Activo
+                                </span>
+                            </div>
+
+                            <form onsubmit="handleSaveConfig(event, 'Pasarela de Pagos')">
+                                <div class="row g-3">
+                                    <div class="col-12 col-md-6">
+                                        <label class="form-label-custom">Public Key (MercadoPago / Webpay)</label>
+                                        <input type="text" class="form-control-custom" value="APP_USR-8829102-120419-8a9d1827">
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <label class="form-label-custom">Access Token (Secret Key)</label>
+                                        <input type="password" class="form-control-custom" value="APP_USR-771829384756-029381">
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <label class="form-label-custom">Modo de Procesamiento</label>
+                                        <select class="form-control-custom">
+                                            <option selected>Live / Producción</option>
+                                            <option>Sandbox / Pruebas</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <label class="form-label-custom">URL Webhook de Notificaciones IPN</label>
+                                        <input type="text" class="form-control-custom" readonly value="https://eduteka.cl/api/payments/webhook/">
+                                    </div>
+                                </div>
+                                <div class="mt-3 text-end">
+                                    <button type="submit" class="btn-primary-custom">
+                                        <i class="bi bi-save"></i> Guardar Pasarela de Pagos
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Sección 3: Proveedor de Correo -->
+                        <div class="panel-box mb-0">
+                            <div class="panel-box-header">
+                                <div>
+                                    <h2 class="panel-box-title d-flex align-items-center gap-2">
+                                        <i class="bi bi-envelope-paper text-primary"></i>
+                                        Proveedor de Correo Electrónico (SendGrid / AWS SES)
+                                    </h2>
+                                    <div class="panel-box-desc">Infraestructura de correo transaccional para boletines, clave y comprobantes.</div>
+                                </div>
+                            </div>
+
+                            <form onsubmit="handleSaveConfig(event, 'Proveedor de Correo')">
+                                <div class="row g-3">
+                                    <div class="col-12 col-md-6">
+                                        <label class="form-label-custom">API Key SendGrid / AWS Secret</label>
+                                        <input type="password" class="form-control-custom" value="SG.293819283719283719283">
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <label class="form-label-custom">Email Remitente Corporativo</label>
+                                        <input type="email" class="form-control-custom" value="notificaciones@eduteka.cl">
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <label class="form-label-custom">Nombre de Remitente</label>
+                                        <input type="text" class="form-control-custom" value="Plataforma Eduteka SaaS">
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <label class="form-label-custom">Límite Diario de Envíos</label>
+                                        <input type="number" class="form-control-custom" value="50000">
+                                    </div>
+                                </div>
+                                <div class="mt-3 text-end">
+                                    <button type="submit" class="btn-primary-custom">
+                                        <i class="bi bi-save"></i> Guardar Proveedor de Correo
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
+
+
+                    <!-- ═════ PESTAÑA 2: SEGURIDAD Y ACCESOS ═════ -->
+                    <div id="tab-seguridad" class="tab-panel d-none">
+                        <div class="panel-box">
+                            <div class="panel-box-header">
+                                <div>
+                                    <h2 class="panel-box-title d-flex align-items-center gap-2">
+                                        <i class="bi bi-shield-check text-primary"></i>
+                                        Políticas Globales de Seguridad y Control de Sesión
+                                    </h2>
+                                    <div class="panel-box-desc">Definición de parámetros de autenticación, tiempos de caducidad y accesos.</div>
+                                </div>
+                            </div>
+
+                            <form onsubmit="handleSaveConfig(event, 'Seguridad y Accesos')">
+                                <div class="row g-4">
+                                    <!-- Inactividad de sesión -->
+                                    <div class="col-12 col-md-6">
+                                        <label class="form-label-custom">Tiempo Máximo de Inactividad de Sesión</label>
+                                        <select class="form-control-custom">
+                                            <option value="15">15 Minutos (Estricto)</option>
+                                            <option value="30" selected>30 Minutos (Recomendado)</option>
+                                            <option value="60">60 Minutos</option>
+                                            <option value="120">120 Minutos (2 horas)</option>
+                                        </select>
+                                        <div style="font-size:.74rem;color:var(--gray-text);" class="mt-1">Las sesiones inactivas se cerrarán automáticamente cumplido este plazo.</div>
+                                    </div>
+
+                                    <!-- Máximo de intentos fallidos -->
+                                    <div class="col-12 col-md-6">
+                                        <label class="form-label-custom">Intentos Fallidos antes de Bloqueo de IP</label>
+                                        <input type="number" class="form-control-custom" value="5" min="3" max="10">
+                                        <div style="font-size:.74rem;color:var(--gray-text);" class="mt-1">Aplica un bloqueo temporal de 30 min a la IP de origen.</div>
+                                    </div>
+
+                                    <div class="col-12"><hr class="my-1"></div>
+
+                                    <!-- Toggles de seguridad -->
+                                    <div class="col-12">
+                                        <div class="flag-card mb-3">
+                                            <div>
+                                                <div class="flag-title d-flex align-items-center gap-2">
+                                                    <i class="bi bi-key-fill text-primary"></i>
+                                                    Forzar Autenticación de 2 Factores (2FA) obligatoria
+                                                </div>
+                                                <div class="flag-desc">Requerir código OTP / Google Authenticator para roles Directores, Administradores y Sostenedores.</div>
+                                            </div>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="check2FA" checked style="width:2.5em;height:1.3em;">
+                                            </div>
+                                        </div>
+
+                                        <div class="flag-card mb-3">
+                                            <div>
+                                                <div class="flag-title d-flex align-items-center gap-2">
+                                                    <i class="bi bi-lock-fill text-primary"></i>
+                                                    Política de Contraseñas Estrictas
+                                                </div>
+                                                <div class="flag-desc">Exigir mínimo 10 caracteres, incluyendo mayúsculas, números y símbolos especiales.</div>
+                                            </div>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="checkPassPolicy" checked style="width:2.5em;height:1.3em;">
+                                            </div>
+                                        </div>
+
+                                        <div class="flag-card">
+                                            <div>
+                                                <div class="flag-title d-flex align-items-center gap-2">
+                                                    <i class="bi bi-globe-americas text-primary"></i>
+                                                    Restricción Geográfica IP (Solo Chile)
+                                                </div>
+                                                <div class="flag-desc">Bloquear intentos de acceso iniciados desde fuera del territorio nacional (salvo VPN autorizada).</div>
+                                            </div>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="checkGeoIP" style="width:2.5em;height:1.3em;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-4 text-end">
+                                    <button type="submit" class="btn-primary-custom">
+                                        <i class="bi bi-shield-check"></i> Guardar Políticas de Seguridad
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+
+                    <!-- ═════ PESTAÑA 3: FEATURE FLAGS (CONTROL DE MÓDULOS) ═════ -->
+                    <div id="tab-features" class="tab-panel d-none">
+                        <div class="panel-box">
+                            <div class="panel-box-header">
+                                <div>
+                                    <h2 class="panel-box-title d-flex align-items-center gap-2">
+                                        <i class="bi bi-toggle-on text-primary"></i>
+                                        Control Global de Módulos & Feature Flags
+                                    </h2>
+                                    <div class="panel-box-desc">Habilita o deshabilita funcionalidades avanzadas en toda la infraestructura SaaS de Eduteka.</div>
+                                </div>
+                            </div>
+
+                            <form onsubmit="handleSaveConfig(event, 'Feature Flags')">
+                                <div class="d-flex flex-column gap-3">
+
+                                    <div class="flag-card">
+                                        <div>
+                                            <div class="flag-title d-flex align-items-center gap-2">
+                                                <i class="bi bi-journal-check text-primary"></i>
+                                                Habilitar Nuevo Libro de Clases V3.0 (Beta)
+                                            </div>
+                                            <div class="flag-desc">Permite a los profesores probar el nuevo diseño interactivo con firma digital avanzada.</div>
+                                        </div>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" checked style="width:2.5em;height:1.3em;">
+                                        </div>
+                                    </div>
+
+                                    <div class="flag-card">
+                                        <div>
+                                            <div class="flag-title d-flex align-items-center gap-2">
+                                                <i class="bi bi-building-gear text-primary"></i>
+                                                Integración Oficial Mineduc / SIMCE
+                                            </div>
+                                            <div class="flag-desc">Sincronización automatizada de actas de rendimiento académico con servidores del Ministerio.</div>
+                                        </div>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" checked style="width:2.5em;height:1.3em;">
+                                        </div>
+                                    </div>
+
+                                    <div class="flag-card">
+                                        <div>
+                                            <div class="flag-title d-flex align-items-center gap-2">
+                                                <i class="bi bi-phone-vibrate text-primary"></i>
+                                                App Móvil para Apoderados y Estudiantes
+                                            </div>
+                                            <div class="flag-desc">Habilita notificaciones push de asistencia e inspectoría en dispositivos Android / iOS.</div>
+                                        </div>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" checked style="width:2.5em;height:1.3em;">
+                                        </div>
+                                    </div>
+
+                                    <div class="flag-card">
+                                        <div>
+                                            <div class="flag-title d-flex align-items-center gap-2">
+                                                <i class="bi bi-calculator text-primary"></i>
+                                                Módulo ERP de Gestión Financiera Avanzada
+                                            </div>
+                                            <div class="flag-desc">Activa el motor de conciliación bancaria y presupuestos para colegios con Plan Premium.</div>
+                                        </div>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" checked style="width:2.5em;height:1.3em;">
+                                        </div>
+                                    </div>
+
+                                    <div class="flag-card">
+                                        <div>
+                                            <div class="flag-title d-flex align-items-center gap-2">
+                                                <i class="bi bi-qr-code text-primary"></i>
+                                                Generador de Certificados con Código QR
+                                            </div>
+                                            <div class="flag-desc">Validación pública inmediata de certificados de alumno regular y concentración de notas.</div>
+                                        </div>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" style="width:2.5em;height:1.3em;">
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="mt-4 text-end">
+                                    <button type="submit" class="btn-primary-custom">
+                                        <i class="bi bi-check2-circle"></i> Actualizar Feature Flags
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+
+                    <!-- ═════ PESTAÑA 4: ESTADO DEL SISTEMA (ÁREA DE PELIGRO) ═════ -->
+                    <div id="tab-sistema" class="tab-panel d-none">
+                        <div class="danger-panel mb-4">
+                            <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                                <div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="bi bi-exclamation-octagon-fill text-danger fs-4"></i>
+                                        <h2 class="fs-5 fw-bold text-danger mb-0">Área de Control Crítico del Sistema</h2>
+                                    </div>
+                                    <div style="font-size:.82rem;color:#991B1B;margin-top:.2rem;">
+                                        Estas acciones afectan la disponibilidad completa de Eduteka para todas las instituciones activas.
+                                    </div>
+                                </div>
+                                <span class="badge" style="background:#FEE2E2;color:#991B1B;font-weight:700;padding:.4rem .75rem;border-radius:20px;font-size:.75rem;">
+                                    Plataforma Operativa (Normal)
+                                </span>
+                            </div>
+
+                            <form onsubmit="handleSaveConfig(event, 'Estado del Sistema')">
+
+                                <!-- Switch Modo Mantenimiento -->
+                                <div class="p-3 mb-4 rounded" style="background:white;border:1px solid #FCA5A5;">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div>
+                                            <div class="fw-bold text-danger" style="font-size:.92rem;">
+                                                <i class="bi bi-power me-1"></i> Activar Modo Mantenimiento Global
+                                            </div>
+                                            <div style="font-size:.78rem;color:var(--gray-text);margin-top:.15rem;">
+                                                Bloquea el acceso a directores, profesores y estudiantes. Solo el Super Admin mantendrá acceso.
+                                            </div>
+                                        </div>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="checkMantenimiento" style="width:2.8em;height:1.5em;">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Mensaje de Mantenimiento -->
+                                <div class="mb-4">
+                                    <label class="form-label-custom" style="color:#7F1D1D;">Mensaje Visible para los Usuarios</label>
+                                    <textarea class="form-control-custom" rows="3" style="border-color:#FCA5A5;"
+                                        placeholder="Ej: Nos encontramos realizando una actualización programada de nuestros servidores. La plataforma volverá a estar disponible a las 06:00 AM."></textarea>
+                                </div>
+
+                                <!-- Modo Solo Lectura -->
+                                <div class="p-3 mb-4 rounded" style="background:white;border:1px solid #FCA5A5;">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div>
+                                            <div class="fw-bold text-dark" style="font-size:.9rem;">
+                                                <i class="bi bi-lock me-1" style="color:#D97706;"></i> Modo Solo Lectura (Read-Only)
+                                            </div>
+                                            <div style="font-size:.78rem;color:var(--gray-text);margin-top:.15rem;">
+                                                Permite la consulta de datos pero bloquea la edición de notas, asistencias e inscripciones.
+                                            </div>
+                                        </div>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="checkReadOnly" style="width:2.5em;height:1.3em;">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-end">
+                                    <button type="submit" class="btn-danger-custom">
+                                        <i class="bi bi-exclamation-triangle"></i> Guardar Estado del Sistema
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                </div><!-- /col contenido -->
+
+            </div><!-- /row layout -->
+
+        </div><!-- /content-area -->
+    </main>
+</div><!-- /wrapper -->
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // ── Mobile sidebar toggle
+    document.addEventListener('DOMContentLoaded', () => {
+        const btn = document.getElementById('mobileMenuBtn');
+        const sb  = document.getElementById('sidebar');
+        if (btn && sb) btn.addEventListener('click', () => sb.classList.toggle('active'));
+    });
+
+    // ── Navegación por pestañas (Tabs Switching)
+    function switchTab(tabId, btn) {
+        // Ocultar todos los paneles
+        document.querySelectorAll('.tab-panel').forEach(panel => {
+            panel.classList.add('d-none');
+        });
+
+        // Desactivar todos los botones de pestaña
+        document.querySelectorAll('.config-tab-btn').forEach(b => {
+            b.classList.remove('active');
+        });
+
+        // Mostrar panel seleccionado y activar botón
+        const targetPanel = document.getElementById('tab-' + tabId);
+        if (targetPanel) {
+            targetPanel.classList.remove('d-none');
+        }
+        if (btn) {
+            btn.classList.add('active');
+        }
+    }
+
+    // ── Guardado de feedback visual
+    function handleSaveConfig(e, seccion) {
+        e.preventDefault();
+        alert('¡Configuración de "' + seccion + '" actualizada correctamente!\nLos cambios han sido aplicados al entorno del sistema.');
+    }
+
+    // ── Búsqueda de parámetros
+    document.getElementById('configSearch').addEventListener('input', function() {
+        const q = this.value.toLowerCase().trim();
+        if (!q) return;
+
+        // Buscar texto en tarjetas y paneles
+        const boxes = document.querySelectorAll('.panel-box, .flag-card, .danger-panel');
+        boxes.forEach(box => {
+            const text = box.innerText.toLowerCase();
+            if (text.includes(q)) {
+                box.style.opacity = '1';
+                box.style.border = '2px solid var(--primary)';
+            } else {
+                box.style.opacity = '0.4';
+                box.style.border = '';
             }
         });
-    </script>
+    });
+
+    document.getElementById('configSearch').addEventListener('blur', function() {
+        if (!this.value) {
+            document.querySelectorAll('.panel-box, .flag-card, .danger-panel').forEach(box => {
+                box.style.opacity = '1';
+                box.style.border = '';
+            });
+        }
+    });
+</script>
+
 </body>
 </html>

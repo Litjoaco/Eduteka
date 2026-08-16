@@ -2,7 +2,7 @@
 {% comment %}
   Sidebar unificado Super Admin Eduteka (248px - Estilo Unificado SaaS).
   Uso: {% include '_sidebar_superadmin.html' with active_page='dashboard' %}
-  active_page opciones: dashboard | colegios | planes | facturacion | ordenes | modulos | estadisticas | configuracion
+  active_page opciones: dashboard | colegios | planes | facturacion | ordenes | modulos | estadisticas | configuracion | usuarios | roles | onboarding | solicitudes_global
 {% endcomment %}
 
 <style>
@@ -140,6 +140,30 @@
     </a>
     <a href="{% url 'dashboard_superadmin_modulos_erp' %}" class="nav-item {% if active_page == 'modulos' %}active{% endif %}">
       <i class="bi bi-boxes"></i> Módulos ERP
+    </a>
+
+    <div class="nav-section-label" style="margin-top:.4rem;">Control de Accesos</div>
+
+    <a href="{% url 'dashboard_superadmin_usuarios' %}" class="nav-item {% if active_page == 'usuarios' %}active{% endif %}">
+      <i class="bi bi-people"></i> Usuarios Globales
+    </a>
+    <a href="{% url 'dashboard_superadmin_roles' %}" class="nav-item {% if active_page == 'roles' %}active{% endif %}">
+      <i class="bi bi-key"></i> Roles y Permisos
+    </a>
+    <a href="{% url 'dashboard_superadmin_solicitudes' %}" class="nav-item {% if active_page == 'solicitudes_global' %}active{% endif %}">
+      <i class="bi bi-clipboard-check"></i> Solicitudes de Acceso
+    </a>
+
+    <div class="nav-section-label" style="margin-top:.4rem;">Éxito del Cliente (CSM)</div>
+
+    <a href="{% url 'dashboard_superadmin_onboarding' %}" class="nav-item {% if active_page == 'onboarding' %}active{% endif %}">
+      <i class="bi bi-flag"></i> Monitor de Onboarding
+    </a>
+
+    <div class="nav-section-label" style="margin-top:.4rem;">Comunicación</div>
+
+    <a href="{% url 'dashboard_superadmin_comunicados' %}" class="nav-item {% if active_page == 'comunicados' %}active{% endif %}">
+      <i class="bi bi-megaphone"></i> Centro de Comunicados
     </a>
 
     <div class="nav-section-label" style="margin-top:.4rem;">Analítica y Ajustes</div>
