@@ -50,6 +50,10 @@ def login_view(request):
             if next_url:
                 return redirect(next_url)
             
+            # 0. Si es superusuario -> dashboard superadmin
+            if user.is_superuser:
+                return redirect('dashboard_superadmin')
+
             # 1. Si es administrador de un colegio -> dashboard admin
             if Colegio.objects.filter(administrador=user).exists():
                 return redirect('dashboard_profesor')
