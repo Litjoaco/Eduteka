@@ -5,681 +5,756 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Super Admin Dashboard - Eduteka</title>
+    <meta name="description" content="Centro de Comando Ejecutivo Eduteka — Métricas globales, KPIs SaaS y actividad en tiempo real.">
+    <title>Centro de Comando — Eduteka Super Admin</title>
 
-    <!-- Bootstrap CSS desde local static -->
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-
-    <!-- Fuentes e Iconos -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         :root {
-            --primary: #7C5CFC;
-            --primary-soft: rgba(124, 92, 252, 0.08);
-            --primary-hover: #6747E3;
-            --secondary: #65CDBF;
-            --secondary-soft: rgba(101, 205, 191, 0.08);
-            --bg: #F8F9FD;
-            --white: #FFFFFF;
-            --dark: #151A35;
+            --primary:        #7C5CFC;
+            --primary-soft:   rgba(124, 92, 252, 0.08);
+            --primary-hover:  #6747E3;
+            --secondary:      #65CDBF;
+            --secondary-soft: rgba(101, 205, 191, 0.10);
+            --amber-soft:     rgba(245, 158, 11, 0.09);
+            --red-soft:       rgba(239, 68, 68, 0.08);
+            --green-soft:     rgba(16, 185, 129, 0.09);
+            --bg:     #F4F6FB;
+            --white:  #FFFFFF;
+            --dark:   #151A35;
             --gray-text: #687089;
-            --border: #BCC0CF;
-            --radius-lg: 16px;
-            --radius-md: 10px;
+            --border: #E4E7EF;
+            --radius-lg: 18px;
+            --radius-md: 12px;
             --radius-sm: 8px;
+            --shadow-sm: 0 2px 12px rgba(0,0,0,0.04);
+            --shadow-md: 0 6px 24px rgba(0,0,0,0.06);
         }
 
-        * {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
+        * { font-family: 'Plus Jakarta Sans', sans-serif; box-sizing: border-box; }
 
         body {
-            background-color: var(--bg);
+            background: var(--bg);
             color: var(--dark);
             min-height: 100vh;
             overflow-x: hidden;
             margin: 0;
         }
 
-        /* Ambient Blobs */
+        /* Ambient blobs */
         body::before {
-            content: '';
-            position: fixed;
-            top: -15%; left: 65%;
-            width: 50vw; height: 50vw;
-            background: radial-gradient(circle, rgba(124, 92, 252, 0.07) 0%, rgba(255,255,255,0) 70%);
-            z-index: -2;
-            pointer-events: none;
+            content: ''; position: fixed; top: -15%; left: 65%;
+            width: 50vw; height: 50vw; z-index: -2; pointer-events: none;
+            background: radial-gradient(circle, rgba(124,92,252,0.06) 0%, transparent 70%);
         }
         body::after {
-            content: '';
-            position: fixed;
-            top: 45%; left: -15%;
-            width: 40vw; height: 40vw;
-            background: radial-gradient(circle, rgba(101, 205, 191, 0.06) 0%, rgba(255,255,255,0) 70%);
-            z-index: -2;
-            pointer-events: none;
+            content: ''; position: fixed; top: 50%; left: -15%;
+            width: 40vw; height: 40vw; z-index: -2; pointer-events: none;
+            background: radial-gradient(circle, rgba(101,205,191,0.05) 0%, transparent 70%);
         }
 
-        .wrapper {
-            display: flex;
-            width: 100%;
-            align-items: stretch;
-        }
+        .wrapper { display: flex; width: 100%; align-items: stretch; }
 
-        /* TOPBAR */
+        /* ── Topbar ── */
         .topbar {
-            height: 70px;
-            background: rgba(255, 255, 255, 0.85) !important;
-            backdrop-filter: blur(12px) !important;
-            -webkit-backdrop-filter: blur(12px) !important;
+            height: 68px;
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(14px);
             border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            display: flex; align-items: center; justify-content: space-between;
             padding: 0 2rem;
-            position: sticky;
-            top: 0;
-            z-index: 98;
+            position: sticky; top: 0; z-index: 98;
         }
-
-        .search-bar {
-            position: relative;
-            width: 320px;
-        }
-
-        .search-bar i {
-            position: absolute;
-            left: 0.85rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gray-text);
-        }
-
+        .search-bar { position: relative; width: 300px; }
+        .search-bar i { position: absolute; left: .85rem; top: 50%; transform: translateY(-50%); color: var(--gray-text); font-size: .9rem; }
         .search-bar input {
-            width: 100%;
-            padding: 0.5rem 1rem 0.5rem 2.4rem;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            background-color: var(--bg);
-            font-size: 0.85rem;
-            outline: none;
-            transition: all 0.2s;
+            width: 100%; padding: .5rem 1rem .5rem 2.35rem;
+            border: 1px solid var(--border); border-radius: var(--radius-md);
+            background: var(--bg); font-size: .85rem; outline: none; transition: all .2s;
         }
+        .search-bar input:focus { border-color: var(--primary); background: var(--white); box-shadow: 0 0 0 3px rgba(124,92,252,.12); }
 
-        .search-bar input:focus {
-            border-color: var(--primary);
-            background-color: var(--white);
-            box-shadow: 0 0 0 3px rgba(124, 92, 252, 0.12);
+        .topbar-right { display: flex; align-items: center; gap: 1.1rem; }
+        .notif-bell {
+            position: relative; width: 38px; height: 38px; border-radius: 50%;
+            background: var(--bg); border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--gray-text); font-size: 1.1rem; cursor: pointer; transition: all .2s;
         }
-
-        .topbar-right {
-            display: flex;
-            align-items: center;
-            gap: 1.25rem;
+        .notif-bell:hover { color: var(--primary); border-color: var(--primary); }
+        .notif-badge {
+            position: absolute; top: -3px; right: -3px;
+            background: #EF4444; color: #fff; font-size: .6rem; font-weight: 700;
+            width: 17px; height: 17px; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; border: 2px solid var(--white);
         }
-
-        .notification-bell {
-            position: relative;
-            color: var(--gray-text);
-            font-size: 1.2rem;
-            cursor: pointer;
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            background: var(--bg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid var(--border);
-            transition: all 0.2s;
-        }
-
-        .notification-bell:hover {
-            color: var(--primary);
-            border-color: var(--primary);
-        }
-
-        .notification-badge {
-            position: absolute;
-            top: -2px;
-            right: -2px;
-            background-color: #EF4444;
-            color: white;
-            font-size: 0.65rem;
-            font-weight: 700;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid var(--white);
-        }
-
         .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            background: var(--white);
-            padding: 0.35rem 0.85rem 0.35rem 0.4rem;
-            border-radius: 30px;
-            border: 1px solid var(--border);
+            display: flex; align-items: center; gap: .7rem;
+            background: var(--white); padding: .3rem .8rem .3rem .35rem;
+            border-radius: 30px; border: 1px solid var(--border);
         }
-
         .user-avatar {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 0.85rem;
+            width: 32px; height: 32px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+            color: #fff; display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: .82rem;
         }
+        .user-name { font-weight: 700; font-size: .86rem; color: var(--dark); }
 
-        .user-name {
-            font-weight: 600;
-            font-size: 0.88rem;
-            color: var(--dark);
-        }
+        /* ── Content ── */
+        .content-area { padding: 1.75rem 2rem; max-width: 1420px; width: 100%; margin: 0 auto; }
 
-        /* Dashboard Container */
-        .content-area {
-            padding: 1.75rem 2rem;
-            max-width: 1400px;
-            width: 100%;
-            margin: 0 auto;
-            box-sizing: border-box;
+        /* ── Hero ── */
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: .4rem;
+            background: var(--primary-soft); color: var(--primary);
+            font-size: .7rem; font-weight: 800; letter-spacing: .8px;
+            text-transform: uppercase; padding: .28rem .85rem; border-radius: 20px; margin-bottom: .6rem;
         }
+        .hero-title { font-size: 1.7rem; font-weight: 800; color: var(--dark); margin-bottom: .2rem; }
+        .hero-sub { color: var(--gray-text); font-size: .88rem; margin-bottom: 0; }
 
-        .hero-title {
-            font-size: 1.6rem;
-            font-weight: 800;
-            color: var(--dark);
-            margin-bottom: 0.25rem;
+        /* ── Section divider label ── */
+        .section-label {
+            font-size: .68rem; font-weight: 800; color: var(--gray-text);
+            text-transform: uppercase; letter-spacing: 1px;
+            margin-bottom: .7rem; display: flex; align-items: center; gap: .5rem;
         }
-        .hero-subtitle {
-            color: var(--gray-text);
-            font-size: 0.9rem;
-            margin-bottom: 1.5rem;
-        }
+        .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-        /* KPI Cards */
+        /* ── KPI Cards ── */
         .kpi-card {
-            background: var(--white);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: 1.25rem;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
-            height: 100%;
+            background: var(--white); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 1.2rem 1.3rem;
+            display: flex; align-items: center; gap: 1rem;
+            transition: all .28s cubic-bezier(.25,.8,.25,1);
+            box-shadow: var(--shadow-sm); height: 100%;
+            position: relative; overflow: hidden;
         }
-
-        .kpi-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 25px rgba(124, 92, 252, 0.1) !important;
+        .kpi-card::before {
+            content: ''; position: absolute; left: 0; top: 0;
+            width: 3px; height: 100%; border-radius: 3px 0 0 3px;
+            background: transparent; transition: background .28s;
         }
+        .kpi-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+        .kpi-card.kp { --ac: var(--primary); }
+        .kpi-card.kt { --ac: var(--secondary); }
+        .kpi-card.kg { --ac: #10B981; }
+        .kpi-card.ka { --ac: #F59E0B; }
+        .kpi-card.kr { --ac: #EF4444; }
+        .kpi-card:hover::before { background: var(--ac, var(--primary)); }
 
         .kpi-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: var(--radius-md);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.4rem;
-            flex-shrink: 0;
+            width: 50px; height: 50px; border-radius: var(--radius-md);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem; flex-shrink: 0;
         }
+        .ki-p { background: var(--primary-soft); color: var(--primary); }
+        .ki-t { background: var(--secondary-soft); color: #0E8A7E; }
+        .ki-g { background: var(--green-soft); color: #10B981; }
+        .ki-a { background: var(--amber-soft); color: #D97706; }
+        .ki-r { background: var(--red-soft); color: #EF4444; }
 
-        .kpi-icon.purple { background-color: var(--primary-soft); color: var(--primary); }
-        .kpi-icon.teal { background-color: var(--secondary-soft); color: #148A7A; }
-        .kpi-icon.red { background-color: #FEF2F2; color: #EF4444; }
-        .kpi-icon.amber { background-color: #FFFBEB; color: #D97706; }
+        .kpi-label { font-size: .68rem; color: var(--gray-text); font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+        .kpi-val { font-size: 1.5rem; font-weight: 800; color: var(--dark); line-height: 1.2; }
+        .kpi-sub { font-size: .76rem; font-weight: 600; margin-top: 2px; }
 
-        .kpi-title {
-            font-size: 0.72rem;
-            color: var(--gray-text);
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        /* Retention SVG ring */
+        .ring-wrap { position: relative; width: 50px; height: 50px; flex-shrink: 0; }
+        .ring-wrap svg { transform: rotate(-90deg); }
+        .ring-inner { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: .58rem; font-weight: 800; color: var(--primary); white-space: nowrap; }
+
+        /* ── Panels ── */
+        .panel {
+            background: var(--white); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 1.35rem 1.6rem;
+            box-shadow: var(--shadow-sm);
         }
+        .panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.1rem; }
+        .panel-title { font-size: .98rem; font-weight: 800; color: var(--dark); margin: 0; display: flex; align-items: center; gap: .5rem; }
 
-        .kpi-value {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--dark);
-            line-height: 1.2;
+        /* ── Tables (compact) ── */
+        .tbl { width: 100%; border-collapse: separate; border-spacing: 0 5px; }
+        .tbl th { color: var(--gray-text); font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; padding: .4rem .9rem; border: none; background: none; }
+        .tbl td { background: var(--white); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: .65rem .9rem; font-size: .86rem; vertical-align: middle; }
+        .tbl td:first-child { border-left: 1px solid var(--border); border-radius: var(--radius-sm) 0 0 var(--radius-sm); }
+        .tbl td:last-child  { border-right: 1px solid var(--border); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+        .tbl tbody tr:hover td { background: #FAF9FF; border-color: #D6CFFE; }
+
+        /* ── Pills ── */
+        .pill { display: inline-flex; align-items: center; gap: .3rem; padding: .22rem .65rem; border-radius: 20px; font-size: .72rem; font-weight: 700; }
+        .p-red    { background: #FEF2F2; color: #EF4444; }
+        .p-yellow { background: #FFFBEB; color: #D97706; }
+        .p-green  { background: #ECFDF5; color: #10B981; }
+        .p-purple { background: var(--primary-soft); color: var(--primary); }
+        .p-gray   { background: #F3F4F6; color: var(--gray-text); }
+        .p-teal   { background: var(--secondary-soft); color: #0E8A7E; }
+
+        /* ── Charts ── */
+        .chart-h260 { position: relative; height: 260px; }
+        .chart-h200 { position: relative; height: 200px; }
+
+        /* ── Donut chart block ── */
+        .donut-layout { display: flex; align-items: center; gap: 1.5rem; }
+        .donut-legend { flex: 1; display: flex; flex-direction: column; gap: .55rem; }
+        .leg-row { display: flex; align-items: center; gap: .5rem; font-size: .82rem; }
+        .leg-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+        .leg-name { flex: 1; font-weight: 600; color: var(--dark); }
+        .leg-count { color: var(--gray-text); font-size: .78rem; font-weight: 600; }
+        .leg-pct { background: #F3F4F6; color: var(--gray-text); font-size: .68rem; font-weight: 700; padding: .15rem .4rem; border-radius: 6px; }
+
+        /* ── Activity Feed / Timeline ── */
+        .feed { list-style: none; padding: 0; margin: 0; }
+        .feed-item {
+            display: flex; gap: .85rem; align-items: flex-start;
+            padding: .7rem 0; border-bottom: 1px solid var(--border);
+            transition: all .15s;
         }
+        .feed-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .feed-item:hover { background: #FAF9FF; margin: 0 -.6rem; padding: .7rem .6rem; border-radius: var(--radius-sm); }
 
-        .kpi-sub {
-            font-size: 0.78rem;
-            font-weight: 600;
-            margin-top: 2px;
+        .feed-icon {
+            width: 34px; height: 34px; border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: .95rem; flex-shrink: 0; margin-top: 1px;
         }
+        .fi-purple { background: var(--primary-soft); color: var(--primary); }
+        .fi-teal   { background: var(--secondary-soft); color: #0E8A7E; }
+        .fi-green  { background: var(--green-soft); color: #10B981; }
+        .fi-amber  { background: var(--amber-soft); color: #D97706; }
+        .fi-red    { background: var(--red-soft); color: #EF4444; }
 
-        /* Dashboard Panels */
-        .dashboard-panel {
-            background: var(--white);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: 1.25rem 1.5rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.01);
-            margin-bottom: 1.5rem;
-        }
+        .feed-title  { font-size: .84rem; font-weight: 700; color: var(--dark); margin-bottom: 1px; }
+        .feed-detail { font-size: .76rem; color: var(--gray-text); }
+        .feed-time   { font-size: .7rem; color: #BCC0CF; margin-top: 2px; }
 
-        .panel-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1.25rem;
-        }
-
-        .panel-title {
-            font-size: 1.05rem;
-            font-weight: 800;
-            color: var(--dark);
-            margin: 0;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        /* Tables */
-        .table-custom {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0 8px;
-            margin-bottom: 0;
-        }
-
-        .table-custom th {
-            border: none;
-            background: none;
-            color: var(--gray-text);
-            font-weight: 700;
-            font-size: 0.78rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            padding: 0.5rem 1rem;
-        }
-
-        .table-custom td {
-            background: var(--white);
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-            padding: 0.85rem 1rem;
-            font-size: 0.88rem;
-            vertical-align: middle;
-        }
-
-        .table-custom td:first-child {
-            border-left: 1px solid var(--border);
-            border-top-left-radius: var(--radius-md);
-            border-bottom-left-radius: var(--radius-md);
-        }
-
-        .table-custom td:last-child {
-            border-right: 1px solid var(--border);
-            border-top-right-radius: var(--radius-md);
-            border-bottom-right-radius: var(--radius-md);
-        }
-
-        .table-custom tbody tr:hover td {
-            background-color: #FAF9FF !important;
-            border-color: #D6CFFE;
-        }
-
-        /* Pills */
-        .pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.35rem;
-            padding: 0.3rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 700;
-        }
-
-        .pill-red { background-color: #FEF2F2; color: #EF4444; }
-        .pill-yellow { background-color: #FFFBEB; color: #D97706; }
-        .pill-green { background-color: #ECFDF5; color: #10B981; }
-        .pill-purple { background-color: var(--primary-soft); color: var(--primary); }
-        .pill-gray { background-color: #F3F4F6; color: var(--gray-text); }
-
-        /* Chart Area */
-        .chart-container {
-            position: relative;
-            height: 250px;
-            width: 100%;
-        }
-
+        /* ── Buttons ── */
         .btn-purple {
-            background-color: var(--primary);
-            color: white;
-            font-weight: 600;
-            border-radius: var(--radius-md);
-            padding: 0.45rem 1rem;
-            border: none;
-            transition: all 0.2s;
+            background: var(--primary); color: #fff; font-weight: 700;
+            border-radius: var(--radius-md); padding: .42rem 1rem;
+            border: none; font-size: .84rem; transition: all .2s; cursor: pointer;
         }
-        .btn-purple:hover {
-            background-color: var(--primary-hover);
-            color: white;
-            box-shadow: 0 4px 12px rgba(124, 92, 252, 0.3);
-        }
+        .btn-purple:hover { background: var(--primary-hover); color: #fff; box-shadow: 0 4px 14px rgba(124,92,252,.3); }
     </style>
 </head>
 
 <body>
+<div class="wrapper">
+    {% include '_sidebar_superadmin.html' with active_page='dashboard' %}
 
-    <div class="wrapper">
-        <!-- Sidebar Unificado -->
-        {% include '_sidebar_superadmin.html' with active_page='dashboard' %}
+    <main class="main-content" style="flex:1; overflow-y:auto;">
 
-        <!-- Main Content -->
-        <main class="main-content">
-
-            <!-- Topbar -->
-            <header class="topbar">
-                <div class="d-flex items-center gap-2">
-                    <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn" style="border:none; background:var(--primary-soft); color:var(--primary);">
-                        <i class="bi bi-list fs-5"></i>
-                    </button>
-                    <div class="search-bar">
-                        <i class="bi bi-search"></i>
-                        <input type="text" placeholder="Buscar colegios, órdenes, planes...">
-                    </div>
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="d-flex align-items-center gap-2">
+                <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn"
+                    style="border:none; background:var(--primary-soft); color:var(--primary);">
+                    <i class="bi bi-list fs-5"></i>
+                </button>
+                <div class="search-bar">
+                    <i class="bi bi-search"></i>
+                    <input type="text" placeholder="Buscar colegios, planes, actividad...">
                 </div>
-
-                <div class="topbar-right">
-                    <div class="notification-bell">
-                        <i class="bi bi-bell"></i>
-                        <span class="notification-badge">1</span>
-                    </div>
-                    <div class="user-profile">
-                        <div class="user-avatar">AE</div>
-                        <span class="user-name">Admin Eduteka</span>
-                    </div>
+            </div>
+            <div class="topbar-right">
+                <div class="notif-bell">
+                    <i class="bi bi-bell"></i>
+                    <span class="notif-badge">{{ solicitudes_pendientes|default:"1" }}</span>
                 </div>
-            </header>
-
-            <!-- Dashboard Container -->
-            <div class="content-area">
-
-                <div class="mb-4">
-                    <h1 class="hero-title">Resumen Global Eduteka</h1>
-                    <div class="hero-subtitle">Métricas clave, estado de suscripciones y facturación global</div>
+                <div class="user-profile">
+                    <div class="user-avatar">AE</div>
+                    <span class="user-name">Admin Eduteka</span>
                 </div>
+            </div>
+        </header>
 
-                <!-- Metrics Cards -->
-                <div class="row g-3 mb-4">
-                    <div class="col-12 col-sm-6 col-xl-3">
-                        <div class="kpi-card">
-                            <div class="kpi-icon purple">
-                                <i class="bi bi-building"></i>
-                            </div>
-                            <div>
-                                <div class="kpi-title">Colegios Activos</div>
-                                <div class="kpi-value">215</div>
-                                <div class="kpi-sub text-success"><i class="bi bi-arrow-up-right"></i> +3.2% vs jun</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-sm-6 col-xl-3">
-                        <div class="kpi-card">
-                            <div class="kpi-icon teal">
-                                <i class="bi bi-cash-stack"></i>
-                            </div>
-                            <div>
-                                <div class="kpi-title">MRR (Ingresos Recurrentes)</div>
-                                <div class="kpi-value">$12.5M <span style="font-size:0.85rem; font-weight:600;" class="text-muted">CLP</span></div>
-                                <div class="kpi-sub text-success"><i class="bi bi-arrow-up-right"></i> +5.8%</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-sm-6 col-xl-3">
-                        <div class="kpi-card">
-                            <div class="kpi-icon red">
-                                <i class="bi bi-exclamation-triangle-fill"></i>
-                            </div>
-                            <div>
-                                <div class="kpi-title">Próximos Vencimientos</div>
-                                <div class="kpi-value">18 Alertas</div>
-                                <div class="kpi-sub text-danger">9 Críticos en rojo</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-sm-6 col-xl-3">
-                        <div class="kpi-card">
-                            <div class="kpi-icon amber">
-                                <i class="bi bi-folder-check"></i>
-                            </div>
-                            <div>
-                                <div class="kpi-title">Órdenes Pendientes</div>
-                                <div class="kpi-value">9 Solicitudes</div>
-                                <div class="kpi-sub text-muted">Pendientes de revisión</div>
-                            </div>
+        <div class="content-area">
+
+            <!-- ── Hero ────────────────────────────────────────────────────── -->
+            <div class="mb-4">
+                <div class="hero-badge"><i class="bi bi-lightning-charge-fill"></i> Centro de Comando</div>
+                <h1 class="hero-title">Resumen Global Eduteka</h1>
+                <p class="hero-sub">Vista 360° del negocio — KPIs SaaS, ingresos y actividad del sistema</p>
+            </div>
+
+            <!-- ── FILA 1: 5 KPIs ────────────────────────────────────────── -->
+            <div class="section-label"><i class="bi bi-bar-chart-fill"></i> Métricas Clave</div>
+            <div class="row g-3 mb-4">
+
+                <div class="col-6 col-sm-4 col-xl">
+                    <div class="kpi-card kp">
+                        <div class="kpi-icon ki-p"><i class="bi bi-building"></i></div>
+                        <div>
+                            <div class="kpi-label">Colegios Activos</div>
+                            <div class="kpi-val">{{ colegios_activos|default:"215" }}</div>
+                            <div class="kpi-sub text-success"><i class="bi bi-arrow-up-right"></i> +3.2% vs jun</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Middle Section -->
-                <div class="row g-3 mb-4">
-
-                    <!-- Alerts Table -->
-                    <div class="col-12 col-lg-7">
-                        <div class="dashboard-panel h-100 mb-0">
-                            <div class="panel-header">
-                                <h2 class="panel-title">
-                                    <i class="bi bi-clock-history text-primary"></i> Tablero de Alertas de Pago
-                                </h2>
-                                <a href="{% url 'dashboard_superadmin_facturacion' %}" class="btn btn-sm btn-outline-primary rounded-pill">Ver Todo</a>
-                            </div>
-                            <div class="table-responsive">
-                                <table class="table-custom">
-                                    <thead>
-                                        <tr>
-                                            <th>Colegio</th>
-                                            <th>Plan</th>
-                                            <th>Emisión</th>
-                                            <th>Días Restantes</th>
-                                            <th>Acción</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td><strong>Liceo Santa María</strong></td>
-                                            <td><span class="pill pill-purple">Premium</span></td>
-                                            <td>01/06/26</td>
-                                            <td><span class="pill pill-red"><i class="bi bi-alarm"></i> 2 Días</span></td>
-                                            <td><button class="btn btn-sm btn-danger rounded-pill px-3">Pagar</button></td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>Colegio Los Alerces</strong></td>
-                                            <td><span class="pill pill-purple">Estándar</span></td>
-                                            <td>10/06/26</td>
-                                            <td><span class="pill pill-yellow"><i class="bi bi-exclamation-circle"></i> 11 Días</span></td>
-                                            <td><button class="btn btn-sm btn-warning text-white rounded-pill px-3">Ver Alerta</button></td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>Instituto Profesional</strong></td>
-                                            <td><span class="pill pill-gray">Básico</span></td>
-                                            <td>15/06/26</td>
-                                            <td><span class="pill pill-green"><i class="bi bi-check-circle"></i> 16 Días</span></td>
-                                            <td><button class="btn btn-sm btn-light border rounded-pill px-3">Detalles</button></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Revenue Chart -->
-                    <div class="col-12 col-lg-5">
-                        <div class="dashboard-panel h-100 mb-0">
-                            <div class="panel-header">
-                                <h2 class="panel-title">
-                                    <i class="bi bi-graph-up text-success"></i> Crecimiento de Ingresos
-                                </h2>
-                            </div>
-                            <div class="chart-container">
-                                <canvas id="revenueChart"></canvas>
-                            </div>
+                <div class="col-6 col-sm-4 col-xl">
+                    <div class="kpi-card kt">
+                        <div class="kpi-icon ki-t"><i class="bi bi-cash-stack"></i></div>
+                        <div>
+                            <div class="kpi-label">MRR Ingresos</div>
+                            <div class="kpi-val">{{ mrr_display|default:"$12.5M" }} <small class="text-muted fw-semibold" style="font-size:.75rem;">CLP</small></div>
+                            <div class="kpi-sub text-success"><i class="bi bi-arrow-up-right"></i> +5.8%</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Recent Clients Table -->
-                <div class="dashboard-panel">
-                    <div class="panel-header">
-                        <h2 class="panel-title">
-                            <i class="bi bi-people-fill text-primary"></i> Resumen de Clientes Recientes
-                        </h2>
-                        <a href="{% url 'dashboard_superadmin_colegios' %}" class="btn btn-sm btn-purple rounded-pill">
-                            <i class="bi bi-plus-lg me-1"></i> Ir a Directorio
-                        </a>
+                <!-- Tasa de Retención con SVG ring animado -->
+                <div class="col-6 col-sm-4 col-xl">
+                    <div class="kpi-card kg">
+                        <div class="ring-wrap">
+                            <svg width="50" height="50" viewBox="0 0 50 50">
+                                <circle cx="25" cy="25" r="19" fill="none" stroke="#E4E7EF" stroke-width="5"/>
+                                <circle id="retArc" cx="25" cy="25" r="19" fill="none" stroke="#7C5CFC"
+                                    stroke-width="5" stroke-dasharray="119.4" stroke-dashoffset="0"
+                                    stroke-linecap="round"/>
+                            </svg>
+                            <div class="ring-inner" id="retLabel">{{ tasa_retencion|default:"94.2" }}%</div>
+                        </div>
+                        <div>
+                            <div class="kpi-label">Tasa Retención</div>
+                            <div class="kpi-val">{{ tasa_retencion|default:"94.2" }}<span style="font-size:.9rem;">%</span></div>
+                            <div class="kpi-sub" style="color:#10B981;"><i class="bi bi-shield-check"></i> Churn: {{ churn_rate|default:"5.8" }}%</div>
+                        </div>
                     </div>
-                    <div class="table-responsive">
-                        <table class="table-custom">
-                            <thead>
-                                <tr>
-                                    <th>Colegio</th>
-                                    <th>Alumnos</th>
-                                    <th>Profesores</th>
-                                    <th>Onboarding</th>
-                                    <th>Plan</th>
-                                    <th class="text-end">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><strong>Colegio Arturo Prat</strong></td>
-                                    <td>1,200</td>
-                                    <td>65</td>
-                                    <td><span class="pill pill-yellow"><i class="bi bi-exclamation-triangle-fill"></i> Capacitación Pendiente</span></td>
-                                    <td><span class="pill pill-purple">Premium</span></td>
-                                    <td class="text-end">
-                                        <button class="btn btn-sm btn-outline-primary rounded-pill me-1">Detalles</button>
-                                        <button class="btn btn-sm btn-light border rounded-pill">Ficha</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Escuela Gabriela Mistral</strong></td>
-                                    <td>850</td>
-                                    <td>42</td>
-                                    <td><span class="pill pill-green"><i class="bi bi-check-circle-fill"></i> Completado</span></td>
-                                    <td><span class="pill pill-purple">Estándar</span></td>
-                                    <td class="text-end">
-                                        <button class="btn btn-sm btn-outline-primary rounded-pill me-1">Detalles</button>
-                                        <button class="btn btn-sm btn-light border rounded-pill">Ficha</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Liceo Bicentenario</strong></td>
-                                    <td>2,100</td>
-                                    <td>110</td>
-                                    <td><span class="pill pill-gray"><i class="bi bi-hourglass-split"></i> En Proceso (Día 2)</span></td>
-                                    <td><span class="pill pill-purple">Premium</span></td>
-                                    <td class="text-end">
-                                        <button class="btn btn-sm btn-outline-primary rounded-pill me-1">Detalles</button>
-                                        <button class="btn btn-sm btn-light border rounded-pill">Ficha</button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                </div>
+
+                <div class="col-6 col-sm-4 col-xl">
+                    <div class="kpi-card kr">
+                        <div class="kpi-icon ki-r"><i class="bi bi-exclamation-triangle-fill"></i></div>
+                        <div>
+                            <div class="kpi-label">Alertas Vencimiento</div>
+                            <div class="kpi-val">18</div>
+                            <div class="kpi-sub text-danger">9 Críticos</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-6 col-sm-4 col-xl">
+                    <div class="kpi-card ka">
+                        <div class="kpi-icon ki-a"><i class="bi bi-folder-check"></i></div>
+                        <div>
+                            <div class="kpi-label">Solicitudes</div>
+                            <div class="kpi-val">{{ solicitudes_pendientes|default:"9" }}</div>
+                            <div class="kpi-sub text-muted">Pendientes revisión</div>
+                        </div>
                     </div>
                 </div>
 
             </div>
-        </main>
-    </div>
 
-    <!-- Script Chart.js y Toggle Móvil -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Toggle móvil sidebar
-            const mobileBtn = document.getElementById('mobileMenuBtn');
-            const sidebar = document.getElementById('sidebar');
-            if (mobileBtn && sidebar) {
-                mobileBtn.addEventListener('click', function () {
-                    sidebar.classList.toggle('active');
-                });
+            <!-- ── FILA 2: Line Chart (65%) + Tablero Alertas (35%) ──────── -->
+            <div class="section-label"><i class="bi bi-graph-up-arrow"></i> Ingresos y Alertas Críticas</div>
+            <div class="row g-3 mb-4">
+
+                <!-- Line Chart Ingresos -->
+                <div class="col-12 col-lg-7">
+                    <div class="panel" style="height:100%;">
+                        <div class="panel-header">
+                            <h2 class="panel-title"><i class="bi bi-graph-up text-success"></i> Crecimiento de Ingresos</h2>
+                            <span class="pill p-green"><i class="bi bi-arrow-up-right"></i> +5.8% YTD</span>
+                        </div>
+                        <div class="chart-h260">
+                            <canvas id="revenueChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alertas de Pago -->
+                <div class="col-12 col-lg-5">
+                    <div class="panel" style="height:100%;">
+                        <div class="panel-header">
+                            <h2 class="panel-title"><i class="bi bi-clock-history text-primary"></i> Alertas de Pago</h2>
+                            <a href="{% url 'dashboard_superadmin_facturacion' %}" class="btn btn-sm btn-outline-primary rounded-pill">Ver todo</a>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="tbl">
+                                <thead>
+                                    <tr>
+                                        <th>Colegio</th>
+                                        <th>Plan</th>
+                                        <th>Días Rest.</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Liceo Santa María</strong></td>
+                                        <td><span class="pill p-purple">Premium</span></td>
+                                        <td><span class="pill p-red"><i class="bi bi-alarm"></i> 2 días</span></td>
+                                        <td><button class="btn btn-sm btn-danger rounded-pill px-3">Pagar</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Colegio Los Alerces</strong></td>
+                                        <td><span class="pill p-purple">Estándar</span></td>
+                                        <td><span class="pill p-yellow"><i class="bi bi-exclamation-circle"></i> 11 días</span></td>
+                                        <td><button class="btn btn-sm btn-warning text-white rounded-pill px-3">Ver</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Instituto Profesional</strong></td>
+                                        <td><span class="pill p-gray">Básico</span></td>
+                                        <td><span class="pill p-green"><i class="bi bi-check-circle"></i> 16 días</span></td>
+                                        <td><button class="btn btn-sm btn-light border rounded-pill px-3">Info</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Liceo Baquedano</strong></td>
+                                        <td><span class="pill p-purple">Estándar</span></td>
+                                        <td><span class="pill p-yellow"><i class="bi bi-exclamation-circle"></i> 8 días</span></td>
+                                        <td><button class="btn btn-sm btn-warning text-white rounded-pill px-3">Ver</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ── FILA 3: Tabla Clientes Recientes (compacta) ───────────── -->
+            <div class="section-label"><i class="bi bi-people-fill"></i> Clientes Recientes</div>
+            <div class="panel mb-4">
+                <div class="panel-header">
+                    <h2 class="panel-title"><i class="bi bi-people-fill" style="color:var(--primary);"></i> Directorio de Clientes</h2>
+                    <a href="{% url 'dashboard_superadmin_colegios' %}" class="btn-purple">
+                        <i class="bi bi-grid me-1"></i> Ver Directorio Completo
+                    </a>
+                </div>
+                <div class="table-responsive">
+                    <table class="tbl">
+                        <thead>
+                            <tr>
+                                <th>Colegio</th>
+                                <th>Alumnos</th>
+                                <th>Implementación</th>
+                                <th>Plan</th>
+                                <th>Estado</th>
+                                <th class="text-end">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div style="font-weight:700;">Colegio Arturo Prat</div>
+                                    <div style="font-size:.74rem; color:var(--gray-text);">Santiago, Región Metropolitana</div>
+                                </td>
+                                <td>1,200</td>
+                                <td><span class="pill p-yellow"><i class="bi bi-hourglass-split"></i> En proceso</span></td>
+                                <td><span class="pill p-purple">Premium</span></td>
+                                <td><span class="pill p-green"><i class="bi bi-circle-fill" style="font-size:.4rem;"></i> Activo</span></td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-outline-primary rounded-pill me-1">Detalles</button>
+                                    <button class="btn btn-sm btn-light border rounded-pill">Ficha</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div style="font-weight:700;">Escuela Gabriela Mistral</div>
+                                    <div style="font-size:.74rem; color:var(--gray-text);">Valparaíso</div>
+                                </td>
+                                <td>850</td>
+                                <td><span class="pill p-green"><i class="bi bi-check-circle-fill"></i> Completado</span></td>
+                                <td><span class="pill p-purple">Estándar</span></td>
+                                <td><span class="pill p-green"><i class="bi bi-circle-fill" style="font-size:.4rem;"></i> Activo</span></td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-outline-primary rounded-pill me-1">Detalles</button>
+                                    <button class="btn btn-sm btn-light border rounded-pill">Ficha</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div style="font-weight:700;">Liceo Bicentenario</div>
+                                    <div style="font-size:.74rem; color:var(--gray-text);">Concepción</div>
+                                </td>
+                                <td>2,100</td>
+                                <td><span class="pill p-green"><i class="bi bi-check-circle-fill"></i> Completado</span></td>
+                                <td><span class="pill p-purple">Premium</span></td>
+                                <td><span class="pill p-green"><i class="bi bi-circle-fill" style="font-size:.4rem;"></i> Activo</span></td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-outline-primary rounded-pill me-1">Detalles</button>
+                                    <button class="btn btn-sm btn-light border rounded-pill">Ficha</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div style="font-weight:700;">Instituto San Martín</div>
+                                    <div style="font-size:.74rem; color:var(--gray-text);">La Serena</div>
+                                </td>
+                                <td>430</td>
+                                <td><span class="pill p-green"><i class="bi bi-check-circle-fill"></i> Completado</span></td>
+                                <td><span class="pill p-gray">Básico</span></td>
+                                <td><span class="pill p-yellow"><i class="bi bi-circle-fill" style="font-size:.4rem;"></i> Pendiente</span></td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-outline-primary rounded-pill me-1">Detalles</button>
+                                    <button class="btn btn-sm btn-light border rounded-pill">Ficha</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ── FILA 4: Distribución de Planes (Donut) + Feed de Actividad ── -->
+            <div class="section-label"><i class="bi bi-pie-chart-fill"></i> Distribución y Actividad del Sistema</div>
+            <div class="row g-3 mb-2">
+
+                <!-- Tarjeta: Distribución de Planes Actuales -->
+                <div class="col-12 col-lg-5">
+                    <div class="panel" style="height:100%;">
+                        <div class="panel-header">
+                            <h2 class="panel-title">
+                                <i class="bi bi-pie-chart-fill" style="color:var(--primary);"></i>
+                                Distribución de Planes Actuales
+                            </h2>
+                        </div>
+                        <div class="donut-layout">
+                            <!-- Donut Chart -->
+                            <div style="position:relative; width:180px; height:180px; flex-shrink:0;">
+                                <canvas id="planesChart" width="180" height="180"></canvas>
+                                <!-- Centro label -->
+                                <div id="donutCenter" style="
+                                    position:absolute; top:50%; left:50%;
+                                    transform:translate(-50%,-50%);
+                                    text-align:center; pointer-events:none;">
+                                    <div style="font-size:1.3rem; font-weight:800; color:var(--dark);" id="donutTotal">—</div>
+                                    <div style="font-size:.65rem; font-weight:700; color:var(--gray-text); text-transform:uppercase; letter-spacing:.5px;">Colegios</div>
+                                </div>
+                            </div>
+                            <!-- Leyenda -->
+                            <div class="donut-legend" id="planesLeyenda"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta: Última Actividad del Sistema (Timeline) -->
+                <div class="col-12 col-lg-7">
+                    <div class="panel" style="height:100%;">
+                        <div class="panel-header">
+                            <h2 class="panel-title">
+                                <i class="bi bi-activity" style="color:#10B981;"></i>
+                                Última Actividad del Sistema
+                            </h2>
+                            <span class="pill p-green" style="font-size:.66rem; animation: pulse 2s infinite;">
+                                <i class="bi bi-circle-fill" style="font-size:.4rem;"></i> En vivo
+                            </span>
+                        </div>
+
+                        {% if actividad_feed %}
+                        <ul class="feed">
+                            {% for ev in actividad_feed %}
+                            <li class="feed-item">
+                                <div class="feed-icon fi-{{ ev.color }}">
+                                    <i class="bi {{ ev.icono }}"></i>
+                                </div>
+                                <div style="flex:1; min-width:0;">
+                                    <div class="feed-title">{{ ev.titulo }}</div>
+                                    <div class="feed-detail text-truncate">{{ ev.detalle }}</div>
+                                    <div class="feed-time"><i class="bi bi-clock me-1"></i>{{ ev.fecha }}</div>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <!-- Feed de ejemplo (BD vacía) -->
+                        <ul class="feed">
+                            <li class="feed-item">
+                                <div class="feed-icon fi-purple"><i class="bi bi-building-check"></i></div>
+                                <div>
+                                    <div class="feed-title">Nuevo colegio registrado</div>
+                                    <div class="feed-detail">Liceo Bicentenario Norte — Temuco</div>
+                                    <div class="feed-time"><i class="bi bi-clock me-1"></i>Hace 2 horas</div>
+                                </div>
+                            </li>
+                            <li class="feed-item">
+                                <div class="feed-icon fi-teal"><i class="bi bi-check-circle-fill"></i></div>
+                                <div>
+                                    <div class="feed-title">Suscripción activada — Plan Premium</div>
+                                    <div class="feed-detail">Escuela Arturo Prat — Santiago</div>
+                                    <div class="feed-time"><i class="bi bi-clock me-1"></i>Hace 5 horas</div>
+                                </div>
+                            </li>
+                            <li class="feed-item">
+                                <div class="feed-icon fi-green"><i class="bi bi-person-check-fill"></i></div>
+                                <div>
+                                    <div class="feed-title">Solicitud de acceso aprobada</div>
+                                    <div class="feed-detail">Director — Colegio Los Álamos</div>
+                                    <div class="feed-time"><i class="bi bi-clock me-1"></i>Ayer 09:15</div>
+                                </div>
+                            </li>
+                            <li class="feed-item">
+                                <div class="feed-icon fi-amber"><i class="bi bi-file-earmark-spreadsheet"></i></div>
+                                <div>
+                                    <div class="feed-title">Reporte Excel exportado</div>
+                                    <div class="feed-detail">Exportación completa directorio de colegios</div>
+                                    <div class="feed-time"><i class="bi bi-clock me-1"></i>Ayer 11:40</div>
+                                </div>
+                            </li>
+                            <li class="feed-item">
+                                <div class="feed-icon fi-red"><i class="bi bi-exclamation-triangle-fill"></i></div>
+                                <div>
+                                    <div class="feed-title">Alerta de pago crítica generada</div>
+                                    <div class="feed-detail">Liceo Santa María — Vence en 2 días</div>
+                                    <div class="feed-time"><i class="bi bi-clock me-1"></i>Hace 2 días</div>
+                                </div>
+                            </li>
+                        </ul>
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div><!-- /fila 4 -->
+
+        </div><!-- /content-area -->
+    </main>
+</div>
+
+<style>
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50%       { opacity: .5; }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    // ── Mobile sidebar ──────────────────────────────────────────────────────────
+    const mobileBtn = document.getElementById('mobileMenuBtn');
+    const sidebar   = document.getElementById('sidebar');
+    if (mobileBtn && sidebar) mobileBtn.addEventListener('click', () => sidebar.classList.toggle('active'));
+
+    // ── Retention Arc Animation ─────────────────────────────────────────────────
+    const retVal   = parseFloat("{{ tasa_retencion|default:'94.2' }}");
+    const circ     = 2 * Math.PI * 19;          // r = 19
+    const offset   = circ - (retVal / 100) * circ;
+    const arc      = document.getElementById('retArc');
+    if (arc) {
+        arc.setAttribute('stroke-dasharray', circ.toFixed(1));
+        arc.style.strokeDashoffset = offset.toFixed(1);
+        if (retVal < 80)      arc.style.stroke = '#EF4444';
+        else if (retVal < 90) arc.style.stroke = '#F59E0B';
+    }
+
+    // ── Revenue Line Chart ──────────────────────────────────────────────────────
+    const revCtx = document.getElementById('revenueChart').getContext('2d');
+    const grad   = revCtx.createLinearGradient(0, 0, 0, 260);
+    grad.addColorStop(0, 'rgba(124,92,252,0.20)');
+    grad.addColorStop(1, 'rgba(124,92,252,0.0)');
+
+    new Chart(revCtx, {
+        type: 'line',
+        data: {
+            labels: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'],
+            datasets: [{
+                label: 'Ingresos (MM CLP)',
+                data:  [2, 4, 5, 8, 9, 11, 12.5, 14, 16, 19, 22, 25],
+                borderColor: '#7C5CFC',
+                backgroundColor: grad,
+                borderWidth: 2.5,
+                fill: true,
+                pointBackgroundColor: '#fff',
+                pointBorderColor: '#7C5CFC',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 7,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 800, easing: 'easeInOutQuart' },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#151A35', padding: 11,
+                    titleFont: { family: 'Plus Jakarta Sans', size: 12 },
+                    bodyFont:  { family: 'Plus Jakarta Sans', size: 13, weight: 'bold' },
+                    displayColors: false,
+                    callbacks: { label: ctx => '$' + ctx.parsed.y + 'M CLP' }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(188,192,207,0.18)', drawBorder: false },
+                    ticks: { font: { family: 'Plus Jakarta Sans', size: 10 }, color: '#687089', callback: v => '$' + v + 'M' }
+                },
+                x: {
+                    grid: { display: false, drawBorder: false },
+                    ticks: { font: { family: 'Plus Jakarta Sans', size: 10 }, color: '#687089' }
+                }
             }
+        }
+    });
 
-            // Chart.js
-            const ctx = document.getElementById('revenueChart').getContext('2d');
-            const data = {
-                labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-                datasets: [{
-                    label: 'Ingresos (MM CLP)',
-                    data: [2, 4, 5, 8, 9, 11, 12.5, 14, 16, 19, 22, 25],
-                    borderColor: '#7C5CFC',
-                    backgroundColor: 'rgba(124, 92, 252, 0.08)',
-                    borderWidth: 3,
-                    fill: true,
-                    pointBackgroundColor: '#FFFFFF',
-                    pointBorderColor: '#7C5CFC',
-                    pointBorderWidth: 2,
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                    tension: 0.35
-                }]
-            };
+    // ── Planes Doughnut Chart ───────────────────────────────────────────────────
+    const planesRaw  = JSON.parse('{{ distribucion_planes_json|escapejs }}');
+    const COLORS     = ['#7C5CFC','#65CDBF','#F59E0B','#EF4444','#10B981','#6366F1','#EC4899'];
+    const hasData    = planesRaw.data.some(v => v > 0);
+    const totalColeg = planesRaw.data.reduce((a, b) => a + b, 0);
 
-            const config = {
-                type: 'line',
-                data: data,
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: '#151A35',
-                            padding: 10,
-                            titleFont: { family: 'Plus Jakarta Sans', size: 12 },
-                            bodyFont: { family: 'Plus Jakarta Sans', size: 13, weight: 'bold' },
-                            displayColors: false,
-                            callbacks: {
-                                label: function (context) {
-                                    return '$' + context.parsed.y + 'M CLP';
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 25,
-                            grid: { color: 'rgba(188, 192, 207, 0.2)', drawBorder: false },
-                            ticks: {
-                                font: { family: 'Plus Jakarta Sans', size: 10 },
-                                color: '#687089',
-                                callback: function (value) { return value + 'M'; }
-                            }
-                        },
-                        x: {
-                            grid: { display: false, drawBorder: false },
-                            ticks: { font: { family: 'Plus Jakarta Sans', size: 10 }, color: '#687089' }
-                        }
+    // Centro label
+    const donutTotal = document.getElementById('donutTotal');
+    if (donutTotal) donutTotal.textContent = hasData ? totalColeg : '—';
+
+    const planesCtx = document.getElementById('planesChart').getContext('2d');
+    new Chart(planesCtx, {
+        type: 'doughnut',
+        data: {
+            labels: planesRaw.labels,
+            datasets: [{
+                data: hasData ? planesRaw.data : [1, 1, 1],
+                backgroundColor: COLORS,
+                borderWidth: 3,
+                borderColor: '#fff',
+                hoverOffset: 8,
+                hoverBorderWidth: 3,
+                hoverBorderColor: '#ffffff'
+            }]
+        },
+        options: {
+            responsive: false,
+            cutout: '68%',
+            animation: { animateRotate: true, duration: 1000 },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#151A35', padding: 10,
+                    callbacks: {
+                        label: ctx => hasData
+                            ? ` ${ctx.label}: ${ctx.parsed} colegios`
+                            : ` ${ctx.label}: Sin datos`
                     }
                 }
-            };
+            }
+        }
+    });
 
-            new Chart(ctx, config);
+    // Leyenda personalizada
+    const leyenda = document.getElementById('planesLeyenda');
+    if (leyenda) {
+        planesRaw.labels.forEach((lbl, i) => {
+            const cnt = planesRaw.data[i];
+            const pct = totalColeg > 0 ? Math.round((cnt / totalColeg) * 100) : 0;
+            leyenda.innerHTML += `
+                <div class="leg-row">
+                    <div class="leg-dot" style="background:${COLORS[i]};"></div>
+                    <span class="leg-name">${lbl}</span>
+                    <span class="leg-count">${hasData ? cnt + ' col.' : '—'}</span>
+                    <span class="leg-pct">${pct}%</span>
+                </div>`;
         });
-    </script>
-</body>
+    }
 
+});
+</script>
+</body>
 </html>

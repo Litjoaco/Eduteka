@@ -247,6 +247,19 @@
                 </div>
             </div>
 
+            <!-- MENSAJES DE ESTADO (SUCCESS / ERROR) -->
+            {% if messages %}
+            <div class="mb-4">
+                {% for message in messages %}
+                <div class="alert alert-{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}danger{% else %}info{% endif %} d-flex align-items-center gap-2 alert-dismissible fade show" role="alert" style="border-radius:var(--radius-md);font-size:.88rem;font-weight:600;">
+                    <i class="bi bi-{% if message.tags == 'success' %}check-circle-fill text-success{% else %}exclamation-triangle-fill text-danger{% endif %}"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
             <!-- LAYOUT EN 2 COLUMNAS (NAVEGACIÓN VERTICAL PESTAÑAS + CONTENIDO) -->
             <div class="row g-4">
 
@@ -308,30 +321,41 @@
                                 </span>
                             </div>
 
-                            <form onsubmit="handleSaveConfig(event, 'Integración SII')">
+                            <form method="POST" action="{% url 'dashboard_superadmin_configuracion' %}" id="form-sii">
+                                {% csrf_token %}
                                 <div class="row g-3">
                                     <div class="col-12 col-md-6">
-                                        <label class="form-label-custom">RUT Emisor de la Empresa</label>
-                                        <input type="text" class="form-control-custom" value="77.123.456-K">
+                                        <label class="form-label-custom" for="sii_rut">RUT Emisor de la Empresa</label>
+                                        <input type="text" id="sii_rut" name="sii_rut" class="form-control-custom"
+                                               placeholder="77.123.456-K"
+                                               value="{{ config.sii_rut|default:'' }}">
                                     </div>
                                     <div class="col-12 col-md-6">
-                                        <label class="form-label-custom">Razón Social Registrada</label>
-                                        <input type="text" class="form-control-custom" value="Eduteka SpA">
+                                        <label class="form-label-custom" for="sii_razon_social">Razón Social Registrada</label>
+                                        <input type="text" id="sii_razon_social" name="sii_razon_social" class="form-control-custom"
+                                               placeholder="Eduteka SpA"
+                                               value="{{ config.sii_razon_social|default:'' }}">
                                     </div>
                                     <div class="col-12 col-md-6">
-                                        <label class="form-label-custom">Ambiente SII</label>
-                                        <select class="form-control-custom">
-                                            <option selected>Producción (Oficial)</option>
-                                            <option>Certificación / Staging (Testing)</option>
+                                        <label class="form-label-custom" for="sii_ambiente">Ambiente SII</label>
+                                        <select id="sii_ambiente" name="sii_ambiente" class="form-control-custom">
+                                            <option value="produccion" {% if config.sii_ambiente == 'produccion' %}selected{% endif %}>Producción (Oficial)</option>
+                                            <option value="certificacion" {% if config.sii_ambiente == 'certificacion' or not config.sii_ambiente %}selected{% endif %}>Certificación / Staging (Testing)</option>
                                         </select>
                                     </div>
                                     <div class="col-12 col-md-6">
-                                        <label class="form-label-custom">Token API Facturación Electrónica</label>
-                                        <input type="password" class="form-control-custom" value="sii_live_token_9938102938472910">
+                                        <label class="form-label-custom" for="sii_token">Token API Facturación Electrónica</label>
+                                        <input type="password" id="sii_token" name="sii_token" class="form-control-custom"
+                                               placeholder="sii_live_token_..."
+                                               value="{{ config.sii_token|default:'' }}">
                                     </div>
                                 </div>
+                                <!-- Campos MP ocultos para enviar todo en un solo POST -->
+                                <input type="hidden" name="mp_public_key"   value="{{ config.mp_public_key|default:'' }}">
+                                <input type="hidden" name="mp_access_token" value="{{ config.mp_access_token|default:'' }}">
+                                <input type="hidden" name="mp_modo"         value="{{ config.mp_modo|default:'sandbox' }}">
                                 <div class="mt-3 text-end">
-                                    <button type="submit" class="btn-primary-custom">
+                                    <button type="submit" class="btn-primary-custom" id="btn-guardar-sii">
                                         <i class="bi bi-save"></i> Guardar Credenciales SII
                                     </button>
                                 </div>
@@ -353,21 +377,26 @@
                                 </span>
                             </div>
 
-                            <form onsubmit="handleSaveConfig(event, 'Pasarela de Pagos')">
+                            <form method="POST" action="{% url 'dashboard_superadmin_configuracion' %}" id="form-mp">
+                                {% csrf_token %}
                                 <div class="row g-3">
                                     <div class="col-12 col-md-6">
-                                        <label class="form-label-custom">Public Key (MercadoPago / Webpay)</label>
-                                        <input type="text" class="form-control-custom" value="APP_USR-8829102-120419-8a9d1827">
+                                        <label class="form-label-custom" for="mp_public_key">Public Key (MercadoPago / Webpay)</label>
+                                        <input type="text" id="mp_public_key" name="mp_public_key" class="form-control-custom"
+                                               placeholder="APP_USR-..."
+                                               value="{{ config.mp_public_key|default:'' }}">
                                     </div>
                                     <div class="col-12 col-md-6">
-                                        <label class="form-label-custom">Access Token (Secret Key)</label>
-                                        <input type="password" class="form-control-custom" value="APP_USR-771829384756-029381">
+                                        <label class="form-label-custom" for="mp_access_token">Access Token (Secret Key)</label>
+                                        <input type="password" id="mp_access_token" name="mp_access_token" class="form-control-custom"
+                                               placeholder="APP_USR-..."
+                                               value="{{ config.mp_access_token|default:'' }}">
                                     </div>
                                     <div class="col-12 col-md-6">
-                                        <label class="form-label-custom">Modo de Procesamiento</label>
-                                        <select class="form-control-custom">
-                                            <option selected>Live / Producción</option>
-                                            <option>Sandbox / Pruebas</option>
+                                        <label class="form-label-custom" for="mp_modo">Modo de Procesamiento</label>
+                                        <select id="mp_modo" name="mp_modo" class="form-control-custom">
+                                            <option value="live"    {% if config.mp_modo == 'live'    %}selected{% endif %}>Live / Producción</option>
+                                            <option value="sandbox" {% if config.mp_modo == 'sandbox' or not config.mp_modo %}selected{% endif %}>Sandbox / Pruebas</option>
                                         </select>
                                     </div>
                                     <div class="col-12 col-md-6">
@@ -375,8 +404,13 @@
                                         <input type="text" class="form-control-custom" readonly value="https://eduteka.cl/api/payments/webhook/">
                                     </div>
                                 </div>
+                                <!-- Campos SII ocultos para enviar todo en un solo POST -->
+                                <input type="hidden" name="sii_rut"          value="{{ config.sii_rut|default:'' }}">
+                                <input type="hidden" name="sii_razon_social" value="{{ config.sii_razon_social|default:'' }}">
+                                <input type="hidden" name="sii_ambiente"     value="{{ config.sii_ambiente|default:'certificacion' }}">
+                                <input type="hidden" name="sii_token"        value="{{ config.sii_token|default:'' }}">
                                 <div class="mt-3 text-end">
-                                    <button type="submit" class="btn-primary-custom">
+                                    <button type="submit" class="btn-primary-custom" id="btn-guardar-mp">
                                         <i class="bi bi-save"></i> Guardar Pasarela de Pagos
                                     </button>
                                 </div>

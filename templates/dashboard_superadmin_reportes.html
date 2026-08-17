@@ -1,0 +1,618 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Reportes Avanzados - Super Admin Eduteka</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <!-- Fuentes e Iconos -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Tailwind CSS (CDN con utilidades SaaS) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f4f0ff',
+                            100: '#e9e0ff',
+                            500: '#7C5CFC',
+                            600: '#6747E3',
+                            700: '#5234c1',
+                        },
+                        emeraldbrand: '#10B981',
+                        darkbg: '#151A35',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* ══ DESIGN TOKENS (Estilo Unificado SaaS Eduteka) ══════════════════ */
+        :root {
+            --primary:        #7C5CFC;
+            --primary-soft:   rgba(124, 92, 252, 0.08);
+            --primary-hover:  #6747E3;
+            --secondary:      #65CDBF;
+            --secondary-soft: rgba(101, 205, 191, 0.08);
+            --bg:             #F8F9FD;
+            --white:          #FFFFFF;
+            --dark:           #151A35;
+            --gray-text:      #687089;
+            --border:         #BCC0CF;
+            --radius-lg:      16px;
+            --radius-md:      10px;
+            --radius-sm:      8px;
+        }
+
+        * { font-family: 'Plus Jakarta Sans', sans-serif; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+            margin: 0;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -15%; left: 65%;
+            width: 50vw; height: 50vw;
+            background: radial-gradient(circle, rgba(124, 92, 252, 0.07) 0%, rgba(255,255,255,0) 70%);
+            z-index: -2; pointer-events: none;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            top: 45%; left: -15%;
+            width: 40vw; height: 40vw;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.06) 0%, rgba(255,255,255,0) 70%);
+            z-index: -2; pointer-events: none;
+        }
+
+        .wrapper { display: flex; width: 100%; align-items: stretch; }
+
+        /* ── TOPBAR */
+        .topbar {
+            height: 70px;
+            background: rgba(255, 255, 255, 0.85) !important;
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 2rem;
+            position: sticky; top: 0; z-index: 98;
+        }
+        .search-bar { position: relative; width: 340px; }
+        .search-bar i { position: absolute; left: .85rem; top: 50%; transform: translateY(-50%); color: var(--gray-text); }
+        .search-bar input {
+            width: 100%; padding: .5rem 1rem .5rem 2.4rem;
+            border: 1px solid var(--border); border-radius: var(--radius-md);
+            background: var(--bg); font-size: .85rem; outline: none; transition: all .2s;
+        }
+        .search-bar input:focus { border-color: var(--primary); background: var(--white); box-shadow: 0 0 0 3px rgba(124,92,252,.12); }
+
+        .topbar-right { display: flex; align-items: center; gap: 1.25rem; }
+        .user-profile {
+            display: flex; align-items: center; gap: .75rem;
+            background: var(--white); padding: .35rem .85rem .35rem .4rem;
+            border-radius: 30px; border: 1px solid var(--border);
+        }
+        .user-avatar {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+            color: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: .85rem;
+        }
+        .user-name { font-weight: 600; font-size: .88rem; color: var(--dark); }
+
+        /* ── CONTENT AREA */
+        .content-area { padding: 1.75rem 2rem; max-width: 1450px; width: 100%; margin: 0 auto; }
+
+        /* ── HERO */
+        .hero-title { font-size: 1.5rem; font-weight: 800; color: var(--dark); letter-spacing: -.02em; }
+        .hero-subtitle { font-size: .88rem; color: var(--gray-text); margin-top: .2rem; }
+
+        /* ── BUTTONS */
+        .btn-primary-custom {
+            background: var(--primary); color: white; border: none;
+            border-radius: var(--radius-md); padding: .65rem 1.4rem;
+            font-weight: 700; font-size: .9rem; display: inline-flex;
+            align-items: center; justify-content: center; gap: .6rem; transition: all .2s; text-decoration: none;
+            box-shadow: 0 4px 14px rgba(124, 92, 252, 0.28);
+            cursor: pointer;
+        }
+        .btn-primary-custom:hover { background: var(--primary-hover); color: white; transform: translateY(-1px); }
+
+        .btn-excel-custom {
+            background: #10B981; color: white; border: none;
+            border-radius: var(--radius-md); padding: .75rem 1.75rem;
+            font-weight: 700; font-size: .95rem; display: inline-flex;
+            align-items: center; justify-content: center; gap: .65rem; transition: all .2s; text-decoration: none;
+            box-shadow: 0 6px 18px rgba(16, 185, 129, 0.3);
+            cursor: pointer;
+        }
+        .btn-excel-custom:hover { background: #059669; color: white; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4); }
+
+        .btn-outline-custom {
+            background: var(--white); color: var(--dark);
+            border: 1px solid var(--border); border-radius: var(--radius-md);
+            padding: .6rem 1.1rem; font-weight: 600; font-size: .85rem;
+            display: inline-flex; align-items: center; gap: .5rem;
+            transition: all .2s; text-decoration: none; cursor: pointer;
+        }
+        .btn-outline-custom:hover { background: var(--bg); border-color: var(--primary); color: var(--primary); }
+
+        /* ── PANEL CONTAINER */
+        .panel {
+            background: var(--white); border-radius: var(--radius-lg);
+            border: 1px solid var(--border); overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,0,0,.02);
+            height: 100%;
+        }
+        .panel-header {
+            padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: .75rem; background: var(--white);
+        }
+        .panel-title { font-size: 1.05rem; font-weight: 800; color: var(--dark); }
+        .panel-subtitle { font-size: .8rem; color: var(--gray-text); margin-top: .15rem; }
+
+        /* ── FORM CONTROLS */
+        .form-control-custom {
+            width: 100%; padding: .65rem .9rem;
+            border: 1px solid var(--border); border-radius: var(--radius-md);
+            background: var(--bg); font-size: .88rem; color: var(--dark);
+            outline: none; transition: all .2s;
+        }
+        .form-control-custom:focus {
+            border-color: var(--primary); background: var(--white);
+            box-shadow: 0 0 0 3px rgba(124,92,252,.12);
+        }
+        .form-label-custom {
+            font-size: .78rem; font-weight: 800; color: var(--dark);
+            text-transform: uppercase; letter-spacing: 0.04em;
+            margin-bottom: .45rem; display: block;
+        }
+
+        /* ── STEP BADGES */
+        .step-badge {
+            width: 26px; height: 26px; border-radius: 50%;
+            background: var(--primary); color: white;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: .8rem; flex-shrink: 0;
+        }
+
+        /* ── TABLE STYLING */
+        .reportes-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+        .reportes-table th {
+            background: #FAFBFF; padding: .85rem 1.1rem;
+            font-size: .72rem; font-weight: 800; text-transform: uppercase;
+            letter-spacing: .06em; color: var(--gray-text);
+            border-bottom: 1px solid var(--border); white-space: nowrap;
+        }
+        .reportes-table td {
+            padding: 1rem 1.1rem; vertical-align: middle;
+            border-bottom: 1px solid rgba(188,192,207,.3); font-size: .85rem;
+        }
+        .reportes-table tbody tr { transition: background .15s; }
+        .reportes-table tbody tr:hover { background: rgba(248,249,253,1); }
+
+        @media (max-width: 991.98px) {
+            .content-area { padding: 1.25rem 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    {% include '_sidebar_superadmin.html' with active_page='reportes' %}
+
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <div class="search-bar">
+                <i class="bi bi-search"></i>
+                <input type="text" placeholder="Buscar reportes, consultas históricas...">
+            </div>
+
+            <div class="topbar-right">
+                <div class="hidden md:flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <i class="fa-solid fa-file-excel text-emerald-600"></i>
+                    Engine openpyxl Habilitado
+                </div>
+
+                <div class="relative cursor-pointer">
+                    <i class="bi bi-bell fs-5 text-slate-600"></i>
+                    <span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white rounded-full text-[10px] flex items-center justify-center font-bold">2</span>
+                </div>
+
+                <div class="user-profile">
+                    <div class="user-avatar">SA</div>
+                    <span class="user-name">Super Admin</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- CONTENT AREA -->
+        <div class="content-area space-y-6">
+
+            <!-- ENCABEZADO / HERO -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 class="hero-title flex items-center gap-2.5">
+                        <span class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-lg">
+                            <i class="fa-solid fa-file-excel"></i>
+                        </span>
+                        Generador de Reportes Avanzados
+                    </h1>
+                    <p class="hero-subtitle">Exportación de datos cruzados del sistema en formato CSV y Excel (.xlsx) procesados dinámicamente.</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button type="button" onclick="window.location.reload();" class="btn-outline-custom">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        <span class="hidden sm:inline">Actualizar</span>
+                    </button>
+                    <a href="#historialReportes" class="btn-outline-custom">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        Ver Historial
+                    </a>
+                </div>
+            </div>
+
+            <!-- PANEL PRINCIPAL (FORMULARIO DE GENERACIÓN) -->
+            <div class="panel p-6 md:p-8">
+                <form id="formReportGenerator" method="GET" action="{% url 'descargar_excel' %}">
+
+                    <!-- PASO 1: TIPO DE REPORTE -->
+                    <div class="mb-8">
+                        <div class="flex items-center gap-3 mb-4 pb-2 border-b border-slate-100">
+                            <span class="step-badge">1</span>
+                            <div>
+                                <h3 class="font-extrabold text-base text-slate-800">Seleccionar Tipo de Reporte</h3>
+                                <p class="text-xs text-slate-500">Elija el conjunto de datos maestro que desea consolidar en el archivo.</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <!-- Opción 1: Facturación Mensual y Proyecciones -->
+                            <label class="relative flex flex-col p-4 rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-brand-500 bg-slate-50 hover:bg-white group">
+                                <input type="radio" name="reportType" value="Facturación Mensual y Proyecciones" class="peer sr-only" checked>
+                                <div class="absolute top-3 right-3 text-brand-500 opacity-0 peer-checked:opacity-100 transition">
+                                    <i class="fa-solid fa-circle-check text-lg"></i>
+                                </div>
+                                <div class="w-10 h-10 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-lg mb-3">
+                                    <i class="fa-solid fa-receipt"></i>
+                                </div>
+                                <span class="font-bold text-sm text-slate-800 group-hover:text-brand-600">Facturación y Proyecciones</span>
+                                <span class="text-xs text-slate-500 mt-1">Ingresos, MRR, pagos pendientes y estado SII.</span>
+                            </label>
+
+                            <!-- Opción 2: Estado de Onboarding de Clientes -->
+                            <label class="relative flex flex-col p-4 rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-brand-500 bg-slate-50 hover:bg-white group">
+                                <input type="radio" name="reportType" value="Estado de Onboarding de Clientes" class="peer sr-only">
+                                <div class="absolute top-3 right-3 text-brand-500 opacity-0 peer-checked:opacity-100 transition">
+                                    <i class="fa-solid fa-circle-check text-lg"></i>
+                                </div>
+                                <div class="w-10 h-10 rounded-lg bg-teal-100 text-teal-600 flex items-center justify-center text-lg mb-3">
+                                    <i class="fa-solid fa-flag"></i>
+                                </div>
+                                <span class="font-bold text-sm text-slate-800 group-hover:text-brand-600">Estado de Onboarding</span>
+                                <span class="text-xs text-slate-500 mt-1">Avance del checklist, etapas completadas y tiempos.</span>
+                            </label>
+
+                            <!-- Opción 3: Uso Académico Global -->
+                            <label class="relative flex flex-col p-4 rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-brand-500 bg-slate-50 hover:bg-white group">
+                                <input type="radio" name="reportType" value="Uso Académico Global" class="peer sr-only">
+                                <div class="absolute top-3 right-3 text-brand-500 opacity-0 peer-checked:opacity-100 transition">
+                                    <i class="fa-solid fa-circle-check text-lg"></i>
+                                </div>
+                                <div class="w-10 h-10 rounded-lg bg-purple-100 text-brand-500 flex items-center justify-center text-lg mb-3">
+                                    <i class="fa-solid fa-graduation-cap"></i>
+                                </div>
+                                <span class="font-bold text-sm text-slate-800 group-hover:text-brand-600">Uso Académico Global</span>
+                                <span class="text-xs text-slate-500 mt-1">Métricas de asistencia, notas creadas y anotaciones.</span>
+                            </label>
+
+                            <!-- Opción 4: Directorio de Usuarios -->
+                            <label class="relative flex flex-col p-4 rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-brand-500 bg-slate-50 hover:bg-white group">
+                                <input type="radio" name="reportType" value="Directorio de Usuarios Globales" class="peer sr-only">
+                                <div class="absolute top-3 right-3 text-brand-500 opacity-0 peer-checked:opacity-100 transition">
+                                    <i class="fa-solid fa-circle-check text-lg"></i>
+                                </div>
+                                <div class="w-10 h-10 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center text-lg mb-3">
+                                    <i class="fa-solid fa-users-gear"></i>
+                                </div>
+                                <span class="font-bold text-sm text-slate-800 group-hover:text-brand-600">Directorio de Usuarios</span>
+                                <span class="text-xs text-slate-500 mt-1">Nombres, emails, roles asignados y último acceso.</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- PASO 2: FILTROS APLICABLES -->
+                    <div class="mb-8">
+                        <div class="flex items-center gap-3 mb-4 pb-2 border-b border-slate-100">
+                            <span class="step-badge">2</span>
+                            <div>
+                                <h3 class="font-extrabold text-base text-slate-800">Filtros y Parámetros de Extracción</h3>
+                                <p class="text-xs text-slate-500">Defina el rango temporal, segmentación geográfica y formato de salida.</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                            <!-- Rango de Fechas (Desde - Hasta) -->
+                            <div class="space-y-3">
+                                <div>
+                                    <label for="dateFrom" class="form-label-custom">Fecha Desde</label>
+                                    <input type="date" id="dateFrom" class="form-control-custom" value="2026-07-01">
+                                </div>
+                                <div>
+                                    <label for="dateTo" class="form-label-custom">Fecha Hasta</label>
+                                    <input type="date" id="dateTo" class="form-control-custom" value="2026-08-16">
+                                </div>
+                            </div>
+
+                            <!-- Filtrar por Plan -->
+                            <div>
+                                <label for="selectPlan" class="form-label-custom">Filtrar por Plan</label>
+                                <select id="selectPlan" class="form-control-custom cursor-pointer">
+                                    <option value="">Todos los Planes</option>
+                                    <option value="Básico">Plan Básico</option>
+                                    <option value="Estándar">Plan Estándar (Pro)</option>
+                                    <option value="Premium">Plan Premium / Enterprise</option>
+                                </select>
+
+                                <div class="mt-4">
+                                    <label for="selectFormat" class="form-label-custom">Formato de Salida</label>
+                                    <select id="selectFormat" class="form-control-custom font-semibold cursor-pointer">
+                                        <option value="xlsx">Excel (.xlsx) - openpyxl</option>
+                                        <option value="csv">CSV (.csv) - Valores separados por coma</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Filtrar por Región -->
+                            <div>
+                                <label for="selectRegion" class="form-label-custom">Filtrar por Región</label>
+                                <select id="selectRegion" class="form-control-custom cursor-pointer">
+                                    <option value="">Todas las Regiones</option>
+                                    <option value="RM">Región Metropolitana</option>
+                                    <option value="Antofagasta">Región de Antofagasta</option>
+                                    <option value="Valparaíso">Región de Valparaíso</option>
+                                    <option value="Biobío">Región del Biobío</option>
+                                    <option value="Los Lagos">Región de Los Lagos</option>
+                                </select>
+                            </div>
+
+                            <!-- Opciones Adicionales de Columnas (Checkboxes) -->
+                            <div>
+                                <label class="form-label-custom">Campos Personalizados</label>
+                                <div class="space-y-2.5 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                                    <label class="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer">
+                                        <input type="checkbox" class="w-4 h-4 rounded text-brand-500 focus:ring-brand-500" checked>
+                                        Incluir datos de contacto del Director
+                                    </label>
+                                    <label class="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer">
+                                        <input type="checkbox" class="w-4 h-4 rounded text-brand-500 focus:ring-brand-500" checked>
+                                        Desglose de IVA y folios SII
+                                    </label>
+                                    <label class="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer">
+                                        <input type="checkbox" class="w-4 h-4 rounded text-brand-500 focus:ring-brand-500" checked>
+                                        Métricas de retención y asistencia
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BOTÓN DE ACCIÓN PRINCIPAL -->
+                    <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div class="text-xs text-slate-500 font-medium flex items-center gap-2">
+                            <i class="fa-solid fa-shield-check text-emerald-600 text-sm"></i>
+                            Los reportes son procesados de manera segura en el servidor backend usando openpyxl.
+                        </div>
+
+                        <a href="{% url 'descargar_excel' %}" class="btn-excel-custom w-full sm:w-auto" id="btnDownloadExcel">
+                            <i class="fa-solid fa-file-excel text-xl"></i>
+                            Generar y Descargar Excel (.xlsx)
+                        </a>
+                    </div>
+
+                </form>
+            </div>
+
+            <!-- SECCIÓN INFERIOR (HISTORIAL DE EXPORTACIONES) -->
+            <div class="panel" id="historialReportes">
+                <div class="panel-header">
+                    <div>
+                        <h2 class="panel-title flex items-center gap-2">
+                            <i class="fa-solid fa-clock-rotate-left text-brand-500"></i>
+                            Últimos Reportes Generados
+                        </h2>
+                        <p class="panel-subtitle">Historial de archivos exportados recientemente disponibles para descarga rápida.</p>
+                    </div>
+                    <span class="text-xs font-bold text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
+                        3 archivos guardados
+                    </span>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="reportes-table">
+                        <thead>
+                            <tr>
+                                <th>Nombre del Reporte</th>
+                                <th>Generado por</th>
+                                <th>Fecha y Hora</th>
+                                <th>Tamaño</th>
+                                <th class="text-end">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+
+                            <!-- FILA 1 -->
+                            <tr>
+                                <td>
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-9 h-9 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-lg flex-shrink-0">
+                                            <i class="fa-solid fa-file-excel"></i>
+                                        </div>
+                                        <div>
+                                            <div class="font-bold text-slate-800">Facturacion_Mensual_Julio_2026.xlsx</div>
+                                            <div class="text-xs text-slate-400">Tipo: Facturación Mensual y Proyecciones</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="font-semibold text-slate-800">Carlos Silva</div>
+                                    <div class="text-xs text-slate-400">Super Admin</div>
+                                </td>
+                                <td class="whitespace-nowrap">
+                                    <div class="font-bold text-slate-700">16/08/2026</div>
+                                    <div class="text-xs text-slate-400 font-mono">18:20 hrs</div>
+                                </td>
+                                <td class="whitespace-nowrap font-mono font-bold text-slate-600">
+                                    2.4 MB
+                                </td>
+                                <td class="text-end whitespace-nowrap">
+                                    <button type="button" onclick="downloadSample('Facturacion_Mensual_Julio_2026.xlsx');" class="btn-outline-custom text-xs py-1.5 px-3">
+                                        <i class="fa-solid fa-download text-emerald-600 me-1"></i> Volver a Descargar
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <!-- FILA 2 -->
+                            <tr>
+                                <td>
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-9 h-9 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-lg flex-shrink-0">
+                                            <i class="fa-solid fa-file-excel"></i>
+                                        </div>
+                                        <div>
+                                            <div class="font-bold text-slate-800">Onboarding_Colegios_Q3_2026.xlsx</div>
+                                            <div class="text-xs text-slate-400">Tipo: Estado de Onboarding de Clientes</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="font-semibold text-slate-800">Carlos Silva</div>
+                                    <div class="text-xs text-slate-400">Super Admin</div>
+                                </td>
+                                <td class="whitespace-nowrap">
+                                    <div class="font-bold text-slate-700">15/08/2026</div>
+                                    <div class="text-xs text-slate-400 font-mono">11:45 hrs</div>
+                                </td>
+                                <td class="whitespace-nowrap font-mono font-bold text-slate-600">
+                                    1.8 MB
+                                </td>
+                                <td class="text-end whitespace-nowrap">
+                                    <button type="button" onclick="downloadSample('Onboarding_Colegios_Q3_2026.xlsx');" class="btn-outline-custom text-xs py-1.5 px-3">
+                                        <i class="fa-solid fa-download text-emerald-600 me-1"></i> Volver a Descargar
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <!-- FILA 3 -->
+                            <tr>
+                                <td>
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-9 h-9 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-lg flex-shrink-0">
+                                            <i class="fa-solid fa-file-excel"></i>
+                                        </div>
+                                        <div>
+                                            <div class="font-bold text-slate-800">Reporte_Uso_Academico_Nacional.xlsx</div>
+                                            <div class="text-xs text-slate-400">Tipo: Uso Académico Global</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="font-semibold text-slate-800">María González</div>
+                                    <div class="text-xs text-slate-400">Auditor Académico</div>
+                                </td>
+                                <td class="whitespace-nowrap">
+                                    <div class="font-bold text-slate-700">12/08/2026</div>
+                                    <div class="text-xs text-slate-400 font-mono">09:30 hrs</div>
+                                </td>
+                                <td class="whitespace-nowrap font-mono font-bold text-slate-600">
+                                    4.1 MB
+                                </td>
+                                <td class="text-end whitespace-nowrap">
+                                    <button type="button" onclick="downloadSample('Reporte_Uso_Academico_Nacional.xlsx');" class="btn-outline-custom text-xs py-1.5 px-3">
+                                        <i class="fa-solid fa-download text-emerald-600 me-1"></i> Volver a Descargar
+                                    </button>
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<script>
+    function generateReport(e) {
+        e.preventDefault();
+        const reportType = document.querySelector('input[name="reportType"]:checked').value;
+        const format = document.getElementById('selectFormat').value.toUpperCase();
+
+        const filename = `${reportType.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.${format.toLowerCase()}`;
+
+        alert(`¡Generando reporte dinámico openpyxl!\n\nArchivo: ${filename}\nFormato: ${format}\n\nEl archivo se descargará automáticamente.`);
+
+        // Append new row to history table visually
+        const tbody = document.getElementById('historyTableBody');
+        const newRowHtml = `
+            <tr class="bg-emerald-50/50">
+                <td>
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-lg flex-shrink-0">
+                            <i class="fa-solid fa-file-excel"></i>
+                        </div>
+                        <div>
+                            <div class="font-bold text-slate-800">${filename}</div>
+                            <div class="text-xs text-slate-400">Tipo: ${reportType}</div>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="font-semibold text-slate-800">Carlos Silva</div>
+                    <div class="text-xs text-slate-400">Super Admin</div>
+                </td>
+                <td class="whitespace-nowrap">
+                    <div class="font-bold text-slate-700">Hoy</div>
+                    <div class="text-xs text-slate-400 font-mono">Ahora mismo</div>
+                </td>
+                <td class="whitespace-nowrap font-mono font-bold text-emerald-700">
+                    3.2 MB
+                </td>
+                <td class="text-end whitespace-nowrap">
+                    <button type="button" onclick="downloadSample('${filename}');" class="btn-outline-custom text-xs py-1.5 px-3">
+                        <i class="fa-solid fa-download text-emerald-600 me-1"></i> Volver a Descargar
+                    </button>
+                </td>
+            </tr>
+        `;
+        tbody.insertAdjacentHTML('afterbegin', newRowHtml);
+    }
+
+    function downloadSample(filename) {
+        alert(`Iniciando descarga del archivo de reporte: ${filename}`);
+    }
+</script>
+
+</body>
+</html>

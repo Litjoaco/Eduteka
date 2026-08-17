@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitor de Onboarding - Super Admin Eduteka</title>
+    <title>Seguimiento de Implementación - Super Admin Eduteka</title>
 
     <!-- Bootstrap CSS -->
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
@@ -261,7 +261,7 @@
                 </button>
                 <div class="search-bar">
                     <i class="bi bi-search"></i>
-                    <input type="text" id="globalSearch" placeholder="Buscar colegio en onboarding...">
+                    <input type="text" id="globalSearch" placeholder="Buscar colegio en implementación...">
                 </div>
             </div>
             <div class="topbar-right">
@@ -285,7 +285,7 @@
                         <div style="width:34px;height:34px;background:var(--primary-soft);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;">
                             <i class="bi bi-flag-fill" style="color:var(--primary);font-size:1rem;"></i>
                         </div>
-                        <h1 class="hero-title mb-0">Monitor de Onboarding de Colegios</h1>
+                        <h1 class="hero-title mb-0">Implementación de Colegios</h1>
                     </div>
                     <p class="hero-subtitle ms-1">
                         Supervisión del embudo de configuración y adopción de nuevos clientes.
@@ -308,7 +308,7 @@
                         <div class="stat-icon purple"><i class="bi bi-clock-history"></i></div>
                         <div>
                             <div class="stat-value">{{ colegios_en_onboarding }}</div>
-                            <div class="stat-label">Colegios en Onboarding</div>
+                            <div class="stat-label">Colegios en Implementación</div>
                         </div>
                     </div>
                 </div>
@@ -344,7 +344,7 @@
             <!-- FUNNEL OVERVIEW WIDGET -->
             <div class="mb-4">
                 <div style="font-size:.82rem;font-weight:700;color:var(--gray-text);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.6rem;">
-                    <i class="bi bi-funnel-fill me-1" style="color:var(--primary);"></i> Distribución en Embudo de Onboarding
+                    <i class="bi bi-funnel-fill me-1" style="color:var(--primary);"></i> Distribución en Embudo de Implementación
                 </div>
                 <div class="d-flex gap-2 flex-wrap">
                     <div class="funnel-card">
@@ -441,59 +441,107 @@
                         </thead>
                         <tbody id="onboardingBody">
 
-                            {% for c in colegios %}
-                            {% if c.alerta == 'Crítico' %}
-                            <tr data-paso="{% if c.completado %}Completado{% else %}Paso {{ c.paso_actual }}{% endif %}" data-alerta="{{ c.alerta }}" style="background:rgba(239,68,68,.025);">
-                            {% elif c.alerta == 'Atascado' %}
-                            <tr data-paso="Paso {{ c.paso_actual }}" data-alerta="{{ c.alerta }}" style="background:rgba(245,158,11,.02);">
-                            {% else %}
-                            <tr data-paso="{% if c.completado %}Completado{% else %}Paso {{ c.paso_actual }}{% endif %}" data-alerta="{{ c.alerta }}">
-                            {% endif %}
+                            {% for estado in estados_onboarding %}
+                            {% with pct=estado.porcentaje_completado %}
+                            <tr data-paso="{{ pct }}%" data-alerta="{% if estado.is_atascado %}Atascado{% elif pct == 100 %}Completado{% else %}Normal{% endif %}" {% if estado.is_atascado %}style="background:rgba(245,158,11,.02);"{% endif %}>
                                 <td>
-                                    <div style="font-size:.88rem;font-weight:700;color:var(--dark);">{{ c.nombre }}</div>
-                                    <div style="font-size:.74rem;color:var(--gray-text);">{{ c.region }}</div>
+                                    <div style="font-size:.88rem;font-weight:700;color:var(--dark);">{{ estado.colegio.nombre }}</div>
+                                    <div style="font-size:.74rem;color:var(--gray-text);">{{ estado.colegio.ciudad_comuna|default:"Sin ciudad" }}</div>
                                 </td>
                                 <td>
                                     <div class="progress-container">
                                         <div class="progress-track">
-                                            <div class="progress-fill {{ c.fill_class }}" style="width: {{ c.progreso }}%;"></div>
+                                            <div class="progress-fill {{ estado.fill_class }}" style="width: {{ pct }}%;"></div>
                                         </div>
                                         <div class="progress-meta">
-                                            {% if c.completado %}
-                                            <span class="step-tag" style="color:#059669;">{{ c.paso_label }}</span>
+                                            {% if pct == 100 %}
+                                            <span class="step-tag" style="color:#059669;">✔ Implementación Completa</span>
                                             <span class="pct-tag" style="color:#059669;">100%</span>
                                             {% else %}
-                                            <span class="step-tag">{{ c.paso_label }}</span>
-                                            <span class="pct-tag">{{ c.progreso }}%</span>
+                                            <span class="step-tag">En progreso</span>
+                                            <span class="pct-tag">{{ pct }}%</span>
                                             {% endif %}
                                         </div>
                                     </div>
+                                    <!-- Tareas Checklist -->
+                                    <div class="mt-2 d-flex flex-wrap gap-2">
+                                        
+                                        <!-- Tarea 1: Configuración Inicial -->
+                                        {% if estado.configuracion_inicial %}
+                                            <span class="badge bg-success" style="font-size:0.7rem;"><i class="bi bi-check2-circle"></i> Datos Base</span>
+                                        {% else %}
+                                            <form method="POST" action="{% url 'dashboard_superadmin_onboarding' %}" style="display:inline;">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="onboarding_id" value="{{ estado.id }}">
+                                                <input type="hidden" name="tarea" value="configuracion_inicial">
+                                                <button type="submit" class="btn btn-sm btn-outline-secondary" style="font-size:0.7rem; padding:0.1rem 0.3rem;" title="Marcar como completado">
+                                                    <i class="bi bi-circle"></i> Datos Base
+                                                </button>
+                                            </form>
+                                        {% endif %}
+
+                                        <!-- Tarea 2: Carga de Alumnos -->
+                                        {% if estado.carga_alumnos %}
+                                            <span class="badge bg-success" style="font-size:0.7rem;"><i class="bi bi-check2-circle"></i> Alumnos</span>
+                                        {% else %}
+                                            <form method="POST" action="{% url 'dashboard_superadmin_onboarding' %}" style="display:inline;">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="onboarding_id" value="{{ estado.id }}">
+                                                <input type="hidden" name="tarea" value="carga_alumnos">
+                                                <button type="submit" class="btn btn-sm btn-outline-secondary" style="font-size:0.7rem; padding:0.1rem 0.3rem;" title="Marcar como completado">
+                                                    <i class="bi bi-circle"></i> Alumnos
+                                                </button>
+                                            </form>
+                                        {% endif %}
+
+                                        <!-- Tarea 3: Capacitación -->
+                                        {% if estado.capacitacion_docentes %}
+                                            <span class="badge bg-success" style="font-size:0.7rem;"><i class="bi bi-check2-circle"></i> Docentes</span>
+                                        {% else %}
+                                            <form method="POST" action="{% url 'dashboard_superadmin_onboarding' %}" style="display:inline;">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="onboarding_id" value="{{ estado.id }}">
+                                                <input type="hidden" name="tarea" value="capacitacion_docentes">
+                                                <button type="submit" class="btn btn-sm btn-outline-secondary" style="font-size:0.7rem; padding:0.1rem 0.3rem;" title="Marcar como completado">
+                                                    <i class="bi bi-circle"></i> Docentes
+                                                </button>
+                                            </form>
+                                        {% endif %}
+
+                                        <!-- Tarea 4: Lanzamiento -->
+                                        {% if estado.lanzamiento_oficial %}
+                                            <span class="badge bg-success" style="font-size:0.7rem;"><i class="bi bi-check2-circle"></i> Lanzamiento</span>
+                                        {% else %}
+                                            <form method="POST" action="{% url 'dashboard_superadmin_onboarding' %}" style="display:inline;">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="onboarding_id" value="{{ estado.id }}">
+                                                <input type="hidden" name="tarea" value="lanzamiento_oficial">
+                                                <button type="submit" class="btn btn-sm btn-outline-secondary" style="font-size:0.7rem; padding:0.1rem 0.3rem;" title="Marcar como completado">
+                                                    <i class="bi bi-circle"></i> Lanzamiento
+                                                </button>
+                                            </form>
+                                        {% endif %}
+
+                                    </div>
                                 </td>
                                 <td>
-                                    {% if c.completado %}
+                                    {% if pct == 100 %}
                                     <div style="font-size:.84rem;font-weight:700;color:#059669;">Completado</div>
-                                    <div style="font-size:.72rem;color:var(--gray-text);">Configuración finalizada</div>
-                                    {% elif c.alerta == 'Crítico' %}
-                                    <div style="font-size:.84rem;font-weight:700;color:#DC2626;">{{ c.dias_en_paso }} día{{ c.dias_en_paso|pluralize }}</div>
-                                    <div style="font-size:.72rem;color:#DC2626;font-weight:600;">Sin actividad > 7 días</div>
-                                    {% elif c.alerta == 'Atascado' %}
-                                    <div style="font-size:.84rem;font-weight:700;color:#D97706;">{{ c.dias_en_paso }} día{{ c.dias_en_paso|pluralize }}</div>
+                                    {% elif estado.is_atascado %}
+                                    <div style="font-size:.84rem;font-weight:700;color:#D97706;">{{ estado.dias_ultima_actividad }} día{{ estado.dias_ultima_actividad|pluralize }}</div>
                                     <div style="font-size:.72rem;color:var(--gray-text);">Sin avance reciente</div>
                                     {% else %}
-                                    <div style="font-size:.84rem;font-weight:700;color:var(--dark);">{{ c.dias_en_paso }} día{{ c.dias_en_paso|pluralize }}</div>
-                                    <div style="font-size:.72rem;color:var(--gray-text);">Inicio: {{ c.obj.fecha_actualizacion|date:'d M Y' }}</div>
+                                    <div style="font-size:.84rem;font-weight:700;color:var(--dark);">{{ estado.dias_ultima_actividad }} día{{ estado.dias_ultima_actividad|pluralize }}</div>
                                     {% endif %}
                                 </td>
                                 <td>
-                                    <div style="font-size:.84rem;font-weight:600;color:var(--dark);">{{ c.contacto_nombre }}</div>
-                                    <div style="font-size:.74rem;color:var(--gray-text);">{{ c.contacto_email }}</div>
+                                    <div style="font-size:.84rem;font-weight:600;color:var(--dark);">{{ estado.colegio.nombre_administrador|default:"—" }}</div>
+                                    <div style="font-size:.74rem;color:var(--gray-text);">{{ estado.colegio.correo_institucional|default:"—" }}</div>
                                 </td>
                                 <td>
-                                    {% if c.completado %}
+                                    {% if pct == 100 %}
                                     <span class="status-badge status-completado"><i class="bi bi-check-circle-fill" style="font-size:.45rem;"></i> Completado</span>
-                                    {% elif c.alerta == 'Crítico' %}
-                                    <span class="status-badge status-critico"><i class="bi bi-x-circle-fill" style="font-size:.45rem;"></i> Crítico</span>
-                                    {% elif c.alerta == 'Atascado' %}
+                                    {% elif estado.is_atascado %}
                                     <span class="status-badge status-atascado"><i class="bi bi-exclamation-triangle-fill" style="font-size:.45rem;"></i> Atascado</span>
                                     {% else %}
                                     <span class="status-badge status-normal"><i class="bi bi-circle-fill" style="font-size:.45rem;"></i> Normal</span>
@@ -501,21 +549,22 @@
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center justify-content-center gap-1">
-                                        <button class="action-btn view" title="Ver detalle de paso" onclick="openStepDetail('{{ c.nombre|escapejs }}', {{ c.paso_actual }})"><i class="bi bi-eye"></i></button>
-                                        {% if not c.completado %}
-                                        <button class="action-btn mail" title="Enviar ayuda" onclick="openContactModal('{{ c.contacto_nombre|escapejs }}', '{{ c.contacto_email|escapejs }}')"><i class="bi bi-envelope"></i></button>
-                                        {% if c.alerta == 'Atascado' or c.alerta == 'Crítico' %}
-                                        <button class="action-btn help" title="Asistir setup" onclick="assistSetup('{{ c.nombre|escapejs }}')"><i class="bi bi-headset"></i></button>
+                                        <button class="action-btn view" title="Ver detalle"><i class="bi bi-eye"></i></button>
+                                        {% if pct < 100 %}
+                                        <button class="action-btn mail" title="Enviar ayuda"><i class="bi bi-envelope"></i></button>
+                                        {% if estado.is_atascado %}
+                                        <button class="action-btn help" title="Asistir setup"><i class="bi bi-headset"></i></button>
                                         {% endif %}
                                         {% endif %}
                                     </div>
                                 </td>
                             </tr>
+                            {% endwith %}
                             {% empty %}
                             <tr>
                                 <td colspan="6" style="text-align:center;padding:2.5rem;color:var(--gray-text);font-size:.9rem;">
                                     <i class="bi bi-inbox" style="font-size:2rem;display:block;margin-bottom:.5rem;"></i>
-                                    No hay colegios registrados en el sistema aún.
+                                    No hay colegios en proceso de implementación.
                                 </td>
                             </tr>
                             {% endfor %}

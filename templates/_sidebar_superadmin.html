@@ -2,7 +2,7 @@
 {% comment %}
   Sidebar unificado Super Admin Eduteka (248px - Estilo Unificado SaaS).
   Uso: {% include '_sidebar_superadmin.html' with active_page='dashboard' %}
-  active_page opciones: dashboard | colegios | planes | facturacion | ordenes | modulos | estadisticas | configuracion | usuarios | roles | onboarding | solicitudes_global
+  active_page opciones: dashboard | colegios | planes | facturacion | ordenes | modulos | estadisticas | configuracion | usuarios | roles | onboarding | solicitudes_global | comunicados | auditoria | academico | reportes
 {% endcomment %}
 
 <style>
@@ -124,7 +124,7 @@
       <i class="bi bi-grid-1x2"></i> Resumen Global
     </a>
 
-    <div class="nav-section-label" style="margin-top:.4rem;">Gestión Saas</div>
+    <div class="nav-section-label" style="margin-top:.4rem;">GESTIÓN COMERCIAL</div>
 
     <a href="{% url 'dashboard_superadmin_colegios' %}" class="nav-item {% if active_page == 'colegios' %}active{% endif %}">
       <i class="bi bi-building"></i> Colegios Clientes
@@ -154,10 +154,10 @@
       <i class="bi bi-clipboard-check"></i> Solicitudes de Acceso
     </a>
 
-    <div class="nav-section-label" style="margin-top:.4rem;">Éxito del Cliente (CSM)</div>
+    <div class="nav-section-label" style="margin-top:.4rem;">ATENCIÓN Y SOPORTE</div>
 
     <a href="{% url 'dashboard_superadmin_onboarding' %}" class="nav-item {% if active_page == 'onboarding' %}active{% endif %}">
-      <i class="bi bi-flag"></i> Monitor de Onboarding
+      <i class="bi bi-flag"></i> Implementación
     </a>
 
     <div class="nav-section-label" style="margin-top:.4rem;">Comunicación</div>
@@ -166,8 +166,23 @@
       <i class="bi bi-megaphone"></i> Centro de Comunicados
     </a>
 
+    <div class="nav-section-label" style="margin-top:.4rem;">Seguridad y Auditoría</div>
+
+    <a href="{% url 'dashboard_superadmin_auditoria' %}" class="nav-item {% if active_page == 'auditoria' %}active{% endif %}">
+      <i class="bi bi-shield-lock-fill"></i> Registro de Auditoría
+    </a>
+
+    <div class="nav-section-label" style="margin-top:.4rem;">Gestión Académica Global</div>
+
+    <a href="{% url 'dashboard_superadmin_academico' %}" class="nav-item {% if active_page == 'academico' %}active{% endif %}">
+      <i class="bi bi-mortarboard-fill"></i> Monitor Académico
+    </a>
+
     <div class="nav-section-label" style="margin-top:.4rem;">Analítica y Ajustes</div>
 
+    <a href="{% url 'dashboard_superadmin_reportes' %}" class="nav-item {% if active_page == 'reportes' %}active{% endif %}">
+      <i class="bi bi-file-earmark-excel-fill"></i> Generador de Reportes
+    </a>
     <a href="{% url 'dashboard_superadmin_estadisticas' %}" class="nav-item {% if active_page == 'estadisticas' %}active{% endif %}">
       <i class="bi bi-graph-up-arrow"></i> Estadísticas Globales
     </a>

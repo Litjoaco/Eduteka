@@ -370,31 +370,22 @@
                     <form method="GET" action="" class="d-flex align-items-center gap-2 flex-wrap">
                         <div class="table-search">
                             <i class="bi bi-search"></i>
-                            <input type="text" name="q" value="{{ request.GET.q|default:'' }}" id="tableSearch" placeholder="Buscar solicitante o email..." oninput="filterTable()">
+                            <input type="text" name="q" value="{{ request.GET.q|default:'' }}" id="tableSearch" placeholder="Buscar colegio, email, RUT..." oninput="filterTable()">
                         </div>
-
-                        <!-- Filtro por Colegio (dinámico desde BD) -->
-                        <select name="colegio" id="filterColegio" class="form-control-custom"
-                            style="width:auto;padding:.45rem .85rem;font-size:.82rem;" onchange="this.form.submit()">
-                            <option value="">Filtrar por Colegio</option>
-                            {% for c in colegios_con_solicitudes %}
-                            <option value="{{ c.colegio__nombre }}" {% if request.GET.colegio == c.colegio__nombre %}selected{% endif %}>{{ c.colegio__nombre }}</option>
-                            {% endfor %}
-                        </select>
 
                         <!-- Filtro por Estado -->
                         <select name="estado" id="filterEstado" class="form-control-custom"
                             style="width:auto;padding:.45rem .85rem;font-size:.82rem;" onchange="this.form.submit()">
                             <option value="">Estado</option>
                             <option value="pendiente" {% if request.GET.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
-                            <option value="aprobada" {% if request.GET.estado == 'aprobada' %}selected{% endif %}>Aprobada</option>
+                            <option value="aprobada"  {% if request.GET.estado == 'aprobada'  %}selected{% endif %}>Aprobada</option>
                             <option value="rechazada" {% if request.GET.estado == 'rechazada' %}selected{% endif %}>Rechazada</option>
                         </select>
 
                         <button type="submit" class="btn-outline-custom" style="padding:.45rem .85rem;font-size:.82rem;">
                             <i class="bi bi-funnel"></i> Filtrar
                         </button>
-                        {% if request.GET.q or request.GET.colegio or request.GET.estado %}
+                        {% if request.GET.q or request.GET.estado %}
                         <a href="{% url 'dashboard_superadmin_solicitudes' %}" class="btn-outline-custom" style="padding:.45rem .85rem;font-size:.82rem;color:#DC2626;border-color:#FCA5A5;">
                             <i class="bi bi-x-circle"></i> Limpiar
                         </a>
@@ -406,9 +397,10 @@
                     <table class="solicitudes-table" id="solicitudesTable">
                         <thead>
                             <tr>
-                                <th>Usuario Solicitante</th>
-                                <th>Colegio Destino</th>
-                                <th>Rol Solicitado</th>
+                                <th>Institución Solicitante</th>
+                                <th>RUT Sostenedor</th>
+                                <th>Contacto</th>
+                                <th>Plan Solicitado</th>
                                 <th>Fecha de Petición</th>
                                 <th>Estado</th>
                                 <th style="width:130px;text-align:center;">Acciones</th>
@@ -417,37 +409,47 @@
                         <tbody id="solicitudesBody">
 
                             {% for s in solicitudes %}
-                            {% with nombre_display=s.usuario.get_full_name|default:s.usuario.username iniciales=s.usuario.first_name|slice:':1' %}
-                            {% with iniciales2=iniciales|add:s.usuario.last_name|slice:':1' %}
-                            <tr data-colegio="{{ s.colegio.nombre }}" data-estado="{{ s.get_estado_display }}">
-                                <!-- Usuario -->
+                            <tr data-colegio="{{ s.nombre_colegio }}" data-estado="{{ s.get_estado_display }}">
+                                <!-- Institución -->
                                 <td>
                                     <div class="user-cell">
                                         <div class="user-avatar-circle" style="background:linear-gradient(135deg,#7C5CFC,#5B3FD4);">
-                                            {{ iniciales2|upper|default:s.usuario.username|slice:':2'|upper }}
+                                            {{ s.nombre_colegio|slice:":2"|upper }}
                                         </div>
                                         <div>
-                                            <div class="user-name-text">{{ nombre_display }}</div>
-                                            <div class="user-subtext">{{ s.usuario.email }}</div>
+                                            <div class="user-name-text">{{ s.nombre_colegio }}</div>
+                                            <div class="user-subtext">{{ s.ciudad_comuna|default:"—" }}</div>
                                         </div>
                                     </div>
                                 </td>
 
-                                <!-- Colegio -->
+                                <!-- RUT -->
                                 <td>
-                                    <div style="font-size:.84rem;font-weight:600;color:var(--dark);">{{ s.colegio.nombre }}</div>
-                                    <div style="font-size:.74rem;color:var(--gray-text);">{{ s.colegio.ciudad_comuna|default:s.colegio.region|default:'—' }}</div>
+                                    <div style="font-size:.84rem;font-weight:600;color:var(--dark);">{{ s.rut_sostenedor }}</div>
+                                    <div style="font-size:.74rem;color:var(--gray-text);">{{ s.nombre_administrador|default:"—" }}</div>
                                 </td>
 
-                                <!-- Rol -->
+                                <!-- Contacto -->
                                 <td>
-                                    <span class="role-chip chip-profesor"><span class="dot"></span>{{ s.rol_solicitado|capfirst }}</span>
+                                    <div style="font-size:.84rem;font-weight:600;color:var(--dark);">{{ s.email_contacto }}</div>
+                                    <div style="font-size:.74rem;color:var(--gray-text);">{{ s.telefono|default:"Sin teléfono" }}</div>
+                                </td>
+
+                                <!-- Plan -->
+                                <td>
+                                    {% if s.plan_solicitado %}
+                                    <span class="role-chip chip-profesor">
+                                        <span class="dot"></span>{{ s.plan_solicitado.nombre }}
+                                    </span>
+                                    {% else %}
+                                    <span style="font-size:.8rem;color:var(--gray-text);">—</span>
+                                    {% endif %}
                                 </td>
 
                                 <!-- Fecha -->
                                 <td>
-                                    <div style="font-size:.82rem;color:var(--dark);">{{ s.fecha_solicitud|date:'d M Y, H:i' }}</div>
-                                    <div style="font-size:.72rem;color:var(--gray-text);">{{ s.fecha_solicitud|timesince }} atrás</div>
+                                    <div style="font-size:.82rem;color:var(--dark);">{{ s.created_at|date:"d M Y, H:i" }}</div>
+                                    <div style="font-size:.72rem;color:var(--gray-text);">{{ s.created_at|timesince }} atrás</div>
                                 </td>
 
                                 <!-- Estado Badge -->
@@ -465,26 +467,35 @@
                                 <td>
                                     <div class="d-flex align-items-center justify-content-center gap-1">
                                         {% if s.estado == 'pendiente' %}
-                                        <button class="action-btn approve" title="Aprobar acceso"
-                                            onclick="confirmApprove('{{ nombre_display|escapejs }}', '{{ s.colegio.nombre|escapejs }}', '{{ s.rol_solicitado|capfirst|escapejs }}', {{ s.id }})">
-                                            <i class="bi bi-check-lg"></i>
-                                        </button>
-                                        <button class="action-btn reject" title="Rechazar acceso"
-                                            onclick="confirmReject('{{ nombre_display|escapejs }}', {{ s.id }})">
-                                            <i class="bi bi-x-lg"></i>
-                                        </button>
+                                        <!-- Botón Aprobar -->
+                                        <form method="POST" action="{% url 'dashboard_superadmin_solicitudes' %}" style="display:inline;" onsubmit="return confirm('¿Confirmas aprobar la solicitud de {{ s.nombre_colegio|escapejs }}? Se creará un Colegio automáticamente.');">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="solicitud_id" value="{{ s.id }}">
+                                            <input type="hidden" name="accion" value="aprobar">
+                                            <button type="submit" class="action-btn approve" title="Aprobar y crear colegio">
+                                                <i class="bi bi-check-lg"></i>
+                                            </button>
+                                        </form>
+                                        <!-- Botón Rechazar -->
+                                        <form method="POST" action="{% url 'dashboard_superadmin_solicitudes' %}" style="display:inline;" onsubmit="return confirm('¿Confirmas rechazar la solicitud de {{ s.nombre_colegio|escapejs }}?');">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="solicitud_id" value="{{ s.id }}">
+                                            <input type="hidden" name="accion" value="rechazar">
+                                            <button type="submit" class="action-btn reject" title="Rechazar solicitud">
+                                                <i class="bi bi-x-lg"></i>
+                                            </button>
+                                        </form>
                                         {% endif %}
+                                        <!-- Ver detalle -->
                                         <button class="action-btn view" title="Ver detalle"
-                                            onclick="openDetailModal('{{ nombre_display|escapejs }}', '{{ s.usuario.email|escapejs }}', '{{ s.colegio.nombre|escapejs }}', '{{ s.rol_solicitado|capfirst|escapejs }}', '{{ s.mensaje|default:'Sin mensaje adicional.'|escapejs }}')"
+                                            onclick="openDetailModal('{{ s.nombre_colegio|escapejs }}', '{{ s.email_contacto|escapejs }}', '{{ s.rut_sostenedor|escapejs }}', '{% if s.plan_solicitado %}{{ s.plan_solicitado.nombre|escapejs }}{% else %}Sin plan{% endif %}', '{{ s.notas_admin|default:'Sin notas adicionales.'|escapejs }}')"
                                         ><i class="bi bi-eye"></i></button>
                                     </div>
                                 </td>
                             </tr>
-                            {% endwith %}
-                            {% endwith %}
                             {% empty %}
                             <tr>
-                                <td colspan="6" style="text-align:center;padding:3rem;color:var(--gray-text);font-size:.9rem;">
+                                <td colspan="7" style="text-align:center;padding:3rem;color:var(--gray-text);font-size:.9rem;">
                                     <i class="bi bi-inbox" style="font-size:2.5rem;display:block;margin-bottom:.75rem;opacity:.4;"></i>
                                     No se encontraron solicitudes con los filtros seleccionados.
                                 </td>
