@@ -1,0 +1,200 @@
+/* ==========================================================================
+   EDUTEKA - PANTALLA DE CARGA MINIMALISTA & ELEGANTE (APPLE / LINEAR STYLE)
+   ========================================================================== */
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+:root {
+    --purple-main: #7C5CFA;
+    --purple-dark: #5B38E8;
+    --purple-soft: #FAF8FF;
+    --lilac-border: #E8E2FF;
+    --text-primary: #0F172A;
+    --text-secondary: #64748B;
+    --text-muted: #94A3B8;
+    --border-subtle: #F1F5F9;
+    --bg-surface: #FFFFFF;
+}
+
+body {
+    background-color: #FAFAFD;
+    background-image: 
+        radial-gradient(circle at 50% 30%, rgba(124, 92, 250, 0.08) 0%, transparent 60%),
+        radial-gradient(circle at 50% 80%, rgba(16, 185, 129, 0.05) 0%, transparent 60%);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--text-primary);
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+}
+
+.minimal-loader-wrapper {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Minimalist Logo / Icon Spinner */
+.minimal-icon-frame {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.minimal-icon-center {
+    width: 64px;
+    height: 64px;
+    border-radius: 20px;
+    background: #FFFFFF;
+    border: 1.5px solid var(--lilac-border);
+    box-shadow: 0 10px 30px rgba(124, 92, 250, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--purple-main);
+    font-size: 1.8rem;
+    position: relative;
+    z-index: 2;
+    transition: all 0.5s ease;
+}
+
+.minimal-orbit-ring {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    border-top-color: var(--purple-main);
+    animation: orbitRotate 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    z-index: 1;
+}
+
+@keyframes orbitRotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Titles */
+.minimal-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.65rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem 0;
+    line-height: 1.25;
+}
+
+.minimal-school-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin: 0 0 2.25rem 0;
+}
+
+/* Hairline Progress Bar */
+.hairline-progress-container {
+    width: 100%;
+    max-width: 380px;
+    height: 5px;
+    background: #E2E8F0;
+    border-radius: 100px;
+    overflow: hidden;
+    margin-bottom: 1.25rem;
+    position: relative;
+}
+
+.hairline-progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--purple-main) 0%, #10B981 100%);
+    border-radius: 100px;
+    transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Dynamic Live Status Text */
+.status-text-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 380px;
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    min-height: 24px;
+    margin-bottom: 2rem;
+}
+
+.status-step-label {
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.status-step-label.fade-out {
+    opacity: 0;
+    transform: translateY(-4px);
+}
+
+.status-step-label.fade-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.status-percent-num {
+    font-weight: 800;
+    color: var(--purple-main);
+    font-variant-numeric: tabular-nums;
+}
+
+/* Minimalist Step Indicator Dots */
+.step-dots-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: center;
+}
+
+.step-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #CBD5E1;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.step-dot.active {
+    background: var(--purple-main);
+    width: 22px;
+    border-radius: 10px;
+}
+
+.step-dot.completed {
+    background: #10B981;
+}
+
+/* Fade Out Transition on Complete */
+.app-screen-fadeout {
+    opacity: 0;
+    transform: scale(0.98);
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}

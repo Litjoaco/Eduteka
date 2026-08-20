@@ -1,0 +1,365 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pasar Lista: {{ taller.nombre }} - Eduteka</title>
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #7C5CFC;
+      --primary-soft: rgba(124, 92, 252, 0.08);
+      --primary-hover: #6747E3;
+      --secondary: #65CDBF;
+      --bg: #F8F9FD;
+      --white: #FFFFFF;
+      --dark: #151A35;
+      --gray-text: #687089;
+      --border: #BCC0CF;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+    }
+
+    * { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+    }
+
+    .wrapper { display: flex; flex: 1; position: relative; }
+
+    .topbar {
+      height: 70px;
+      background: rgba(255, 255, 255, 0.85) !important;
+      backdrop-filter: blur(12px) !important;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; position: sticky; top: 0; z-index: 98;
+    }
+    .content-body { padding: 2rem; flex-grow: 1; max-width: 1200px; margin: 0 auto; width: 100%; }
+
+    /* Hero Banner Asistencia */
+    .hero-banner-asist {
+      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+      border-radius: var(--radius-lg);
+      padding: 2rem 2.2rem;
+      color: var(--white);
+      margin-bottom: 2rem;
+      box-shadow: 0 10px 25px rgba(16, 185, 129, 0.25);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-banner-asist::before {
+      content: '';
+      position: absolute;
+      width: 280px; height: 280px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 70%);
+      top: -70px; right: -50px;
+      border-radius: 50%;
+    }
+
+    .hero-badge-pill {
+      background: rgba(255, 255, 255, 0.2);
+      color: #FFFFFF !important;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 20px;
+      padding: 0.35rem 0.85rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      backdrop-filter: blur(8px);
+    }
+
+    .card-panel-sheet {
+      background: var(--white);
+      border: 1px solid #E2E8F0;
+      border-radius: var(--radius-lg);
+      padding: 1.6rem 1.75rem;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.02);
+      margin-bottom: 1.5rem;
+    }
+
+    /* Estado Radio Buttons Buttons */
+    .btn-check:checked + .btn-outline-success {
+      background-color: #10B981 !important;
+      border-color: #10B981 !important;
+      color: #fff !important;
+    }
+    .btn-check:checked + .btn-outline-danger {
+      background-color: #EF4444 !important;
+      border-color: #EF4444 !important;
+      color: #fff !important;
+    }
+    .btn-check:checked + .btn-outline-warning {
+      background-color: #F59E0B !important;
+      border-color: #F59E0B !important;
+      color: #fff !important;
+    }
+    .btn-check:checked + .btn-outline-info {
+      background-color: #3B82F6 !important;
+      border-color: #3B82F6 !important;
+      color: #fff !important;
+    }
+
+    .table-sheet {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+    .table-sheet th {
+      background: #F8FAFC;
+      color: #64748B;
+      font-weight: 800;
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid #E2E8F0;
+    }
+    .table-sheet td {
+      padding: 0.85rem 1rem;
+      vertical-align: middle;
+      border-bottom: 1px solid #F1F5F9;
+    }
+    .table-sheet tr:hover td {
+      background: #F8FAFC;
+    }
+  </style>
+</head>
+<body>
+
+<div class="wrapper">
+  {% include 'colegios/_sidebar.html' with active_page='talleres' %}
+
+  <div class="main-content">
+    <header class="topbar">
+      <div class="d-flex align-items-center gap-3">
+        <a href="{% url 'detalle_taller' taller.id %}" class="btn btn-sm btn-light border" style="border-radius:8px;">
+          <i class="bi bi-arrow-left me-1"></i> Volver al Taller
+        </a>
+        <span class="fw-bold text-dark fs-5"><i class="bi bi-calendar-check text-success me-2"></i>Pasar Lista: {{ taller.nombre }}</span>
+      </div>
+
+      <div class="topbar-right d-flex align-items-center gap-4">
+        <div class="topbar-date d-none d-sm-block text-muted small fw-semibold">
+          <i class="bi bi-calendar3 me-1"></i> {{ hoy|date:"l, d \d\e F \d\e Y"|title }}
+        </div>
+      </div>
+    </header>
+
+    <main class="content-body">
+      
+      <form method="POST" action="{% url 'tomar_asistencia_taller' taller.id %}">
+        {% csrf_token %}
+
+        <!-- HERO BANNER ASISTENCIA -->
+        <div class="hero-banner-asist">
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-4 position-relative" style="z-index:1;">
+            <div>
+              <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                <span class="hero-badge-pill">
+                  <i class="bi bi-star-fill"></i> {{ taller.nombre }}
+                </span>
+                <span class="hero-badge-pill">
+                  <i class="bi bi-people-fill"></i> {{ inscripciones|length }} Alumno(s) Inscritos
+                </span>
+              </div>
+              <h2 class="fw-extrabold text-white mb-1 fs-3">Registro de Asistencia por Sesión</h2>
+              <p class="text-white text-opacity-85 small mb-0">
+                Pasa lista de los integrantes del taller provenientes de todos los cursos.
+              </p>
+            </div>
+
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-light fw-extrabold px-4 py-2.5 shadow" style="border-radius:12px; color:#059669; font-size:0.95rem;">
+                <i class="bi bi-check-circle-fill me-1.5"></i> Guardar Asistencia
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONTROLES DE FECHA Y CONTENIDO -->
+        <div class="card-panel-sheet mb-4">
+          <div class="row g-3 align-items-center">
+            <div class="col-md-4">
+              <label class="form-label fw-bold text-dark small">Fecha de la Sesión</label>
+              <input type="date" name="fecha" class="form-control fw-bold" value="{{ fecha_hoy }}" required style="border-radius:10px;">
+            </div>
+            <div class="col-md-8">
+              <label class="form-label fw-bold text-dark small">Contenido / Actividad Realizada (Opcional)</label>
+              <input type="text" name="contenido_actividad" class="form-control" placeholder="Ej: Práctica de tiros libres y pase largo, Ensayo de acto cívico..." value="{{ sesion_hoy.contenido_actividad|default:'' }}" style="border-radius:10px;">
+            </div>
+          </div>
+        </div>
+
+        <!-- TABLA DE ASISTENCIA -->
+        <div class="card-panel-sheet p-0 overflow-hidden">
+          <div class="d-flex justify-content-between align-items-center p-3 border-bottom bg-light">
+            <div class="fw-bold text-dark">
+              <i class="bi bi-person-lines-fill me-1.5 text-primary"></i> Nómina de Estudiantes
+            </div>
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-sm btn-outline-success fw-bold" style="border-radius:8px;" onclick="marcarTodos('presente')">
+                <i class="bi bi-check-all me-1"></i> Marcar Todos Presentes
+              </button>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table-sheet">
+              <thead>
+                <tr>
+                  <th>Estudiante</th>
+                  <th>Curso de Origen</th>
+                  <th class="text-center" style="width: 340px;">Estado Asistencia</th>
+                  <th>Observación (Opcional)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for insc in inscripciones %}
+                  {% with est=insc.estudiante %}
+                    <tr>
+                      <td>
+                        <div class="d-flex align-items-center gap-2.5">
+                          <img src="https://ui-avatars.com/api/?name={{ est.nombre_completo|urlencode }}&background=E2E8F0&color=475569" style="width:34px; height:34px; border-radius:50%; object-fit:cover;">
+                          <div>
+                            <div class="fw-bold text-dark">{{ est.nombre_completo }}</div>
+                            <span class="text-muted extra-small">RUT: {{ est.rut|default:"-" }}</span>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        {% if est.seccion %}
+                          <span class="badge px-2 py-1 fw-bold" style="background:#F0EDFF; color:#7C5CFC; border-radius:6px; font-size:0.75rem;">
+                            {{ est.seccion.nombre }}
+                          </span>
+                        {% else %}
+                          <span class="text-muted extra-small">Sin curso</span>
+                        {% endif %}
+                      </td>
+                      <td class="text-center">
+                        <div class="d-flex flex-column align-items-center">
+                          <!-- Input final enviado al servidor -->
+                          <input type="hidden" name="estado_{{ est.id }}" id="final_taller_estado_{{ est.id }}" value="{% if est.estado_actual %}{{ est.estado_actual }}{% else %}presente{% endif %}">
+
+                          <div class="btn-group btn-group-sm w-100" role="group">
+                            <input type="radio" class="btn-check radio-asist radio-p" name="main_taller_estado_{{ est.id }}" id="p_{{ est.id }}" value="presente" {% if est.estado_actual == 'presente' or not est.estado_actual %}checked{% endif %} onchange="onCambioEstadoTaller('{{ est.id }}', 'presente')">
+                            <label class="btn btn-outline-success fw-bold" for="p_{{ est.id }}" title="Presente">Presente</label>
+
+                            <input type="radio" class="btn-check radio-asist radio-t" name="main_taller_estado_{{ est.id }}" id="t_{{ est.id }}" value="tarde" {% if est.estado_actual == 'tarde' %}checked{% endif %} onchange="onCambioEstadoTaller('{{ est.id }}', 'tarde')">
+                            <label class="btn btn-outline-warning fw-bold" for="t_{{ est.id }}" title="Atrasado">Tarde</label>
+
+                            <input type="radio" class="btn-check radio-asist radio-a" name="main_taller_estado_{{ est.id }}" id="a_{{ est.id }}" value="ausente" {% if est.estado_actual == 'ausente' or est.estado_actual == 'justificado' %}checked{% endif %} onchange="onCambioEstadoTaller('{{ est.id }}', 'ausente')">
+                            <label class="btn btn-outline-danger fw-bold" for="a_{{ est.id }}" title="Ausente">Ausente</label>
+                          </div>
+
+                          <!-- Sub-opción Justificado solo visible cuando está Ausente -->
+                          <div class="sub-justificado-container mt-1.5 p-1 px-2 rounded-2 border {% if est.estado_actual != 'ausente' and est.estado_actual != 'justificado' %}d-none{% endif %}" id="sub_just_{{ est.id }}" style="background: #EFF6FF; border-color: #BFDBFE !important;">
+                            <div class="form-check form-switch d-flex align-items-center gap-1.5 m-0 p-0">
+                              <input class="form-check-input m-0 cursor-pointer" type="checkbox" role="switch" id="check_just_{{ est.id }}" {% if est.estado_actual == 'justificado' %}checked{% endif %} onchange="onToggleJustificadoTaller('{{ est.id }}')">
+                              <label class="form-check-label extra-small fw-bold text-primary cursor-pointer mb-0" for="check_just_{{ est.id }}">
+                                <i class="bi bi-file-earmark-medical me-1"></i>¿Inasistencia Justificada?
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <input type="text" name="obs_{{ est.id }}" class="form-control form-control-sm" placeholder="Nota..." value="{{ est.obs_actual|default:'' }}" style="border-radius:6px;">
+                      </td>
+                    </tr>
+                  {% endwith %}
+                {% empty %}
+
+                  <tr>
+                    <td colspan="4" class="text-center py-5 text-muted">
+                      No hay alumnos inscritos en este taller para pasar lista.
+                      <div class="mt-2">
+                        <a href="{% url 'detalle_taller' taller.id %}" class="btn btn-sm btn-primary fw-bold">Inscribir Alumnos</a>
+                      </div>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          {% if inscripciones %}
+            <div class="p-3 border-top bg-light d-flex justify-content-end">
+              <button type="submit" class="btn btn-success fw-extrabold px-4 py-2" style="border-radius:10px; background:#10B981; border:none;">
+                <i class="bi bi-check-circle-fill me-1.5"></i> Guardar y Finalizar Asistencia
+              </button>
+            </div>
+          {% endif %}
+        </div>
+
+      </form>
+
+    </main>
+  </div>
+</div>
+
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+<script>
+  function onCambioEstadoTaller(estId, estado) {
+    const subJust = document.getElementById('sub_just_' + estId);
+    const checkJust = document.getElementById('check_just_' + estId);
+    const finalInput = document.getElementById('final_taller_estado_' + estId);
+
+    if (estado === 'ausente') {
+      if (subJust) subJust.classList.remove('d-none');
+      if (checkJust && checkJust.checked) {
+        finalInput.value = 'justificado';
+      } else {
+        finalInput.value = 'ausente';
+      }
+    } else {
+      if (subJust) subJust.classList.add('d-none');
+      if (checkJust) checkJust.checked = false;
+      finalInput.value = estado;
+    }
+  }
+
+  function onToggleJustificadoTaller(estId) {
+    const checkJust = document.getElementById('check_just_' + estId);
+    const finalInput = document.getElementById('final_taller_estado_' + estId);
+    if (checkJust && checkJust.checked) {
+      finalInput.value = 'justificado';
+    } else {
+      finalInput.value = 'ausente';
+    }
+  }
+
+  function marcarTodos(estado) {
+    if (estado === 'presente') {
+      document.querySelectorAll('.radio-p').forEach(r => {
+        r.checked = true;
+        const estId = r.id.replace('p_', '');
+        onCambioEstadoTaller(estId, 'presente');
+      });
+    } else if (estado === 'ausente') {
+      document.querySelectorAll('.radio-a').forEach(r => {
+        r.checked = true;
+        const estId = r.id.replace('a_', '');
+        onCambioEstadoTaller(estId, 'ausente');
+      });
+    }
+  }
+</script>
+
+
+</body>
+</html>

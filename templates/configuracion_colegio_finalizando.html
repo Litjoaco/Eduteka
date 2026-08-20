@@ -1,0 +1,139 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personalizando tu Institución — Eduteka</title>
+    
+    <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/configuracion_colegio_finalizando.css' %}?v=3">
+</head>
+<body>
+
+    <div class="minimal-loader-wrapper" id="mainLoaderContainer">
+        
+        <!-- Icono Minimalista con Órbita Animada -->
+        <div class="minimal-icon-frame">
+            <div class="minimal-orbit-ring" id="orbitRing"></div>
+            <div class="minimal-icon-center" id="iconCenter">
+                <i class="bi bi-building-check" id="mainIcon"></i>
+            </div>
+        </div>
+
+        <h1 class="minimal-title" id="statusTitle">Personalizando tu espacio escolar</h1>
+        <p class="minimal-school-name">{{ colegio.nombre|default:"Tu Establecimiento" }}</p>
+
+        <!-- Barra de Progreso Minimalista -->
+        <div class="hairline-progress-container">
+            <div class="hairline-progress-bar" id="hairlineBar"></div>
+        </div>
+
+        <!-- Línea de Estado Dinámica -->
+        <div class="status-text-row">
+            <span class="status-step-label fade-in" id="statusLabel">
+                <span class="spinner-border spinner-border-sm text-primary" style="width: 12px; height: 12px; border-width: 1.5px;"></span>
+                <span id="labelText">Sincronizando cursos y niveles...</span>
+            </span>
+            <span class="status-percent-num" id="percentNum">0%</span>
+        </div>
+
+        <!-- Puntos Indicadores de Etapa Minimalistas -->
+        <div class="step-dots-row">
+            <div class="step-dot active" id="dot1"></div>
+            <div class="step-dot" id="dot2"></div>
+            <div class="step-dot" id="dot3"></div>
+            <div class="step-dot" id="dot4"></div>
+        </div>
+
+    </div>
+
+    <!-- Script de Animación Fluida -->
+    <script>
+        const targetUrl = "{% url 'dashboard_profesor' %}";
+        const bar = document.getElementById('hairlineBar');
+        const percentNum = document.getElementById('percentNum');
+        const labelText = document.getElementById('labelText');
+        const statusLabel = document.getElementById('statusLabel');
+        const statusTitle = document.getElementById('statusTitle');
+        const mainIcon = document.getElementById('mainIcon');
+        const orbitRing = document.getElementById('orbitRing');
+        const container = document.getElementById('mainLoaderContainer');
+
+        function updateStep(percentage, text, currentDot, completedDots) {
+            bar.style.width = percentage + '%';
+            percentNum.textContent = percentage + '%';
+
+            // Animación suave de cambio de texto
+            statusLabel.classList.add('fade-out');
+            statusLabel.classList.remove('fade-in');
+
+            setTimeout(() => {
+                labelText.textContent = text;
+                statusLabel.classList.remove('fade-out');
+                statusLabel.classList.add('fade-in');
+            }, 180);
+
+            // Actualizar puntos
+            for (let i = 1; i <= 4; i++) {
+                const dot = document.getElementById(`dot${i}`);
+                if (completedDots.includes(i)) {
+                    dot.className = 'step-dot completed';
+                } else if (i === currentDot) {
+                    dot.className = 'step-dot active';
+                } else {
+                    dot.className = 'step-dot';
+                }
+            }
+        }
+
+        // Secuencia de Progreso Fluido
+        setTimeout(() => {
+            updateStep(30, 'Sincronizando cursos y niveles...', 1, []);
+        }, 200);
+
+        setTimeout(() => {
+            updateStep(60, 'Configurando roles y permisos de seguridad...', 2, [1]);
+        }, 1100);
+
+        setTimeout(() => {
+            updateStep(85, 'Habilitando libro de clases y asistencia...', 3, [1, 2]);
+        }, 2000);
+
+        setTimeout(() => {
+            updateStep(100, '¡Todo listo! Iniciando sesión...', 4, [1, 2, 3, 4]);
+            statusTitle.textContent = '¡Bienvenido a Eduteka!';
+            mainIcon.className = 'bi bi-check-lg text-success';
+            orbitRing.style.borderTopColor = '#10B981';
+
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 50,
+                    spread: 60,
+                    origin: { y: 0.65 }
+                });
+            }
+        }, 2900);
+
+        // Transición suave hacia el Dashboard
+        setTimeout(() => {
+            container.classList.add('app-screen-fadeout');
+        }, 3600);
+
+        setTimeout(() => {
+            window.location.href = targetUrl;
+        }, 3900);
+    </script>
+</body>
+</html>

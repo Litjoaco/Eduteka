@@ -1,0 +1,713 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventario & Control de Stock - Eduteka</title>
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #7C5CFC;
+      --primary-soft: rgba(124, 92, 252, 0.08);
+      --primary-hover: #6747E3;
+      --secondary: #65CDBF;
+      --bg: #F8F9FD;
+      --white: #FFFFFF;
+      --dark: #151A35;
+      --gray-text: #687089;
+      --border: #BCC0CF;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+    }
+
+    * { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+    }
+
+    .wrapper { display: flex; flex: 1; position: relative; }
+
+    .topbar {
+      height: 70px;
+      background: rgba(255, 255, 255, 0.85) !important;
+      backdrop-filter: blur(12px) !important;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; position: sticky; top: 0; z-index: 98;
+    }
+    .content-body { padding: 2rem; flex-grow: 1; max-width: 1440px; margin: 0 auto; width: 100%; }
+
+    /* Hero Banner Inventario */
+    .hero-banner-inv {
+      background: linear-gradient(135deg, #7C5CFC 0%, #6344CE 50%, #4F46E5 100%);
+      border-radius: var(--radius-lg);
+      padding: 2rem 2.2rem;
+      color: var(--white);
+      margin-bottom: 2rem;
+      box-shadow: 0 10px 25px rgba(124, 92, 252, 0.22);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-banner-inv::before {
+      content: '';
+      position: absolute;
+      width: 320px; height: 320px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 70%);
+      top: -80px; right: -60px;
+      border-radius: 50%;
+    }
+
+    .hero-badge-pill {
+      background: rgba(255, 255, 255, 0.2);
+      color: #FFFFFF !important;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 20px;
+      padding: 0.35rem 0.85rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      backdrop-filter: blur(8px);
+    }
+
+    .hero-school-pill {
+      background: rgba(0, 0, 0, 0.2);
+      color: #FFFFFF !important;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 20px;
+      padding: 0.35rem 0.85rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      backdrop-filter: blur(8px);
+    }
+
+    /* KPI Cards */
+    .kpi-grid-inv {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+
+
+    .kpi-card-inv {
+      background: var(--white);
+      border: 1px solid #E2E8F0;
+      border-radius: var(--radius-lg);
+      padding: 1.35rem 1.5rem;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.02);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.25s ease;
+    }
+    .kpi-card-inv:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    }
+    .kpi-card-inv::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3.5px;
+      background: var(--acc-color, var(--primary));
+    }
+    .kpi-card-inv.purple { --acc-color: #7C5CFC; }
+    .kpi-card-inv.red { --acc-color: #EF4444; }
+    .kpi-card-inv.amber { --acc-color: #F59E0B; }
+    .kpi-card-inv.green { --acc-color: #10B981; }
+
+    /* Alert Banner */
+    .alert-banner-critical {
+      background: linear-gradient(135deg, #FFF1F2 0%, #FFE4E6 100%);
+      border: 1px solid #FECDD3;
+      border-radius: var(--radius-md);
+      padding: 1.2rem 1.5rem;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    /* Tables */
+    .card-panel-inv {
+      background: var(--white);
+      border: 1px solid #E2E8F0;
+      border-radius: var(--radius-lg);
+      padding: 1.6rem 1.75rem;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.02);
+      margin-bottom: 1.5rem;
+    }
+
+    .table-inv {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+    .table-inv th {
+      background: #F8FAFC;
+      color: #64748B;
+      font-weight: 800;
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid #E2E8F0;
+    }
+    .table-inv td {
+      padding: 0.9rem 1rem;
+      vertical-align: middle;
+      border-bottom: 1px solid #F1F5F9;
+      font-size: 0.88rem;
+    }
+    .table-inv tr:hover td {
+      background: #F8FAFC;
+    }
+
+    .badge-stock-optimo {
+      background: #ECFDF5;
+      color: #059669;
+      border: 1px solid #A7F3D0;
+      font-weight: 800;
+      border-radius: 6px;
+      padding: 0.25rem 0.6rem;
+      font-size: 0.75rem;
+    }
+    .badge-stock-critico {
+      background: #FEF3C7;
+      color: #D97706;
+      border: 1px solid #FDE68A;
+      font-weight: 800;
+      border-radius: 6px;
+      padding: 0.25rem 0.6rem;
+      font-size: 0.75rem;
+    }
+    .badge-stock-agotado {
+      background: #FFF1F2;
+      color: #E11D48;
+      border: 1px solid #FECDD3;
+      font-weight: 800;
+      border-radius: 6px;
+      padding: 0.25rem 0.6rem;
+      font-size: 0.75rem;
+    }
+  </style>
+</head>
+<body>
+
+<div class="wrapper">
+  {% include 'colegios/_sidebar.html' with active_page='inventario' %}
+
+  <div class="main-content">
+    <header class="topbar">
+      <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn" style="border:none; background:var(--primary-soft); color:var(--primary);">
+          <i class="bi bi-list fs-5"></i>
+        </button>
+        <span class="fw-bold text-dark fs-5"><i class="bi bi-box-seam text-primary me-2"></i>Inventario General & Stock</span>
+      </div>
+
+      <div class="topbar-right d-flex align-items-center gap-4">
+        <div class="topbar-date d-none d-sm-block text-muted small fw-semibold">
+          <i class="bi bi-calendar3 me-1"></i> {{ hoy|date:"l, d \d\e F \d\e Y"|title }}
+        </div>
+      </div>
+    </header>
+
+    <main class="content-body">
+      
+      <!-- HERO BANNER -->
+      <div class="hero-banner-inv">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-4 position-relative" style="z-index:1;">
+          <div>
+            <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+              <span class="hero-badge-pill">
+                <i class="bi bi-boxes"></i> Gestión de Insumos & Bodega
+              </span>
+              <span class="hero-school-pill">
+                <i class="bi bi-building"></i> {{ colegio.nombre }}
+              </span>
+            </div>
+            <h2 class="fw-extrabold text-white mb-1 fs-3">Control de Stock & Reposición Directa</h2>
+            <p class="text-white text-opacity-85 small mb-0">
+              Monitoreo de insumos escolares, alertas de bajo stock, pedidos instantáneos por WhatsApp y directorio de proveedores.
+            </p>
+          </div>
+
+          <div class="d-flex gap-2 flex-wrap">
+            <button type="button" class="btn btn-light fw-bold px-3 py-2 shadow-sm" style="border-radius:12px; color:#7C5CFC;" data-bs-toggle="modal" data-bs-target="#modalNuevoItem">
+              <i class="bi bi-plus-lg me-1"></i> Nuevo Artículo
+            </button>
+
+            <a href="{% url 'proveedores_directorio' %}" class="btn btn-outline-light fw-bold px-3 py-2" style="border-radius:12px;">
+              <i class="bi bi-truck me-1"></i> Ver Proveedores
+            </a>
+
+            <a href="{% url 'exportar_inventario_excel' %}" class="btn btn-outline-light fw-bold px-3 py-2" style="border-radius:12px;">
+              <i class="bi bi-file-earmark-excel me-1"></i> Exportar Excel
+            </a>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- 4 KPIS -->
+      <div class="kpi-grid-inv">
+        <div class="kpi-card-inv purple">
+          <span class="text-muted extra-small text-uppercase fw-bold d-block">Catálogo Total</span>
+          <span class="fs-3 fw-extrabold text-dark mt-1 d-block">{{ total_articulos }}</span>
+          <span class="text-muted extra-small mt-1 d-block">Artículos e insumos registrados</span>
+        </div>
+
+        <div class="kpi-card-inv amber">
+          <span class="text-muted extra-small text-uppercase fw-bold d-block">Stock Crítico / Alerta</span>
+          <span class="fs-3 fw-extrabold text-warning mt-1 d-block">{{ total_en_alerta }}</span>
+          <span class="text-muted extra-small mt-1 d-block">Por debajo del umbral mínimo</span>
+        </div>
+
+        <div class="kpi-card-inv red">
+          <span class="text-muted extra-small text-uppercase fw-bold d-block">Artículos Agotados</span>
+          <span class="fs-3 fw-extrabold text-danger mt-1 d-block">{{ total_agotados }}</span>
+          <span class="text-muted extra-small mt-1 d-block">Sin stock en bodega (0 un.)</span>
+        </div>
+
+        <div class="kpi-card-inv green">
+          <span class="text-muted extra-small text-uppercase fw-bold d-block">Valorización Total</span>
+          <span class="fs-3 fw-extrabold text-success mt-1 d-block">${{ valor_total_inv|floatformat:0 }}</span>
+          <span class="text-muted extra-small mt-1 d-block">Valor estimado en inventario</span>
+        </div>
+      </div>
+
+      <!-- ALERTA ACTIVA DE REPOSICION SI HAY ARTICULOS CRITICOS -->
+      {% if total_criticos > 0 %}
+        <div class="alert-banner-critical">
+          <div class="d-flex align-items-center gap-3">
+            <div class="rounded-circle p-2 bg-danger text-white d-flex align-items-center justify-content-center" style="width:40px; height:40px;">
+              <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+            </div>
+            <div>
+              <h6 class="fw-extrabold text-danger mb-0">¡Alerta de Reposición Urgente! Hay {{ total_criticos }} artículo(s) con stock crítico o agotado</h6>
+              <span class="text-danger text-opacity-75 extra-small">Contacta directamente a los proveedores vía WhatsApp o correo electrónico para solicitar reposición inmediata.</span>
+            </div>
+          </div>
+          <a href="{% url 'inventario_dashboard' %}?estado=alerta" class="btn btn-sm btn-danger fw-bold px-3 py-1.5" style="border-radius:8px;">
+            <i class="bi bi-filter me-1"></i> Ver Solo Alertas ({{ total_criticos }})
+          </a>
+        </div>
+      {% endif %}
+
+      <!-- FILTROS -->
+      <div class="card-panel-inv p-3 mb-4">
+        <form method="GET" action="{% url 'inventario_dashboard' %}" class="row g-2 align-items-center">
+          <div class="col-md-3">
+            <input type="text" name="q" class="form-control form-control-sm" placeholder="Buscar artículo, SKU o ubicación..." value="{{ busqueda }}">
+          </div>
+          <div class="col-md-2">
+            <select name="categoria" class="form-select form-select-sm" onchange="this.form.submit();">
+              <option value="">-- Categoría --</option>
+              {% for c in categorias %}
+                <option value="{{ c.id }}" {% if cat_filtro == c.id %}selected{% endif %}>{{ c.nombre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-2">
+            <select name="proveedor" class="form-select form-select-sm" onchange="this.form.submit();">
+              <option value="">-- Proveedor --</option>
+              {% for p in proveedores %}
+                <option value="{{ p.id }}" {% if prov_filtro == p.id %}selected{% endif %}>{{ p.nombre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-2">
+            <select name="estado" class="form-select form-select-sm" onchange="this.form.submit();">
+              <option value="">-- Estado Stock --</option>
+              <option value="alerta" {% if estado_filtro == 'alerta' %}selected{% endif %}>🚨 Bajo Stock (Alerta)</option>
+              <option value="agotado" {% if estado_filtro == 'agotado' %}selected{% endif %}>🚫 Agotado (0 Stock)</option>
+              <option value="optimo" {% if estado_filtro == 'optimo' %}selected{% endif %}>✅ Óptimo</option>
+            </select>
+          </div>
+          <div class="col-md-3 d-flex gap-1">
+            <button type="submit" class="btn btn-sm btn-primary fw-bold w-100"><i class="bi bi-search"></i> Filtrar</button>
+            <a href="{% url 'inventario_dashboard' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-x"></i></a>
+          </div>
+        </form>
+      </div>
+
+      <!-- TABLA DE ARTICULOS DE INVENTARIO -->
+      <div class="card-panel-inv p-0 overflow-hidden">
+        <div class="table-responsive">
+          <table class="table-inv">
+            <thead>
+              <tr>
+                <th>Código / SKU</th>
+                <th>Artículo & Descripción</th>
+                <th>Categoría</th>
+                <th class="text-center">Stock Actual</th>
+                <th class="text-center">Mínimo</th>
+                <th class="text-center">Estado</th>
+                <th>Ubicación</th>
+                <th>Proveedor Asignado</th>
+                <th class="text-center">Acciones & Reposición</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for it in items %}
+                <tr class="{% if it.stock_actual <= 0 %}table-danger table-opacity-25{% elif it.en_alerta %}table-warning table-opacity-25{% endif %}">
+                  <td class="fw-bold text-muted small">{{ it.sku|default:"-" }}</td>
+                  <td>
+                    <div class="fw-bold text-dark">{{ it.nombre }}</div>
+                    {% if it.descripcion %}
+                      <span class="text-muted extra-small d-block">{{ it.descripcion|truncatechars:50 }}</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if it.categoria %}
+                      <span class="badge px-2 py-1" style="background:rgba(124,92,252,0.08); color:#7C5CFC; border-radius:6px; font-size:0.75rem;">
+                        {{ it.categoria.nombre }}
+                      </span>
+                    {% else %}
+                      <span class="text-muted small">-</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-center">
+                    <span class="fs-6 fw-extrabold {% if it.stock_actual <= 0 %}text-danger{% elif it.en_alerta %}text-warning{% else %}text-dark{% endif %}">
+                      {{ it.stock_actual }}
+                    </span>
+                    <span class="text-muted extra-small d-block">{{ it.unidad_medida }}</span>
+                  </td>
+                  <td class="text-center text-muted small fw-bold">
+                    {{ it.stock_minimo }} {{ it.unidad_medida }}
+                  </td>
+                  <td class="text-center">
+                    {% if it.stock_actual <= 0 %}
+                      <span class="badge-stock-agotado"><i class="bi bi-x-circle-fill me-1"></i>Agotado</span>
+                    {% elif it.en_alerta %}
+                      <span class="badge-stock-critico"><i class="bi bi-exclamation-triangle-fill me-1"></i>Bajo Stock</span>
+                    {% else %}
+                      <span class="badge-stock-optimo"><i class="bi bi-check-circle-fill me-1"></i>Óptimo</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-muted small"><i class="bi bi-geo-alt me-1 text-primary"></i>{{ it.ubicacion }}</td>
+                  <td>
+                    {% if it.proveedor_principal %}
+                      <div class="fw-bold text-dark small">{{ it.proveedor_principal.nombre }}</div>
+                      {% if it.proveedor_principal.telefono %}
+                        <span class="text-muted extra-small"><i class="bi bi-telephone me-1"></i>{{ it.proveedor_principal.telefono }}</span>
+                      {% endif %}
+                    {% else %}
+                      <span class="text-muted extra-small">Sin Proveedor Asignado</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-center">
+                    <div class="d-flex align-items-center justify-content-center gap-1">
+                      <!-- BOTON PEDIR REPOSICION -->
+                      {% if it.proveedor_principal %}
+                        <button type="button" class="btn btn-sm {% if it.en_alerta %}btn-danger{% else %}btn-outline-success{% endif %} py-0.5 px-2 fw-bold" style="border-radius:6px; font-size:0.76rem;" title="Pedir Reposición / Contactar Proveedor" onclick="openContactarProveedorModal('{{ it.id }}', '{{ it.nombre|escapejs }}', '{{ it.stock_actual }}', '{{ it.unidad_medida|escapejs }}', '{{ it.proveedor_principal.nombre|escapejs }}', '{{ it.proveedor_principal.contacto_nombre|default:''|escapejs }}', '{{ it.proveedor_principal.telefono|default:''|escapejs }}', '{{ it.proveedor_principal.email|default:''|escapejs }}', '{{ colegio.nombre|escapejs }}')">
+                          <i class="bi bi-whatsapp me-1"></i> Pedir
+                        </button>
+                      {% endif %}
+
+                      <!-- BOTON AJUSTAR STOCK -->
+                      <button type="button" class="btn btn-sm btn-outline-primary py-0.5 px-1.5" style="border-radius:6px; font-size:0.76rem;" title="Ajustar Stock (+ / -)" onclick="openAjusteStockModal('{{ it.id }}', '{{ it.nombre|escapejs }}', '{{ it.stock_actual }}', '{{ it.unidad_medida|escapejs }}')">
+                        <i class="bi bi-arrow-down-up"></i>
+                      </button>
+
+                      <!-- BOTON ELIMINAR -->
+                      <a href="{% url 'eliminar_item_inventario' it.id %}" class="btn btn-sm btn-outline-danger py-0.5 px-1.5" style="border-radius:6px; font-size:0.76rem;" onclick="return confirm('¿Eliminar este artículo del inventario?')">
+                        <i class="bi bi-trash"></i>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="9" class="text-center py-5 text-muted">
+                    <i class="bi bi-box-seam fs-2 d-block mb-2 text-muted"></i>
+                    No hay artículos en inventario según el filtro seleccionado.
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- PAGINACION -->
+        {% if items.has_other_pages %}
+          <div class="d-flex justify-content-between align-items-center p-3 border-top bg-light">
+            <span class="text-muted small">Mostrando página {{ items.number }} de {{ items.paginator.num_pages }}</span>
+            <ul class="pagination pagination-sm mb-0">
+              {% if items.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ items.previous_page_number }}">Anterior</a></li>
+              {% endif %}
+              <li class="page-item active"><span class="page-link">{{ items.number }}</span></li>
+              {% if items.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ items.next_page_number }}">Siguiente</a></li>
+              {% endif %}
+            </ul>
+          </div>
+        {% endif %}
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- MODAL NUEVO ARTICULO -->
+<div class="modal fade" id="modalNuevoItem" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 shadow-lg" style="border-radius:16px;">
+      <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+        <h5 class="modal-title fw-extrabold text-dark"><i class="bi bi-box-seam text-primary me-2"></i>Registrar Nuevo Artículo de Inventario</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="POST" action="{% url 'crear_item_inventario' %}">
+        {% csrf_token %}
+        <div class="modal-body p-4">
+          
+          <div class="row g-3 mb-3">
+            <div class="col-md-8">
+              <label class="form-label fw-bold text-dark small">Nombre del Artículo / Insumo</label>
+              <input type="text" name="nombre" class="form-control fw-bold" placeholder="Ej: Resmas de Papel Carta, Plumones de Pizarra..." required style="border-radius:10px;">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-bold text-dark small">Código / SKU</label>
+              <input type="text" name="sku" class="form-control" placeholder="Ej: PAP-001" style="border-radius:10px;">
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">Categoría</label>
+              <select name="categoria_id" class="form-select" style="border-radius:10px;">
+                <option value="">-- Sin Categoría --</option>
+                {% for cat in categorias %}
+                  <option value="{{ cat.id }}">{{ cat.nombre }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">Proveedor Principal / Contacto</label>
+              <select name="proveedor_id" class="form-select fw-bold" style="border-radius:10px;">
+                <option value="">-- Sin Proveedor Asignado --</option>
+                {% for p in proveedores %}
+                  <option value="{{ p.id }}">{{ p.nombre }} ({{ p.categoria_insumos }})</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-4">
+              <label class="form-label fw-bold text-dark small">Tipo de Artículo</label>
+              <select name="tipo" class="form-select" style="border-radius:10px;">
+                <option value="consumible">Insumo Consumible / Fungible</option>
+                <option value="activo">Activo Fijo / Mobiliario / Equipo</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-bold text-dark small">Stock Inicial</label>
+              <input type="number" name="stock_actual" class="form-control fw-extrabold" value="0" min="0" required style="border-radius:10px;">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-bold text-dark small">Stock Mínimo (Alerta)</label>
+              <input type="number" name="stock_minimo" class="form-control fw-bold" value="5" min="1" required style="border-radius:10px;">
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-4">
+              <label class="form-label fw-bold text-dark small">Unidad de Medida</label>
+              <input type="text" name="unidad_medida" class="form-control" placeholder="Ej: resmas, cajas, unidades, litros" value="unidades" required style="border-radius:10px;">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-bold text-dark small">Ubicación Física</label>
+              <input type="text" name="ubicacion" class="form-control" placeholder="Ej: Bodega Central - Estante 2" value="Bodega Principal" required style="border-radius:10px;">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-bold text-dark small">Costo Unitario Estimado ($)</label>
+              <input type="number" name="costo_unitario" class="form-control" placeholder="Ej: 3500" value="0" style="border-radius:10px;">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold text-dark small">Descripción / Notas</label>
+            <textarea name="descripcion" class="form-control" rows="2" placeholder="Especificaciones técnicas, marca o uso específico..." style="border-radius:10px;"></textarea>
+          </div>
+
+        </div>
+        <div class="modal-footer border-top-0 p-4 pt-0">
+          <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary fw-extrabold px-4" style="border-radius:10px; background:linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%); border:none;">Guardar Artículo</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DINAMICO AJUSTAR STOCK -->
+<div class="modal fade" id="modalAjusteStock" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg" style="border-radius:16px;">
+      <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+        <h5 class="modal-title fw-extrabold text-dark"><i class="bi bi-arrow-down-up text-primary me-2"></i>Ajustar Stock de Insumo</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="POST" id="ajusteStockForm" action="">
+        {% csrf_token %}
+        <div class="modal-body p-4">
+          
+          <div class="p-3 bg-light rounded-3 mb-3 border">
+            <span class="text-muted extra-small text-uppercase fw-bold d-block">Artículo</span>
+            <h6 class="fw-extrabold text-dark mb-1" id="ajusteItemNombre">-</h6>
+            <span class="text-muted small">Stock actual en bodega: <strong class="text-dark" id="ajusteItemStock">-</strong></span>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold text-dark small">Tipo de Operación</label>
+            <div class="d-flex gap-2">
+              <input type="radio" class="btn-check" name="tipo_movimiento" id="opEntrada" value="entrada" checked>
+              <label class="btn btn-outline-success fw-bold flex-grow-1" for="opEntrada"><i class="bi bi-plus-lg me-1"></i> Entrada (+)</label>
+
+              <input type="radio" class="btn-check" name="tipo_movimiento" id="opSalida" value="salida">
+              <label class="btn btn-outline-danger fw-bold flex-grow-1" for="opSalida"><i class="bi bi-dash-lg me-1"></i> Entrega / Salida (-)</label>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold text-dark small">Cantidad</label>
+            <input type="number" name="cantidad" class="form-control fw-extrabold fs-5" value="1" min="1" required style="border-radius:10px;">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold text-dark small">Entregado a / Destino (Opcional)</label>
+            <input type="text" name="entregado_a" class="form-control" placeholder="Ej: Profesora Claudia Morales (2° Básico A)" style="border-radius:10px;">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold text-dark small">Motivo / Detalle</label>
+            <input type="text" name="motivo" class="form-control" placeholder="Ej: Material para proyecto de ciencias..." style="border-radius:10px;">
+          </div>
+
+        </div>
+        <div class="modal-footer border-top-0 p-4 pt-0">
+          <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary fw-extrabold px-4" style="border-radius:10px; background:linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%); border:none;">Confirmar Ajuste</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONTACTAR PROVEEDOR (WHATSAPP & CORREO AUTO-REDACTADO) -->
+<div class="modal fade" id="modalContactarProveedor" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 shadow-lg" style="border-radius:16px;">
+      <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+        <h5 class="modal-title fw-extrabold text-dark"><i class="bi bi-chat-dots-fill text-success me-2"></i>Solicitar Reposición al Proveedor</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <div class="p-3 bg-light rounded-3 border h-100">
+              <span class="text-muted extra-small text-uppercase fw-bold d-block">Insumo / Stock</span>
+              <h6 class="fw-extrabold text-dark mb-1" id="contItemNombre">-</h6>
+              <span class="badge bg-danger-subtle text-danger fw-bold" id="contItemStock">-</span>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="p-3 bg-light rounded-3 border h-100">
+              <span class="text-muted extra-small text-uppercase fw-bold d-block">Proveedor Asignado</span>
+              <h6 class="fw-extrabold text-dark mb-1" id="contProvNombre">-</h6>
+              <span class="text-muted small d-block" id="contProvEjecutivo">-</span>
+              <span class="text-muted small d-block" id="contProvTel">-</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-bold text-dark small">Mensaje Automático de Pedido / Reposición</label>
+          <textarea id="contMensajeTexto" class="form-control fw-medium" rows="4" style="border-radius:10px; font-size:0.88rem;"></textarea>
+          <span class="text-muted extra-small">Puedes editar el texto antes de enviarlo directamente por WhatsApp o Correo.</span>
+        </div>
+
+        <div class="d-flex gap-2 justify-content-end pt-2">
+          <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Cerrar</button>
+          
+          <button type="button" class="btn btn-outline-primary fw-bold px-3" id="btnEnviarEmail">
+            <i class="bi bi-envelope-fill me-1"></i> Enviar Correo
+          </button>
+
+          <button type="button" class="btn btn-success fw-extrabold px-4" id="btnEnviarWhatsapp" style="border-radius:10px; background:#10B981; border:none;">
+            <i class="bi bi-whatsapp me-1"></i> Abrir WhatsApp
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+<script>
+  function openAjusteStockModal(itemId, nombre, stock, unidad) {
+    document.getElementById('ajusteItemNombre').textContent = nombre;
+    document.getElementById('ajusteItemStock').textContent = stock + ' ' + unidad;
+    document.getElementById('ajusteStockForm').action = '/colegios/inventario/ajustar-stock/' + itemId + '/';
+    const modal = new bootstrap.Modal(document.getElementById('modalAjusteStock'));
+    modal.show();
+  }
+
+  function openContactarProveedorModal(itemId, itemNombre, stockActual, unidadMedida, provNombre, contactoNombre, telefono, email, colegioNombre) {
+    document.getElementById('contItemNombre').textContent = itemNombre;
+    document.getElementById('contItemStock').textContent = 'Stock actual: ' + stockActual + ' ' + unidadMedida;
+    document.getElementById('contProvNombre').textContent = provNombre;
+    document.getElementById('contProvEjecutivo').textContent = contactoNombre ? 'Contacto: ' + contactoNombre : 'Atención a Clientes';
+    document.getElementById('contProvTel').textContent = telefono ? 'Tel/WhatsApp: ' + telefono : '';
+
+    const saludo = contactoNombre ? 'Hola ' + contactoNombre + ' (' + provNombre + ')' : 'Estimados ' + provNombre;
+    const msg = saludo + ',\n\nLes escribimos desde ' + colegioNombre + ' para solicitar la reposición urgente del siguiente insumo:\n- Artículo: ' + itemNombre + '\n- Stock disponible actualmente: ' + stockActual + ' ' + unidadMedida + '\n\nPor favor confirmar disponibilidad de stock, tiempo de entrega y cotización formal.\n\nQuedamos atentos a su respuesta.\nSaludos cordiales.';
+
+    document.getElementById('contMensajeTexto').value = msg;
+
+    // Configurar botones de WhatsApp y Mail
+    document.getElementById('btnEnviarWhatsapp').onclick = function() {
+      const cleanPhone = telefono.replace(/[^0-9]/g, '');
+      const finalMsg = encodeURIComponent(document.getElementById('contMensajeTexto').value);
+      if (cleanPhone) {
+        window.open('https://wa.me/' + cleanPhone + '?text=' + finalMsg, '_blank');
+      } else {
+        window.open('https://wa.me/?text=' + finalMsg, '_blank');
+      }
+    };
+
+    document.getElementById('btnEnviarEmail').onclick = function() {
+      const subject = encodeURIComponent('Solicitud de Reposición y Cotización: ' + itemNombre + ' - ' + colegioNombre);
+      const body = encodeURIComponent(document.getElementById('contMensajeTexto').value);
+      window.location.href = 'mailto:' + (email || '') + '?subject=' + subject + '&body=' + body;
+    };
+
+    const modal = new bootstrap.Modal(document.getElementById('modalContactarProveedor'));
+    modal.show();
+  }
+</script>
+</body>
+</html>

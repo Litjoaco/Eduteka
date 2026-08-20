@@ -4,342 +4,359 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configura tu colegio - Paso 5 - Eduteka</title>
+    <title>Configura tu colegio - Paso 5: Activación de Módulos — Eduteka</title>
     
-    <!-- Google Fonts: Inter -->
+    <!-- Google Fonts: Inter & Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- Bootstrap Icons -->
+    <!-- Bootstrap CSS & Icons -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{% static 'css/configuracion_colegio_paso5.css' %}">
-    <style>
-        /* Unificar el diseño del Stepper para que sea igual en todos los pasos */
-        .stepper .step {
-            background: transparent !important;
-            border-radius: 0 !important;
-            padding: 0 !important;
-        }
-        .stepper .step-icon {
-            width: 32px !important;
-            height: 32px !important;
-            border-radius: 50% !important; /* Siempre circulares, elimina efecto pastilla */
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            font-weight: 700 !important;
-            background-image: none !important; /* Elimina íconos de fondo */
-            text-indent: 0 !important; /* Mantiene el número visible */
-        }
-        .stepper .step.completed .step-icon {
-            background-color: #7b52d9 !important; /* Color morado */
-            border-color: #7b52d9 !important;
-            color: #ffffff !important;
-        }
-        /* Ocultar checkmarks (ticket positivo) inyectados mediante seudo-elementos */
-        .stepper .step.completed .step-icon::before,
-        .stepper .step.completed .step-icon::after {
-            display: none !important;
-            content: none !important;
-        }
-        
-        /* Mejoras en las tarjetas de los módulos */
-        .module-card {
-            transition: all 0.3s ease !important;
-            border: 2px solid transparent;
-        }
-        .module-card.active {
-            border-color: #7b52d9 !important;
-            background-color: #fcfbfe !important;
-            box-shadow: 0 10px 25px rgba(123, 82, 217, 0.1) !important;
-        }
-        .module-card.inactive {
-            opacity: 0.7;
-            background-color: #f8fafc !important;
-            border-color: #e2e8f0 !important;
-        }
-
-        /* Estilos fijos y seguros para los botones del Paso 5 */
-        .btn-next {
-            background: linear-gradient(135deg, #7b52d9 0%, #6a44c2 100%) !important;
-            color: #fff !important;
-            border: none !important;
-            padding: 0.75rem 1.5rem !important;
-            border-radius: 12px !important;
-            font-weight: 700 !important;
-            box-shadow: 0 4px 15px rgba(123, 82, 217, 0.25) !important;
-            transition: all 0.3s ease !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            gap: 0.5rem !important;
-        }
-        .btn-next:hover {
-            transform: translateY(-2px) !important;
-            box-shadow: 0 6px 20px rgba(123, 82, 217, 0.35) !important;
-        }
-        .btn-secondary-sm {
-            background: #ffffff !important;
-            border: 1px solid #cbd5e1 !important;
-            color: #475569 !important;
-            padding: 0.5rem 1rem !important;
-            border-radius: 8px !important;
-            font-weight: 600 !important;
-            transition: all 0.2s ease !important;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
-        }
-        .btn-secondary-sm:hover {
-            background: #f8fafc !important;
-            border-color: #94a3b8 !important;
-            color: #0f172a !important;
-        }
-    </style>
+    <link rel="stylesheet" href="{% static 'css/configuracion_colegio_paso5.css' %}?v=9">
+    <link rel="stylesheet" href="{% static 'css/backbutton.css' %}">
 </head>
 <body>
 
-<div class="config-container">
-    
-    <!-- ==========================================
-         LEFT COLUMN 
-         ========================================== -->
-    <div class="left-column">
-        <div class="logo-container">
-            <img src="{% static 'img/logo.png' %}" alt="Eduteka Logo" style="height: 100px; width: auto;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzdiNTJkOSIgcng9IjIwIi8+PHRleHQgeD0iNTAiIHk9IjY0IiBmb250LWZhbWlseT0iSW50ZXIiIGZvbnQtd2VpZ2h0PSI4MDAiIGZvbnQtc2l6ZT0iNDgiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5FPC90ZXh0Pjwvc3ZnPg=='">
-        </div>
+    <!-- Botón Volver al paso 4 -->
+    <a href="{% url 'configuracion_colegio_paso4' colegio.id %}" class="back-button">
+        <i class="bi bi-arrow-left"></i> Volver al Paso 4
+    </a>
+
+    <div class="config-container">
         
-        <div class="header-text-group">
+        <!-- ==========================================
+             LEFT COLUMN (Branding & Guidance)
+             ========================================== -->
+        <div class="left-column">
+            <div class="logo-container">
+                <img src="{% static 'img/logo.png' %}" alt="Eduteka Logo" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzdiNTJkOSIgcng9IjIwIi8+PHRleHQgeD0iNTAiIHk9IjY0IiBmb250LWZhbWlseT0iSW50ZXIiIGZvbnQtd2VpZ2h0PSI4MDAiIGZvbnQtc2l6ZT0iNDgiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5FPC90ZXh0Pjwvc3ZnPg=='">
+            </div>
+            
             <div class="step-pill">
-                <i class="bi bi-puzzle-fill"></i> Paso 5 de 5
+                <i class="bi bi-grid-fill"></i> Paso 5 de 6: Activación de Módulos
             </div>
-            <h1>Activa los módulos que necesitas</h1>
-            <p class="desc-text">Selecciona los módulos que tu colegio utilizará en la plataforma. Puedes activarlos o desactivarlos cuando lo necesites.</p>
+
+            <h1>Ecosistema Digital Escolar</h1>
+            <p class="desc-text">Activa o pausa las herramientas que tu institución necesita. Todo tu equipo podrá colaborar en tiempo real bajo un mismo entorno integrado.</p>
+
+            <!-- Ilustración con Aura Luminosa -->
+            <div class="left-illustration-frame">
+                <div class="left-illustration-aura"></div>
+                <img src="{% static 'img/modulos.png' %}" alt="Módulos Eduteka" class="img-fluid left-illustration-img">
+            </div>
+            
+            <div class="plan-includes-card">
+                <h3><i class="bi bi-lightning-charge-fill text-warning"></i> Beneficios de la Suite</h3>
+                <ul class="plan-includes-list">
+                    <li><i class="bi bi-sliders"></i> <strong>Flexibilidad:</strong> Modifica módulos cuando quieras.</li>
+                    <li><i class="bi bi-cloud-check"></i> <strong>Sincronización:</strong> Datos centralizados en la nube.</li>
+                    <li><i class="bi bi-shield-check"></i> <strong>Auditoría:</strong> Cumplimiento normativo MINEDUC.</li>
+                </ul>
+            </div>
         </div>
         
-        <div class="illustration-wrapper">
-            <div class="deco-blob blob-1"></div>
-            <div class="deco-blob blob-2"></div>
-            <div class="deco-blob blob-3"></div>
-            <img src="{% static 'img/modulos.png' %}" alt="Ilustración Módulos" onerror="this.src='https://placehold.co/400x300/F4F0FF/7C5CFA?text=Modules+3D'">
-        </div>
-        
-        <div class="plan-includes-card">
-            <h3>Beneficios de los módulos</h3>
-            <ul class="plan-includes-list">
-                <li><i class="bi bi-sliders"></i> Personalización total</li>
-                <li><i class="bi bi-wallet2"></i> Solo pagas lo que usas</li>
-                <li><i class="bi bi-lightning-charge"></i> Activación inmediata</li>
-                <li><i class="bi bi-graph-up-arrow"></i> Escalabilidad para tu crecimiento</li>
-            </ul>
+        <!-- ==========================================
+             MAIN CARD (Right: Stepper + Modules Grid + Live Workspace Summary)
+             ========================================== -->
+        <div class="main-card">
+            
+            <!-- Stepper Moderno de 6 Pasos -->
+            <div class="stepper-pro-6">
+                <div class="stepper-pro-line-6"></div>
+
+                <!-- Paso 1 -->
+                <div class="stepper-step-node-6 completed">
+                    <div class="step-node-circle"><i class="bi bi-check2"></i></div>
+                    <span class="step-node-label">1. Identidad ✓</span>
+                </div>
+
+                <!-- Paso 2 -->
+                <div class="stepper-step-node-6 completed">
+                    <div class="step-node-circle"><i class="bi bi-check2"></i></div>
+                    <span class="step-node-label">2. Contacto ✓</span>
+                </div>
+
+                <!-- Paso 3 -->
+                <div class="stepper-step-node-6 completed">
+                    <div class="step-node-circle"><i class="bi bi-check2"></i></div>
+                    <span class="step-node-label">3. Académica ✓</span>
+                </div>
+
+                <!-- Paso 4 -->
+                <div class="stepper-step-node-6 completed">
+                    <div class="step-node-circle"><i class="bi bi-check2"></i></div>
+                    <span class="step-node-label">4. Roles ✓</span>
+                </div>
+
+                <!-- Paso 5: Activo -->
+                <div class="stepper-step-node-6 active">
+                    <div class="step-node-circle"><i class="bi bi-grid"></i></div>
+                    <span class="step-node-label">5. Módulos</span>
+                </div>
+
+                <!-- Paso 6 -->
+                <div class="stepper-step-node-6">
+                    <div class="step-node-circle"><i class="bi bi-sliders2"></i></div>
+                    <span class="step-node-label">6. Políticas</span>
+                </div>
+            </div>
+            
+            <!-- Form Header -->
+            <div class="form-section-header">
+                <div class="section-icon-wrapper">
+                    <i class="bi bi-grid-fill"></i>
+                </div>
+                <div class="section-titles">
+                    <h2>5. Activación de Módulos y Herramientas</h2>
+                    <p>Enciende las funcionalidades que utilizarán los directivos, docentes y administrativos de <strong>{{ colegio.nombre }}</strong>.</p>
+                </div>
+            </div>
+            
+            <!-- Content Grid (Form Modules + Live Summary) -->
+            <div class="content-grid">
+                
+                <!-- Columna Izquierda: Tarjetas de Módulos Categorizadas -->
+                <div class="form-area">
+                    {% if messages %}
+                        <div class="messages-container mb-3">
+                            {% for message in messages %}
+                                <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}" style="border-radius: 12px; font-size: 0.9rem; padding: 0.85rem 1rem;">
+                                    <i class="bi bi-exclamation-circle-fill me-1"></i> {{ message }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <!-- Barra de Acciones Rápidas -->
+                    <div class="quick-toolbar">
+                        <span class="small fw-bold text-muted text-uppercase" style="letter-spacing:0.5px;">Acciones Rápidas:</span>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="quick-btn" onclick="toggleAllModules(true)">
+                                <i class="bi bi-check-all text-success"></i> Activar Todos
+                            </button>
+                            <button type="button" class="quick-btn" onclick="setEssentialOnly()">
+                                <i class="bi bi-mortarboard text-primary"></i> Solo Esenciales MINEDUC
+                            </button>
+                        </div>
+                    </div>
+
+                    <form id="config-form-paso5" method="post" action="{% url 'configuracion_colegio_paso5' colegio.id %}">
+                        {% csrf_token %}
+                        
+                        <div class="form-group-block">
+                            <div class="form-block-title">
+                                <i class="bi bi-puzzle-fill text-primary"></i> Módulos Disponibles en tu Plan
+                            </div>
+
+                            <div class="modules-cards-grid">
+                                {% for mod_col in modulos_colegio %}
+                                <div class="module-pro-card {% if mod_col.activo %}active{% else %}inactive{% endif %}" 
+                                     data-module-name="{{ mod_col.modulo.nombre }}" 
+                                     data-is-essential="{% if mod_col.modulo.nombre == 'Libro de clases' or mod_col.modulo.nombre == 'Asistencia' or mod_col.modulo.nombre == 'Perfil del estudiante' %}true{% else %}false{% endif %}">
+                                    <div class="module-card-top">
+                                        <div class="module-icon-box">
+                                            <i class="bi {% if mod_col.modulo.nombre == 'Libro de clases' %}bi-book{% elif mod_col.modulo.nombre == 'Asistencia' %}bi-calendar-check{% elif mod_col.modulo.nombre == 'Perfil del estudiante' %}bi-person-vcard{% elif mod_col.modulo.nombre == 'Reportes y analíticas' %}bi-bar-chart{% elif mod_col.modulo.nombre == 'Finanzas' %}bi-calculator{% elif mod_col.modulo.nombre == 'Proveedores' %}bi-truck{% elif mod_col.modulo.nombre == 'SIMCE' %}bi-clipboard-data{% elif mod_col.modulo.nombre == 'Calendario' %}bi-calendar-event{% else %}bi-grid{% endif %}"></i>
+                                        </div>
+                                        <div class="form-check form-switch m-0">
+                                            <input class="form-check-input form-check-input-module" type="checkbox" name="modulo_{{ mod_col.modulo.id }}" {% if mod_col.activo %}checked{% endif %} onchange="updateCardState(this)">
+                                        </div>
+                                    </div>
+                                    <div class="module-title-area">
+                                        {% if mod_col.modulo.nombre == 'Libro de clases' or mod_col.modulo.nombre == 'Asistencia' %}
+                                            <span class="module-badge-tag badge-mineduc">Requerido MINEDUC</span>
+                                        {% elif mod_col.modulo.nombre == 'Perfil del estudiante' %}
+                                            <span class="module-badge-tag badge-mineduc">Base Institucional</span>
+                                        {% elif mod_col.modulo.nombre == 'SIMCE' %}
+                                            <span class="module-badge-tag badge-optional">Evaluación Integral</span>
+                                        {% elif mod_col.modulo.nombre == 'Finanzas' %}
+                                            <span class="module-badge-tag badge-optional">Gestión Económica</span>
+                                        {% elif mod_col.modulo.nombre == 'Proveedores' %}
+                                            <span class="module-badge-tag badge-optional">Logística Escolar</span>
+                                        {% else %}
+                                            <span class="module-badge-tag badge-optional">Métricas & Control</span>
+                                        {% endif %}
+                                        <h4>{{ mod_col.modulo.nombre }}</h4>
+                                        <p class="module-desc-text">{{ mod_col.modulo.descripcion|default:"Gestión digital integrada para tu establecimiento." }}</p>
+                                        <ul class="module-features-list">
+                                            <li><i class="bi bi-check2"></i> Sincronización en tiempo real</li>
+                                            <li><i class="bi bi-check2"></i> Acceso por rol y seguridad</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <div class="col-12 text-center py-4 text-muted">
+                                    <i class="bi bi-exclamation-circle fs-2 d-block mb-2"></i>
+                                    No hay módulos registrados en el sistema.
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+                
+                <!-- Columna Derecha: Resumen del Espacio de Trabajo (Sticky Workspace Preview) -->
+                <div class="summary-area">
+                    <div class="workspace-summary-card">
+                        
+                        <div class="workspace-header">
+                            <div class="workspace-avatar">
+                                <i class="bi bi-building-check"></i>
+                            </div>
+                            <div>
+                                <h5 class="workspace-title">{{ colegio.nombre|default:"Colegio Institucional" }}</h5>
+                                <span class="badge bg-primary-subtle text-primary border" style="font-size: 0.72rem; font-weight: 800;">Plan Integral Eduteka 2026</span>
+                            </div>
+                        </div>
+
+                        <!-- Métricas de Módulos -->
+                        <div class="workspace-metrics-box">
+                            <div>
+                                <div class="metric-number" id="sumActivosNum">0</div>
+                                <div class="metric-text">Módulos Activos</div>
+                            </div>
+                            <div>
+                                <div class="metric-number" id="sumInactivosNum" style="color:#94A3B8;">0</div>
+                                <div class="metric-text">Inactivos</div>
+                            </div>
+                        </div>
+
+                        <!-- Capacidades Habilitadas en Vivo -->
+                        <div class="capabilities-box">
+                            <div class="capabilities-title">
+                                <i class="bi bi-check-circle-fill"></i> Funcionalidades Habilitadas
+                            </div>
+                            <ul class="capabilities-list" id="capabilitiesList">
+                                <!-- Elementos dinámicos -->
+                            </ul>
+                        </div>
+
+                        <!-- Sello de Trazabilidad y Seguridad -->
+                        <div class="security-seal-box">
+                            <i class="bi bi-shield-lock-fill"></i>
+                            <p><strong>Seguridad y Respaldo:</strong> Todos los datos de los módulos se respaldan automáticamente a diario en servidores de alta disponibilidad.</p>
+                        </div>
+
+                    </div>
+                </div>
+                
+            </div> <!-- End Content Grid -->
+            
+            <!-- Bottom Actions & Continue -->
+            <div class="bottom-area">
+                <div class="action-bar">
+                    <a href="{% url 'configuracion_colegio_paso4' colegio.id %}" class="btn-secondary-outline">
+                        <i class="bi bi-arrow-left"></i> Volver al Paso 4
+                    </a>
+                    
+                    <button type="button" class="btn-primary-gradient" id="btnSubmitPaso5" onclick="submitPaso5Form()">
+                        <span id="btnSubmitPaso5Text">Guardar y Continuar al Paso 6</span>
+                        <i class="bi bi-arrow-right-short fs-3" id="btnSubmitPaso5Icon"></i>
+                        <span class="spinner-border spinner-border-sm d-none" id="btnSubmitPaso5Spinner" role="status"></span>
+                    </button>
+                </div>
+            </div>
+            
         </div>
     </div>
-    
-    <!-- ==========================================
-         MAIN CARD (RIGHT) 
-         ========================================== -->
-    <div class="main-card">
-        
-        <!-- Compact Stepper -->
-        <div class="stepper">
-            <div class="step completed">
-                <div class="step-icon">1</div>
-                <div class="step-text">Identidad</div>
-            </div>
-            <div class="step completed">
-                <div class="step-icon">2</div>
-                <div class="step-text">Contacto</div>
-            </div>
-            <div class="step completed">
-                <div class="step-icon">3</div>
-                <div class="step-text">Académica</div>
-            </div>
-            <div class="step completed">
-                <div class="step-icon">4</div>
-                <div class="step-text">Roles</div>
-            </div>
-            <div class="step active">
-                <div class="step-icon">5</div>
-                <div class="step-text">Módulos</div>
-            </div>
-        </div>
-        
-        <!-- Form Header -->
-        <div class="form-section-header">
-            <div class="section-icon-wrapper">
-                <i class="bi bi-puzzle-fill"></i>
-            </div>
-            <div class="section-titles">
-                <h2>5. Módulos y accesos</h2>
-                <p>Selecciona y activa los módulos que tu colegio utilizará en la plataforma.</p>
-            </div>
-        </div>
-        
-        <form id="config-form-paso5" method="post" action="{% url 'configuracion_colegio_paso5' colegio.id %}">
-            {% csrf_token %}
-            
-            <div class="modules-section-header">
-                <div class="modules-titles">
-                    <h3>Módulos disponibles</h3>
-                    <p>Activa los módulos que necesitas. Puedes modificarlos más adelante desde la configuración del colegio.</p>
-                </div>
-                <div class="modules-actions">
-                    <button type="button" class="btn-secondary-sm" id="btnToggleAll"><i class="bi bi-check2-all"></i> Seleccionar todos</button>
-                </div>
-            </div>
 
-            <!-- Modules Grid -->
-            <div class="modules-grid">
-                {% for mod_col in modulos_colegio %}
-                <div class="module-card {% if mod_col.activo %}active{% else %}inactive{% endif %}">
-                    <div class="module-header">
-                        <div class="module-icon"><i class="bi {{ mod_col.modulo.icono|default:'bi-puzzle' }}"></i></div>
-                        <label class="switch">
-                            <input type="checkbox" name="modulo_{{ mod_col.modulo.id }}" {% if mod_col.activo %}checked{% endif %}>
-                            <span class="slider round"></span>
-                        </label>
-                    </div>
-                    <div class="module-content">
-                        <h4>{{ mod_col.modulo.nombre }}</h4>
-                        <p>{{ mod_col.modulo.descripcion }}</p>
-                    </div>
-                </div>
-                {% empty %}
-                <p>No hay módulos asignados a tu plan actual.</p>
-                {% endfor %}
-            </div>
-
-            <!-- Resumen de Selección -->
-            <div class="summary-section">
-                <h3>Resumen de tu selección</h3>
-                <div class="metrics-grid">
-                    <div class="metric-card">
-                        <div class="metric-icon turquoise"><i class="bi bi-puzzle"></i></div>
-                        <div class="metric-info">
-                            <span class="metric-value" id="summary-activos">{{ modulos_activos_count|default:"0" }}</span>
-                            <span class="metric-label">Módulos activos</span>
-                        </div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-icon coral"><i class="bi bi-puzzle"></i></div>
-                        <div class="metric-info">
-                            <span class="metric-value" id="summary-inactivos">{{ modulos_inactivos_count|default:"0" }}</span>
-                            <span class="metric-label">Módulos inactivos</span>
-                        </div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-icon purple"><i class="bi bi-people"></i></div>
-                        <div class="metric-info">
-                            <span class="metric-value">{{ usuarios_totales_count|default:"0" }}</span>
-                            <span class="metric-label">Usuarios que podrán acceder</span>
-                        </div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-icon yellow"><i class="bi bi-award"></i></div>
-                        <div class="metric-info">
-                            <span class="metric-value plan-value">{{ colegio.plan|default:"Plan Profesional" }}</span>
-                            <span class="metric-label">Plan recomendado</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </form>
-        
-        <!-- Info Box (Estructura Original Recuperada) -->
-        <div class="info-box">
-            <i class="bi bi-info-circle"></i>
-            <p>Puedes activar o desactivar módulos en cualquier momento desde la configuración del colegio.</p>
-        </div>
-
-        <!-- Botones Inferiores (Estructura Original con Estilos Forzados) -->
-        <div class="form-actions">
-            <a href="{% url 'configuracion_colegio_paso4' colegio.id %}" class="btn-back" style="color: #64748b; text-decoration: none; font-weight: 600; transition: color 0.2s;">Volver al paso 4</a>
-            <div class="right-actions">
-                <button type="submit" form="config-form-paso5" class="btn-next">
-                    Finalizar configuración <i class="bi bi-check2-circle"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const checkboxes = document.querySelectorAll('.module-card input[type="checkbox"]');
-        const btnToggleAll = document.getElementById('btnToggleAll');
-        
-        // Mapeo dinámico de Iconos y Colores según el nombre del módulo
-        const iconMap = {
-            'Libro de clases': { icon: 'bi-book', color: '#7b52d9', bg: '#f3f0ff' },
-            'Asistencia': { icon: 'bi-calendar-check', color: '#0d9488', bg: '#f0fdfa' },
-            'Perfil del estudiante': { icon: 'bi-person-vcard', color: '#e11d48', bg: '#fff1f2' },
-            'Calendario': { icon: 'bi-calendar-event', color: '#2563eb', bg: '#eff6ff' },
-            'Reportes y analíticas': { icon: 'bi-bar-chart', color: '#d97706', bg: '#fffbeb' },
-            'Finanzas': { icon: 'bi-calculator', color: '#059669', bg: '#ecfdf5' },
-            'Proveedores': { icon: 'bi-truck', color: '#475569', bg: '#f8fafc' },
-            'SIMCE': { icon: 'bi-clipboard-data', color: '#7c3aed', bg: '#eef2ff' }
-        };
-
-        // Asignar los iconos y colores estéticos
-        document.querySelectorAll('.module-card').forEach(card => {
-            const title = card.querySelector('h4').textContent.trim();
-            const iconDiv = card.querySelector('.module-icon');
-            const iconEl = iconDiv.querySelector('i');
-            
-            if (iconMap[title]) {
-                iconEl.className = `bi ${iconMap[title].icon}`;
-                iconDiv.style.color = iconMap[title].color;
-                iconDiv.style.backgroundColor = iconMap[title].bg;
+    <!-- Script de Gestión Reactiva de Módulos -->
+    <script>
+        function updateCardState(checkbox) {
+            const card = checkbox.closest('.module-pro-card');
+            if (checkbox.checked) {
+                card.classList.add('active');
+                card.classList.remove('inactive');
+            } else {
+                card.classList.remove('active');
+                card.classList.add('inactive');
             }
-        });
+            updateWorkspaceSummary();
+        }
 
-        function updateSummary() {
-            let activos = 0;
-            let inactivos = 0;
-
-            checkboxes.forEach(cb => {
-                const card = cb.closest('.module-card');
-                if (cb.checked) {
-                    activos++;
+        function toggleAllModules(state) {
+            document.querySelectorAll('.module-pro-card input[type="checkbox"]').forEach(cb => {
+                cb.checked = state;
+                const card = cb.closest('.module-pro-card');
+                if (state) {
                     card.classList.add('active');
                     card.classList.remove('inactive');
                 } else {
-                    inactivos++;
                     card.classList.remove('active');
                     card.classList.add('inactive');
                 }
             });
+            updateWorkspaceSummary();
+        }
 
-            const sumActivos = document.getElementById('summary-activos');
-            const sumInactivos = document.getElementById('summary-inactivos');
-            
-            if (sumActivos) sumActivos.textContent = activos;
-            if (sumInactivos) sumInactivos.textContent = inactivos;
-            
-            if (activos === checkboxes.length) {
-                btnToggleAll.innerHTML = '<i class="bi bi-x-circle"></i> Deseleccionar todos';
-            } else {
-                btnToggleAll.innerHTML = '<i class="bi bi-check2-all"></i> Seleccionar todos';
+        function setEssentialOnly() {
+            document.querySelectorAll('.module-pro-card').forEach(card => {
+                const isEssential = (card.dataset.isEssential === 'true');
+                const cb = card.querySelector('input[type="checkbox"]');
+                cb.checked = isEssential;
+                if (isEssential) {
+                    card.classList.add('active');
+                    card.classList.remove('inactive');
+                } else {
+                    card.classList.remove('active');
+                    card.classList.add('inactive');
+                }
+            });
+            updateWorkspaceSummary();
+        }
+
+        function updateWorkspaceSummary() {
+            const allCheckboxes = document.querySelectorAll('.module-pro-card input[type="checkbox"]');
+            let activeCount = 0;
+            let inactiveCount = 0;
+
+            allCheckboxes.forEach(cb => {
+                if (cb.checked) activeCount++;
+                else inactiveCount++;
+            });
+
+            const sumActivosEl = document.getElementById('sumActivosNum');
+            const sumInactivosEl = document.getElementById('sumInactivosNum');
+            if (sumActivosEl) sumActivosEl.textContent = activeCount;
+            if (sumInactivosEl) sumInactivosEl.textContent = inactiveCount;
+
+            // Actualizar lista de capacidades
+            const capList = document.getElementById('capabilitiesList');
+            if (capList) {
+                capList.innerHTML = '';
+                const activeCards = document.querySelectorAll('.module-pro-card.active');
+                if (activeCards.length === 0) {
+                    capList.innerHTML = '<li class="text-muted"><i class="bi bi-exclamation-circle"></i> Sin módulos activos seleccionados</li>';
+                } else {
+                    activeCards.forEach(c => {
+                        const title = c.querySelector('h4').textContent.trim();
+                        const li = document.createElement('li');
+                        li.innerHTML = `<i class="bi bi-check2"></i> ${title} habilitado`;
+                        capList.appendChild(li);
+                    });
+                }
             }
         }
 
-        checkboxes.forEach(cb => {
-            cb.addEventListener('change', updateSummary);
-        });
+        function submitPaso5Form() {
+            const form = document.getElementById('config-form-paso5');
+            const btn = document.getElementById('btnSubmitPaso5');
+            const txt = document.getElementById('btnSubmitPaso5Text');
+            const icon = document.getElementById('btnSubmitPaso5Icon');
+            const spinner = document.getElementById('btnSubmitPaso5Spinner');
 
-        if (btnToggleAll) {
-            btnToggleAll.addEventListener('click', () => {
-                const allChecked = Array.from(checkboxes).every(cb => cb.checked);
-                checkboxes.forEach(cb => {
-                    cb.checked = !allChecked;
-                });
-                updateSummary();
-            });
+            btn.disabled = true;
+            txt.textContent = 'Guardando módulos activos...';
+            icon.classList.add('d-none');
+            spinner.classList.remove('d-none');
+            form.submit();
         }
 
-        updateSummary();
-    });
-</script>
+        document.addEventListener('DOMContentLoaded', updateWorkspaceSummary);
+    </script>
 </body>
 </html>

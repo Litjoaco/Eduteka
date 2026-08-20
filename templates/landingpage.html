@@ -2,615 +2,988 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eduteka - La gestión escolar en una sola plataforma</title>
-    <!-- Google Fonts: Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Bootstrap CSS from local static -->
-    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-    <!-- Bootstrap Icons (CDN for icons) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    
-    <!-- AOS Animation CSS -->
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eduteka — El ERP & Libro de Clases Digital más moderno de Chile</title>
 
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="{% static 'css/landingpage.css' %}?v=3">
-    
-    <!-- Estilos inyectados para darle vida, color y profundidad al diseño -->
-    <style>
-        body {
-            background-color: #fcfcfd; /* Un blanco ligeramente azulado, menos plano */
-            position: relative;
-            overflow-x: hidden;
-        }
-        
-        /* Contenedor seguro para que el fondo no quede oculto detrás del body */
-        .background-effects {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            z-index: 0;
-            pointer-events: none;
-        }
+  <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet">
 
-        /* Manchas de color difuminadas (Blobs) para el fondo */
-        .bg-blob {
-            position: absolute;
-            filter: blur(70px);
-            opacity: 0.7;
-            animation: float-blob 15s ease-in-out infinite alternate;
-            border-radius: 50%;
-        }
-        .blob-purple {
-            top: -10%;
-            left: -10%;
-            width: 50vw;
-            height: 50vw;
-            background: radial-gradient(circle, rgba(123, 82, 217, 0.35) 0%, rgba(123, 82, 217, 0) 70%);
-        }
-        .blob-teal {
-            top: 20%;
-            right: -10%;
-            width: 40vw;
-            height: 40vw;
-            background: radial-gradient(circle, rgba(13, 148, 136, 0.35) 0%, rgba(13, 148, 136, 0) 70%);
-            animation-delay: -5s;
-        }
-        
-        @keyframes float-blob {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(40px, 60px) scale(1.1); }
-        }
+  <!-- Bootstrap 5 CSS -->
+  <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  
+  <!-- AOS Animation CSS -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
-        /* Forzar fondo transparente para dejar ver las luces */
-        .hero-section {
-            background: transparent !important;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Navbar interactivo con Glassmorphism */
-        .navbar {
-            background: rgba(255, 255, 255, 0.85) !important;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-        
-        /* Diferenciación sutil de secciones */
-        .modules-section {
-            background-color: #f8fafc;
-            border-top: 1px solid rgba(0,0,0,0.03);
-            border-bottom: 1px solid rgba(0,0,0,0.03);
-            padding: 5rem 0;
-        }
-        .benefits-section {
-            padding: 5rem 0;
-        }
-        
-        /* Llamado a la acción (CTA) resaltado */
-        .cta-section {
-            background: linear-gradient(135deg, #7b52d9 0%, #4c1d95 100%);
-            border-radius: 24px;
-            padding: 4rem 2rem;
-            text-align: center;
-            margin: 4rem 0;
-            box-shadow: 0 20px 40px rgba(123, 82, 217, 0.25);
-        }
-        .cta-section h2 { color: #ffffff !important; font-weight: 800; margin-bottom: 1rem; }
-    </style>
+  <!-- Ultra-Modern Stylesheet -->
+  <link rel="stylesheet" href="{% static 'css/landingpage.css' %}?v=5">
 </head>
 <body>
 
-    <!-- Formas de color flotantes de fondo -->
-    <div class="background-effects">
-        <div class="bg-blob blob-purple"></div>
-        <div class="bg-blob blob-teal"></div>
+  <!-- Aura Ambient Lighting & Dot Mesh -->
+  <div class="bg-mesh-grid"></div>
+  <div class="aura-orb orb-1"></div>
+  <div class="aura-orb orb-2"></div>
+  <div class="aura-orb orb-3"></div>
+
+  <!-- 1. NAVBAR GLASSMORPHISM -->
+  <nav class="navbar navbar-expand-lg navbar-glass">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center" href="#inicio">
+        <img src="{% static 'img/logo.png' %}" alt="Eduteka Logo" style="height: 52px; width: auto;">
+      </a>
+
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navEduteka" aria-controls="navEduteka" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="bi bi-list fs-2 text-dark"></i>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navEduteka">
+        <ul class="navbar-nav mx-auto">
+          <li class="nav-item"><a class="nav-link" href="#inicio">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link" href="#bento-features">Características</a></li>
+          <li class="nav-item"><a class="nav-link" href="#simulador-demo">Explorador Interactivo</a></li>
+          <li class="nav-item"><a class="nav-link" href="#calculadora-roi">Calculadora ROI</a></li>
+          <li class="nav-item"><a class="nav-link" href="#comparativa">¿Por qué Eduteka?</a></li>
+          <li class="nav-item"><a class="nav-link" href="#precios">Precios</a></li>
+          <li class="nav-item"><a class="nav-link" href="#faq">Preguntas</a></li>
+        </ul>
+
+        <div class="d-flex align-items-center gap-2.5 mt-3 mt-lg-0">
+          <a href="{% url 'login' %}" class="btn btn-eduteka-outline py-2 px-3.5">
+            <i class="bi bi-box-arrow-in-right"></i> Ingresar
+          </a>
+          <a href="{% url 'registro_colegio' %}" class="btn btn-eduteka-primary py-2 px-4">
+            <i class="bi bi-rocket-takeoff-fill"></i> Probar Gratis
+          </a>
+        </div>
+      </div>
     </div>
+  </nav>
 
-    <!-- 1. Navbar -->
-    <nav class="navbar navbar-expand-lg">
-        <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="#">
-                <img src="{% static 'img/logo.png' %}" alt="Eduteka Logo" style="height: 140px; width: auto;">
+  <!-- 2. HERO SECTION DE ALTO IMPACTO -->
+  <header id="inicio" class="hero-wrapper">
+    <div class="container">
+      <div class="row align-items-center g-5">
+        
+        <!-- Left: Text & Pitch -->
+        <div class="col-lg-6 text-center text-lg-start" data-aos="fade-up">
+          <div class="hero-tag shimmer-badge">
+            <span class="badge rounded-pill bg-primary px-2 py-0.5" style="background:#7C5CFC !important; font-size:0.75rem;">Novedad 2026</span>
+            <span>100% Conforme a Circular N° 30 MINEDUC & SIGE</span>
+          </div>
+
+          <h1 class="hero-heading">
+            El ERP escolar que <br class="d-none d-lg-block">
+            tu colegio <span class="gradient-text">merece tener</span>.
+          </h1>
+
+          <p class="hero-desc">
+            Reemplaza cuadernos de papel, planillas Excel desactualizadas y sistemas lentos. Eduteka unifica el <strong>Libro de Clases Digital</strong>, asistencia en 1 clic, evaluaciones <strong>SIMCE & DIA</strong>, finanzas e inventario en una plataforma ultra rápida y visualmente impecable.
+          </p>
+
+          <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start mb-4">
+            <a href="{% url 'registro_colegio' %}" class="btn btn-eduteka-primary btn-lg px-4 py-3">
+              <i class="bi bi-buildings-fill"></i> Registrar mi Colegio Gratis
             </a>
-            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
+            <a href="#simulador-demo" class="btn btn-eduteka-outline btn-lg px-4 py-3">
+              <i class="bi bi-play-circle-fill text-primary"></i> Probar Demo en Vivo
+            </a>
+          </div>
+
+          <!-- Trust Badges -->
+          <div class="d-flex align-items-center justify-content-center justify-content-lg-start gap-4 text-muted small pt-2">
+            <div class="d-flex align-items-center gap-1.5"><i class="bi bi-shield-check text-success fs-5"></i> <span>Sin tarjeta de crédito</span></div>
+            <div class="d-flex align-items-center gap-1.5"><i class="bi bi-cloud-arrow-up text-primary fs-5"></i> <span>Activación en 5 min</span></div>
+            <div class="d-flex align-items-center gap-1.5"><i class="bi bi-patch-check text-info fs-5"></i> <span>Certificado Oficial</span></div>
+          </div>
+        </div>
+
+        <!-- Right: 3D Browser Mockup with Interactive Floating Badges -->
+        <div class="col-lg-6" data-aos="fade-left" data-aos-delay="200">
+          <div class="position-relative">
+            
+            <!-- Floating Badge 1: Asistencia en Vivo -->
+            <div class="hero-glass-badge badge-top-left">
+              <div class="rounded-circle d-flex align-items-center justify-content-center" style="width:44px; height:44px; background:#ECFDF5; color:#10B981; font-size:1.3rem;">
+                <i class="bi bi-calendar-check-fill"></i>
+              </div>
+              <div>
+                <span class="text-muted extra-small d-block fw-bold text-uppercase" style="font-size:0.68rem; letter-spacing:0.5px;">Asistencia Hoy</span>
+                <span class="fw-extrabold text-dark small">98.4% Presentes <span class="badge bg-success-subtle text-success ms-1" style="font-size:0.68rem;">En vivo</span></span>
+              </div>
+            </div>
+
+            <!-- Main Mockup Frame -->
+            <div class="browser-mockup">
+              <div class="browser-topbar">
+                <div class="window-dots">
+                  <span class="window-dot dot-close"></span>
+                  <span class="window-dot dot-min"></span>
+                  <span class="window-dot dot-max"></span>
+                </div>
+                <div class="browser-url-pill">
+                  <i class="bi bi-lock-fill text-success"></i> https://app.eduteka.cl/dashboard/
+                </div>
+                <div class="d-flex align-items-center gap-1 text-success extra-small fw-bold">
+                  <span class="spinner-grow spinner-grow-sm" role="status" style="width:7px; height:7px;"></span> En línea
+                </div>
+              </div>
+
+              <div class="p-0 position-relative">
+                <img src="{% static 'img/resumen.png' %}" alt="Eduteka Dashboard" class="img-fluid w-100" style="display:block;">
+              </div>
+            </div>
+
+            <!-- Floating Badge 2: Ensayo SIMCE -->
+            <div class="hero-glass-badge badge-bottom-right">
+              <div class="rounded-circle d-flex align-items-center justify-content-center" style="width:44px; height:44px; background:#F0EDFF; color:#7C5CFC; font-size:1.3rem;">
+                <i class="bi bi-trophy-fill"></i>
+              </div>
+              <div>
+                <span class="text-muted extra-small d-block fw-bold text-uppercase" style="font-size:0.68rem; letter-spacing:0.5px;">Ensayo SIMCE Matemática</span>
+                <span class="fw-extrabold text-dark small">298 pts <span class="badge bg-primary-subtle text-primary ms-1" style="font-size:0.68rem;">+32 vs GSE</span></span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 3. BARRA DE CIFRAS Y PRUEBA SOCIAL -->
+      <div class="stats-banner" data-aos="fade-up" data-aos-delay="300">
+        <div class="row g-4 text-center">
+          <div class="col-6 col-md-3 border-end">
+            <div class="stat-number-gradient">+150</div>
+            <span class="text-muted small fw-bold">Colegios en Todo Chile</span>
+          </div>
+          <div class="col-6 col-md-3 border-end">
+            <div class="stat-number-gradient">+48.000</div>
+            <span class="text-muted small fw-bold">Estudiantes Activos</span>
+          </div>
+          <div class="col-6 col-md-3 border-end">
+            <div class="stat-number-gradient">99.9%</div>
+            <span class="text-muted small fw-bold">Disponibilidad en Nube</span>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="stat-number-gradient">100%</div>
+            <span class="text-muted small fw-bold">Libro Digital Normado</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- 4. BENTO GRID - CARACTERÍSTICAS DESTACADAS -->
+  <section id="bento-features" class="bento-section">
+    <div class="container">
+      
+      <div class="text-center max-w-700 mx-auto mb-5" data-aos="fade-up">
+        <span class="badge rounded-pill px-3 py-1.5 mb-2" style="background:#F0EDFF; color:#7C5CFC; font-weight:700;">Arquitectura Inteligente</span>
+        <h2 class="fs-1 fw-extrabold mb-3">Diseñado para la velocidad y precisión pedagógica</h2>
+        <p class="text-muted">Cada herramienta fue construida junto a directivos y docentes chilenos para eliminar la burocracia escolar.</p>
+      </div>
+
+      <div class="row g-4">
+        
+        <!-- Bento 1: Libro de Clases (Card Grande 8 Col) -->
+        <div class="col-lg-8" data-aos="fade-up" data-aos-delay="100">
+          <div class="bento-card bento-card-primary">
+            <div>
+              <div class="d-flex justify-content-between align-items-start mb-3">
+                <div class="bento-icon-pill" style="background:rgba(124,92,252,0.25); color:#A98CF5;">
+                  <i class="bi bi-journal-bookmark-fill"></i>
+                </div>
+                <span class="badge bg-success-subtle text-success px-3 py-1.5 fw-bold rounded-pill">100% Conforme SIGE</span>
+              </div>
+              <h3 class="fs-3 fw-extrabold mb-2">Libro de Clases Digital & Calificaciones</h3>
+              <p class="mb-4">
+                Registra evaluaciones por escala tradicional (1.0 a 7.0), ponderaciones porcentuales o rúbricas. El motor calcula automáticamente los promedios semestrales en vivo y detecta alumnos en riesgo pedagógico.
+              </p>
+            </div>
+
+            <!-- Mini Visual Widget de Notas -->
+            <div class="p-3.5 rounded-4" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1);">
+              <div class="d-flex justify-content-between align-items-center mb-2 text-white small">
+                <span class="fw-bold"><i class="bi bi-table me-1.5 text-primary"></i> 2° Medio A — Lenguaje y Comunicación</span>
+                <span class="badge bg-primary px-2.5 py-1 fw-bold">Promedio: 6.2</span>
+              </div>
+              <div class="progress" style="height: 8px; border-radius: 10px; background: rgba(255,255,255,0.1);">
+                <div class="progress-bar" style="width: 88%; background: linear-gradient(90deg, #7C5CFC 0%, #10B981 100%);"></div>
+              </div>
+              <div class="d-flex justify-content-between extra-small text-white-50 mt-2">
+                <span>94% de Aprobación</span>
+                <span>Acompañamiento PIE Activo 🧩</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bento 2: SIMCE & Diagnóstico DIA (4 Col) -->
+        <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
+          <div class="bento-card">
+            <div>
+              <div class="bento-icon-pill" style="background:#FEF3C7; color:#D97706;">
+                <i class="bi bi-award-fill"></i>
+              </div>
+              <h4 class="fs-4 fw-extrabold mb-2">SIMCE & DIA Inteligente</h4>
+              <p class="small text-muted mb-4">
+                Aplica simulacros con cálculo lineal en escala oficial (150 a 350 pts) y compara el avance frente al GSE nacional.
+              </p>
+            </div>
+
+            <!-- Mini Visual Score -->
+            <div class="p-3 bg-light rounded-3 border text-center">
+              <span class="text-muted extra-small fw-bold text-uppercase d-block mb-1">Puntaje Estimado</span>
+              <span class="fs-2 fw-extrabold text-primary">298 <small class="fs-6 text-muted">/ 350 pts</small></span>
+              <div class="d-flex justify-content-center gap-1 mt-2">
+                <span class="badge bg-danger-subtle text-danger px-2 py-0.5" style="font-size:0.68rem;">12% Insuf.</span>
+                <span class="badge bg-warning-subtle text-warning px-2 py-0.5" style="font-size:0.68rem;">28% Elem.</span>
+                <span class="badge bg-success-subtle text-success px-2 py-0.5" style="font-size:0.68rem;">60% Adec.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bento 3: Asistencia en 1 Clic (4 Col) -->
+        <div class="col-lg-4" data-aos="fade-up" data-aos-delay="300">
+          <div class="bento-card">
+            <div>
+              <div class="bento-icon-pill" style="background:#ECFDF5; color:#10B981;">
+                <i class="bi bi-calendar-check-fill"></i>
+              </div>
+              <h4 class="fs-4 fw-extrabold mb-2">Asistencia en 30 Segundos</h4>
+              <p class="small text-muted mb-4">
+                Pasar lista nunca fue tan rápido. Incluye switch condicional para justificar inasistencias médicas y alertas de deserción escolar.
+              </p>
+            </div>
+
+            <div class="p-3 bg-light rounded-3 border d-flex align-items-center justify-content-between">
+              <div>
+                <span class="fw-bold text-dark small d-block">¿Falta Justificada?</span>
+                <span class="text-muted extra-small">Certificado médico adjunto</span>
+              </div>
+              <div class="form-check form-switch m-0">
+                <input class="form-check-input" type="checkbox" checked disabled>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bento 4: Talleres ACLES Multicurso (4 Col) -->
+        <div class="col-lg-4" data-aos="fade-up" data-aos-delay="400">
+          <div class="bento-card">
+            <div>
+              <div class="bento-icon-pill" style="background:#EFF6FF; color:#2563EB;">
+                <i class="bi bi-star-fill"></i>
+              </div>
+              <h4 class="fs-4 fw-extrabold mb-2">Talleres (ACLES)</h4>
+              <p class="small text-muted mb-4">
+                Gestiona actividades extracurriculares con inscripción multicurso, control de cupos y asistencia independiente por sesión.
+              </p>
+            </div>
+
+            <div class="d-flex gap-2 flex-wrap">
+              <span class="badge px-2.5 py-1.5 fw-bold" style="background:#F0EDFF; color:#7C5CFC;"><i class="bi bi-trophy me-1"></i> Robótica (24/25)</span>
+              <span class="badge px-2.5 py-1.5 fw-bold" style="background:#ECFDF5; color:#10B981;"><i class="bi bi-dribbble me-1"></i> Básquetbol (30/30)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bento 5: Finanzas, Inventario & Proveedores (4 Col) -->
+        <div class="col-lg-4" data-aos="fade-up" data-aos-delay="500">
+          <div class="bento-card">
+            <div>
+              <div class="bento-icon-pill" style="background:#FFE4E6; color:#F43F5E;">
+                <i class="bi bi-wallet2"></i>
+              </div>
+              <h4 class="fs-4 fw-extrabold mb-2">Finanzas & Proveedores</h4>
+              <p class="small text-muted mb-4">
+                Controla la caja chica, egresos por centro de costos y recibe alertas de stock crítico para pedir insumos por WhatsApp con 1 clic.
+              </p>
+            </div>
+
+            <div class="p-2.5 bg-danger-subtle text-danger rounded-3 border border-danger-subtle d-flex align-items-center justify-content-between">
+              <span class="extra-small fw-bold"><i class="bi bi-exclamation-triangle-fill me-1"></i> Stock Crítico: Papel Carta</span>
+              <span class="badge bg-danger text-white">Pedir WhatsApp</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. EXPLORADOR INTERACTIVO DE PANTALLAS (INTERACTIVE LIVE DEMO) -->
+  <section id="simulador-demo" class="py-6" style="padding: 6.5rem 0;">
+    <div class="container">
+      
+      <div class="text-center max-w-700 mx-auto mb-5" data-aos="fade-up">
+        <span class="badge rounded-pill px-3 py-1.5 mb-2" style="background:#F0EDFF; color:#7C5CFC; font-weight:700;">Experiencia Interactiva</span>
+        <h2 class="fs-1 fw-extrabold mb-3">Prueba la interfaz de Eduteka en tiempo real</h2>
+        <p class="text-muted">Haz clic en las pestañas para explorar cómo se ven y funcionan los módulos clave de la plataforma.</p>
+      </div>
+
+      <div class="interactive-showcase" data-aos="zoom-in">
+        
+        <!-- Pestañas de control del simulador -->
+        <div class="d-flex justify-content-center mb-4 overflow-auto pb-2">
+          <div class="interactive-pill-nav d-inline-flex p-1.5 bg-light rounded-pill border gap-1">
+            <button type="button" class="active" onclick="cambiarDemo('notas', this)">
+              <i class="bi bi-journal-check text-primary"></i> Libro de Calificaciones
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav mx-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#inicio">Inicio</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#modulos">Módulos</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#beneficios">Beneficios</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#contacto">Contacto</a>
-                    </li>
-                </ul>
-                <div class="d-flex align-items-center mt-3 mt-lg-0 gap-4">
-                    <a href="{% url 'login' %}" class="btn btn-outline-custom">Iniciar sesión</a>
-                    <a href="{% url 'registro' %}" class="btn btn-primary-custom">Registrarme</a>
-                </div>
-            </div>
+            <button type="button" onclick="cambiarDemo('asistencia', this)">
+              <i class="bi bi-calendar-check text-success"></i> Planilla de Asistencia
+            </button>
+            <button type="button" onclick="cambiarDemo('simce', this)">
+              <i class="bi bi-award text-warning"></i> Simulador SIMCE
+            </button>
+            <button type="button" onclick="cambiarDemo('finanzas', this)">
+              <i class="bi bi-wallet2 text-danger"></i> Control Financiero
+            </button>
+          </div>
         </div>
-    </nav>
 
-    <!-- 2. Hero principal -->
-    <section id="inicio" class="hero-section d-flex align-items-center">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-6 hero-content text-center text-lg-start" data-aos="fade-up">
-                    <h1 class="hero-title">La gestión escolar en <br class="d-none d-lg-block">
-                        <span class="letra-coral">u</span><span class="letra-turquesa">n</span><span class="letra-morado">a</span>
-                        <span class="letra-amarillo">s</span><span class="letra-azul">o</span><span class="letra-lila">l</span><span class="letra-turquesa">a</span>
-                        <span class="letra-coral">p</span><span class="letra-morado">l</span><span class="letra-amarillo">a</span><span class="letra-azul">t</span><span class="letra-turquesa">a</span><span class="letra-lila">f</span><span class="letra-coral">o</span><span class="letra-morado">r</span><span class="letra-amarillo">m</span><span class="letra-azul">a</span>
-                    </h1>
-                    <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="100">Eduteka centraliza alumnos, asistencia, notas, reportes y procesos administrativos para que los colegios trabajen de forma más simple y ordenada.</p>
-                    <div class="d-flex flex-wrap gap-3 hero-buttons" data-aos="fade-up" data-aos-delay="200">
-                        <a href="{% url 'registro_colegio' %}" class="btn btn-primary-custom btn-lg">Registrar mi colegio</a>
-                        <a href="{% url 'registro' %}" class="btn btn-outline-custom btn-lg">Crear cuenta de usuario</a>
-                    </div>
-                </div>
-                <div class="col-lg-6 mt-5 mt-lg-0" data-aos="fade-left" data-aos-delay="300">
-                    <!-- Simple Mockup -->
-                    <div class="hero-mockup overflow-hidden floating-element">
-                        <div class="mockup-header">
-                            <span class="mockup-dot dot-red"></span>
-                            <span class="mockup-dot dot-yellow"></span>
-                            <span class="mockup-dot dot-green"></span>
-                        </div>
-                        <div class="p-0">
-                            <img src="{% static 'img/resumen.png' %}" alt="Dashboard Resumen" class="img-fluid w-100">
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <!-- Contenedor de la pantalla simulada -->
+        <div id="demoScreenContainer" class="p-4 bg-light rounded-4 border">
+          <!-- Renderizado dinámico vía JavaScript -->
         </div>
-    </section>
 
-    <!-- 3. Cómo funciona (Diferencia de usuarios con Pestañas) -->
-        <section id="como-funciona" class="how-it-works-section mt-5" style="background-color: #f8fafc;">
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 6. CALCULADORA ROI INTERACTIVA DE AHORRO -->
+  <section id="calculadora-roi" class="py-6" style="padding: 6.5rem 0; background:#F8FAFC;">
+    <div class="container">
+      <div class="roi-calculator-box" data-aos="zoom-in">
+        <div class="row align-items-center g-5">
+          
+          <div class="col-lg-6">
+            <span class="badge rounded-pill px-3 py-1.5 mb-3" style="background:rgba(124,92,252,0.25); color:#A98CF5; font-weight:700;">Simulador Escolar de Ahorro</span>
+            <h2 class="fs-1 fw-extrabold text-white mb-3">Calcula el impacto económico y de tiempo en tu colegio</h2>
+            <p class="text-white text-opacity-75 mb-4">
+              Mueve el selector según la matrícula de tu establecimiento y observa el ahorro tangible en horas hombre y reducción de papel al año.
+            </p>
+
+            <div class="mb-4">
+              <label for="sliderMatricula" class="form-label text-white fw-bold d-flex justify-content-between mb-2">
+                <span>Matrícula de Estudiantes:</span>
+                <span class="text-warning fs-4 fw-extrabold" id="txtMatricula">500 alumnos</span>
+              </label>
+              <input type="range" class="form-range" id="sliderMatricula" min="100" max="2000" step="50" value="500" oninput="calcularROI(this.value)" style="cursor:pointer;">
+              <div class="d-flex justify-content-between text-white-50 extra-small">
+                <span>100 alumnos</span>
+                <span>1.000 alumnos</span>
+                <span>2.000+ alumnos</span>
+              </div>
+            </div>
+
+            <div class="d-flex gap-2 flex-wrap">
+              <span class="badge p-2 text-white" style="background:rgba(255,255,255,0.08);"><i class="bi bi-clock-history text-warning me-1"></i> -80% Tiempo en Actas</span>
+              <span class="badge p-2 text-white" style="background:rgba(255,255,255,0.08);"><i class="bi bi-tree text-success me-1"></i> Cero Resmas de Papel</span>
+              <span class="badge p-2 text-white" style="background:rgba(255,255,255,0.08);"><i class="bi bi-whatsapp text-success me-1"></i> Comunicación Ágil</span>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="row g-3">
+              
+              <div class="col-6">
+                <div class="roi-metric-card">
+                  <span class="text-white-50 extra-small text-uppercase fw-bold d-block mb-1">Horas Ahorradas / Mes</span>
+                  <span class="fs-2 fw-extrabold text-warning" id="resHorasDocentes">60 hrs</span>
+                  <span class="extra-small text-white-50 d-block mt-1">menos papeleo para docentes</span>
+                </div>
+              </div>
+
+              <div class="col-6">
+                <div class="roi-metric-card">
+                  <span class="text-white-50 extra-small text-uppercase fw-bold d-block mb-1">Hojas de Papel / Año</span>
+                  <span class="fs-2 fw-extrabold text-info" id="resHojasPapel">18.000</span>
+                  <span class="extra-small text-white-50 d-block mt-1">resmas y carpetas eliminadas</span>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <div class="roi-metric-card" style="background:rgba(124,92,252,0.25); border-color:rgba(124,92,252,0.45);">
+                  <span class="text-white-50 extra-small text-uppercase fw-bold d-block mb-1">Ahorro Económico Estimado Anual</span>
+                  <span class="fs-1 fw-extrabold text-white" id="resAhorroDinero">$2.700.000</span>
+                  <span class="small text-white-50 d-block mt-1">en fotocopias, carpetas, tintas y horas extras</span>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="mt-4 text-center">
+              <a href="{% url 'registro_colegio' %}" class="btn btn-light fw-extrabold w-100 py-3 text-primary" style="border-radius:14px; font-size:1rem;">
+                Comenzar a Ahorrar con mi Colegio <i class="bi bi-arrow-right ms-1"></i>
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. COMPARATIVA: "SISTEMA TRADICIONAL VS EDUTEKA" -->
+  <section id="comparativa" class="comparison-section">
+    <div class="container">
+      
+      <div class="text-center max-w-700 mx-auto mb-5" data-aos="fade-up">
+        <span class="badge rounded-pill px-3 py-1.5 mb-2" style="background:#F0EDFF; color:#7C5CFC; font-weight:700;">Comparativa de Valor</span>
+        <h2 class="fs-1 fw-extrabold mb-3">La diferencia entre el pasado y el futuro escolar</h2>
+        <p class="text-muted">Comprueba por qué más de 150 colegios migraron de sistemas tradicionales a Eduteka.</p>
+      </div>
+
+      <div class="row g-4 justify-content-center" data-aos="fade-up">
         
-        <!-- Cabecera con fondo dinámico limitado -->
-        <div class="role-header-wrapper position-relative" style="padding: 7rem 0 3rem 0; overflow: hidden;">
-            <!-- Fondos dinámicos limitados a esta cabecera -->
-            <div class="dynamic-bg bg-docente active"></div>
-            <div class="dynamic-bg bg-colegio"></div>
-            <div class="bg-overlay"></div>
-
-            <div class="container position-relative" style="z-index: 5;">
-                <div class="text-center mb-5 position-relative" data-aos="fade-up" style="padding: 1rem 0;">
-                    <span class="badge rounded-pill px-4 py-2 mb-4 shadow" style="background: var(--color-main); color: white; font-size: 0.9rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;">Tu rol en Eduteka</span>
-                    <h2 class="section-title mb-4" style="font-size: clamp(2.2rem, 4vw, 3.5rem); color: #000000; letter-spacing: -1px; font-weight: 900; line-height: 1.2; text-shadow: 0px 0px 15px rgba(255,255,255,0.8);">Hecho a la medida de tu perfil</h2>
-                    <p class="lead" style="color: #000000; max-width: 720px; margin: 0 auto; font-size: clamp(1.1rem, 2vw, 1.25rem); line-height: 1.7; font-weight: 700; text-shadow: 0px 0px 12px rgba(255,255,255,0.8);">Elige cómo interactúas con la plataforma y descubre las herramientas pensadas exclusivamente para ti y tu institución.</p>
-                </div>
-
-                <!-- Nav Tabs -->
-                <div class="d-flex justify-content-center" data-aos="fade-up" data-aos-delay="100">
-                    <ul class="nav nav-pills p-2 bg-white rounded-pill shadow-sm" id="pills-tab" role="tablist" style="border: 1px solid rgba(0,0,0,0.05);">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active rounded-pill px-4 py-3 fw-semibold d-flex align-items-center" id="pills-user-tab" data-bs-toggle="pill" data-bs-target="#pills-user" type="button" role="tab" aria-controls="pills-user" aria-selected="true" style="transition: all 0.3s ease;">
-                                <i class="bi bi-person-fill me-2 fs-5"></i>Soy usuario del colegio
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link rounded-pill px-4 py-3 fw-semibold d-flex align-items-center" id="pills-school-tab" data-bs-toggle="pill" data-bs-target="#pills-school" type="button" role="tab" aria-controls="pills-school" aria-selected="false" style="transition: all 0.3s ease;">
-                                <i class="bi bi-buildings me-2 fs-5"></i>Quiero registrar mi colegio
-                            </button>
-                        </li>
-                    </ul>
-                </div>
+        <!-- Método Tradicional / Antiguo -->
+        <div class="col-lg-5 col-md-6">
+          <div class="compare-card-old h-100">
+            <div class="d-flex align-items-center gap-2 mb-3 text-danger fw-bold fs-5">
+              <i class="bi bi-x-circle-fill"></i> Software Tradicional / Físico
             </div>
+            <ul class="list-unstyled d-flex flex-column gap-3 mb-0 small text-muted">
+              <li class="d-flex align-items-start gap-2">
+                <i class="bi bi-x-lg text-danger mt-1"></i>
+                <span>Libros de clases físicos pesados y con riesgo de extravío.</span>
+              </li>
+              <li class="d-flex align-items-start gap-2">
+                <i class="bi bi-x-lg text-danger mt-1"></i>
+                <span>Planillas Excel desarticuladas y propensas a errores de fórmula.</span>
+              </li>
+              <li class="d-flex align-items-start gap-2">
+                <i class="bi bi-x-lg text-danger mt-1"></i>
+                <span>Cálculo manual de actas y promedios semestrales durante horas.</span>
+              </li>
+              <li class="d-flex align-items-start gap-2">
+                <i class="bi bi-x-lg text-danger mt-1"></i>
+                <span>Sin análisis comparativo de SIMCE frente a promedios nacionales.</span>
+              </li>
+              <li class="d-flex align-items-start gap-2">
+                <i class="bi bi-x-lg text-danger mt-1"></i>
+                <span>Soporte técnico lento que tarda días en responder correos.</span>
+              </li>
+            </ul>
+          </div>
         </div>
 
-        <!-- Estilos locales para esta sección -->
-        <style>
-            /* Animaciones y estilos del fondo sutil */
-            .dynamic-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; opacity: 0; z-index: 0; transform: scale(1.08); transition: opacity 1.5s ease-in-out, transform 8s ease-out; }
-            .dynamic-bg.active { opacity: 1; transform: scale(1); }
-            /* Reemplaza estas URLs de Unsplash por las tuyas usando {% static 'img/tu-foto.jpg' %} cuando quieras */
-            .bg-docente { background-image: url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2070&auto=format&fit=crop'); }
-            .bg-colegio { background-image: url('https://images.unsplash.com/photo-1577412647305-991150c7d163?q=80&w=2070&auto=format&fit=crop'); }
-            /* Capa superpuesta para asegurar máxima legibilidad */
-            .bg-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(248,250,252,0) 60%, #f8fafc 100%), linear-gradient(135deg, rgba(248, 250, 252, 0.70) 15%, rgba(248, 250, 252, 0.35) 100%); z-index: 1; pointer-events: none; }
+        <!-- Con Eduteka -->
+        <div class="col-lg-5 col-md-6">
+          <div class="compare-card-new h-100">
+            <div class="compare-badge-winner">✨ La Solución Moderna</div>
+            <div class="d-flex align-items-center gap-2 mb-3 text-success fw-bold fs-5">
+              <i class="bi bi-check-circle-fill"></i> Con Eduteka
+            </div>
+            <ul class="list-unstyled d-flex flex-column gap-3 mb-0 small text-dark fw-semibold">
+              <li class="d-flex align-items-start gap-2">
+                <i class="bi bi-check2-circle text-success fs-5"></i>
+                <span>100% Digital en la nube, seguro y accesible desde cualquier dispositivo.</span>
+              </li>
+              <li class="d-flex align-items-start gap-2">
+                <i class="bi bi-check2-circle text-success fs-5"></i>
+                <span>Módulos de notas, asistencia, finanzas y talleres conectados entre sí.</span>
+              </li>
+              <li class="d-flex align-items-start gap-2">
+                <i class="bi bi-check2-circle text-success fs-5"></i>
+                <span>Cálculo automático e instantáneo de actas con 1 solo clic.</span>
+              </li>
+              <li class="d-flex align-items-start gap-2">
+                <i class="bi bi-check2-circle text-success fs-5"></i>
+                <span>Módulo SIMCE & DIA con benchmark oficial contra el GSE de tu colegio.</span>
+              </li>
+              <li class="d-flex align-items-start gap-2">
+                <i class="bi bi-check2-circle text-success fs-5"></i>
+                <span>Mesa de ayuda directa por WhatsApp con atención preferencial.</span>
+              </li>
+            </ul>
+          </div>
+        </div>
 
-            #como-funciona .nav-pills .nav-link { color: #64748b !important; font-size: 1.05rem; }
-            #como-funciona .nav-pills .nav-link.active,
-            #como-funciona .nav-pills .nav-link.active:hover { background-color: #7066e0 !important; color: white !important; box-shadow: 0 4px 15px rgba(112, 102, 224, 0.35); font-weight: 700 !important; }
-            .step-item:not(:last-child)::after { content: ''; position: absolute; width: 2px; background: #e2e8f0; left: 24px; top: 50px; bottom: -24px; z-index: 1; }
-            .step-circle { width: 50px; height: 50px; font-size: 1.2rem; font-weight: 700; z-index: 2; transition: transform 0.3s ease; }
-            .step-item:hover .step-circle { transform: scale(1.1); }
-            .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08); }
-            @keyframes float-element {
-                0% { transform: translateY(0px); }
-                50% { transform: translateY(-12px); }
-                100% { transform: translateY(0px); }
-            }
-        </style>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 8. PLANES & PRECIOS TRANSPARENTES -->
+  <section id="precios" class="pricing-section">
+    <div class="container">
+      
+      <div class="text-center max-w-700 mx-auto mb-5" data-aos="fade-up">
+        <span class="badge rounded-pill px-3 py-1.5 mb-2" style="background:#F0EDFF; color:#7C5CFC; font-weight:700;">Tarifas Claras</span>
+        <h2 class="fs-1 fw-extrabold mb-3">Planes escalables para cada institución</h2>
+        <p class="text-muted">Sin costos ocultos ni cobros por usuario extra. Paga solo por el plan que tu colegio necesita.</p>
+
+        <!-- Toggle Anual / Mensual -->
+        <div class="d-inline-flex align-items-center gap-3 bg-white p-2 rounded-pill border shadow-sm mt-3">
+          <span class="fw-bold small text-muted ps-2">Mensual</span>
+          <div class="form-check form-switch m-0">
+            <input class="form-check-input cursor-pointer" type="checkbox" id="toggleBilling" onchange="alternarFacturacion(this.checked)" checked style="width:2.5em; height:1.3em;">
+          </div>
+          <span class="fw-bold small text-primary pe-2">
+            Facturación Anual <span class="badge bg-success-subtle text-success ms-1">-15% Ahorro</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="row g-4 align-items-stretch justify-content-center">
         
-        <div class="container" style="padding-bottom: 7rem; position: relative; z-index: 5;">
-            <!-- Tab Content -->
-            <div class="tab-content mt-4" id="pills-tabContent" data-aos="fade-up" data-aos-delay="200">
-                <!-- Tab 1: Usuario -->
-                <div class="tab-pane fade show active" id="pills-user" role="tabpanel" aria-labelledby="pills-user-tab">
-                    <div class="row align-items-center">
-                        <div class="col-lg-6 mb-5 mb-lg-0 pe-lg-5">
-                            <h3 class="mb-4 fw-bold" style="font-size: 2.5rem; color: #1e293b; line-height: 1.2;">Conéctate con tu colegio</h3>
-                            <p class="mb-5" style="font-size: 1.15rem; line-height: 1.7; color: #64748b;">Accede a tus calificaciones, revisa la asistencia y mantén comunicación directa con tu comunidad educativa según tu rol (alumno, familiar, profesor o directivo).</p>
-                            
-                            <div class="d-flex flex-column position-relative pb-4">
-                                <div class="step-item d-flex align-items-start mb-4 position-relative">
-                                    <div class="step-circle d-flex align-items-center justify-content-center flex-shrink-0 rounded-circle shadow" style="background: #7066e0; color: white;">1</div>
-                                    <div class="ms-4 pt-2 pb-3 bg-white px-4 rounded-4 shadow-sm w-100" style="border: 1px solid rgba(0,0,0,0.03);">
-                                        <h5 class="fw-bold mb-1" style="color: #1e293b;">Crea tu cuenta</h5>
-                                        <p class="text-secondary mb-0" style="font-size: 0.95rem;">Regístrate de forma gratuita con tu correo electrónico personal.</p>
-                                    </div>
-                                </div>
-                                
-                                <div class="step-item d-flex align-items-start mb-4 position-relative">
-                                    <div class="step-circle d-flex align-items-center justify-content-center flex-shrink-0 rounded-circle shadow-sm" style="background: white; color: #7066e0; border: 2px solid #7066e0;">2</div>
-                                    <div class="ms-4 pt-2 pb-3 bg-white px-4 rounded-4 shadow-sm w-100" style="border: 1px solid rgba(0,0,0,0.03);">
-                                        <h5 class="fw-bold mb-1" style="color: #1e293b;">Solicita acceso</h5>
-                                        <p class="text-secondary mb-0" style="font-size: 0.95rem;">Busca tu colegio en nuestra red y envía una solicitud para unirte.</p>
-                                    </div>
-                                </div>
-                                
-                                <div class="step-item d-flex align-items-start position-relative">
-                                    <div class="step-circle d-flex align-items-center justify-content-center flex-shrink-0 rounded-circle shadow-sm" style="background: white; color: #7066e0; border: 2px solid #7066e0;">3</div>
-                                    <div class="ms-4 pt-2 pb-3 bg-white px-4 rounded-4 shadow-sm w-100" style="border: 1px solid rgba(0,0,0,0.03);">
-                                        <h5 class="fw-bold mb-1" style="color: #1e293b;">Accede a tu portal</h5>
-                                        <p class="text-secondary mb-0" style="font-size: 0.95rem;">Una vez aprobado, accede a las herramientas y datos correspondientes a tu rol.</p>
-                                    </div>
-                                </div>
-                            </div>
+        <!-- Plan Básico -->
+        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+          <div class="pricing-card-v2">
+            <h4 class="fw-extrabold mb-1">Plan Básico</h4>
+            <p class="small text-muted mb-4">Para jardines y escuelas pequeñas que buscan digitalizar su libro de clases.</p>
 
-                            <div class="mt-4 d-flex flex-wrap gap-3">
-                                <a href="{% url 'registro' %}" class="btn btn-primary-custom rounded-pill d-inline-flex align-items-center px-4 py-3 fw-bold shadow" style="font-size: 1rem;">
-                                    Comenzar y crear mi cuenta <i class="bi bi-person-plus ms-2"></i>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col-lg-6 text-center position-relative">
-                            <div class="position-absolute rounded-circle" style="width: 450px; height: 450px; background: radial-gradient(circle, rgba(112, 102, 224, 0.12) 0%, rgba(112, 102, 224, 0) 70%); top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 0;"></div>
-                            
-                            <div class="glass-card p-3 rounded-4 position-relative" style="z-index: 1; transform: perspective(1000px) rotateY(-5deg) translateY(-10px); transition: transform 0.5s ease;" onmouseover="this.style.transform='perspective(1000px) rotateY(0deg) translateY(0)'" onmouseout="this.style.transform='perspective(1000px) rotateY(-5deg) translateY(-10px)'">
-                                <!-- Interfaz falsa navegador -->
-                                <div class="d-flex align-items-center px-3 pb-3 mb-2" style="border-bottom: 1px solid rgba(0,0,0,0.05);">
-                                    <div class="d-flex gap-2">
-                                        <div class="rounded-circle shadow-sm" style="width: 12px; height: 12px; background: #ff5f56;"></div>
-                                        <div class="rounded-circle shadow-sm" style="width: 12px; height: 12px; background: #ffbd2e;"></div>
-                                        <div class="rounded-circle shadow-sm" style="width: 12px; height: 12px; background: #27c93f;"></div>
-                                    </div>
-                                </div>
-                                <div class="p-1">
-                                    <img src="{% static 'img/resumen.png' %}" alt="Portal Usuario" class="img-fluid rounded-3" style="box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tab 2: Colegio -->
-                <div class="tab-pane fade" id="pills-school" role="tabpanel" aria-labelledby="pills-school-tab">
-                    <div class="row align-items-center">
-                        <div class="col-lg-6 mb-5 mb-lg-0 pe-lg-5">
-                            <span class="text-uppercase fw-bold mb-2 d-block" style="color: #0d9488; letter-spacing: 1px; font-size: 0.85rem;"><i class="bi bi-hdd-network-fill me-1"></i> Plataforma Institucional</span>
-                            <h3 class="mb-4 fw-bold" style="font-size: 2.5rem; color: #1e293b; line-height: 1.2;">Un ERP escolar completo y modular</h3>
-                            <p class="mb-5" style="font-size: 1.15rem; line-height: 1.7; color: #64748b;">Optimiza la administración de tu colegio. Configura módulos de asistencia, notas, contabilidad y comunicación a la medida de tu comunidad educativa.</p>
-                            
-                            <div class="d-flex flex-column position-relative pb-4">
-                                <div class="step-item d-flex align-items-start mb-4 position-relative">
-                                    <div class="step-circle d-flex align-items-center justify-content-center flex-shrink-0 rounded-circle shadow" style="background: #0d9488; color: white;">1</div>
-                                    <div class="ms-4 pt-2 pb-3 bg-white px-4 rounded-4 shadow-sm w-100" style="border: 1px solid rgba(0,0,0,0.03);">
-                                        <h5 class="fw-bold mb-1" style="color: #1e293b;">Registra tu institución</h5>
-                                        <p class="text-secondary mb-0" style="font-size: 0.95rem;">Da de alta tu colegio y configura el perfil básico y corporativo.</p>
-                                    </div>
-                                </div>
-                                
-                                <div class="step-item d-flex align-items-start mb-4 position-relative">
-                                    <div class="step-circle d-flex align-items-center justify-content-center flex-shrink-0 rounded-circle shadow-sm" style="background: white; color: #0d9488; border: 2px solid #0d9488;">2</div>
-                                    <div class="ms-4 pt-2 pb-3 bg-white px-4 rounded-4 shadow-sm w-100" style="border: 1px solid rgba(0,0,0,0.03);">
-                                        <h5 class="fw-bold mb-1" style="color: #1e293b;">Elige tu plan a medida</h5>
-                                        <p class="text-secondary mb-0" style="font-size: 0.95rem;">Selecciona el nivel de servicio y las herramientas que realmente necesitas.</p>
-                                    </div>
-                                </div>
-                                
-                                <div class="step-item d-flex align-items-start position-relative">
-                                    <div class="step-circle d-flex align-items-center justify-content-center flex-shrink-0 rounded-circle shadow-sm" style="background: white; color: #0d9488; border: 2px solid #0d9488;">3</div>
-                                    <div class="ms-4 pt-2 pb-3 bg-white px-4 rounded-4 shadow-sm w-100" style="border: 1px solid rgba(0,0,0,0.03);">
-                                        <h5 class="fw-bold mb-1" style="color: #1e293b;">Invita a tu comunidad</h5>
-                                        <p class="text-secondary mb-0" style="font-size: 0.95rem;">Agrega profesores, aprueba alumnos y comienza a operar tu escuela.</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="mt-3">
-                                <a href="{% url 'registro_colegio' %}" class="btn btn-outline-custom rounded-pill d-inline-flex align-items-center px-5 py-3 fw-bold shadow-sm" style="font-size: 1.05rem; border-color: #0d9488; color: #0d9488; background: white;">
-                                    Registrar mi colegio ahora <i class="bi bi-building ms-2 fs-5"></i>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col-lg-6 text-center position-relative mt-5 mt-lg-0">
-                            <div class="position-absolute rounded-circle" style="width: 450px; height: 450px; background: radial-gradient(circle, rgba(13, 148, 136, 0.12) 0%, rgba(13, 148, 136, 0) 70%); top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 0;"></div>
-                            
-                            <div class="glass-card p-5 rounded-4 d-flex flex-column justify-content-center align-items-center position-relative" style="z-index: 1; min-height: 480px; transform: perspective(1000px) rotateY(5deg) translateY(-10px); transition: transform 0.5s ease;" onmouseover="this.style.transform='perspective(1000px) rotateY(0deg) translateY(0)'" onmouseout="this.style.transform='perspective(1000px) rotateY(5deg) translateY(-10px)'">
-                                <div class="mb-4 position-relative">
-                                    <!-- Bolitas flotantes para un toque más tec/moderno -->
-                                    <div class="position-absolute rounded-circle shadow" style="width: 24px; height: 24px; top: -10px; right: -15px; z-index: 2; background: linear-gradient(135deg, #f59e0b, #d97706); animation: float-element 2s ease-in-out infinite;"></div>
-                                    <div class="position-absolute rounded-circle shadow" style="width: 16px; height: 16px; bottom: 20px; left: -20px; z-index: 2; background: linear-gradient(135deg, #3b82f6, #2563eb); animation: float-element 2.5s ease-in-out infinite alternate;"></div>
-                                    
-                                    <i class="bi bi-laptop" style="font-size: 9rem; color: #0d9488; position: relative; z-index: 1;"></i>
-                                </div>
-                                <h4 class="fw-bold mb-2" style="color: #1e293b; font-size: 1.8rem;">Control Total en tu Panel</h4>
-                                <p class="mb-0" style="color: #64748b; font-size: 1.1rem; max-width: 85%;">Gestiona métricas, facturación y procesos académicos de forma unificada.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="mb-4">
+              <span class="fs-1 fw-extrabold text-dark price-val" data-mensual="$49.900" data-anual="$42.400">$42.400</span>
+              <span class="text-muted small">/ mes + IVA</span>
             </div>
-        </div>
-    </section>
 
-    <!-- 4. Sección de módulos -->
-    <section id="modulos" class="modules-section">
-        <div class="container">
-            <h2 class="section-title" data-aos="fade-up">Módulos principales</h2>
-            <div class="row g-4">
-                <!-- Módulo 1 -->
-                <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="100">
-                    <div class="module-card">
-                        <div class="module-icon icon-purple">
-                            <i class="bi bi-book"></i>
-                        </div>
-                        <h3 class="module-title">Libro de clases</h3>
-                        <p class="mb-0">Gestión digital de contenidos y planificaciones.</p>
-                    </div>
-                </div>
-                <!-- Módulo 2 -->
-                <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="200">
-                    <div class="module-card">
-                        <div class="module-icon icon-mint">
-                            <i class="bi bi-calendar2-check"></i>
-                        </div>
-                        <h3 class="module-title">Asistencia</h3>
-                        <p class="mb-0">Registro rápido y preciso con alertas automáticas.</p>
-                    </div>
-                </div>
-                <!-- Módulo 3 -->
-                <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="300">
-                    <div class="module-card">
-                        <div class="module-icon icon-coral">
-                            <i class="bi bi-person-badge"></i>
-                        </div>
-                        <h3 class="module-title">Perfil del alumno</h3>
-                        <p class="mb-0">Ficha centralizada con historial académico y médico.</p>
-                    </div>
-                </div>
-                <!-- Módulo 4 -->
-                <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="400">
-                    <div class="module-card">
-                        <div class="module-icon icon-yellow">
-                            <i class="bi bi-bar-chart-line"></i>
-                        </div>
-                        <h3 class="module-title">Reportes</h3>
-                        <p class="mb-0">Generación de informes de notas y certificados.</p>
-                    </div>
-                </div>
-                <!-- Módulo 5 -->
-                <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="100">
-                    <div class="module-card">
-                        <div class="module-icon icon-blue">
-                            <i class="bi bi-calendar-event"></i>
-                        </div>
-                        <h3 class="module-title">Calendario</h3>
-                        <p class="mb-0">Eventos, pruebas y feriados escolares compartidos.</p>
-                    </div>
-                </div>
-                <!-- Módulo 6 -->
-                <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="200">
-                    <div class="module-card">
-                        <div class="module-icon icon-purple">
-                            <i class="bi bi-file-earmark-bar-graph"></i>
-                        </div>
-                        <h3 class="module-title">SIMCE</h3>
-                        <p class="mb-0">Gestión y análisis de ensayos estandarizados.</p>
-                    </div>
-                </div>
-                <!-- Módulo 7 -->
-                <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="300">
-                    <div class="module-card">
-                        <div class="module-icon icon-mint">
-                            <i class="bi bi-wallet2"></i>
-                        </div>
-                        <h3 class="module-title">Contabilidad</h3>
-                        <p class="mb-0">Control de pagos, mensualidades y matrículas.</p>
-                    </div>
-                </div>
-                <!-- Módulo 8 -->
-                <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="400">
-                    <div class="module-card">
-                        <div class="module-icon icon-gray">
-                            <i class="bi bi-box-seam"></i>
-                        </div>
-                        <h3 class="module-title">Proveedores</h3>
-                        <p class="mb-0">Administración de compras y recursos escolares.</p>
-                    </div>
-                </div>
+            <ul class="list-unstyled small text-muted d-flex flex-column gap-2.5 mb-4 flex-grow-1">
+              <li><i class="bi bi-check-circle-fill text-success me-2"></i> Hasta 200 estudiantes</li>
+              <li><i class="bi bi-check-circle-fill text-success me-2"></i> Libro de clases digital estándar</li>
+              <li><i class="bi bi-check-circle-fill text-success me-2"></i> Asistencia diaria y atrasos</li>
+              <li><i class="bi bi-check-circle-fill text-success me-2"></i> Registro de notas y promedios</li>
+              <li><i class="bi bi-x-circle text-muted me-2"></i> Simulador SIMCE & DIA</li>
+              <li><i class="bi bi-x-circle text-muted me-2"></i> Finanzas & Directorio Proveedores</li>
+            </ul>
+
+            <a href="{% url 'registro_colegio' %}" class="btn btn-eduteka-outline w-100 py-2.5 justify-content-center">
+              Elegir Plan Básico
+            </a>
+          </div>
+        </div>
+
+        <!-- Plan Profesional (Featured) -->
+        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+          <div class="pricing-card-v2 featured">
+            <div class="popular-ribbon">⭐ Más Elegido por Colegios</div>
+
+            <h4 class="fw-extrabold mb-1 text-primary">Plan Profesional</h4>
+            <p class="small text-muted mb-4">Para colegios y liceos que requieren control curricular, SIMCE y ACLES.</p>
+
+            <div class="mb-4">
+              <span class="fs-1 fw-extrabold text-primary price-val" data-mensual="$89.900" data-anual="$76.400">$76.400</span>
+              <span class="text-muted small">/ mes + IVA</span>
             </div>
-        </div>
-    </section>
 
-    <!-- 5. Sección de beneficios -->
-    <section id="beneficios" class="benefits-section">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-6 pe-lg-5" data-aos="fade-right">
-                    <h2 class="mb-4" style="font-size: 2.5rem; line-height: 1.3;">Todo lo que tu colegio necesita, en 
-                        <span class="letra-coral">u</span><span class="letra-turquesa">n</span>
-                        <span class="letra-morado">s</span><span class="letra-amarillo">o</span><span class="letra-azul">l</span><span class="letra-lila">o</span>
-                        <span class="letra-turquesa">l</span><span class="letra-coral">u</span><span class="letra-morado">g</span><span class="letra-amarillo">a</span><span class="letra-azul">r</span>
-                    </h2>
-                    <p class="mb-5" style="font-size: 1.1rem;">Nuestra plataforma está diseñada específicamente para las necesidades reales de los colegios, eliminando el papeleo y reduciendo el tiempo en tareas administrativas.</p>
-                    
-                    <div class="benefit-item" data-aos="fade-up" data-aos-delay="100">
-                        <i class="bi bi-check-circle-fill benefit-icon"></i>
-                        <div>
-                            <h5 class="mb-1">Centraliza la información académica.</h5>
-                            <p class="small">Todo el historial de los estudiantes accesible en segundos, de forma segura.</p>
-                        </div>
-                    </div>
-                    <div class="benefit-item" data-aos="fade-up" data-aos-delay="200">
-                        <i class="bi bi-check-circle-fill benefit-icon"></i>
-                        <div>
-                            <h5 class="mb-1">Mejora la comunicación interna.</h5>
-                            <p class="small">Conecta a directivos, profesores, alumnos y apoderados eficientemente.</p>
-                        </div>
-                    </div>
-                    <div class="benefit-item" data-aos="fade-up" data-aos-delay="300">
-                        <i class="bi bi-check-circle-fill benefit-icon"></i>
-                        <div>
-                            <h5 class="mb-1">Facilita reportes e informes.</h5>
-                            <p class="small">Exporta datos en formato oficial o personalizado con un par de clics.</p>
-                        </div>
-                    </div>
-                    <div class="benefit-item" data-aos="fade-up" data-aos-delay="400">
-                        <i class="bi bi-check-circle-fill benefit-icon"></i>
-                        <div>
-                            <h5 class="mb-1">Permite controlar asistencia, notas y alumnos.</h5>
-                            <p class="small">Herramientas ágiles para el día a día en el aula.</p>
-                        </div>
-                    </div>
-                    <div class="benefit-item" data-aos="fade-up" data-aos-delay="500">
-                        <i class="bi bi-check-circle-fill benefit-icon"></i>
-                        <div>
-                            <h5 class="mb-1">Sistema adaptable a cada colegio.</h5>
-                            <p class="small">Configurable según la metodología y reglas de tu institución educativa.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6" data-aos="fade-left" data-aos-delay="200">
-                    <div class="benefits-image-wrapper text-center floating-element">
-                        <img src="{% static 'img/mujer.png' %}" alt="Plataforma Integral" class="img-fluid rounded-4 shadow-lg">
-                    </div>
-                </div>
+            <ul class="list-unstyled small text-dark fw-semibold d-flex flex-column gap-2.5 mb-4 flex-grow-1">
+              <li><i class="bi bi-check-circle-fill text-primary me-2"></i> Hasta 700 estudiantes</li>
+              <li><i class="bi bi-check-circle-fill text-primary me-2"></i> <strong>Libro de Clases Full + Acompañamiento PIE</strong></li>
+              <li><i class="bi bi-check-circle-fill text-primary me-2"></i> <strong>Módulo SIMCE & Diagnóstico Integral DIA</strong></li>
+              <li><i class="bi bi-check-circle-fill text-primary me-2"></i> Talleres Extracurriculares (ACLES)</li>
+              <li><i class="bi bi-check-circle-fill text-primary me-2"></i> Convivencia escolar y hoja de vida</li>
+              <li><i class="bi bi-check-circle-fill text-primary me-2"></i> Exportación oficial Excel y actas SIGE</li>
+            </ul>
+
+            <a href="{% url 'registro_colegio' %}" class="btn btn-eduteka-primary w-100 py-3 justify-content-center shadow">
+              Comenzar con Profesional
+            </a>
+          </div>
+        </div>
+
+        <!-- Plan Institucional -->
+        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+          <div class="pricing-card-v2">
+            <h4 class="fw-extrabold mb-1">Plan Institucional</h4>
+            <p class="small text-muted mb-4">La suite corporativa total con control financiero, inventario y soporte 24/7.</p>
+
+            <div class="mb-4">
+              <span class="fs-1 fw-extrabold text-dark price-val" data-mensual="$149.900" data-anual="$127.400">$127.400</span>
+              <span class="text-muted small">/ mes + IVA</span>
             </div>
-        </div>
-    </section>
 
-    <!-- 6. CTA final -->
-    <section class="container" data-aos="zoom-in">
-        <div class="cta-section">
-            <h2>Lleva a tu colegio al siguiente nivel</h2>
-            <p class="mb-4 text-white" style="opacity: 0.9; font-size: 1.1rem;">Contrata Eduteka hoy, elige tu plan y simplifica la administración escolar para toda tu comunidad.</p>
-            <a href="{% url 'registro_colegio' %}" class="btn btn-white btn-lg px-5" style="border-radius: 30px; font-weight: bold; text-transform: uppercase; font-size: 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">Registrar mi colegio</a>
-        </div>
-    </section>
+            <ul class="list-unstyled small text-muted d-flex flex-column gap-2.5 mb-4 flex-grow-1">
+              <li><i class="bi bi-check-circle-fill text-success me-2"></i> Estudiantes ilimitados</li>
+              <li><i class="bi bi-check-circle-fill text-success me-2"></i> <strong>Todos los módulos activos</strong></li>
+              <li><i class="bi bi-check-circle-fill text-success me-2"></i> Control financiero, caja chica y rendiciones</li>
+              <li><i class="bi bi-check-circle-fill text-success me-2"></i> Inventario & Directorio de Proveedores</li>
+              <li><i class="bi bi-check-circle-fill text-success me-2"></i> Soporte preferencial WhatsApp 24/7</li>
+              <li><i class="bi bi-check-circle-fill text-success me-2"></i> Capacitación presencial y online ilimitada</li>
+            </ul>
 
-    <!-- 7. Footer -->
-    <footer id="contacto" class="footer">
-        <div class="container">
-            <div class="row gy-4">
-                <div class="col-lg-4 col-md-6">
-                    <a href="#" class="footer-logo text-decoration-none">
-                        <img src="{% static 'img/logo.png' %}" alt="Eduteka Logo" style="height: 100px; width: auto;">
-                    </a>
-                    <p class="footer-text">El ERP escolar diseñado para simplificar la vida de la comunidad educativa. Centraliza, organiza y optimiza los procesos de tu colegio.</p>
+            <a href="{% url 'registro_colegio' %}" class="btn btn-eduteka-outline w-100 py-2.5 justify-content-center">
+              Elegir Institucional
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. PREGUNTAS FRECUENTES (FAQ) -->
+  <section id="faq" class="py-6" style="padding: 6.5rem 0;">
+    <div class="container">
+      
+      <div class="text-center max-w-700 mx-auto mb-5" data-aos="fade-up">
+        <span class="badge rounded-pill px-3 py-1.5 mb-2" style="background:#F0EDFF; color:#7C5CFC; font-weight:700;">Resolvemos tus Dudas</span>
+        <h2 class="fs-1 fw-extrabold mb-3">Preguntas Frecuentes</h2>
+        <p class="text-muted">Conoce todo acerca de la normativa, seguridad y soporte de Eduteka.</p>
+      </div>
+
+      <div class="row justify-content-center" data-aos="fade-up">
+        <div class="col-lg-9">
+          <div class="accordion accordion-modern" id="accFaqEduteka">
+            
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingFaq1">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFaq1" aria-expanded="true" aria-controls="collapseFaq1">
+                  ¿Eduteka cumple con la Circular N° 30 de la Superintendencia de Educación?
+                </button>
+              </h2>
+              <div id="collapseFaq1" class="accordion-collapse collapse show" aria-labelledby="headingFaq1" data-bs-parent="#accFaqEduteka">
+                <div class="accordion-body text-muted">
+                  <strong>Sí, en su totalidad.</strong> Eduteka cumple rigurosamente con los lineamientos técnicos, firma digital, respaldo automático y trazabilidad inalterable de asistencia y calificaciones establecidos por la Superintendencia de Educación para el Libro de Clases Digital.
                 </div>
-                <div class="col-lg-2 col-md-6">
-                    <h5>Plataforma</h5>
-                    <ul class="footer-links">
-                        <li><a href="#modulos">Módulos</a></li>
-                        <li><a href="#beneficios">Beneficios</a></li>
-                        <li><a href="#">Integraciones</a></li>
-                        <li><a href="#">Precios</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-2 col-md-6">
-                    <h5>Compañía</h5>
-                    <ul class="footer-links">
-                        <li><a href="#">Sobre nosotros</a></li>
-                        <li><a href="#">Casos de éxito</a></li>
-                        <li><a href="#">Blog</a></li>
-                        <li><a href="#">Empleos</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-4 col-md-6">
-                    <h5>Contacto</h5>
-                    <ul class="footer-links">
-                        <li class="d-flex align-items-center mb-2">
-                            <i class="bi bi-envelope me-2" style="color: var(--color-secondary);"></i>
-                            <a href="mailto:hola@eduteka.com">hola@eduteka.com</a>
-                        </li>
-                        <li class="d-flex align-items-center mb-2">
-                            <i class="bi bi-telephone me-2" style="color: var(--color-secondary);"></i>
-                            <span class="footer-text mb-0">+1 234 567 8900</span>
-                        </li>
-                        <li class="d-flex align-items-center">
-                            <i class="bi bi-geo-alt me-2" style="color: var(--color-secondary);"></i>
-                            <span class="footer-text mb-0">Santiago, Chile</span>
-                        </li>
-                    </ul>
-                    <div class="d-flex gap-3 mt-4">
-                        <a href="#" class="fs-5" style="color: var(--text-secondary); transition: color 0.3s;" onmouseover="this.style.color='var(--color-main)'" onmouseout="this.style.color='var(--text-secondary)'"><i class="bi bi-linkedin"></i></a>
-                        <a href="#" class="fs-5" style="color: var(--text-secondary); transition: color 0.3s;" onmouseover="this.style.color='var(--color-main)'" onmouseout="this.style.color='var(--text-secondary)'"><i class="bi bi-twitter-x"></i></a>
-                        <a href="#" class="fs-5" style="color: var(--text-secondary); transition: color 0.3s;" onmouseover="this.style.color='var(--color-main)'" onmouseout="this.style.color='var(--text-secondary)'"><i class="bi bi-instagram"></i></a>
-                    </div>
-                </div>
+              </div>
             </div>
-            <div class="copyright">
-                <p>&copy; 2026 Eduteka. Todos los derechos reservados.</p>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingFaq2">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFaq2" aria-expanded="false" aria-controls="collapseFaq2">
+                  ¿Cómo migramos los datos desde nuestro sistema o planillas Excel?
+                </button>
+              </h2>
+              <div id="collapseFaq2" class="accordion-collapse collapse" aria-labelledby="headingFaq2" data-bs-parent="#accFaqEduteka">
+                <div class="accordion-body text-muted">
+                  Eduteka cuenta con un importador masivo en formato Excel que te permite cargar toda la nómina de estudiantes, apoderados, cursos y profesores en minutos. Además, nuestro equipo de soporte te asiste de forma personalizada durante todo el onboarding.
+                </div>
+              </div>
             </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingFaq3">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFaq3" aria-expanded="false" aria-controls="collapseFaq3">
+                  ¿Cómo calcula los puntajes el módulo de Evaluación SIMCE?
+                </button>
+              </h2>
+              <div id="collapseFaq3" class="accordion-collapse collapse" aria-labelledby="headingFaq3" data-bs-parent="#accFaqEduteka">
+                <div class="accordion-body text-muted">
+                  Al registrar un simulacro e ingresar las respuestas correctas por estudiante, el sistema aplica una escala lineal oficial de 150 a 350 puntos, categoriza en los 3 estándares de aprendizaje (Insuficiente, Elemental, Adecuado) y grafica la evolución histórica comparada contra el GSE y el promedio Nacional.
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingFaq4">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFaq4" aria-expanded="false" aria-controls="collapseFaq4">
+                  ¿Qué nivel de soporte técnico y capacitación se entrega?
+                </button>
+              </h2>
+              <div id="collapseFaq4" class="accordion-collapse collapse" aria-labelledby="headingFaq4" data-bs-parent="#accFaqEduteka">
+                <div class="accordion-body text-muted">
+                  Entregamos capacitación telemática o presencial a directivos y docentes, manuales de usuario y una mesa de ayuda dedicada vía WhatsApp y correo electrónico para resolver cualquier requerimiento en minutos.
+                </div>
+              </div>
+            </div>
+
+          </div>
         </div>
-    </footer>
+      </div>
 
-    <!-- Bootstrap JS Bundle from local static -->
-    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
-    
-    <!-- AOS Animation JS -->
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    </div>
+  </section>
 
-    <script>
-        // Initialize AOS
-        AOS.init({
-            duration: 500,
-            once: true,
-            offset: 100
-        });
+  <!-- 10. BANNER FINAL CTA GLOW -->
+  <section class="container" data-aos="zoom-in">
+    <div class="cta-glow-container">
+      <div class="position-relative" style="z-index:2; max-width:760px; margin:0 auto;">
+        <h2 class="fs-1 fw-extrabold text-white mb-3">Lleva a tu colegio al siguiente nivel digital</h2>
+        <p class="text-white text-opacity-90 fs-5 mb-4">
+          Únete a más de 150 colegios que ya simplificaron su administración escolar con Eduteka. Comienza tu prueba gratuita hoy mismo.
+        </p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+          <a href="{% url 'registro_colegio' %}" class="btn btn-light btn-lg px-5 py-3 text-primary fw-extrabold shadow" style="border-radius:100px;">
+            <i class="bi bi-rocket-takeoff-fill me-1.5"></i> Registrar mi Colegio Gratis
+          </a>
+          <a href="{% url 'registro' %}" class="btn btn-outline-light btn-lg px-4 py-3 fw-bold" style="border-radius:100px;">
+            Crear cuenta de usuario
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        // Transición de fondos para la sección "Tu rol en Eduteka"
-        document.addEventListener('DOMContentLoaded', function() {
-            const studentTab = document.getElementById('pills-user-tab');
-            const schoolTab = document.getElementById('pills-school-tab');
-            const bgDocente = document.querySelector('.bg-docente');
-            const bgColegio = document.querySelector('.bg-colegio');
+  <!-- 11. FOOTER INSTITUCIONAL -->
+  <footer id="contacto" class="footer-v2">
+    <div class="container">
+      <div class="row gy-4">
+        
+        <div class="col-lg-4 col-md-6">
+          <a href="#inicio" class="d-inline-block mb-3">
+            <img src="{% static 'img/logo.png' %}" alt="Eduteka Logo" style="height: 52px; width: auto;">
+          </a>
+          <p class="text-muted small mb-3">
+            Eduteka es el software ERP y Libro de Clases Digital líder en Chile, diseñado para conectar a directivos, profesores y familias en un entorno intuitivo y confiable.
+          </p>
+          <div class="d-flex gap-3 text-muted">
+            <a href="#" class="fs-5"><i class="bi bi-linkedin"></i></a>
+            <a href="#" class="fs-5"><i class="bi bi-instagram"></i></a>
+            <a href="#" class="fs-5"><i class="bi bi-youtube"></i></a>
+          </div>
+        </div>
 
-            if(studentTab && schoolTab) {
-                studentTab.addEventListener('show.bs.tab', function () {
-                    bgDocente.classList.add('active');
-                    bgColegio.classList.remove('active');
-                });
+        <div class="col-lg-2 col-md-6">
+          <h6 class="fw-extrabold text-dark mb-3">Módulos</h6>
+          <ul class="list-unstyled small d-flex flex-column gap-2">
+            <li><a href="#bento-features">Libro de Clases</a></li>
+            <li><a href="#bento-features">Asistencia en Vivo</a></li>
+            <li><a href="#bento-features">SIMCE & DIA</a></li>
+            <li><a href="#bento-features">Talleres ACLES</a></li>
+            <li><a href="#bento-features">Control Financiero</a></li>
+          </ul>
+        </div>
 
-                schoolTab.addEventListener('show.bs.tab', function () {
-                    bgColegio.classList.add('active');
-                    bgDocente.classList.remove('active');
-                });
-            }
-        });
-    </script>
+        <div class="col-lg-2 col-md-6">
+          <h6 class="fw-extrabold text-dark mb-3">Plataforma</h6>
+          <ul class="list-unstyled small d-flex flex-column gap-2">
+            <li><a href="#simulador-demo">Demo Interactiva</a></li>
+            <li><a href="#calculadora-roi">Calculadora ROI</a></li>
+            <li><a href="#precios">Planes y Tarifas</a></li>
+            <li><a href="#faq">Preguntas Frecuentes</a></li>
+            <li><a href="{% url 'login' %}">Iniciar Sesión</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+          <h6 class="fw-extrabold text-dark mb-3">Contacto & Mesa de Ayuda</h6>
+          <ul class="list-unstyled small d-flex flex-column gap-2 text-muted">
+            <li><i class="bi bi-envelope-fill text-primary me-2"></i> contacto@eduteka.cl</li>
+            <li><i class="bi bi-whatsapp text-success me-2"></i> +56 9 8765 4321 (Atención Colegios)</li>
+            <li><i class="bi bi-geo-alt-fill text-danger me-2"></i> Santiago, Chile</li>
+          </ul>
+          <div class="mt-3 p-3 bg-light rounded-3 border">
+            <span class="extra-small text-muted fw-bold d-block text-uppercase mb-1">Acreditación Normativa</span>
+            <span class="small fw-bold text-dark"><i class="bi bi-shield-check text-success me-1"></i> Cumplimiento Circular N° 30 MINEDUC</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="border-top pt-4 mt-5 d-flex justify-content-between align-items-center flex-wrap gap-2 text-muted extra-small">
+        <span>&copy; 2026 Eduteka SpA. Todos los derechos reservados.</span>
+        <div class="d-flex gap-3">
+          <a href="#" class="text-muted">Términos de Servicio</a>
+          <a href="#" class="text-muted">Políticas de Privacidad</a>
+          <a href="#" class="text-muted">Seguridad de Datos</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+  <!-- AOS JS -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+  <!-- Interactive Demo & Calculators Logic -->
+  <script>
+    AOS.init({
+      duration: 600,
+      once: true,
+      offset: 80
+    });
+
+    // Vistas del Simulador Interactivo
+    const demoViews = {
+      'notas': `
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+          <div>
+            <h5 class="fw-bold text-dark mb-0"><i class="bi bi-journal-check text-primary me-2"></i>Planilla de Calificaciones — 3° Básico A</h5>
+            <span class="text-muted extra-small">Asignatura: Matemáticas &nbsp;|&nbsp; 1° Semestre 2026</span>
+          </div>
+          <span class="badge bg-primary-subtle text-primary fw-bold px-3 py-1.5 rounded-pill">Promedio Curso: 6.1</span>
+        </div>
+        <div class="table-responsive bg-white rounded-3 border shadow-sm">
+          <table class="table table-hover align-middle mb-0 extra-small">
+            <thead class="table-light">
+              <tr>
+                <th>Estudiante</th>
+                <th class="text-center">Eval 1 (25%)</th>
+                <th class="text-center">Eval 2 (35%)</th>
+                <th class="text-center">Prueba Semestral (40%)</th>
+                <th class="text-center">Promedio</th>
+                <th class="text-center">Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="fw-bold text-dark"><i class="bi bi-person-circle text-muted me-1.5"></i> Alvarez, Camilo <span class="badge bg-light text-primary border ms-1">PIE</span></td>
+                <td class="text-center fw-semibold text-success">6.5</td>
+                <td class="text-center fw-semibold text-success">6.0</td>
+                <td class="text-center fw-semibold text-success">6.8</td>
+                <td class="text-center fw-extrabold text-primary fs-6">6.4</td>
+                <td class="text-center"><span class="badge bg-success-subtle text-success">Aprobado</span></td>
+              </tr>
+              <tr>
+                <td class="fw-bold text-dark"><i class="bi bi-person-circle text-muted me-1.5"></i> Gonzalez, Sofia</td>
+                <td class="text-center fw-semibold text-success">7.0</td>
+                <td class="text-center fw-semibold text-success">6.8</td>
+                <td class="text-center fw-semibold text-success">6.5</td>
+                <td class="text-center fw-extrabold text-primary fs-6">6.7</td>
+                <td class="text-center"><span class="badge bg-success-subtle text-success">Sobresaliente</span></td>
+              </tr>
+              <tr>
+                <td class="fw-bold text-dark"><i class="bi bi-person-circle text-muted me-1.5"></i> Morales, Diego</td>
+                <td class="text-center fw-semibold text-warning">4.8</td>
+                <td class="text-center fw-semibold text-success">5.5</td>
+                <td class="text-center fw-semibold text-success">5.2</td>
+                <td class="text-center fw-extrabold text-dark fs-6">5.2</td>
+                <td class="text-center"><span class="badge bg-primary-subtle text-primary">Aprobado</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `,
+      'asistencia': `
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+          <div>
+            <h5 class="fw-bold text-dark mb-0"><i class="bi bi-calendar-check text-success me-2"></i>Pase de Lista — 1° Medio B</h5>
+            <span class="text-muted extra-small">Fecha: Hoy &nbsp;|&nbsp; Pase de lista en 1 Clic</span>
+          </div>
+          <span class="badge bg-success px-3 py-1.5 text-white fw-bold rounded-pill">96.8% Presentes Hoy</span>
+        </div>
+        <div class="table-responsive bg-white rounded-3 border shadow-sm">
+          <table class="table table-hover align-middle mb-0 extra-small">
+            <thead class="table-light">
+              <tr>
+                <th>Estudiante</th>
+                <th class="text-center">Estado Asistencia</th>
+                <th>Justificación</th>
+                <th>Observación</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="fw-bold text-dark"><i class="bi bi-person-circle text-muted me-1.5"></i> Castro, Valentina</td>
+                <td class="text-center"><span class="badge bg-success text-white px-3 py-1 fw-bold">Presente</span></td>
+                <td class="text-muted">-</td>
+                <td class="text-muted">-</td>
+              </tr>
+              <tr>
+                <td class="fw-bold text-dark"><i class="bi bi-person-circle text-muted me-1.5"></i> Herrera, Martin</td>
+                <td class="text-center"><span class="badge bg-danger text-white px-3 py-1 fw-bold">Ausente</span></td>
+                <td><span class="badge bg-info-subtle text-info border"><i class="bi bi-file-earmark-medical me-1"></i>Médica</span></td>
+                <td class="text-muted small">Reposo 48 hrs</td>
+              </tr>
+              <tr>
+                <td class="fw-bold text-dark"><i class="bi bi-person-circle text-muted me-1.5"></i> Silva, Lucas</td>
+                <td class="text-center"><span class="badge bg-warning text-dark px-3 py-1 fw-bold">Atrasado</span></td>
+                <td class="text-muted">-</td>
+                <td class="text-muted small">Ingreso 08:20 AM</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `,
+      'simce': `
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+          <div>
+            <h5 class="fw-bold text-dark mb-0"><i class="bi bi-award text-warning me-2"></i>Simulador Oficial SIMCE & DIA</h5>
+            <span class="text-muted extra-small">Ensayo 4° Básico — Lectura comprensiva</span>
+          </div>
+          <span class="badge bg-warning-subtle text-warning fw-bold px-3 py-1.5 rounded-pill">Puntaje Colegio: 304 pts</span>
+        </div>
+        <div class="row g-3">
+          <div class="col-md-4 text-center p-3 bg-white rounded-3 border">
+            <span class="text-muted extra-small text-uppercase fw-bold d-block">Puntaje Promedio</span>
+            <span class="fs-2 fw-extrabold text-primary">304 pts</span>
+            <span class="extra-small text-success d-block fw-bold"><i class="bi bi-arrow-up-circle me-1"></i>+28 pts sobre GSE</span>
+          </div>
+          <div class="col-md-8 p-3 bg-white rounded-3 border">
+            <span class="text-muted extra-small text-uppercase fw-bold d-block mb-1">Distribución de Estándares Mineduc</span>
+            <div class="progress mb-2" style="height: 12px; border-radius:6px;">
+              <div style="width: 10%; background:#EF4444;" title="Insuficiente 10%"></div>
+              <div style="width: 25%; background:#F59E0B;" title="Elemental 25%"></div>
+              <div style="width: 65%; background:#10B981;" title="Adecuado 65%"></div>
+            </div>
+            <div class="d-flex justify-content-between extra-small text-muted">
+              <span class="text-danger fw-bold">🔴 10% Insuficiente</span>
+              <span class="text-warning fw-bold">🟡 25% Elemental</span>
+              <span class="text-success fw-bold">🟢 65% Adecuado</span>
+            </div>
+          </div>
+        </div>
+      `,
+      'finanzas': `
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+          <div>
+            <h5 class="fw-bold text-dark mb-0"><i class="bi bi-wallet2 text-danger me-2"></i>Flujo de Caja Chica & Subvención SEP</h5>
+            <span class="text-muted extra-small">Mes en curso &nbsp;|&nbsp; Rendición de cuentas al día</span>
+          </div>
+          <span class="badge bg-success-subtle text-success fw-bold px-3 py-1.5 rounded-pill">Saldo Disponible: $4.850.000</span>
+        </div>
+        <div class="table-responsive bg-white rounded-3 border shadow-sm">
+          <table class="table table-hover align-middle mb-0 extra-small">
+            <thead class="table-light">
+              <tr>
+                <th>Fecha</th>
+                <th>Concepto / Proveedor</th>
+                <th>Centro de Costo</th>
+                <th class="text-end">Monto</th>
+                <th class="text-center">Comprobante</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>18/08/2026</td>
+                <td class="fw-bold text-dark">Subvención General MINEDUC</td>
+                <td><span class="badge bg-primary-subtle text-primary">Ingreso</span></td>
+                <td class="text-end fw-extrabold text-success">+$6.200.000</td>
+                <td class="text-center"><i class="bi bi-check-circle-fill text-success"></i></td>
+              </tr>
+              <tr>
+                <td>15/08/2026</td>
+                <td class="fw-bold text-dark">Distribuidora Escolar — Resmas Papel</td>
+                <td><span class="badge bg-danger-subtle text-danger">Gasto SEP</span></td>
+                <td class="text-end fw-extrabold text-danger">-$340.000</td>
+                <td class="text-center"><i class="bi bi-file-earmark-pdf-fill text-danger"></i></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `
+    };
+
+    function cambiarDemo(vista, btn) {
+      document.querySelectorAll('.interactive-pill-nav button').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      document.getElementById('demoScreenContainer').innerHTML = demoViews[vista] || '';
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+      cambiarDemo('notas', document.querySelector('.interactive-pill-nav button'));
+      calcularROI(500);
+    });
+
+    // Calculadora ROI
+    function calcularROI(matricula) {
+      document.getElementById('txtMatricula').textContent = matricula + ' alumnos';
+
+      const horas = Math.round(matricula * 0.12);
+      const hojas = Math.round(matricula * 36);
+      const dinero = Math.round(matricula * 5400);
+
+      document.getElementById('resHorasDocentes').textContent = horas + ' hrs';
+      document.getElementById('resHojasPapel').textContent = hojas.toLocaleString('es-CL');
+      document.getElementById('resAhorroDinero').textContent = '$' + dinero.toLocaleString('es-CL');
+    }
+
+    // Toggle Facturación Anual
+    function alternarFacturacion(esAnual) {
+      document.querySelectorAll('.price-val').forEach(el => {
+        el.textContent = esAnual ? el.getAttribute('data-anual') : el.getAttribute('data-mensual');
+      });
+    }
+  </script>
 </body>
 </html>

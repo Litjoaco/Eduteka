@@ -80,40 +80,63 @@ def logout_view(request):
 
 @login_required
 def dashboard_usuarios_view(request):
-    # Verificamos por seguridad que el usuario sea miembro activo para poder ver este dashboard
+    # Obtenemos el colegio que administra el usuario o del cual es miembro activo
+    colegio = request.user.colegios_administrados.order_by('-fecha_creacion').first()
     miembro = MiembroColegio.objects.filter(usuario=request.user, activo=True).first()
-    if not miembro:
-        # Si intenta entrar por URL forzada, lo devolvemos a donde corresponde
+    
+    if not colegio and miembro:
+        colegio = miembro.colegio
+    elif not colegio and not miembro:
         if SolicitudAcceso.objects.filter(usuario=request.user, estado='pendiente').exists():
             messages.warning(request, "Tu solicitud aún se encuentra en revisión.")
             return redirect('solicitud_enviada')
         else:
             messages.warning(request, "No has solicitado acceso a ningún colegio.")
             return redirect('solicitar_acceso')
-        
-    colegio = miembro.colegio
-    periodo = ConfiguracionAcademica.objects.filter(colegio=colegio).first()
-    cursos_count = CursoColegio.objects.filter(colegio=colegio, activo=True).count()
-    
-    # Alumnos en riesgo
+
+    from colegios.models import ConfiguracionAcademica, Estudiante, CursoColegio, EventoAgenda, AnotacionEstudiante
     from asistencia.utils import calcular_alumnos_en_riesgo
+    
+    periodo = ConfiguracionAcademica.objects.filter(colegio=colegio).first()
+    total_estudiantes_count = Estudiante.objects.filter(colegio=colegio, activo=True).count()
+    total_cursos_count = CursoColegio.objects.filter(colegio=colegio, activo=True).count()
+    usuarios_colegio_count = MiembroColegio.objects.filter(colegio=colegio, activo=True).count()
+    
+    solicitudes_pendientes = SolicitudAcceso.objects.filter(colegio=colegio, estado='pendiente').order_by('-fecha_solicitud')
+    solicitudes_pendientes_count = solicitudes_pendientes.count()
+    
     alumnos_en_riesgo = calcular_alumnos_en_riesgo(colegio)
     alumnos_en_riesgo_count = len(alumnos_en_riesgo)
     
-    # Rol del usuario para filtrar sidebar
+    hoy_date = timezone.now().date()
+    eventos_hoy = EventoAgenda.objects.filter(colegio=colegio, fecha_inicio__date=hoy_date).order_by('fecha_inicio')
+    cursos = CursoColegio.objects.filter(colegio=colegio, activo=True).prefetch_related('secciones')
+    ultimas_anotaciones = AnotacionEstudiante.objects.filter(estudiante__colegio=colegio).select_related('estudiante', 'docente').order_by('-fecha')[:5]
+
+    
     is_admin = (
         request.user.colegios_administrados.filter(id=colegio.id).exists()
-        or (miembro and miembro.rol.nombre in ['Administrador', 'Director'])
+        or (miembro and miembro.rol and miembro.rol.nombre in ['Administrador', 'Director'])
     )
 
     context = {
         'colegio': colegio,
         'miembro': miembro,
         'periodo': periodo,
-        'cursos_count': cursos_count,
-        'is_admin': is_admin,
-        'hoy': timezone.now(),
-        'alumnos_en_riesgo': alumnos_en_riesgo,
+        'total_estudiantes_count': total_estudiantes_count,
+        'total_cursos_count': total_cursos_count,
+        'cursos_count': total_cursos_count,
+        'usuarios_colegio_count': usuarios_colegio_count,
+        'solicitudes_pendientes': solicitudes_pendientes,
+        'solicitudes_pendientes_count': solicitudes_pendientes_count,
+        'alumnos_en_riesgo': alumnos_en_riesgo[:6],
         'alumnos_en_riesgo_count': alumnos_en_riesgo_count,
+        'eventos_hoy': eventos_hoy,
+        'cursos': cursos,
+        'ultimas_anotaciones': ultimas_anotaciones,
+        'is_admin': is_admin,
+        'active_page': 'inicio',
+        'hoy': timezone.now(),
     }
     return render(request, 'dashboard_usuarios.html', context)
+

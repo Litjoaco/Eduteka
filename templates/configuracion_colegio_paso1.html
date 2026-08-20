@@ -4,250 +4,419 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configura tu colegio - Paso 1 - Eduteka</title>
+    <title>Configura tu colegio - Paso 1: Identidad — Eduteka</title>
     
-    <!-- Google Fonts: Inter -->
+    <!-- Google Fonts: Inter & Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet">
     
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{% static 'css/configuracion_colegio.css' %}">
-    <style>
-        /* Unificar el diseño del Stepper para que sea igual en todos los pasos */
-        .stepper .step {
-            background: transparent !important;
-            border-radius: 0 !important;
-            padding: 0 !important;
-        }
-        .stepper .step-icon {
-            width: 32px !important;
-            height: 32px !important;
-            border-radius: 50% !important; /* Siempre circulares, elimina efecto pastilla */
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            font-weight: 700 !important;
-            background-image: none !important; /* Elimina íconos de fondo */
-            text-indent: 0 !important; /* Mantiene el número visible */
-        }
-        .stepper .step.completed .step-icon {
-            background-color: #7b52d9 !important; /* Color morado */
-            border-color: #7b52d9 !important;
-            color: #ffffff !important;
-        }
-        /* Ocultar checkmarks (ticket positivo) inyectados mediante seudo-elementos */
-        .stepper .step.completed .step-icon::before,
-        .stepper .step.completed .step-icon::after {
-            display: none !important;
-            content: none !important;
-        }
-    </style>
+    <link rel="stylesheet" href="{% static 'css/configuracion_colegio.css' %}?v=6">
+    <link rel="stylesheet" href="{% static 'css/backbutton.css' %}">
 </head>
 <body>
 
-<div class="config-container">
-    
-    <!-- ==========================================
-         LEFT COLUMN 
-         ========================================== -->
-    <div class="left-column">
-        <div class="logo-container">
-            <img src="/static/img/logo.png" alt="Eduteka Logo" style="height: 100px; width: auto;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzdiNTJkOSIgcng9IjIwIi8+PHRleHQgeD0iNTAiIHk9IjY0IiBmb250LWZhbWlseT0iSW50ZXIiIGZvbnQtd2VpZ2h0PSI4MDAiIGZvbnQtc2l6ZT0iNDgiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5FPC90ZXh0Pjwvc3ZnPg=='">
-        </div>
-        
-        <div class="header-text-group">
-            <div class="step-pill">
-                <i class="bi bi-geo-alt-fill"></i> Paso 1 de 5
-            </div>
-            <h1>Configura tu colegio</h1>
-            <p class="desc-text">Comienza definiendo la identidad básica de tu institución para que tu comunidad la reconozca fácilmente.</p>
-        </div>
-        
-        <div class="illustration-wrapper">
-            <div class="deco-blob blob-1"></div>
-            <div class="deco-blob blob-2"></div>
-            <div class="deco-blob blob-3"></div>
-            <img src="{% static 'img/personaliza colegio 1.png' %}" alt="Ilustración Colegio">
-        </div>
-        
-        <div class="plan-includes-card">
-            <h3>Lo que definirás ahora</h3>
-            <ul class="plan-includes-list">
-                <li><i class="bi bi-shield-check"></i> El nombre e identidad central.</li>
-                <li><i class="bi bi-image"></i> Los recursos gráficos principales.</li>
-                <li><i class="bi bi-layout-wtf"></i> La base visual para tu plataforma.</li>
-            </ul>
-        </div>
-    </div>
-    
-    <!-- ==========================================
-         MAIN CARD (RIGHT) 
-         ========================================== -->
-    <div class="main-card">
-        
-        <!-- Compact Stepper -->
-        <div class="stepper">
-            <div class="step active">
-                <div class="step-icon">1</div>
-                <div class="step-text">Identidad</div>
-            </div>
-            <div class="step">
-                <div class="step-icon">2</div>
-                <div class="step-text">Contacto</div>
-            </div>
-            <div class="step">
-                <div class="step-icon">3</div>
-                <div class="step-text">Académica</div>
-            </div>
-            <div class="step">
-                <div class="step-icon">4</div>
-                <div class="step-text">Roles</div>
-            </div>
-            <div class="step">
-                <div class="step-icon">5</div>
-                <div class="step-text">Módulos</div>
-            </div>
-        </div>
-        
-        <!-- Form Header -->
-        <div class="form-section-header">
-            <div class="section-icon-wrapper">
-                <i class="bi bi-building"></i>
-            </div>
-            <div class="section-titles">
-                <h2>Identidad del colegio</h2>
-                <p>Define la información pública principal de tu institución.</p>
-            </div>
-        </div>
-        
-        <!-- Content Grid (Form + Profile Preview) -->
-        <div class="content-grid">
-            
-            <!-- Fields Area -->
-            <div class="form-area">
-                {% if messages %}
-                    <div class="messages-container mb-4">
-                        {% for message in messages %}
-                            <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}" style="border-radius: 8px; font-size: 0.95rem;">
-                                <i class="bi bi-exclamation-circle-fill me-2"></i> {{ message }}
-                            </div>
-                        {% endfor %}
-                    </div>
-                {% endif %}
+    <!-- Botón Volver -->
+    <a href="{% url 'registro_colegio_paso2' colegio.id %}" class="back-button">
+        <i class="bi bi-arrow-left"></i> Volver al Paso 2
+    </a>
 
-                <form id="config-form-paso1" method="post" enctype="multipart/form-data" action="{% url 'configuracion_colegio_paso1' colegio.id %}">
-                    {% csrf_token %}
-                    
-                    <div class="form-group">
-                        <label class="form-label" for="nombre_oficial">Nombre oficial del colegio <span class="required">*</span></label>
-                        <input type="text" class="form-control" id="nombre_oficial" name="nombre_oficial" placeholder="Ej: Colegio Bilingüe Los Andes" value="{{ colegio.nombre|default:'' }}" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label" for="nombre_corto">Nombre corto o Sigla <span class="required">*</span></label>
-                        <input type="text" class="form-control" id="nombre_corto" name="nombre_corto" placeholder="Ej: CLA" value="{{ colegio.nombre_corto|default:'' }}" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label" for="eslogan">Eslogan o lema (Opcional)</label>
-                        <input type="text" class="form-control" id="eslogan" name="eslogan" placeholder="Ej: Formamos líderes para el futuro" value="{{ colegio.eslogan|default:'' }}">
-                    </div>
-                    
-                    <!-- Upload Grid -->
-                    <div class="upload-grid">
-                        <div class="upload-card" id="logo_block">
-                            <div class="upload-icon-circle">
-                                <i class="bi bi-shield-plus"></i>
+    <div class="config-container">
+        
+        <!-- ==========================================
+             LEFT COLUMN (Branding & Guidance)
+             ========================================== -->
+        <div class="left-column">
+            <div class="logo-container">
+                <img src="{% static 'img/logo.png' %}" alt="Eduteka Logo" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzdiNTJkOSIgcng9IjIwIi8+PHRleHQgeD0iNTAiIHk9IjY0IiBmb250LWZhbWlseT0iSW50ZXIiIGZvbnQtd2VpZ2h0PSI4MDAiIGZvbnQtc2l6ZT0iNDgiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5FPC90ZXh0Pjwvc3ZnPg=='">
+            </div>
+            
+            <div class="step-pill">
+                <i class="bi bi-palette-fill"></i> Paso 1 de 5: Identidad
+            </div>
+
+            <h1>Personaliza tu colegio</h1>
+            <p class="desc-text">Define la identidad visual y los colores que verán tus profesores, estudiantes y apoderados al ingresar a Eduteka.</p>
+
+            <!-- Ilustración con Aura Luminosa -->
+            <div class="left-illustration-frame">
+                <div class="left-illustration-aura"></div>
+                <img src="{% static 'img/personaliza colegio 1.png' %}" alt="Personaliza tu Colegio" class="img-fluid left-illustration-img">
+            </div>
+            
+            <div class="plan-includes-card">
+                <h3><i class="bi bi-stars text-primary"></i> Lo que configurarás ahora</h3>
+                <ul class="plan-includes-list">
+                    <li><i class="bi bi-building-check"></i> Nombre oficial y sigla para actas y diplomas.</li>
+                    <li><i class="bi bi-palette2"></i> Color institucional representativo.</li>
+                    <li><i class="bi bi-shield-lock"></i> Logo y portada en alta resolución.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- ==========================================
+             MAIN CARD (Right: Stepper + Form + Live Mockup)
+             ========================================== -->
+        <div class="main-card">
+            
+            <!-- Stepper Moderno de 5 Pasos con Iconos -->
+            <div class="stepper-pro">
+                <div class="stepper-pro-line"></div>
+
+                <!-- Paso 1: Activo -->
+                <div class="stepper-pro-step active">
+                    <div class="step-node-pro"><i class="bi bi-palette"></i></div>
+                    <span class="step-label-pro">1. Identidad</span>
+                </div>
+
+                <!-- Paso 2 -->
+                <div class="stepper-pro-step">
+                    <div class="step-node-pro"><i class="bi bi-geo-alt"></i></div>
+                    <span class="step-label-pro">2. Contacto</span>
+                </div>
+
+                <!-- Paso 3 -->
+                <div class="stepper-pro-step">
+                    <div class="step-node-pro"><i class="bi bi-mortarboard"></i></div>
+                    <span class="step-label-pro">3. Académica</span>
+                </div>
+
+                <!-- Paso 4 -->
+                <div class="stepper-pro-step">
+                    <div class="step-node-pro"><i class="bi bi-people"></i></div>
+                    <span class="step-label-pro">4. Roles</span>
+                </div>
+
+                <!-- Paso 5 -->
+                <div class="stepper-pro-step">
+                    <div class="step-node-pro"><i class="bi bi-grid"></i></div>
+                    <span class="step-label-pro">5. Módulos</span>
+                </div>
+            </div>
+            
+            <!-- Form Header -->
+            <div class="form-section-header">
+                <div class="section-icon-wrapper">
+                    <i class="bi bi-palette-fill"></i>
+                </div>
+                <div class="section-titles">
+                    <h2>Identidad y Marca Institucional</h2>
+                    <p>Completa la información que identificará a <strong>{{ colegio.nombre }}</strong>.</p>
+                </div>
+            </div>
+            
+            <!-- Content Grid (Form + Live Interactive Mockup) -->
+            <div class="content-grid">
+                
+                <!-- Columna Izquierda: Formulario -->
+                <div class="form-area">
+                    {% if messages %}
+                        <div class="messages-container mb-4">
+                            {% for message in messages %}
+                                <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}" style="border-radius: 12px; font-size: 0.9rem; padding: 0.85rem 1rem;">
+                                    <i class="bi bi-exclamation-circle-fill me-1"></i> {{ message }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <form id="config-form-paso1" method="post" enctype="multipart/form-data" action="{% url 'configuracion_colegio_paso1' colegio.id %}">
+                        {% csrf_token %}
+                        
+                        <!-- Nombre Oficial -->
+                        <div class="form-group">
+                            <label class="form-label" for="nombre_oficial">Nombre oficial del colegio <span class="required">*</span></label>
+                            <div class="input-icon-wrapper">
+                                <i class="bi bi-building"></i>
+                                <input type="text" class="form-control-enhanced" id="nombre_oficial" name="nombre_oficial" placeholder="Ej: Colegio Bilingüe Los Andes" value="{{ colegio.nombre|default:'' }}" required>
                             </div>
-                            <div class="upload-title">Logo institucional</div>
-                            <div class="upload-sub">PNG, JPG, SVG (Máx. 2MB)</div>
-                            <button type="button" class="btn-upload-outline">{% if colegio.logo %}Cambiar logo{% else %}Subir logo{% endif %}</button>
-                            <input type="file" id="logo_input" name="logo" accept=".png, .jpg, .jpeg, .svg">
                         </div>
                         
-                        <div class="upload-card" id="img_block">
-                            <div class="upload-icon-circle">
-                                <i class="bi bi-images"></i>
+                        <!-- Nombre Corto / Sigla -->
+                        <div class="form-group">
+                            <label class="form-label" for="nombre_corto">Nombre corto o Sigla institucional <span class="required">*</span></label>
+                            <div class="input-icon-wrapper">
+                                <i class="bi bi-tag"></i>
+                                <input type="text" class="form-control-enhanced" id="nombre_corto" name="nombre_corto" placeholder="Ej: CLA" value="{{ colegio.nombre_corto|default:'' }}" required>
                             </div>
-                            <div class="upload-title">Imagen de portada</div>
-                            <div class="upload-sub">JPG, PNG (Máx. 5MB)</div>
-                            <button type="button" class="btn-upload-outline">{% if colegio.imagen_portada %}Cambiar portada{% else %}Subir portada{% endif %}</button>
-                            <input type="file" id="img_input" name="imagen" accept=".png, .jpg, .jpeg">
                         </div>
-                    </div>
-                </form>
-            </div>
-            
-            <!-- Real Profile Preview Area -->
-            <div class="preview-area">
-                <div class="preview-label">
-                    <i class="bi bi-eye-fill"></i> Vista Previa del Perfil
+                        
+                        <!-- Eslogan -->
+                        <div class="form-group">
+                            <label class="form-label" for="eslogan">Eslogan o lema institucional (Opcional)</label>
+                            <div class="input-icon-wrapper">
+                                <i class="bi bi-chat-quote"></i>
+                                <input type="text" class="form-control-enhanced" id="eslogan" name="eslogan" placeholder="Ej: Formamos líderes para el futuro" value="{{ colegio.eslogan|default:'' }}">
+                            </div>
+                        </div>
+
+                        <!-- Selector de Color Institucional -->
+                        <div class="color-picker-section">
+                            <label class="form-label mb-1">
+                                <i class="bi bi-palette me-1 text-primary"></i> Color de Marca Institucional
+                            </label>
+                            <span class="small text-muted d-block mb-2">Se utilizará en el encabezado de tu colegio e informes oficiales.</span>
+
+                            <input type="hidden" name="color_principal" id="color_principal_input" value="{{ colegio.color_principal|default:'#7C5CFA' }}">
+
+                            <div class="color-swatches-grid">
+                                <!-- Swatch 1: Violeta Eduteka -->
+                                <div class="color-swatch-btn {% if colegio.color_principal == '#7C5CFA' or not colegio.color_principal %}active{% endif %}" style="background-color: #7C5CFA;" data-color="#7C5CFA" title="Violeta Eduteka">
+                                    <i class="bi bi-check"></i>
+                                </div>
+                                <!-- Swatch 2: Azul Marino -->
+                                <div class="color-swatch-btn {% if colegio.color_principal == '#1E3A8A' %}active{% endif %}" style="background-color: #1E3A8A;" data-color="#1E3A8A" title="Azul Marino">
+                                    <i class="bi bi-check"></i>
+                                </div>
+                                <!-- Swatch 3: Verde Esmeralda -->
+                                <div class="color-swatch-btn {% if colegio.color_principal == '#0D9488' %}active{% endif %}" style="background-color: #0D9488;" data-color="#0D9488" title="Verde Esmeralda">
+                                    <i class="bi bi-check"></i>
+                                </div>
+                                <!-- Swatch 4: Burdeos -->
+                                <div class="color-swatch-btn {% if colegio.color_principal == '#991B1B' %}active{% endif %}" style="background-color: #991B1B;" data-color="#991B1B" title="Burdeos / Rojo">
+                                    <i class="bi bi-check"></i>
+                                </div>
+                                <!-- Swatch 5: Ámbar / Dorado -->
+                                <div class="color-swatch-btn {% if colegio.color_principal == '#D97706' %}active{% endif %}" style="background-color: #D97706;" data-color="#D97706" title="Dorado / Ámbar">
+                                    <i class="bi bi-check"></i>
+                                </div>
+                                <!-- Color Picker Libre -->
+                                <div class="color-custom-input-wrapper" title="Elegir otro color personalizado">
+                                    <i class="bi bi-plus-lg text-muted"></i>
+                                    <input type="color" id="customColorPicker" value="{{ colegio.color_principal|default:'#7C5CFA' }}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Cajas de Carga Drag & Drop -->
+                        <div class="upload-grid">
+                            
+                            <!-- Subir Logo -->
+                            <div class="upload-card" id="logo_block" onclick="document.getElementById('logo_input').click();">
+                                <div class="upload-icon-circle">
+                                    <i class="bi bi-shield-plus"></i>
+                                </div>
+                                <div class="upload-title">Logo institucional</div>
+                                <div class="upload-sub" id="logo_filename">PNG, JPG o SVG (Máx. 2MB)</div>
+                                <button type="button" class="btn-upload-outline">
+                                    {% if colegio.logo %}Cambiar logo{% else %}Subir logo{% endif %}
+                                </button>
+                                <input type="file" id="logo_input" name="logo" accept=".png, .jpg, .jpeg, .svg">
+                            </div>
+                            
+                            <!-- Subir Portada -->
+                            <div class="upload-card" id="img_block" onclick="document.getElementById('img_input').click();">
+                                <div class="upload-icon-circle">
+                                    <i class="bi bi-images"></i>
+                                </div>
+                                <div class="upload-title">Imagen de portada</div>
+                                <div class="upload-sub" id="cover_filename">JPG o PNG (Máx. 5MB)</div>
+                                <button type="button" class="btn-upload-outline">
+                                    {% if colegio.imagen_portada %}Cambiar portada{% else %}Subir portada{% endif %}
+                                </button>
+                                <input type="file" id="img_input" name="imagen" accept=".png, .jpg, .jpeg">
+                            </div>
+                        </div>
+                    </form>
                 </div>
                 
-                <div class="mockup-card">
-                    <div class="mockup-cover" id="prev-image-container" {% if colegio.imagen_portada %}style="background-image: url('{{ colegio.imagen_portada.url }}'); background-size: cover; background-position: center; background-color: #e2e8f0;"{% endif %}>
-                        {% if not colegio.imagen_portada %}<i class="bi bi-image-alt"></i>{% endif %}
+                <!-- Columna Derecha: Vista Previa en Vivo (Live Mockup Institucional) -->
+                <div class="preview-area">
+                    <div class="preview-label">
+                        <i class="bi bi-eye-fill"></i> Vista Previa en Tiempo Real
                     </div>
-                    <div class="mockup-body">
-                        <div class="mockup-logo-wrapper" id="prev-logo-container" {% if colegio.logo %}style="background-image: url('{{ colegio.logo.url }}'); background-size: cover; background-position: center; background-color: #ffffff;"{% endif %}>
-                            {% if not colegio.logo %}<i class="bi bi-building-add"></i>{% endif %}
+                    
+                    <div class="mockup-card">
+                        <!-- Portada Mockup con fondo reactivo al color institucional -->
+                        <div class="mockup-cover" id="prev-image-container" {% if colegio.imagen_portada %}style="background-image: url('{{ colegio.imagen_portada.url }}'); background-color: #E2E8F0;"{% else %}style="background: linear-gradient(135deg, {{ colegio.color_principal|default:'#7C5CFA' }} 0%, #0D9488 100%);"{% endif %}>
+                            {% if not colegio.imagen_portada %}
+                                <i class="bi bi-image" style="opacity: 0.6;"></i>
+                            {% endif %}
                         </div>
-                        <h4 class="mockup-title" id="prev-nombre">{{ colegio.nombre|default:"Colegio Bilingüe Los Andes" }}</h4>
-                        <div class="mockup-badges">
-                            <span class="mockup-badge" id="prev-corto">{{ colegio.nombre_corto|default:"CLA" }}</span>
+
+                        <!-- Cuerpo Mockup con Logo Overlap -->
+                        <div class="mockup-body">
+                            <div class="mockup-logo-wrapper" id="prev-logo-container" {% if colegio.logo %}style="background-image: url('{{ colegio.logo.url }}'); background-color: #ffffff;"{% endif %}>
+                                {% if not colegio.logo %}
+                                    <i class="bi bi-mortarboard-fill"></i>
+                                {% endif %}
+                            </div>
+                            
+                            <h4 class="mockup-title" id="prev-nombre">{{ colegio.nombre|default:"Colegio San Bernardo" }}</h4>
+                            
+                            <div class="mockup-badges">
+                                <span class="mockup-badge" id="prev-corto" style="color: {{ colegio.color_principal|default:'#7C5CFA' }};">{{ colegio.nombre_corto|default:"CSB" }}</span>
+                                <span class="mockup-badge" style="background:#ECFDF5; color:#10B981; border-color:#A7F3D0;"><i class="bi bi-patch-check-fill me-1"></i>Verificado</span>
+                                <span class="mockup-badge" style="background:#F1F5F9; color:#475569; border-color:#CBD5E1;">Ciclo 2026</span>
+                            </div>
+                            
+                            <p class="mockup-slogan" id="prev-eslogan">{{ colegio.eslogan|default:'"Formamos líderes para el futuro con excelencia y valores"' }}</p>
                         </div>
-                        <p class="mockup-slogan" id="prev-eslogan">{{ colegio.eslogan|default:'"Formamos líderes para el futuro"' }}</p>
                     </div>
+                </div>
+                
+            </div> <!-- End Content Grid -->
+            
+            <!-- Bottom Actions & Tip -->
+            <div class="bottom-area">
+                <div class="tip-card">
+                    <div class="tip-icon-bg">
+                        <i class="bi bi-lightbulb-fill"></i>
+                    </div>
+                    <p><strong>Recomendación:</strong> Usa un logo en formato <strong>PNG con fondo transparente</strong> para que se integre perfectamente con la cabecera del libro de clases digital y los informes para apoderados.</p>
+                </div>
+                
+                <div class="action-bar">
+                    <a href="{% url 'configuracion_colegio_paso2' colegio.id %}" class="btn-link-subtle">
+                        Omitir por ahora y continuar
+                    </a>
+                    <button type="button" class="btn-primary-gradient" id="btnSubmitPaso1" onclick="submitPaso1Form()">
+                        <span id="btnSubmitPaso1Text">Guardar y Continuar al Paso 2</span>
+                        <i class="bi bi-arrow-right-short fs-3" id="btnSubmitPaso1Icon"></i>
+                        <span class="spinner-border spinner-border-sm d-none" id="btnSubmitPaso1Spinner" role="status"></span>
+                    </button>
                 </div>
             </div>
             
-        </div> <!-- End Content Grid -->
-        
-        <!-- Bottom Actions & Tip -->
-        <div class="bottom-area">
-            <div class="tip-card">
-                <div class="tip-icon-bg">
-                    <i class="bi bi-stars"></i>
-                </div>
-                <p><strong>Consejo:</strong> Usa un logo en formato PNG con fondo transparente para que se integre perfectamente con la portada de tu institución.</p>
-            </div>
-            
-            <div class="action-bar">
-                <a href="#" class="btn-link-subtle">Guardar y continuar después</a>
-                <button type="button" class="btn-primary-gradient" onclick="document.getElementById('config-form-paso1').submit();">
-                    Guardar y continuar <i class="bi bi-arrow-right"></i>
-                </button>
-            </div>
         </div>
-        
     </div>
-</div>
 
-<!-- Scripts -->
-<script src="{% static 'js/configuracion_colegio.js' %}"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const updateText = (inputId, targetId, defaultText) => {
-            const input = document.getElementById(inputId);
-            const target = document.getElementById(targetId);
-            if(input && target) {
-                input.addEventListener('input', (e) => {
-                    target.innerHTML = e.target.value || defaultText;
+    <!-- Scripts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const updateText = (inputId, targetId, defaultText, isQuote = false) => {
+                const input = document.getElementById(inputId);
+                const target = document.getElementById(targetId);
+                if (input && target) {
+                    const handler = (e) => {
+                        const val = e.target.value.trim();
+                        if (val) {
+                            target.textContent = isQuote ? `"${val}"` : val;
+                        } else {
+                            target.textContent = defaultText;
+                        }
+                    };
+                    input.addEventListener('input', handler);
+                }
+            };
+
+            updateText('nombre_oficial', 'prev-nombre', 'Colegio San Bernardo');
+            updateText('nombre_corto', 'prev-corto', 'CSB');
+            updateText('eslogan', 'prev-eslogan', '"Formamos líderes para el futuro con excelencia y valores"', true);
+
+            // Selector de Colores Reactivo
+            const swatches = document.querySelectorAll('.color-swatch-btn');
+            const colorInput = document.getElementById('color_principal_input');
+            const customPicker = document.getElementById('customColorPicker');
+            const mockupCover = document.getElementById('prev-image-container');
+            const badgeCorto = document.getElementById('prev-corto');
+
+            function applyColor(hexColor) {
+                colorInput.value = hexColor;
+                
+                // Actualizar estilo de los swatches
+                swatches.forEach(s => {
+                    if (s.dataset.color.toLowerCase() === hexColor.toLowerCase()) {
+                        s.classList.add('active');
+                        s.innerHTML = '<i class="bi bi-check"></i>';
+                    } else {
+                        s.classList.remove('active');
+                        s.innerHTML = '';
+                    }
                 });
-                // Disparar el evento para inicializar la vista previa con los textos que trae Django
-                input.dispatchEvent(new Event('input'));
+
+                // Si no hay foto de portada personalizada, actualiza el degradado de fondo
+                if (!mockupCover.style.backgroundImage || mockupCover.style.backgroundImage === 'none') {
+                    mockupCover.style.background = `linear-gradient(135deg, ${hexColor} 0%, #0D9488 100%)`;
+                }
+
+                if (badgeCorto) {
+                    badgeCorto.style.color = hexColor;
+                }
             }
-        };
 
-        updateText('nombre_oficial', 'prev-nombre', 'Colegio Bilingüe Los Andes');
-        updateText('nombre_corto', 'prev-corto', 'CLA');
-        updateText('eslogan', 'prev-eslogan', '"Formamos líderes para el futuro"');
-    });
-</script>
+            swatches.forEach(swatch => {
+                swatch.addEventListener('click', function() {
+                    const color = this.dataset.color;
+                    applyColor(color);
+                    customPicker.value = color;
+                });
+            });
 
+            if (customPicker) {
+                customPicker.addEventListener('input', function(e) {
+                    applyColor(e.target.value);
+                });
+            }
+
+            // Previsualización instantánea de archivos con FileReader
+            const logoInput = document.getElementById('logo_input');
+            const logoContainer = document.getElementById('prev-logo-container');
+            const logoFilename = document.getElementById('logo_filename');
+
+            if (logoInput) {
+                logoInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        logoFilename.textContent = file.name;
+                        logoFilename.style.color = '#7C5CFA';
+                        logoFilename.style.fontWeight = '700';
+
+                        const reader = new FileReader();
+                        reader.onload = function(event) {
+                            logoContainer.style.backgroundImage = `url('${event.target.result}')`;
+                            logoContainer.style.backgroundColor = '#ffffff';
+                            logoContainer.innerHTML = '';
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+
+            const imgInput = document.getElementById('img_input');
+            const imgContainer = document.getElementById('prev-image-container');
+            const coverFilename = document.getElementById('cover_filename');
+
+            if (imgInput) {
+                imgInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        coverFilename.textContent = file.name;
+                        coverFilename.style.color = '#7C5CFA';
+                        coverFilename.style.fontWeight = '700';
+
+                        const reader = new FileReader();
+                        reader.onload = function(event) {
+                            imgContainer.style.backgroundImage = `url('${event.target.result}')`;
+                            imgContainer.innerHTML = '';
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+        });
+
+        function submitPaso1Form() {
+            const form = document.getElementById('config-form-paso1');
+            if (form.checkValidity()) {
+                const btn = document.getElementById('btnSubmitPaso1');
+                const txt = document.getElementById('btnSubmitPaso1Text');
+                const icon = document.getElementById('btnSubmitPaso1Icon');
+                const spinner = document.getElementById('btnSubmitPaso1Spinner');
+
+                btn.disabled = true;
+                txt.textContent = 'Guardando identidad institucional...';
+                icon.classList.add('d-none');
+                spinner.classList.remove('d-none');
+                form.submit();
+            } else {
+                form.reportValidity();
+            }
+        }
+    </script>
 </body>
 </html>

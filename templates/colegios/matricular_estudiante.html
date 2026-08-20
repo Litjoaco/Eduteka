@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ titulo_pagina }} - Eduteka</title>
   <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <style>
@@ -21,7 +21,7 @@
       --gray-text: #687089;
       --border: #BCC0CF;
       --radius-lg: 16px;
-      --radius-md: 10px;
+      --radius-md: 12px;
       --radius-sm: 8px;
     }
 
@@ -36,148 +36,16 @@
       overflow-x: hidden;
     }
 
-    /* Floating modern blobs */
-    body::before {
-      content: '';
-      position: fixed;
-      top: -15%; left: 65%;
-      width: 50vw; height: 50vw;
-      background: radial-gradient(circle, rgba(124, 92, 252, 0.07) 0%, rgba(255,255,255,0) 70%);
-      z-index: -2;
-      pointer-events: none;
-    }
-    body::after {
-      content: '';
-      position: fixed;
-      top: 45%; left: -15%;
-      width: 40vw; height: 40vw;
-      background: radial-gradient(circle, rgba(101, 205, 191, 0.06) 0%, rgba(255,255,255,0) 70%);
-      z-index: -2;
-      pointer-events: none;
-    }
-
     .wrapper {
       display: flex;
       width: 100%;
       align-items: stretch;
     }
 
-    /* SIDEBAR */
-    .sidebar {
-      width: 260px;
-      background: var(--white);
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      position: fixed;
-      top: 0; bottom: 0; left: 0;
-      z-index: 1040;
-      transition: transform 0.3s ease;
-    }
-
-    @media (max-width: 991.98px) {
-      .sidebar {
-        position: absolute;
-        left: -260px;
-        top: 0;
-        bottom: 0;
-        z-index: 1050;
-      }
-      .sidebar.active {
-        left: 0;
-      }
-    }
-
-    .sidebar-logo {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 1.4rem 1.5rem 1rem;
-    }
-    .sidebar-logo img { max-height: 100px; width: auto; }
-
-    .sidebar-school {
-      margin: 0 .75rem .75rem;
-      background: linear-gradient(135deg, var(--primary-soft) 0%, #E8E2FF 100%);
-      border-radius: var(--radius-lg);
-      padding: .9rem 1rem;
-    }
-    .sidebar-school-name {
-      font-weight: 700;
-      font-size: .85rem;
-      color: var(--primary);
-      margin-bottom: 2px;
-    }
-    .sidebar-school-sub {
-      font-size: .75rem;
-      color: var(--primary-hover);
-      font-weight: 500;
-    }
-
-    .sidebar-nav {
-      flex: 1;
-      overflow-y: auto;
-      padding: .75rem .75rem 0;
-      scrollbar-width: none;
-    }
-    .sidebar-nav::-webkit-scrollbar { display: none; }
-
-    .nav-section-label {
-      font-size: .67rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      color: var(--gray-text);
-      padding: .5rem .75rem .3rem;
-      margin-top: .25rem;
-    }
-
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: .75rem;
-      padding: .6rem .85rem;
-      color: var(--gray-text);
-      font-weight: 500;
-      font-size: .88rem;
-      border-radius: var(--radius-md);
-      text-decoration: none;
-      transition: background .15s, color .15s;
-      margin-bottom: 2px;
-    }
-    .nav-item i { font-size: 1.05rem; flex-shrink: 0; }
-    .nav-item:hover { background: var(--bg); color: var(--dark); }
-    .nav-item.active {
-      background: var(--primary);
-      color: #fff;
-      font-weight: 600;
-      box-shadow: 0 4px 14px rgba(108,79,240,.3);
-    }
-    .nav-item.active i { color: #fff; }
-
-    .sidebar-footer {
-      padding: .75rem;
-      border-top: 1px solid var(--border);
-      margin-top: auto;
-    }
-
-    /* MAIN CONTENT */
-    .main-content {
-      margin-left: 248px;
-      width: calc(100% - 248px);
-
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      transition: all 0.3s;
-    }
-
-    /* TOPBAR */
     .topbar {
       height: 70px;
-      background: rgba(255, 255, 255, 0.8) !important;
+      background: rgba(255, 255, 255, 0.85) !important;
       backdrop-filter: blur(12px) !important;
-      -webkit-backdrop-filter: blur(12px) !important;
       border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
@@ -188,69 +56,66 @@
       z-index: 98;
     }
 
-    .topbar-date {
-      font-size: 0.85rem;
-      color: var(--gray-text);
-      font-weight: 600;
-    }
-
     .content-body {
-      padding: 2.5rem 2rem;
-      flex-grow: 1;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      animation: fadeInUp 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+      padding: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
     }
 
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* PANEL FORM */
-    .form-panel {
+    .section-card {
       background: var(--white);
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
-      padding: 2rem;
-      max-width: 580px;
-      width: 100%;
-      box-shadow: 0 10px 30px rgba(124, 92, 252, 0.04);
+      padding: 1.75rem;
+      margin-bottom: 1.75rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+      transition: all 0.2s ease;
     }
 
-    .form-title {
-      font-size: 1.25rem;
+    .section-card:hover {
+      box-shadow: 0 8px 25px rgba(0,0,0,0.04);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid #F1F5F9;
+    }
+
+    .section-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: var(--primary-soft);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    .section-title {
+      font-size: 1.1rem;
       font-weight: 800;
       color: var(--dark);
-      margin-bottom: 0.5rem;
-    }
-
-    .form-subtitle {
-      font-size: 0.85rem;
-      color: var(--gray-text);
-      margin-bottom: 2rem;
+      margin: 0;
     }
 
     .form-label {
-      font-size: 0.8rem;
       font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--gray-text);
-      margin-bottom: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--dark);
+      margin-bottom: 0.4rem;
     }
 
     .form-control, .form-select {
       border: 1px solid var(--border);
       border-radius: var(--radius-md);
-      padding: 0.6rem 1rem;
+      padding: 0.65rem 1rem;
       font-size: 0.9rem;
       font-weight: 500;
       color: var(--dark);
@@ -259,14 +124,28 @@
 
     .form-control:focus, .form-select:focus {
       border-color: var(--primary);
-      box-shadow: 0 0 0 4px rgba(124, 92, 252, 0.1);
+      box-shadow: 0 0 0 4px rgba(124, 92, 252, 0.12);
     }
 
-    /* RESPONSIVE */
-    @media (max-width: 992px) {
-      .sidebar { transform: translateX(-100%); }
-      .main-content { margin-left: 0; width: 100%; }
-      .sidebar.active { transform: translateX(0); }
+    /* Target especial PIE */
+    .pie-card {
+      border: 2px solid #D8CEFF !important;
+      background: linear-gradient(180deg, #FFFFFF 0%, #F9F7FF 100%) !important;
+    }
+
+    .pie-badge-header {
+      background: #7C5CFC;
+      color: #FFFFFF;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      letter-spacing: 0.5px;
+    }
+
+    .form-check-input:checked {
+      background-color: var(--primary);
+      border-color: var(--primary);
     }
   </style>
 </head>
@@ -274,7 +153,6 @@
 
 <div class="wrapper">
   {% include 'colegios/_sidebar.html' with active_page='estudiantes' %}
-
 
   <!-- MAIN CONTENT -->
   <div class="main-content">
@@ -284,8 +162,8 @@
         <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn" style="border:none; background:var(--primary-soft); color:var(--primary);">
           <i class="bi bi-list fs-5"></i>
         </button>
-        <a href="{% url 'listar_estudiantes' %}" class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1.5 px-3 py-1.5" style="border-radius: var(--radius-md); font-weight:600; font-size:0.8rem;">
-          <i class="bi bi-arrow-left"></i> Volver a la Lista
+        <a href="{% url 'listar_estudiantes' %}" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1.5 px-3 py-1.5" style="border-radius: var(--radius-md); font-weight:600; font-size:0.85rem;">
+          <i class="bi bi-arrow-left"></i> Volver a Nómina de Estudiantes
         </a>
       </div>
 
@@ -298,78 +176,280 @@
 
     <!-- CONTENT BODY -->
     <main class="content-body">
-      <div class="form-panel">
-        <h2 class="form-title">{{ titulo_pagina }}</h2>
-        <p class="form-subtitle">Completa los campos para registrar o actualizar los datos del estudiante en la plataforma.</p>
+      <div class="mb-4">
+        <h2 class="fw-extrabold text-dark mb-1" style="font-size: 1.6rem;">{{ titulo_pagina }}</h2>
+        <p class="text-muted small mb-0">Completa la ficha completa del estudiante, antecedentes médicos, apoderados y acompañamiento pedagógico PIE.</p>
+      </div>
 
-        <!-- Mensajes Django -->
-        {% if messages %}
-          {% for message in messages %}
-            <div class="alert alert-danger shadow-sm mb-4" role="alert" style="border-radius: var(--radius-md);">
-              {{ message }}
+      <!-- Mensajes Django -->
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-danger shadow-sm mb-4" role="alert" style="border-radius: var(--radius-md);">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <form method="POST">
+        {% csrf_token %}
+
+        <!-- SECCIÓN 1: DATOS PERSONALES Y ACADÉMICOS -->
+        <div class="section-card">
+          <div class="section-header">
+            <div class="section-icon"><i class="bi bi-person-vcard"></i></div>
+            <div>
+              <h5 class="section-title">1. Antecedentes Personales y Académicos</h5>
+              <span class="text-muted extra-small">Identificación oficial del alumno en el establecimiento</span>
             </div>
-          {% endfor %}
-        {% endif %}
-
-        <form method="POST">
-          {% csrf_token %}
-          
-          <!-- Nombre Completo -->
-          <div class="mb-4">
-            <label for="nombre_completo" class="form-label">Nombre Completo del Estudiante</label>
-            <input type="text" class="form-control" id="nombre_completo" name="nombre_completo" 
-                   value="{{ estudiante.nombre_completo|default:'' }}" required placeholder="Ej: Juan Pablo Pérez Rojas">
           </div>
 
-          <!-- RUT -->
-          <div class="mb-4">
-            <label for="rut" class="form-label">RUT del Estudiante</label>
-            <input type="text" class="form-control" id="rut" name="rut" 
-                   value="{{ estudiante.rut|default:'' }}" placeholder="Ej: 21.345.678-K">
-          </div>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="nombre_completo" class="form-label">Nombre Completo del Estudiante <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="nombre_completo" name="nombre_completo" 
+                     value="{{ estudiante.nombre_completo|default:'' }}" required placeholder="Ej: Constanza Andrea Morales Silva">
+            </div>
 
-          <!-- Curso / Sección -->
-          <div class="mb-4">
-            <label for="seccion" class="form-label">Curso y Sección Asignados</label>
-            <select class="form-select" id="seccion" name="seccion" required>
-              <option value="" disabled {% if not estudiante %}selected{% endif %}>Selecciona una opción...</option>
-              {% for sec in secciones %}
-                <option value="{{ sec.id }}" {% if estudiante.seccion.id == sec.id %}selected{% endif %}>
-                  {{ sec.curso.nombre }} - {{ sec.nombre }}
-                </option>
-              {% endfor %}
-            </select>
-          </div>
+            <div class="col-md-3">
+              <label for="rut" class="form-label">RUT / Identificador</label>
+              <input type="text" class="form-control" id="rut" name="rut" 
+                     value="{{ estudiante.rut|default:'' }}" placeholder="Ej: 22.345.678-K">
+            </div>
 
-          <!-- Estado (Si está editando) -->
-          {% if estudiante %}
-            <div class="mb-4">
-              <label for="activo" class="form-label">Estado de la Matrícula</label>
-              <select class="form-select" id="activo" name="activo">
-                <option value="true" {% if estudiante.activo %}selected{% endif %}>Activo (Vigente)</option>
-                <option value="false" {% if not estudiante.activo %}selected{% endif %}>Baja (Inactivo)</option>
+            <div class="col-md-3">
+              <label for="seccion" class="form-label">Curso / Sección Asignada <span class="text-danger">*</span></label>
+              <select class="form-select" id="seccion" name="seccion" required>
+                <option value="" disabled {% if not estudiante %}selected{% endif %}>Seleccionar curso...</option>
+                {% for sec in secciones %}
+                  <option value="{{ sec.id }}" {% if estudiante.seccion.id == sec.id %}selected{% endif %}>
+                    {{ sec.curso.nombre }} - {{ sec.nombre }}
+                  </option>
+                {% endfor %}
               </select>
             </div>
-          {% endif %}
 
-          <div class="d-flex justify-content-end gap-2 mt-5">
-            <a href="{% url 'listar_estudiantes' %}" class="btn btn-light px-4 py-2" style="border-radius: var(--radius-md); font-weight:600;">Cancelar</a>
-            <button type="submit" class="btn btn-primary px-4 py-2" style="border-radius: var(--radius-md); font-weight:700;">
-              {{ boton_texto }}
-            </button>
+            <div class="col-md-3">
+              <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
+              <input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento" 
+                     value="{{ estudiante.fecha_nacimiento|date:'Y-m-d'|default:'' }}">
+            </div>
+
+            <div class="col-md-3">
+              <label for="genero" class="form-label">Género</label>
+              <select class="form-select" id="genero" name="genero">
+                <option value="masculino" {% if estudiante.genero == 'masculino' %}selected{% endif %}>Masculino</option>
+                <option value="femenino" {% if estudiante.genero == 'femenino' %}selected{% endif %}>Femenino</option>
+                <option value="otro" {% if estudiante.genero == 'otro' %}selected{% endif %}>Otro / No Binarie</option>
+                <option value="no_informa" {% if estudiante.genero == 'no_informa' or not estudiante %}selected{% endif %}>Prefiero no decir</option>
+              </select>
+            </div>
+
+            <div class="col-md-3">
+              <label for="nacionalidad" class="form-label">Nacionalidad</label>
+              <input type="text" class="form-control" id="nacionalidad" name="nacionalidad" 
+                     value="{{ estudiante.nacionalidad|default:'Chilena' }}" placeholder="Ej: Chilena">
+            </div>
+
+            <div class="col-md-3">
+              <label for="comuna" class="form-label">Comuna de Residencia</label>
+              <input type="text" class="form-control" id="comuna" name="comuna" 
+                     value="{{ estudiante.comuna|default:'' }}" placeholder="Ej: Maipú">
+            </div>
+
+            <div class="col-md-12">
+              <label for="direccion" class="form-label">Dirección Completa</label>
+              <input type="text" class="form-control" id="direccion" name="direccion" 
+                     value="{{ estudiante.direccion|default:'' }}" placeholder="Ej: Av. Los Pajaritos 1234, Depto 402">
+            </div>
+
+            {% if estudiante %}
+              <div class="col-md-4 mt-3">
+                <label for="activo" class="form-label">Estado de Matrícula</label>
+                <select class="form-select" id="activo" name="activo">
+                  <option value="true" {% if estudiante.activo %}selected{% endif %}>Activo (Vigente)</option>
+                  <option value="false" {% if not estudiante.activo %}selected{% endif %}>Retirado / Inactivo</option>
+                </select>
+              </div>
+            {% endif %}
           </div>
-        </form>
-      </div>
+        </div>
+
+        <!-- SECCIÓN 2: SALUD Y CONTACTO DE EMERGENCIA -->
+        <div class="section-card">
+          <div class="section-header">
+            <div class="section-icon" style="background:#FFF1F2; color:#E11D48;"><i class="bi bi-heart-pulse-fill"></i></div>
+            <div>
+              <h5 class="section-title">2. Ficha de Salud y Urgencias</h5>
+              <span class="text-muted extra-small">Contactos rápidos y resguardo médico en caso de accidentes</span>
+            </div>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label for="prevision_salud" class="form-label">Previsión de Salud</label>
+              <select class="form-select" id="prevision_salud" name="prevision_salud">
+                <option value="fonasa" {% if estudiante.prevision_salud == 'fonasa' or not estudiante %}selected{% endif %}>Fonasa</option>
+                <option value="isapre" {% if estudiante.prevision_salud == 'isapre' %}selected{% endif %}>Isapre</option>
+                <option value="particular" {% if estudiante.prevision_salud == 'particular' %}selected{% endif %}>Particular / Seguro</option>
+                <option value="ninguna" {% if estudiante.prevision_salud == 'ninguna' %}selected{% endif %}>Sin Previsión</option>
+              </select>
+            </div>
+
+            <div class="col-md-3">
+              <label for="grupo_sanguineo" class="form-label">Grupo Sanguíneo</label>
+              <input type="text" class="form-control" id="grupo_sanguineo" name="grupo_sanguineo" 
+                     value="{{ estudiante.grupo_sanguineo|default:'' }}" placeholder="Ej: O+, A+, AB-">
+            </div>
+
+            <div class="col-md-5">
+              <label for="alergias_enfermedades" class="form-label">Alergias o Medicamentos Crónicos</label>
+              <input type="text" class="form-control" id="alergias_enfermedades" name="alergias_enfermedades" 
+                     value="{{ estudiante.alergias_enfermedades|default:'' }}" placeholder="Ej: Alérgico a la penicilina / Asma">
+            </div>
+
+            <div class="col-12 mt-4">
+              <div class="p-3 rounded-3" style="background: #FFF8F8; border: 1px solid #FFE4E6;">
+                <h6 class="fw-bold text-danger mb-3"><i class="bi bi-telephone-fill me-1.5"></i>Contacto Directo de Emergencia</h6>
+                <div class="row g-3">
+                  <div class="col-md-5">
+                    <label for="contacto_emergencia_nombre" class="form-label">Nombre del Contacto</label>
+                    <input type="text" class="form-control" id="contacto_emergencia_nombre" name="contacto_emergencia_nombre" 
+                           value="{{ estudiante.contacto_emergencia_nombre|default:'' }}" placeholder="Ej: Carmen Rojas">
+                  </div>
+                  <div class="col-md-3">
+                    <label for="contacto_emergencia_parentesco" class="form-label">Parentesco</label>
+                    <input type="text" class="form-control" id="contacto_emergencia_parentesco" name="contacto_emergencia_parentesco" 
+                           value="{{ estudiante.contacto_emergencia_parentesco|default:'' }}" placeholder="Ej: Tía / Abuela">
+                  </div>
+                  <div class="col-md-4">
+                    <label for="contacto_emergencia_telefono" class="form-label">Teléfono Urgencia</label>
+                    <input type="text" class="form-control fw-bold text-danger" id="contacto_emergencia_telefono" name="contacto_emergencia_telefono" 
+                           value="{{ estudiante.contacto_emergencia_telefono|default:'' }}" placeholder="Ej: +56 9 8765 4321">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 3: APODERADO TITULAR -->
+        <div class="section-card">
+          <div class="section-header">
+            <div class="section-icon" style="background:#EFF6FF; color:#2563EB;"><i class="bi bi-person-bounding-box"></i></div>
+            <div>
+              <h5 class="section-title">3. Apoderado Titular Responsable</h5>
+              <span class="text-muted extra-small">Tutor legal encargado de citaciones, comunicaciones y boletines</span>
+            </div>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-md-5">
+              <label for="nombre_apoderado" class="form-label">Nombre del Apoderado</label>
+              <input type="text" class="form-control" id="nombre_apoderado" name="nombre_apoderado" 
+                     value="{{ estudiante.nombre_apoderado|default:'' }}" placeholder="Ej: Pedro Morales Gutiérrez">
+            </div>
+            <div class="col-md-3">
+              <label for="rut_apoderado" class="form-label">RUT Apoderado</label>
+              <input type="text" class="form-control" id="rut_apoderado" name="rut_apoderado" 
+                     value="{{ estudiante.rut_apoderado|default:'' }}" placeholder="Ej: 14.567.890-3">
+            </div>
+            <div class="col-md-4">
+              <label for="parentesco_apoderado" class="form-label">Parentesco con el Alumno</label>
+              <input type="text" class="form-control" id="parentesco_apoderado" name="parentesco_apoderado" 
+                     value="{{ estudiante.parentesco_apoderado|default:'' }}" placeholder="Ej: Padre / Madre / Tutor Legal">
+            </div>
+            <div class="col-md-6">
+              <label for="telefono_apoderado" class="form-label">Celular de Contacto</label>
+              <input type="text" class="form-control" id="telefono_apoderado" name="telefono_apoderado" 
+                     value="{{ estudiante.telefono_apoderado|default:'' }}" placeholder="Ej: +56 9 1234 5678">
+            </div>
+            <div class="col-md-6">
+              <label for="email_apoderado" class="form-label">Correo Electrónico</label>
+              <input type="email" class="form-control" id="email_apoderado" name="email_apoderado" 
+                     value="{{ estudiante.email_apoderado|default:'' }}" placeholder="Ej: apoderado@gmail.com">
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 4: PROGRAMA DE INTEGRACIÓN ESCOLAR (PIE) -->
+        <div class="section-card pie-card">
+          <div class="section-header">
+            <div class="section-icon" style="background:#F0EDFF; color:#7C5CFC;"><i class="bi bi-puzzle-fill"></i></div>
+            <div class="d-flex align-items-center justify-content-between flex-grow-1">
+              <div>
+                <h5 class="section-title text-primary"><i class="bi bi-stars me-1 text-warning"></i>Programa PIE y Necesidades Especiales</h5>
+                <span class="text-muted extra-small">Identificación para acompañamiento pedagógico delicado y especializado</span>
+              </div>
+              <span class="pie-badge-header"><i class="bi bi-shield-heart me-1"></i> Acompañamiento Escolar</span>
+            </div>
+          </div>
+
+          <div class="form-check form-switch mb-3 p-3 rounded-3 bg-white border">
+            <input class="form-check-input ms-0 me-3" type="checkbox" role="switch" id="es_pie" name="es_pie" 
+                   {% if estudiante.es_pie %}checked{% endif %} onchange="togglePieFields(this.checked)">
+            <label class="form-check-label fw-bold text-dark" for="es_pie">
+              ¿El estudiante pertenece al Programa de Integración Escolar (PIE)?
+            </label>
+            <p class="text-muted small mb-0 mt-1">Al activar esta opción, se mostrará un distintivo especial 🧩 <strong>PIE</strong> junto al nombre del alumno en las nóminas para que los profesores brinden atención diferenciada.</p>
+          </div>
+
+          <div id="pie-fields-container" class="{% if not estudiante.es_pie %}d-none{% endif %}">
+            <div class="row g-3 p-3 rounded-3 bg-white border">
+              <div class="col-md-4">
+                <label for="tipo_pie" class="form-label">Clasificación NEE</label>
+                <select class="form-select" id="tipo_pie" name="tipo_pie">
+                  <option value="neep" {% if estudiante.tipo_pie == 'neep' %}selected{% endif %}>NEEP - Permanente</option>
+                  <option value="neet" {% if estudiante.tipo_pie == 'neet' %}selected{% endif %}>NEET - Transitorio</option>
+                  <option value="sin_clasificar" {% if estudiante.tipo_pie == 'sin_clasificar' or not estudiante.tipo_pie %}selected{% endif %}>Sin Clasificar / En Proceso</option>
+                </select>
+              </div>
+
+              <div class="col-md-8">
+                <label for="diagnostico_pie" class="form-label">Diagnóstico Principal</label>
+                <input type="text" class="form-control" id="diagnostico_pie" name="diagnostico_pie" 
+                       value="{{ estudiante.diagnostico_pie|default:'' }}" placeholder="Ej: Condición del Espectro Autista (TEA) / TDAH / Trastorno del Lenguaje">
+              </div>
+
+              <div class="col-12">
+                <label for="observaciones_pie" class="form-label text-primary">
+                  <i class="bi bi-chat-heart-fill me-1 text-danger"></i>Recomendaciones Pedagógicas y Trato para Docentes
+                </label>
+                <textarea class="form-control" id="observaciones_pie" name="observaciones_pie" rows="3" 
+                          placeholder="Escribe aquí las pautas de manejo o sensibilidad para profesores (Ej: Sensible a ruidos fuertes, requiere pausas activas cada 20 min, otorgar tiempo adicional en evaluaciones escrito u oral).">{{ estudiante.observaciones_pie|default:'' }}</textarea>
+                <div class="form-text small text-muted">Esta información será visible de forma confidencial para los profesores asignados al curso del alumno.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BOTONES DE ACCIÓN -->
+        <div class="d-flex justify-content-end gap-3 mt-4 mb-5">
+          <a href="{% url 'listar_estudiantes' %}" class="btn btn-light px-4 py-2.5" style="border-radius: var(--radius-md); font-weight:700;">Cancelar</a>
+          <button type="submit" class="btn btn-primary px-5 py-2.5 shadow-sm" style="border-radius: var(--radius-md); font-weight:800; background: linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%); border:none;">
+            <i class="bi bi-check2-circle me-1.5"></i>{{ boton_texto }}
+          </button>
+        </div>
+      </form>
     </main>
   </div>
 </div>
 
 <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 <script>
+  function togglePieFields(checked) {
+    const container = document.getElementById('pie-fields-container');
+    if (container) {
+      if (checked) {
+        container.classList.remove('d-none');
+      } else {
+        container.classList.add('d-none');
+      }
+    }
+  }
+
   document.addEventListener("DOMContentLoaded", function() {
     const mobileBtn = document.getElementById('mobileMenuBtn');
     const sidebar = document.getElementById('sidebar');
-    
     if(mobileBtn) {
       mobileBtn.addEventListener('click', () => {
         sidebar.classList.toggle('active');

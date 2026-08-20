@@ -1,0 +1,427 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configura tu colegio - Paso 6: Políticas de Evaluación & Asistencia — Eduteka</title>
+    
+    <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap CSS & Icons -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/configuracion_colegio_paso6.css' %}?v=1">
+    <link rel="stylesheet" href="{% static 'css/backbutton.css' %}">
+</head>
+<body>
+
+    <!-- Botón Volver al paso 5 -->
+    <a href="{% url 'configuracion_colegio_paso5' colegio.id %}" class="back-button">
+        <i class="bi bi-arrow-left"></i> Volver al Paso 5
+    </a>
+
+    <div class="config-container">
+        
+        <!-- ==========================================
+             LEFT COLUMN (Branding & Guidance)
+             ========================================== -->
+        <div class="left-column">
+            <div class="logo-container">
+                <img src="{% static 'img/logo.png' %}" alt="Eduteka Logo" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzdiNTJkOSIgcng9IjIwIi8+PHRleHQgeD0iNTAiIHk9IjY0IiBmb250LWZhbWlseT0iSW50ZXIiIGZvbnQtd2VpZ2h0PSI4MDAiIGZvbnQtc2l6ZT0iNDgiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5FPC90ZXh0Pjwvc3ZnPg=='">
+            </div>
+            
+            <div class="step-pill">
+                <i class="bi bi-sliders2-vertical"></i> Paso 6 de 6: Políticas & Evaluación
+            </div>
+
+            <h1>Reglas de Evaluación y Asistencia</h1>
+            <p class="desc-text">Define la escala de redondeo de notas, el nivel de exigencia, el método de toma de asistencia y las notificaciones automáticas para apoderados.</p>
+
+            <!-- Ilustración con Aura Luminosa -->
+            <div class="left-illustration-frame">
+                <div class="left-illustration-aura"></div>
+                <img src="{% static 'img/personaliza colegio 1.png' %}" alt="Políticas del Colegio" class="img-fluid left-illustration-img">
+            </div>
+            
+            <div class="plan-includes-card">
+                <h3><i class="bi bi-patch-check-fill text-success"></i> 100% Normativa Chilena</h3>
+                <ul class="plan-includes-list">
+                    <li><i class="bi bi-award"></i> Conforme al <strong>Decreto 67/2018</strong> de evaluación.</li>
+                    <li><i class="bi bi-clock-history"></i> Cumple con <strong>Circular N° 30</strong> de libro digital.</li>
+                    <li><i class="bi bi-send-check"></i> Alertas automáticas para apoderados por inasistencia.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- ==========================================
+             MAIN CARD (Right: Stepper + Form + Simulator)
+             ========================================== -->
+        <div class="main-card">
+            
+            <!-- Stepper Moderno de 6 Pasos -->
+            <div class="stepper-pro-6">
+                <div class="stepper-pro-line-6"></div>
+
+                <!-- Paso 1 -->
+                <div class="stepper-step-node-6 completed">
+                    <div class="step-node-circle"><i class="bi bi-check2"></i></div>
+                    <span class="step-node-label">1. Identidad ✓</span>
+                </div>
+
+                <!-- Paso 2 -->
+                <div class="stepper-step-node-6 completed">
+                    <div class="step-node-circle"><i class="bi bi-check2"></i></div>
+                    <span class="step-node-label">2. Contacto ✓</span>
+                </div>
+
+                <!-- Paso 3 -->
+                <div class="stepper-step-node-6 completed">
+                    <div class="step-node-circle"><i class="bi bi-check2"></i></div>
+                    <span class="step-node-label">3. Académica ✓</span>
+                </div>
+
+                <!-- Paso 4 -->
+                <div class="stepper-step-node-6 completed">
+                    <div class="step-node-circle"><i class="bi bi-check2"></i></div>
+                    <span class="step-node-label">4. Roles ✓</span>
+                </div>
+
+                <!-- Paso 5 -->
+                <div class="stepper-step-node-6 completed">
+                    <div class="step-node-circle"><i class="bi bi-check2"></i></div>
+                    <span class="step-node-label">5. Módulos ✓</span>
+                </div>
+
+                <!-- Paso 6: Activo Final -->
+                <div class="stepper-step-node-6 active">
+                    <div class="step-node-circle"><i class="bi bi-sliders2"></i></div>
+                    <span class="step-node-label">6. Políticas</span>
+                </div>
+            </div>
+            
+            <!-- Form Header -->
+            <div class="form-section-header">
+                <div class="section-icon-wrapper">
+                    <i class="bi bi-sliders2-vertical"></i>
+                </div>
+                <div class="section-titles">
+                    <h2>6. Políticas Académicas y Reglas de Evaluación</h2>
+                    <p>Configura las reglas pedagógicas y de asistencia para <strong>{{ colegio.nombre }}</strong>.</p>
+                </div>
+            </div>
+            
+            <!-- Content Grid (Form + Live Grade Simulator) -->
+            <div class="content-grid">
+                
+                <!-- Columna Izquierda: Formulario -->
+                <div class="form-area">
+                    {% if messages %}
+                        <div class="messages-container mb-3">
+                            {% for message in messages %}
+                                <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}" style="border-radius: 12px; font-size: 0.9rem; padding: 0.85rem 1rem;">
+                                    <i class="bi bi-exclamation-circle-fill me-1"></i> {{ message }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <form id="config-form-paso6" method="post" action="{% url 'configuracion_colegio_paso6' colegio.id %}">
+                        {% csrf_token %}
+                        
+                        <!-- SECCIÓN 1: EVALUACIÓN Y REDONDEO DE NOTAS -->
+                        <div class="form-group-block">
+                            <div class="form-block-title">
+                                <i class="bi bi-calculator-fill text-primary"></i> 1. Calificaciones y Regla de Redondeo (Decreto 67)
+                            </div>
+                            
+                            <label class="form-label mb-2">Regla de Redondeo de Promedios *</label>
+                            <div class="policy-options-grid mb-3">
+                                
+                                <!-- Opción 1: Redondeo Estándar a 1 Decimal -->
+                                <label class="policy-card-option {% if periodo.regla_redondeo == 'un_decimal' or not periodo.regla_redondeo %}active{% endif %}" onclick="selectRounding('un_decimal')">
+                                    <input type="radio" name="regla_redondeo" value="un_decimal" {% if periodo.regla_redondeo == 'un_decimal' or not periodo.regla_redondeo %}checked{% endif %}>
+                                    <div>
+                                        <div class="policy-option-name">Redondeo Estándar (1 Dec.)</div>
+                                        <p class="policy-option-example">Aproxima al decimal más cercano.<br><strong>Ej: 3.95 sube a 4.0</strong></p>
+                                    </div>
+                                    <div class="mt-2 text-end"><span class="badge bg-success-subtle text-success" style="font-size:0.68rem;">Recomendado</span></div>
+                                </label>
+
+                                <!-- Opción 2: Truncado Estricto -->
+                                <label class="policy-card-option {% if periodo.regla_redondeo == 'truncado' %}active{% endif %}" onclick="selectRounding('truncado')">
+                                    <input type="radio" name="regla_redondeo" value="truncado" {% if periodo.regla_redondeo == 'truncado' %}checked{% endif %}>
+                                    <div>
+                                        <div class="policy-option-name">Truncado sin Redondeo</div>
+                                        <p class="policy-option-example">Corta en el primer decimal.<br><strong>Ej: 3.99 queda en 3.9</strong></p>
+                                    </div>
+                                    <div class="mt-2 text-end"><span class="badge bg-light text-muted border" style="font-size:0.68rem;">Estricto</span></div>
+                                </label>
+
+                                <!-- Opción 3: Dos Decimales -->
+                                <label class="policy-card-option {% if periodo.regla_redondeo == 'dos_decimales' %}active{% endif %}" onclick="selectRounding('dos_decimales')">
+                                    <input type="radio" name="regla_redondeo" value="dos_decimales" {% if periodo.regla_redondeo == 'dos_decimales' %}checked{% endif %}>
+                                    <div>
+                                        <div class="policy-option-name">Exacto (2 Decimales)</div>
+                                        <p class="policy-option-example">Mantiene dos cifras decimales.<br><strong>Ej: 3.95 queda en 3.95</strong></p>
+                                    </div>
+                                    <div class="mt-2 text-end"><span class="badge bg-light text-muted border" style="font-size:0.68rem;">Preciso</span></div>
+                                </label>
+
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-sm-6">
+                                    <label class="form-label" for="porcentaje_exigencia">Nivel de Exigencia Estándar *</label>
+                                    <div class="input-group">
+                                        <select class="form-select form-select-enhanced" name="porcentaje_exigencia" id="porcentaje_exigencia" onchange="updateSimulator()">
+                                            <option value="60" {% if periodo.porcentaje_exigencia == 60 or not periodo.porcentaje_exigencia %}selected{% endif %}>60% (Estándar Nacional MINEDUC)</option>
+                                            <option value="50" {% if periodo.porcentaje_exigencia == 50 %}selected{% endif %}>50% (Adecuación Curricular / PIE)</option>
+                                            <option value="70" {% if periodo.porcentaje_exigencia == 70 %}selected{% endif %}>70% (Alta Exigencia Académica)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label class="form-label" for="tipo_calculo_promedio">Cálculo de Promedio Final *</label>
+                                    <select class="form-select form-select-enhanced" name="tipo_calculo_promedio" id="tipo_calculo_promedio">
+                                        <option value="ponderado" {% if periodo.tipo_calculo_promedio == 'ponderado' or not periodo.tipo_calculo_promedio %}selected{% endif %}>Ponderado (según peso de cada prueba)</option>
+                                        <option value="simple" {% if periodo.tipo_calculo_promedio == 'simple' %}selected{% endif %}>Aritmético Simple (mismo peso para todas)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SECCIÓN 2: MODALIDAD DE ASISTENCIA Y PUNTUALIDAD -->
+                        <div class="form-group-block">
+                            <div class="form-block-title">
+                                <i class="bi bi-calendar-check-fill text-success"></i> 2. Modalidad de Toma de Asistencia
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-sm-7">
+                                    <label class="form-label">¿Cómo pasarán la lista tus profesores? *</label>
+                                    <div class="d-flex flex-column gap-2 mt-1">
+                                        <label class="btn btn-outline-secondary text-start d-flex align-items-center gap-2 p-2.5 rounded-3 {% if periodo.modalidad_asistencia == 'asignatura' or not periodo.modalidad_asistencia %}active bg-light border-primary{% endif %}" id="lblAsistAsignatura">
+                                            <input type="radio" name="modalidad_asistencia" value="asignatura" {% if periodo.modalidad_asistencia == 'asignatura' or not periodo.modalidad_asistencia %}checked{% endif %} onchange="toggleAsistenciaMode(this)">
+                                            <div>
+                                                <strong class="d-block text-dark small">Asistencia por Asignatura / Bloque Horario</strong>
+                                                <span class="extra-small text-muted">Cada profesor pasa lista al inicio de su clase. (Recomendado en Media)</span>
+                                            </div>
+                                        </label>
+
+                                        <label class="btn btn-outline-secondary text-start d-flex align-items-center gap-2 p-2.5 rounded-3 {% if periodo.modalidad_asistencia == 'diaria' %}active bg-light border-primary{% endif %}" id="lblAsistDiaria">
+                                            <input type="radio" name="modalidad_asistencia" value="diaria" {% if periodo.modalidad_asistencia == 'diaria' %}checked{% endif %} onchange="toggleAsistenciaMode(this)">
+                                            <div>
+                                                <strong class="d-block text-dark small">Asistencia Diaria Única</strong>
+                                                <span class="extra-small text-muted">El profesor jefe pasa la lista una sola vez por jornada. (Recomendado en Básica)</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-5">
+                                    <label class="form-label" for="porcentaje_asistencia_minima">Asistencia Mínima para Promoción *</label>
+                                    <select class="form-select form-select-enhanced" name="porcentaje_asistencia_minima" id="porcentaje_asistencia_minima">
+                                        <option value="85" {% if periodo.porcentaje_asistencia_minima == 85 or not periodo.porcentaje_asistencia_minima %}selected{% endif %}>85% (Norma Legal MINEDUC)</option>
+                                        <option value="80" {% if periodo.porcentaje_asistencia_minima == 80 %}selected{% endif %}>80%</option>
+                                        <option value="75" {% if periodo.porcentaje_asistencia_minima == 75 %}selected{% endif %}>75%</option>
+                                    </select>
+                                    <span class="extra-small text-muted mt-1.5 d-block">Por debajo de este valor se levanta alerta de repitencia por inasistencia.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SECCIÓN 3: VISIBILIDAD Y COMUNICACIÓN CON APODERADOS -->
+                        <div class="form-group-block">
+                            <div class="form-block-title">
+                                <i class="bi bi-bell-fill text-warning"></i> 3. Comunicación con Apoderados & Notificaciones
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label" for="visibilidad_notas_apoderados">Publicación de Calificaciones en Portal Apoderados *</label>
+                                <select class="form-select form-select-enhanced" name="visibilidad_notas_apoderados" id="visibilidad_notas_apoderados">
+                                    <option value="inmediata" {% if periodo.visibilidad_notas_apoderados == 'inmediata' or not periodo.visibilidad_notas_apoderados %}selected{% endif %}>Inmediata (Visible en la app en cuanto el docente guarda la nota)</option>
+                                    <option value="cierre_periodo" {% if periodo.visibilidad_notas_apoderados == 'cierre_periodo' %}selected{% endif %}>Diferida (Solo visible cuando UTP aprueba el acta semestral)</option>
+                                </select>
+                            </div>
+
+                            <!-- Toggles de Alertas Automáticas -->
+                            <div class="d-flex flex-column gap-2">
+                                <div class="toggle-switch-card">
+                                    <div class="toggle-info">
+                                        <h6><i class="bi bi-whatsapp text-success me-1"></i> Alertas automáticas de inasistencia</h6>
+                                        <p>Notificar al apoderado cuando el alumno se encuentre ausente en la primera hora de clases.</p>
+                                    </div>
+                                    <div class="form-check form-switch m-0">
+                                        <input class="form-check-input" type="checkbox" name="notificar_ausencias" id="notificar_ausencias" {% if periodo.notificar_ausencias or not periodo %}checked{% endif %} style="width:2.2em; height:1.2em; cursor:pointer;">
+                                    </div>
+                                </div>
+
+                                <div class="toggle-switch-card">
+                                    <div class="toggle-info">
+                                        <h6><i class="bi bi-exclamation-triangle text-danger me-1"></i> Alertas de notas insuficientes (&lt; 4.0)</h6>
+                                        <p>Enviar aviso preventivo al apoderado cuando un estudiante obtenga una nota roja.</p>
+                                    </div>
+                                    <div class="form-check form-switch m-0">
+                                        <input class="form-check-input" type="checkbox" name="notificar_notas_rojas" id="notificar_notas_rojas" {% if periodo.notificar_notas_rojas or not periodo %}checked{% endif %} style="width:2.2em; height:1.2em; cursor:pointer;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+                
+                <!-- Columna Derecha: Simulador de Notas en Tiempo Real -->
+                <div class="summary-area">
+                    <div class="simulator-card">
+                        
+                        <div class="simulator-header">
+                            <div class="simulator-icon">
+                                <i class="bi bi-cpu-fill"></i>
+                            </div>
+                            <div>
+                                <h5 class="simulator-title">Simulador de Notas</h5>
+                                <span class="badge bg-light text-success border" style="font-size: 0.72rem; font-weight: 800;" id="sim-active-rule">Redondeo a 1 Dec.</span>
+                            </div>
+                        </div>
+
+                        <!-- Caja de Ejemplo de Cálculo -->
+                        <div class="grade-simulator-box">
+                            <span class="small text-muted d-block mb-1.5 fw-bold" style="font-size: 0.76rem;">NOTAS DE EJEMPLO DEL ALUMNO</span>
+                            
+                            <div class="sim-grades-row">
+                                <span class="sim-grade-pill">N1: 5.5</span>
+                                <span class="sim-grade-pill">N2: 6.2</span>
+                                <span class="sim-grade-pill">N3: 4.8</span>
+                                <span class="sim-grade-pill">N4: 3.3</span>
+                            </div>
+
+                            <div class="sim-calculated-promedio" id="simResultGrade">5.0</div>
+                            <span class="sim-formula-desc" id="simResultFormula">Promedio Exacto: 4.95 → Redondeado: 5.0</span>
+                        </div>
+
+                        <!-- Resumen de Políticas Activas -->
+                        <div class="compliance-badge-box">
+                            <h6><i class="bi bi-shield-lock-fill"></i> Trazabilidad MINEDUC</h6>
+                            <p>Tus reglas quedarán grabadas en los libros de clases digitales y certificados oficiales del año 2026.</p>
+                        </div>
+
+                        <div class="d-flex flex-column gap-2 small text-muted">
+                            <div class="d-flex justify-content-between">
+                                <span>Escala:</span>
+                                <strong class="text-dark">1.0 a 7.0 (Mín. 4.0)</strong>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span>Exigencia:</span>
+                                <strong class="text-dark" id="simExigenciaLbl">60%</strong>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span>Asistencia:</span>
+                                <strong class="text-dark">Mín. 85%</strong>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                
+            </div> <!-- End Content Grid -->
+            
+            <!-- Bottom Actions & Finalize Button -->
+            <div class="bottom-area">
+                <div class="action-bar">
+                    <a href="{% url 'configuracion_colegio_paso5' colegio.id %}" class="btn-secondary-outline">
+                        <i class="bi bi-arrow-left"></i> Volver al Paso 5
+                    </a>
+                    
+                    <button type="button" class="btn-finish-gradient" id="btnSubmitPaso6" onclick="submitPaso6Form()">
+                        <span id="btnSubmitPaso6Text">Finalizar Configuración y Entrar a Eduteka</span>
+                        <i class="bi bi-rocket-takeoff-fill fs-5" id="btnSubmitPaso6Icon"></i>
+                        <span class="spinner-border spinner-border-sm d-none" id="btnSubmitPaso6Spinner" role="status"></span>
+                    </button>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- Scripts y Simulador Reactivo -->
+    <script>
+        let currentRounding = '{{ periodo.regla_redondeo|default:"un_decimal" }}';
+
+        function selectRounding(rule) {
+            currentRounding = rule;
+            document.querySelectorAll('.policy-card-option').forEach(card => {
+                const radio = card.querySelector('input[type="radio"]');
+                if (radio.value === rule) {
+                    card.classList.add('active');
+                    radio.checked = true;
+                } else {
+                    card.classList.remove('active');
+                    radio.checked = false;
+                }
+            });
+            updateSimulator();
+        }
+
+        function toggleAsistenciaMode(radio) {
+            document.getElementById('lblAsistAsignatura').classList.toggle('active', radio.value === 'asignatura');
+            document.getElementById('lblAsistAsignatura').classList.toggle('border-primary', radio.value === 'asignatura');
+            document.getElementById('lblAsistDiaria').classList.toggle('active', radio.value === 'diaria');
+            document.getElementById('lblAsistDiaria').classList.toggle('border-primary', radio.value === 'diaria');
+        }
+
+        function updateSimulator() {
+            const rawAverage = (5.5 + 6.2 + 4.8 + 3.3) / 4; // = 4.95
+            const resultGradeEl = document.getElementById('simResultGrade');
+            const resultFormulaEl = document.getElementById('simResultFormula');
+            const activeRuleBadge = document.getElementById('sim-active-rule');
+            const exigenciaSelect = document.getElementById('porcentaje_exigencia');
+            const exigenciaLbl = document.getElementById('simExigenciaLbl');
+
+            if (exigenciaLbl && exigenciaSelect) {
+                exigenciaLbl.textContent = exigenciaSelect.value + '%';
+            }
+
+            if (currentRounding === 'un_decimal') {
+                resultGradeEl.textContent = '5.0';
+                resultFormulaEl.textContent = `Promedio Exacto: 4.95 → Redondeado: 5.0`;
+                activeRuleBadge.textContent = 'Redondeo a 1 Dec.';
+            } else if (currentRounding === 'truncado') {
+                resultGradeEl.textContent = '4.9';
+                resultFormulaEl.textContent = `Promedio Exacto: 4.95 → Truncado: 4.9`;
+                activeRuleBadge.textContent = 'Truncado Estricto';
+            } else {
+                resultGradeEl.textContent = '4.95';
+                resultFormulaEl.textContent = `Promedio Exacto: 4.95 (2 Dec.)`;
+                activeRuleBadge.textContent = 'Exacto 2 Dec.';
+            }
+        }
+
+        function submitPaso6Form() {
+            const form = document.getElementById('config-form-paso6');
+            if (form.checkValidity()) {
+                const btn = document.getElementById('btnSubmitPaso6');
+                const txt = document.getElementById('btnSubmitPaso6Text');
+                const icon = document.getElementById('btnSubmitPaso6Icon');
+                const spinner = document.getElementById('btnSubmitPaso6Spinner');
+
+                btn.disabled = true;
+                txt.textContent = 'Activando colegio y guardando políticas...';
+                icon.classList.add('d-none');
+                spinner.classList.remove('d-none');
+                form.submit();
+            } else {
+                form.reportValidity();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', updateSimulator);
+    </script>
+</body>
+</html>

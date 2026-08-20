@@ -83,18 +83,30 @@ def registrar_asistencia_view(request):
             return redirect(f'/asistencia/registrar/{seccion_id}/?fecha={fecha_str}&asignatura={asignatura_id}')
         return redirect(f'/asistencia/registrar/{seccion_id}/?fecha={fecha_str}')
 
+    if is_admin:
+        secciones = SeccionCurso.objects.filter(curso__colegio=colegio, activo=True).select_related('curso').order_by('curso__nivel', 'curso__nombre', 'letra')
+    else:
+        asigs_prof = Asignatura.objects.filter(colegio=colegio, docente=request.user, activo=True)
+        cursos_prof = asigs_prof.values_list('curso_id', flat=True).distinct()
+        if cursos_prof.exists():
+            secciones = SeccionCurso.objects.filter(curso_id__in=cursos_prof, activo=True).select_related('curso').order_by('curso__nivel', 'curso__nombre', 'letra')
+        else:
+            secciones = SeccionCurso.objects.filter(curso__colegio=colegio, activo=True).select_related('curso').order_by('curso__nivel', 'curso__nombre', 'letra')
+
     context = {
         'colegio': colegio,
         'miembro': miembro,
         'periodo': periodo,
         'is_admin': is_admin,
         'cursos': cursos,
+        'secciones': secciones,
         'modalidad': modalidad,
         'asignaturas_disponibles': asignaturas_disponibles,
         'fecha_actual': fecha_str,
         'hoy': timezone.now().date(),
     }
     return render(request, 'asistencia/registrar.html', context)
+
 
 
 @login_required

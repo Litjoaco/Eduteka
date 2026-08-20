@@ -1,0 +1,509 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Directorio de Proveedores - Eduteka</title>
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #7C5CFC;
+      --primary-soft: rgba(124, 92, 252, 0.08);
+      --primary-hover: #6747E3;
+      --secondary: #65CDBF;
+      --bg: #F8F9FD;
+      --white: #FFFFFF;
+      --dark: #151A35;
+      --gray-text: #687089;
+      --border: #BCC0CF;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+    }
+
+    * { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+    }
+
+    .wrapper { display: flex; flex: 1; position: relative; }
+
+    .topbar {
+      height: 70px;
+      background: rgba(255, 255, 255, 0.85) !important;
+      backdrop-filter: blur(12px) !important;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; position: sticky; top: 0; z-index: 98;
+    }
+    .content-body { padding: 2rem; flex-grow: 1; max-width: 1440px; margin: 0 auto; width: 100%; }
+
+    /* Hero Banner Proveedores */
+    .hero-banner-prov {
+      background: linear-gradient(135deg, #7C5CFC 0%, #6344CE 50%, #4F46E5 100%);
+      border-radius: var(--radius-lg);
+      padding: 2.2rem 2.5rem;
+      color: var(--white);
+      margin-bottom: 2rem;
+      box-shadow: 0 12px 30px rgba(124, 92, 252, 0.25);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-banner-prov::before {
+      content: '';
+      position: absolute;
+      width: 320px; height: 320px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 70%);
+      top: -80px; right: -60px;
+      border-radius: 50%;
+    }
+
+    .hero-badge-pill {
+      background: rgba(255, 255, 255, 0.2);
+      color: #FFFFFF !important;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 20px;
+      padding: 0.35rem 0.85rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      backdrop-filter: blur(8px);
+    }
+
+    .hero-school-pill {
+      background: rgba(0, 0, 0, 0.2);
+      color: #FFFFFF !important;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 20px;
+      padding: 0.35rem 0.85rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      backdrop-filter: blur(8px);
+    }
+
+
+    /* Cards Grid */
+    .prov-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .prov-card {
+      background: var(--white);
+      border: 1px solid #E2E8F0;
+      border-radius: var(--radius-lg);
+      padding: 1.6rem 1.6rem;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.02);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.25s ease;
+      position: relative;
+    }
+    .prov-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.06);
+      border-color: #CBD5E1;
+    }
+
+    .prov-icon-box {
+      width: 48px; height: 48px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(124,92,252,0.1) 0%, rgba(101,205,191,0.15) 100%);
+      color: var(--primary);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.86rem;
+      color: #475569;
+      margin-bottom: 0.45rem;
+    }
+    .contact-item i {
+      color: var(--primary);
+      font-size: 1rem;
+      width: 18px;
+      text-align: center;
+    }
+
+    .btn-wa-direct {
+      background: #10B981;
+      color: var(--white);
+      border: none;
+      font-weight: 700;
+      border-radius: 10px;
+      padding: 0.45rem 0.9rem;
+      font-size: 0.82rem;
+      transition: all 0.2s ease;
+    }
+    .btn-wa-direct:hover {
+      background: #059669;
+      color: var(--white);
+      transform: scale(1.03);
+    }
+  </style>
+</head>
+<body>
+
+<div class="wrapper">
+  {% include 'colegios/_sidebar.html' with active_page='proveedores' %}
+
+  <div class="main-content">
+    <header class="topbar">
+      <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn" style="border:none; background:var(--primary-soft); color:var(--primary);">
+          <i class="bi bi-list fs-5"></i>
+        </button>
+        <span class="fw-bold text-dark fs-5"><i class="bi bi-truck text-primary me-2"></i>Directorio de Proveedores</span>
+      </div>
+
+      <div class="topbar-right d-flex align-items-center gap-4">
+        <div class="topbar-date d-none d-sm-block text-muted small fw-semibold">
+          <i class="bi bi-calendar3 me-1"></i> {{ hoy|date:"l, d \d\e F \d\e Y"|title }}
+        </div>
+      </div>
+    </header>
+
+    <main class="content-body">
+      
+      <!-- HERO BANNER -->
+      <div class="hero-banner-prov">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-4 position-relative" style="z-index:1;">
+          <div>
+            <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+              <span class="hero-badge-pill">
+                <i class="bi bi-truck"></i> Directorio Comercial & Proveedores
+              </span>
+              <span class="hero-school-pill">
+                <i class="bi bi-building"></i> {{ colegio.nombre }}
+              </span>
+            </div>
+            <h2 class="fw-extrabold text-white mb-1 fs-3">Proveedores de Insumos & Servicios</h2>
+            <p class="text-white text-opacity-85 small mb-0">
+              Directorio de empresas proveedoras con contacto directo para cotizaciones, reposiciones de inventario y compras.
+            </p>
+          </div>
+
+          <div class="d-flex gap-2 flex-wrap">
+            <button type="button" class="btn btn-light fw-bold px-3 py-2 shadow-sm" style="border-radius:12px; color:#7C5CFC;" data-bs-toggle="modal" data-bs-target="#modalNuevoProveedor">
+              <i class="bi bi-plus-lg me-1"></i> Nuevo Proveedor
+            </button>
+
+            <a href="{% url 'inventario_dashboard' %}" class="btn btn-outline-light fw-bold px-3 py-2" style="border-radius:12px;">
+              <i class="bi bi-box-seam me-1"></i> Ver Inventario
+            </a>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- BUSCADOR -->
+      <div class="card p-3 mb-4 border-0 shadow-sm" style="border-radius:14px;">
+        <form method="GET" action="{% url 'proveedores_directorio' %}" class="row g-2 align-items-center">
+          <div class="col-md-9">
+            <div class="input-group">
+              <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+              <input type="text" name="q" class="form-control border-start-0" placeholder="Buscar por razón social, rubro, contacto o teléfono..." value="{{ busqueda }}">
+            </div>
+          </div>
+          <div class="col-md-3 d-flex gap-2">
+            <button type="submit" class="btn btn-primary fw-bold w-100" style="border-radius:10px;"><i class="bi bi-search"></i> Buscar</button>
+            <a href="{% url 'proveedores_directorio' %}" class="btn btn-outline-secondary" style="border-radius:10px;"><i class="bi bi-x-lg"></i></a>
+          </div>
+        </form>
+      </div>
+
+      <!-- GRID DE CARDS DE PROVEEDORES -->
+      <div class="prov-grid">
+        {% for p in proveedores %}
+          <div class="prov-card">
+            <div>
+              <!-- HEADER DE LA CARD -->
+              <div class="d-flex justify-content-between align-items-start mb-3">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="prov-icon-box">
+                    <i class="bi bi-building"></i>
+                  </div>
+                  <div>
+                    <span class="badge px-2 py-0.5 mb-1" style="background:rgba(124,92,252,0.08); color:#7C5CFC; border-radius:6px; font-size:0.75rem; font-weight:700;">
+                      {{ p.categoria_insumos }}
+                    </span>
+                    <h5 class="fw-extrabold text-dark mb-0">{{ p.nombre }}</h5>
+                    {% if p.rut %}
+                      <span class="text-muted extra-small">RUT: {{ p.rut }}</span>
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="dropdown">
+                  <button class="btn btn-sm btn-light border-0" type="button" data-bs-toggle="dropdown" style="border-radius:8px;">
+                    <i class="bi bi-three-dots-vertical"></i>
+                  </button>
+                  <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" style="border-radius:10px;">
+                    <li><button class="dropdown-item small" onclick="openEditarProveedor('{{ p.id }}', '{{ p.nombre|escapejs }}', '{{ p.rut|default:''|escapejs }}', '{{ p.categoria_insumos|escapejs }}', '{{ p.contacto_nombre|default:''|escapejs }}', '{{ p.telefono|default:''|escapejs }}', '{{ p.email|default:''|escapejs }}', '{{ p.direccion|default:''|escapejs }}', '{{ p.sitio_web|default:''|escapejs }}', '{{ p.notas|default:''|escapejs }}')"><i class="bi bi-pencil me-2 text-primary"></i>Editar</button></li>
+                    <li><a class="dropdown-item small text-danger" href="{% url 'eliminar_proveedor' p.id %}" onclick="return confirm('¿Archivar este proveedor?')"><i class="bi bi-trash me-2"></i>Archivar</a></li>
+                  </ul>
+                </div>
+              </div>
+
+              <!-- DATOS DE CONTACTO -->
+              <div class="p-3 bg-light rounded-3 mb-3 border">
+                {% if p.contacto_nombre %}
+                  <div class="contact-item">
+                    <i class="bi bi-person-fill"></i>
+                    <span><strong>{{ p.contacto_nombre }}</strong> (Ejecutivo)</span>
+                  </div>
+                {% endif %}
+
+                {% if p.telefono %}
+                  <div class="contact-item">
+                    <i class="bi bi-telephone-fill"></i>
+                    <span>{{ p.telefono }}</span>
+                  </div>
+                {% endif %}
+
+                {% if p.email %}
+                  <div class="contact-item">
+                    <i class="bi bi-envelope-fill"></i>
+                    <span>{{ p.email }}</span>
+                  </div>
+                {% endif %}
+
+                {% if p.direccion %}
+                  <div class="contact-item">
+                    <i class="bi bi-geo-alt-fill"></i>
+                    <span class="text-truncate">{{ p.direccion }}</span>
+                  </div>
+                {% endif %}
+
+                {% if p.notas %}
+                  <div class="extra-small text-muted mt-2 pt-2 border-top">
+                    <i class="bi bi-info-circle me-1 text-primary"></i> {{ p.notas }}
+                  </div>
+                {% endif %}
+              </div>
+
+              <!-- INSUMOS SUMINISTRADOS -->
+              <div class="mb-3">
+                <span class="text-muted extra-small text-uppercase fw-bold d-block mb-1.5">Artículos Suministrados:</span>
+                <div class="d-flex flex-wrap gap-1">
+                  {% for item in p.articulos_suministrados.all %}
+                    <span class="badge {% if item.stock_actual <= 0 %}bg-danger-subtle text-danger border border-danger-subtle{% elif item.en_alerta %}bg-warning-subtle text-warning border border-warning-subtle{% else %}bg-light text-dark border{% endif %} px-2 py-1" style="border-radius:6px; font-size:0.75rem;">
+                      {{ item.nombre|truncatechars:28 }} (Stock: {{ item.stock_actual }})
+                    </span>
+                  {% empty %}
+                    <span class="text-muted extra-small fst-italic">Sin artículos vinculados aún</span>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+
+            <!-- BOTONES DE CONTACTO DIRECTO -->
+            <div class="d-flex gap-2 pt-3 border-top mt-auto">
+              {% if p.telefono %}
+                <a href="https://wa.me/{{ p.telefono|cut:' '|cut:'+'|cut:'-' }}?text=Hola%20{{ p.contacto_nombre|default:p.nombre|urlencode }},%20les%20escribimos%20desde%20{{ colegio.nombre|urlencode }}%20para%20realizar%20una%20consulta%20de%20insumos." target="_blank" class="btn-wa-direct flex-grow-1 text-center text-decoration-none">
+                  <i class="bi bi-whatsapp me-1"></i> WhatsApp
+                </a>
+              {% endif %}
+
+              {% if p.email %}
+                <a href="mailto:{{ p.email }}?subject=Contacto%20Institucional%20-%20{{ colegio.nombre|urlencode }}" class="btn btn-outline-primary fw-bold flex-grow-1" style="border-radius:10px; font-size:0.82rem;">
+                  <i class="bi bi-envelope me-1"></i> Correo
+                </a>
+              {% endif %}
+            </div>
+          </div>
+        {% empty %}
+          <div class="col-12 text-center py-5">
+            <i class="bi bi-truck fs-1 text-muted d-block mb-2"></i>
+            <h5 class="text-muted fw-bold">No se encontraron proveedores</h5>
+            <p class="text-muted small">Registra nuevos proveedores para contactarlos y gestionar tu inventario escolar.</p>
+          </div>
+        {% endfor %}
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- MODAL NUEVO PROVEEDOR -->
+<div class="modal fade" id="modalNuevoProveedor" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 shadow-lg" style="border-radius:16px;">
+      <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+        <h5 class="modal-title fw-extrabold text-dark"><i class="bi bi-truck text-primary me-2"></i>Registrar Nuevo Proveedor</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="POST" action="{% url 'crear_proveedor' %}">
+        {% csrf_token %}
+        <div class="modal-body p-4">
+          
+          <div class="row g-3 mb-3">
+            <div class="col-md-8">
+              <label class="form-label fw-bold text-dark small">Razón Social / Nombre Proveedor</label>
+              <input type="text" name="nombre" class="form-control fw-bold" placeholder="Ej: Librería & Papelería Central SpA" required style="border-radius:10px;">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-bold text-dark small">RUT Proveedor</label>
+              <input type="text" name="rut" class="form-control" placeholder="Ej: 76.123.456-7" style="border-radius:10px;">
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">Rubro / Categoría de Insumos</label>
+              <input type="text" name="categoria_insumos" class="form-control" placeholder="Ej: Papelería, Útiles, Tecnología, Aseo..." value="Papelería y Útiles" required style="border-radius:10px;">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">Nombre Ejecutivo / Contacto</label>
+              <input type="text" name="contacto_nombre" class="form-control" placeholder="Ej: Rodrigo Valenzuela" style="border-radius:10px;">
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">Teléfono / WhatsApp (+569...)</label>
+              <input type="text" name="telefono" class="form-control fw-bold" placeholder="Ej: +56991234567" style="border-radius:10px;">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">Correo Electrónico</label>
+              <input type="email" name="email" class="form-control" placeholder="Ej: ventas@proveedor.cl" style="border-radius:10px;">
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-8">
+              <label class="form-label fw-bold text-dark small">Dirección Comercial</label>
+              <input type="text" name="direccion" class="form-control" placeholder="Ej: Av. Providencia 1240, Santiago" style="border-radius:10px;">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-bold text-dark small">Sitio Web (Opcional)</label>
+              <input type="url" name="sitio_web" class="form-control" placeholder="https://..." style="border-radius:10px;">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold text-dark small">Notas / Convenios / Descuentos</label>
+            <textarea name="notas" class="form-control" rows="2" placeholder="Descuentos institucionales, días de despacho, condiciones de crédito..." style="border-radius:10px;"></textarea>
+          </div>
+
+        </div>
+        <div class="modal-footer border-top-0 p-4 pt-0">
+          <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary fw-extrabold px-4" style="border-radius:10px; background:linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%); border:none;">Guardar Proveedor</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDITAR PROVEEDOR -->
+<div class="modal fade" id="modalEditarProveedor" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 shadow-lg" style="border-radius:16px;">
+      <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+        <h5 class="modal-title fw-extrabold text-dark"><i class="bi bi-pencil text-primary me-2"></i>Editar Información del Proveedor</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="POST" id="formEditarProveedor" action="">
+        {% csrf_token %}
+        <div class="modal-body p-4">
+          <div class="row g-3 mb-3">
+            <div class="col-md-8">
+              <label class="form-label fw-bold text-dark small">Razón Social</label>
+              <input type="text" name="nombre" id="editNombre" class="form-control fw-bold" required style="border-radius:10px;">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-bold text-dark small">RUT</label>
+              <input type="text" name="rut" id="editRut" class="form-control" style="border-radius:10px;">
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">Rubro / Categoría</label>
+              <input type="text" name="categoria_insumos" id="editCategoria" class="form-control" required style="border-radius:10px;">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">Nombre Contacto</label>
+              <input type="text" name="contacto_nombre" id="editContacto" class="form-control" style="border-radius:10px;">
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">Teléfono / WhatsApp</label>
+              <input type="text" name="telefono" id="editTelefono" class="form-control fw-bold" style="border-radius:10px;">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">Correo Electrónico</label>
+              <input type="email" name="email" id="editEmail" class="form-control" style="border-radius:10px;">
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-8">
+              <label class="form-label fw-bold text-dark small">Dirección</label>
+              <input type="text" name="direccion" id="editDireccion" class="form-control" style="border-radius:10px;">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-bold text-dark small">Sitio Web</label>
+              <input type="url" name="sitio_web" id="editWeb" class="form-control" style="border-radius:10px;">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold text-dark small">Notas / Acuerdos</label>
+            <textarea name="notas" id="editNotas" class="form-control" rows="2" style="border-radius:10px;"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer border-top-0 p-4 pt-0">
+          <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary fw-extrabold px-4" style="border-radius:10px; background:linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%); border:none;">Actualizar Datos</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+<script>
+  function openEditarProveedor(id, nombre, rut, cat, contacto, tel, email, dir, web, notas) {
+    document.getElementById('formEditarProveedor').action = '/colegios/proveedores/editar/' + id + '/';
+    document.getElementById('editNombre').value = nombre;
+    document.getElementById('editRut').value = rut;
+    document.getElementById('editCategoria').value = cat;
+    document.getElementById('editContacto').value = contacto;
+    document.getElementById('editTelefono').value = tel;
+    document.getElementById('editEmail').value = email;
+    document.getElementById('editDireccion').value = dir;
+    document.getElementById('editWeb').value = web;
+    document.getElementById('editNotas').value = notas;
+    const modal = new bootstrap.Modal(document.getElementById('modalEditarProveedor'));
+    modal.show();
+  }
+</script>
+</body>
+</html>

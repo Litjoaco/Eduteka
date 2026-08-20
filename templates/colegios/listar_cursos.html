@@ -4,9 +4,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Estructura Escolar | Eduteka</title>
+  <title>Estructura Escolar y Cursos - Eduteka</title>
   <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <style>
@@ -21,13 +21,11 @@
       --gray-text: #687089;
       --border: #BCC0CF;
       --radius-lg: 16px;
-      --radius-md: 10px;
+      --radius-md: 12px;
       --radius-sm: 8px;
     }
 
-    * {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-    }
+    * { font-family: 'Plus Jakarta Sans', sans-serif; }
 
     body {
       background-color: var(--bg);
@@ -38,16 +36,25 @@
       margin: 0;
     }
 
-    /* WRAPPER */
     .wrapper { display: flex; flex: 1; position: relative; }
+
+    .topbar {
+      height: 70px;
+      background: rgba(255, 255, 255, 0.85) !important;
+      backdrop-filter: blur(12px) !important;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; position: sticky; top: 0; z-index: 98;
+    }
+    .content-body { padding: 2rem; flex-grow: 1; max-width: 1320px; margin: 0 auto; width: 100%; }
 
     /* Estilos para letras/secciones */
     .letra-btn {
       display: inline-flex; align-items: center; justify-content: center;
-      width: 34px; height: 34px;
+      width: 36px; height: 36px;
       border-radius: var(--radius-sm); border: 1.5px solid var(--border);
       background: var(--white); color: var(--gray-text);
-      font-weight: 700; font-size: 0.82rem; cursor: pointer;
+      font-weight: 700; font-size: 0.85rem; cursor: pointer;
       transition: all .2s; user-select: none;
     }
     .letra-btn:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-soft); }
@@ -57,50 +64,56 @@
     }
     .letter-checkbox { display: none; }
 
-    /* MAIN CONTENT */
-    .topbar {
-      height: 70px; background: var(--white);
-      border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 2rem; position: sticky; top: 0; z-index: 98;
-    }
-    .content-body { padding: 2rem; flex-grow: 1; }
-
-    /* DASHBOARD CARDS & TABLE */
-    .dashboard-panel {
-      background: var(--white);
-      border: 1px solid var(--border);
+    /* KPI Cards */
+    .kpi-card-course {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
       border-radius: var(--radius-lg);
-      padding: 1.5rem;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
-      margin-bottom: 2rem;
+      padding: 1.25rem 1.5rem;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.02);
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      transition: all 0.2s ease;
+    }
+    .kpi-card-course:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.05); }
+
+    .kpi-icon-course {
+      width: 48px; height: 48px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.35rem; flex-shrink: 0;
     }
 
+    /* Course Cards */
     .curso-card {
       background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 1.25rem;
-      margin-bottom: 1rem;
+      border: 1px solid #E2E8F0;
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
       transition: transform 0.2s, box-shadow 0.2s;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
-
     .curso-card:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(0,0,0,0.03);
+      border-color: #C5B6FF;
+      box-shadow: 0 8px 25px rgba(124, 92, 252, 0.08);
     }
 
     .badge-section {
-      background: var(--primary-soft);
-      color: var(--primary);
-      border: 1px solid var(--border);
-      font-weight: 600;
-      padding: 0.4rem 0.8rem;
-      border-radius: 20px;
-      font-size: 0.8rem;
+      background: #F0EDFF;
+      color: #7C5CFC;
+      border: 1px solid #D8CEFF;
+      font-weight: 700;
+      padding: 0.4rem 0.85rem;
+      border-radius: 10px;
+      font-size: 0.85rem;
       display: inline-flex;
       align-items: center;
-      gap: 0.3rem;
+      gap: 0.4rem;
     }
 
     .badge-section.inactive {
@@ -108,6 +121,10 @@
       color: #F43F5E;
       border: 1px solid #FECDD3;
     }
+
+    .badge-status-active { background: #ECFDF5; color: #059669; border: 1px solid #A7F3D0; border-radius: 6px; font-size: 0.75rem; }
+    .badge-status-inactive { background: #FFF1F2; color: #E11D48; border: 1px solid #FECDD3; border-radius: 6px; font-size: 0.75rem; }
+
   </style>
 </head>
 <body>
@@ -117,12 +134,13 @@
 
   <!-- MAIN CONTENT -->
   <div class="main-content">
+    <!-- TOPBAR -->
     <header class="topbar">
       <div>
         <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn" style="border:none; background:var(--primary-soft); color:var(--primary);">
           <i class="bi bi-list fs-5"></i>
         </button>
-        <span class="fw-bold text-dark"><i class="bi bi-diagram-3 text-primary me-2"></i>Estructura Académica</span>
+        <span class="fw-bold text-dark fs-5"><i class="bi bi-diagram-3-fill text-primary me-2"></i>Estructura Escolar y Secciones</span>
       </div>
       <div class="topbar-right">
         <div class="text-muted small fw-semibold">
@@ -132,188 +150,313 @@
     </header>
 
     <main class="content-body">
-
-
-      <!-- Header & Action -->
+      
+      <!-- HERO & ACTIONS -->
       <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
         <div>
-          <h2 class="fw-bold text-dark mb-0">Niveles Escolares y Cursos</h2>
-          <p class="text-muted mb-0">Administra los cursos de tu colegio y agrega las secciones o letras correspondientes.</p>
+          <h2 class="fw-extrabold text-dark mb-1" style="font-size: 1.6rem;">Niveles Escolares y Secciones</h2>
+          <p class="text-muted small mb-0">Administra los cursos de tu establecimiento y agrega las letras correspondientes (A, B, C...).</p>
         </div>
-        {% if is_admin %}
-          <button class="btn btn-primary d-flex align-items-center gap-2 px-4 py-2" style="border-radius: var(--radius-md); font-weight:700;" data-bs-toggle="modal" data-bs-target="#modalCrearCurso">
-            <i class="bi bi-plus-lg"></i> Agregar Nivel Escolar
-          </button>
-        {% endif %}
+        <div class="d-flex gap-2 flex-wrap">
+          <a href="{% url 'talleres_dashboard' %}" class="btn btn-outline-primary fw-bold px-3 py-2" style="border-radius: 12px;">
+            <i class="bi bi-star-fill me-1.5 text-warning"></i> Talleres Extracurriculares (ACLES)
+          </a>
+          {% if is_admin %}
+            <button class="btn btn-primary fw-extrabold px-4 py-2 shadow-sm" style="border-radius: 12px; background: linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%); border:none;" data-bs-toggle="modal" data-bs-target="#modalCrearCurso">
+              <i class="bi bi-plus-lg me-1.5"></i> Agregar Nivel Escolar
+            </button>
+          {% endif %}
+        </div>
       </div>
 
-      <!-- Cursos list -->
-      <div class="row">
+
+      <!-- KPI METRICS ROW -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-4 col-6">
+          <div class="kpi-card-course">
+            <div class="kpi-icon-course" style="background:#F0EDFF; color:#7C5CFC;"><i class="bi bi-layers-fill"></i></div>
+            <div>
+              <span class="text-muted extra-small text-uppercase fw-bold d-block">Total Cursos / Niveles</span>
+              <span class="fs-4 fw-extrabold text-dark">{{ cursos_con_secciones|length }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4 col-6">
+          <div class="kpi-card-course">
+            <div class="kpi-icon-course" style="background:#ECFDF5; color:#10B981;"><i class="bi bi-grid-3x3-gap-fill"></i></div>
+            <div>
+              <span class="text-muted extra-small text-uppercase fw-bold d-block">Secciones Habilitadas</span>
+              <span class="fs-4 fw-extrabold text-success">
+                {% with total_sec=0 %}
+                  {% for c in cursos_con_secciones %}
+                    {% if forloop.last %}{{ forloop.counter0|add:c.secciones.count }}{% endif %}
+                  {% empty %}
+                    0
+                  {% endfor %}
+                {% endwith %}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4 col-12">
+          <div class="kpi-card-course">
+            <div class="kpi-icon-course" style="background:#EFF6FF; color:#2563EB;"><i class="bi bi-building-check"></i></div>
+            <div>
+              <span class="text-muted extra-small text-uppercase fw-bold d-block">Estado Institucional</span>
+              <span class="fs-4 fw-extrabold text-primary">Operativo</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CURSOS GRID -->
+      <div class="row g-4">
         {% if cursos_con_secciones %}
           {% for item in cursos_con_secciones %}
-            <div class="col-md-6 mb-4">
+            <div class="col-lg-6">
               <div class="curso-card">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                  <div>
-                    <h4 class="fw-bold text-dark mb-1">{{ item.curso.nombre }}</h4>
-                    <span class="badge {% if item.curso.activo %}bg-success-light text-success{% else %}bg-danger-light text-danger{% endif %} small" style="background-color: {% if item.curso.activo %}#ECFDF5{% else %}#FFF1F2{% endif %}; border: 1px solid {% if item.curso.activo %}#A7F3D0{% else %}#FECDD3{% endif %}; font-size:0.75rem;">
-                      {% if item.curso.activo %}Activo{% else %}Inactivo{% endif %}
-                    </span>
-                  </div>
-                  
-                  {% if is_admin %}
-                    <div class="dropdown">
-                      <button class="btn btn-light btn-sm border" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: var(--radius-sm);">
-                        <i class="bi bi-three-dots-vertical"></i>
-                      </button>
-                      <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="border-radius: var(--radius-md);">
-                        <li>
-                          <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modalEditarCurso{{ item.curso.id }}">
-                            <i class="bi bi-pencil me-2 text-warning"></i> Editar Nombre
-                          </button>
-                        </li>
-                        <li>
-                          <a class="dropdown-item {% if item.curso.activo %}text-danger{% else %}text-success{% endif %}" href="{% url 'baja_curso' item.curso.id %}">
-                            <i class="bi {% if item.curso.activo %}bi-slash-circle text-danger{% else %}bi-check-circle text-success{% endif %} me-2"></i>
-                            {% if item.curso.activo %}Desactivar Nivel{% else %}Activar Nivel{% endif %}
-                          </a>
-                        </li>
-                      </ul>
+                <div>
+                  <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                      <div class="rounded-3 d-flex align-items-center justify-content-center" style="width:38px; height:38px; background:#F0EDFF; color:#7C5CFC;">
+                        <i class="bi bi-mortarboard-fill fs-5"></i>
+                      </div>
+                      <div>
+                        <h4 class="fw-extrabold text-dark mb-0 fs-5">{{ item.curso.nombre }}</h4>
+                        <span class="text-muted extra-small fw-semibold">{{ item.secciones.count }} Secciones</span>
+                      </div>
                     </div>
-                  {% endif %}
-                </div>
+                    
+                    <div class="d-flex align-items-center gap-2">
+                      <span class="badge fw-bold px-2.5 py-1 {% if item.curso.activo %}badge-status-active{% else %}badge-status-inactive{% endif %}">
+                        {% if item.curso.activo %}Activo{% else %}Inactivo{% endif %}
+                      </span>
 
-                <!-- Secciones -->
-                <div class="mb-4">
-                  <div class="text-muted small fw-bold mb-2">Secciones Registradas:</div>
-                  <div class="d-flex flex-wrap gap-2">
-                    {% if item.secciones %}
-                      {% for sec in item.secciones %}
-                        <span class="badge-section {% if not sec.activo %}inactive{% endif %}">
-                          {{ sec.nombre }}
-                          {% if is_admin %}
-                            <a href="{% url 'baja_seccion' sec.id %}" class="ms-1 text-decoration-none text-danger" title="Eliminar Sección" onclick="return confirm('¿Seguro que deseas eliminar esta sección?')">
-                              <i class="bi bi-x-circle" style="font-size: 0.75rem;"></i>
-                            </a>
-                          {% endif %}
-                        </span>
-                      {% endfor %}
-                    {% else %}
-                      <span class="text-muted small italic">Sin secciones registradas</span>
-                    {% endif %}
+
+                      {% if is_admin %}
+                        <div class="dropdown">
+                          <button class="btn btn-light btn-sm border-0 p-1 text-muted" type="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-three-dots-vertical"></i>
+                          </button>
+                          <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="border-radius: 12px; font-size:0.85rem;">
+                            <li>
+                              <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modalEditarCurso{{ item.curso.id }}">
+                                <i class="bi bi-pencil me-2 text-warning"></i> Editar Nombre
+                              </button>
+                            </li>
+                            <li>
+                              <a class="dropdown-item {% if item.curso.activo %}text-danger{% else %}text-success{% endif %}" href="{% url 'baja_curso' item.curso.id %}">
+                                <i class="bi {% if item.curso.activo %}bi-slash-circle text-danger{% else %}bi-check-circle text-success{% endif %} me-2"></i>
+                                {% if item.curso.activo %}Desactivar Nivel{% else %}Activar Nivel{% endif %}
+                              </a>
+                            </li>
+                          </ul>
+                        </div>
+                      {% endif %}
+                    </div>
+                  </div>
+
+                  <!-- SECCIONES -->
+                  <div class="mb-4">
+                    <span class="text-muted extra-small text-uppercase fw-bold d-block mb-2">Secciones y Jefaturas de Curso:</span>
+                    <div class="d-flex flex-column gap-2">
+                      {% if item.secciones %}
+                        {% for sec in item.secciones %}
+                          <div class="d-flex align-items-center justify-content-between p-2 rounded-3 border bg-light">
+                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                              <span class="badge-section {% if not sec.activo %}inactive{% endif %} mb-0">
+                                <i class="bi bi-bookmark-check-fill text-primary"></i> Sección {{ sec.nombre }}
+                              </span>
+
+                              {% if sec.profesor_jefe %}
+                                <span class="badge px-2.5 py-1 fw-bold" style="background:#F0EDFF; color:#7C5CFC; border:1px solid #D8CEFF; border-radius:6px; font-size:0.75rem;">
+                                  <i class="bi bi-star-fill text-warning me-1"></i> Prof. Jefe: {{ sec.profesor_jefe.get_full_name|default:sec.profesor_jefe.username }}
+                                </span>
+                              {% else %}
+                                <span class="badge px-2 py-1 text-muted" style="background:#F1F5F9; border:1px solid #E2E8F0; border-radius:6px; font-size:0.72rem;">
+                                  <i class="bi bi-person-dash me-1"></i> Sin Profesor Jefe
+                                </span>
+                              {% endif %}
+                            </div>
+
+                            {% if is_admin %}
+                              <div class="d-flex align-items-center gap-1.5">
+                                <button type="button" class="btn btn-sm btn-outline-primary py-0.5 px-2" style="font-size:0.75rem; border-radius:6px;" data-bs-toggle="modal" data-bs-target="#modalJefeSeccion{{ sec.id }}">
+                                  <i class="bi bi-person-plus-fill me-1"></i> Jefatura
+                                </button>
+                                <a href="{% url 'baja_seccion' sec.id %}" class="btn btn-sm btn-outline-danger py-0.5 px-1.5" style="font-size:0.75rem; border-radius:6px;" title="Eliminar Sección" onclick="return confirm('¿Seguro que deseas eliminar esta sección?')">
+                                  <i class="bi bi-trash"></i>
+                                </a>
+                              </div>
+                            {% endif %}
+                          </div>
+                        {% endfor %}
+                      {% else %}
+                        <span class="text-muted small">Sin secciones agregadas aún.</span>
+                      {% endif %}
+                    </div>
                   </div>
                 </div>
 
-                <!-- Botón rápido para agregar sección -->
-                {% if is_admin and item.curso.activo %}
-                  <div class="border-top pt-3">
-                    <div class="text-muted small fw-bold mb-2">Agregar Letras/Secciones:</div>
-                    <form method="POST" action="{% url 'crear_seccion' item.curso.id %}" class="d-flex flex-wrap gap-2 align-items-center">
-                      {% csrf_token %}
-                      {% for letra in "ABCDEFGH"|make_list %}
-                        <input class="letter-checkbox" type="checkbox" name="secciones_nuevas" value="Sección {{ letra }}" id="letra_{{ item.curso.id }}_{{ letra }}">
-                        <label class="letra-btn" for="letra_{{ item.curso.id }}_{{ letra }}" title="Sección {{ letra }}">{{ letra }}</label>
-                      {% endfor %}
-                      <button type="submit" class="btn btn-sm btn-primary px-3 fw-bold ms-1" style="border-radius: var(--radius-sm); font-size:0.8rem; height:34px;">
-                        <i class="bi bi-plus-lg me-1"></i>Agregar
-                      </button>
-                    </form>
+                {% if is_admin %}
+                  <div class="border-top pt-3 mt-2 d-flex justify-content-end">
+                    <button class="btn btn-outline-primary btn-sm fw-extrabold px-3 py-1.5" style="border-radius: 8px;" data-bs-toggle="modal" data-bs-target="#modalAgregarSeccion{{ item.curso.id }}">
+                      <i class="bi bi-plus-circle me-1"></i> Agregar Sección
+                    </button>
                   </div>
                 {% endif %}
               </div>
+
             </div>
 
             <!-- MODAL EDITAR CURSO -->
             <div class="modal fade" id="modalEditarCurso{{ item.curso.id }}" tabindex="-1" aria-hidden="true">
               <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content" style="border-radius: var(--radius-md); border:none;">
-                  <div class="modal-header border-bottom-0">
-                    <h5 class="fw-bold">Editar Nombre de Curso</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+                  <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+                    <h5 class="modal-title fw-extrabold text-dark">Editar Nivel Escolar</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                   </div>
                   <form method="POST" action="{% url 'editar_curso' item.curso.id %}">
                     {% csrf_token %}
-                    <div class="modal-body pt-0">
+                    <div class="modal-body p-4">
                       <div class="mb-3">
-                        <label class="form-label small fw-bold">Nombre del Curso</label>
-                        <input type="text" name="nombre" value="{{ item.curso.nombre }}" class="form-control" required style="border-color: var(--border);">
+                        <label class="form-label fw-bold text-dark small">Nombre del Curso</label>
+                        <input type="text" name="nombre" class="form-control fw-bold" value="{{ item.curso.nombre }}" required style="border-radius:10px;">
                       </div>
                     </div>
-                    <div class="modal-footer border-top-0">
-                      <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-                      <button type="submit" class="btn btn-primary fw-bold">Guardar Cambios</button>
+                    <div class="modal-footer border-top-0 p-4 pt-0">
+                      <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Cancelar</button>
+                      <button type="submit" class="btn btn-primary fw-extrabold px-4" style="border-radius:10px; background:linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%); border:none;">Guardar Cambios</button>
                     </div>
                   </form>
                 </div>
               </div>
             </div>
 
+            <!-- MODAL AGREGAR SECCION -->
+            <div class="modal fade" id="modalAgregarSeccion{{ item.curso.id }}" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+                  <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+                    <h5 class="modal-title fw-extrabold text-dark">Agregar Secciones a {{ item.curso.nombre }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                  </div>
+                  <form method="POST" action="{% url 'crear_seccion' item.curso.id %}">
+                    {% csrf_token %}
+                    <div class="modal-body p-4">
+                      <p class="text-muted small mb-3">Selecciona las letras o secciones que deseas habilitar:</p>
+                      
+                      <div class="d-flex flex-wrap gap-2 justify-content-center p-3 bg-light rounded-3 border">
+                        {% for letra in "A,B,C,D,E,F,G,H"|make_list %}
+                          {% if letra != "," %}
+                            <label>
+                              <input type="checkbox" name="letras" value="{{ letra }}" class="letter-checkbox">
+                              <span class="letra-btn">{{ letra }}</span>
+                            </label>
+                          {% endif %}
+                        {% endfor %}
+                      </div>
+                    </div>
+                    <div class="modal-footer border-top-0 p-4 pt-0">
+                      <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Cancelar</button>
+                      <button type="submit" class="btn btn-primary fw-extrabold px-4" style="border-radius:10px; background:linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%); border:none;">Habilitar Secciones</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <!-- MODALES PROFESOR JEFE POR SECCION -->
+            {% for sec in item.secciones %}
+              <div class="modal fade" id="modalJefeSeccion{{ sec.id }}" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+                    <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+                      <h5 class="modal-title fw-extrabold text-dark">
+                        <i class="bi bi-star-fill text-warning me-2"></i>Profesor(a) Jefe: {{ item.curso.nombre }} - {{ sec.nombre }}
+                      </h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form method="POST" action="{% url 'asignar_profesor_jefe' sec.id %}">
+                      {% csrf_token %}
+                      <div class="modal-body p-4">
+                        <p class="text-muted small mb-3">
+                          El profesor jefe asignado tendrá acceso completo al <strong>libro de clases, todas las materias, calificaciones y asistencia</strong> de este curso.
+                        </p>
+                        <div class="mb-3">
+                          <label class="form-label fw-bold text-dark small">Docente Encargado(a)</label>
+                          <select name="profesor_jefe_id" class="form-select fw-bold" style="border-radius:10px;">
+                            <option value="none">-- Sin Asignar (Ninguno) --</option>
+                            {% for prof in profesores %}
+                              <option value="{{ prof.id }}" {% if sec.profesor_jefe and sec.profesor_jefe.id == prof.id %}selected{% endif %}>
+                                {{ prof.get_full_name|default:prof.username }} ({{ prof.email }})
+                              </option>
+                            {% endfor %}
+                          </select>
+                        </div>
+                      </div>
+                      <div class="modal-footer border-top-0 p-4 pt-0">
+                        <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary fw-extrabold px-4" style="border-radius:10px; background:linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%); border:none;">Guardar Jefatura</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+
+
           {% endfor %}
         {% else %}
           <div class="col-12">
-            <div class="dashboard-panel text-center p-5">
-              <i class="bi bi-diagram-3 fs-1 text-muted mb-3 d-block"></i>
-              <h5 class="fw-bold text-secondary">No hay cursos registrados</h5>
-              <p class="text-muted">Crea el primer nivel escolar para el establecimiento usando el botón superior.</p>
+            <div class="card p-5 text-center bg-white border rounded-4 shadow-sm">
+              <i class="bi bi-layers fs-1 text-muted d-block mb-3"></i>
+              <h4 class="fw-bold text-dark">No hay cursos creados en el establecimiento</h4>
+              <p class="text-muted small mb-0">Crea el primer nivel escolar para comenzar.</p>
             </div>
-          </div>
-        {% endif %}
-
-        {% if cursos_con_secciones.has_other_pages %}
-          <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top w-100">
-            <div class="text-muted small">
-              Mostrando cursos <strong>{{ cursos_con_secciones.start_index }} - {{ cursos_con_secciones.end_index }}</strong> de <strong>{{ cursos_con_secciones.paginator.count }}</strong>
-            </div>
-            <nav>
-              <ul class="pagination pagination-sm mb-0">
-                {% if cursos_con_secciones.has_previous %}
-                  <li class="page-item"><a class="page-link text-primary fw-bold" href="?page={{ cursos_con_secciones.previous_page_number }}">‹ Anterior</a></li>
-                {% else %}
-                  <li class="page-item disabled"><span class="page-link">‹ Anterior</span></li>
-                {% endif %}
-
-                {% for i in cursos_con_secciones.paginator.page_range %}
-                  {% if cursos_con_secciones.number == i %}
-                    <li class="page-item active"><span class="page-link bg-primary border-primary">{{ i }}</span></li>
-                  {% else %}
-                    <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
-                  {% endif %}
-                {% endfor %}
-
-                {% if cursos_con_secciones.has_next %}
-                  <li class="page-item"><a class="page-link text-primary fw-bold" href="?page={{ cursos_con_secciones.next_page_number }}">Siguiente ›</a></li>
-                {% else %}
-                  <li class="page-item disabled"><span class="page-link">Siguiente ›</span></li>
-                {% endif %}
-              </ul>
-            </nav>
           </div>
         {% endif %}
       </div>
-    </main>
 
+    </main>
   </div>
 </div>
 
 <!-- MODAL CREAR CURSO -->
-<div class="modal fade" id="modalCrearCurso" tabindex="-1" aria-labelledby="modalCrearCursoLabel" aria-hidden="true">
+<div class="modal fade" id="modalCrearCurso" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content" style="border-radius: var(--radius-md); border:none; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
-      <div class="modal-header border-bottom-0 p-4">
-        <h5 class="modal-title fw-bold" id="modalCrearCursoLabel">Crear Nuevo Nivel Escolar</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+      <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+        <h5 class="modal-title fw-extrabold text-dark">Agregar Nuevo Nivel Escolar</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <form method="POST" action="{% url 'crear_curso' %}">
         {% csrf_token %}
-        <div class="modal-body p-4 pt-0">
+        <div class="modal-body p-4">
           <div class="mb-3">
-            <label for="nombre_curso" class="form-label small fw-bold text-dark">Nombre del Nivel</label>
-            <input type="text" class="form-control" id="nombre_curso" name="nombre" placeholder="Ej: 3° Básico" required style="border-color: var(--border);">
+            <label class="form-label fw-bold text-dark small">Nombre del Curso</label>
+            <input type="text" name="nombre" class="form-control fw-bold" placeholder="Ej: 1° Básico, 3° Medio, Kínder..." required style="border-radius:10px;">
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold text-dark small">Secciones Iniciales</label>
+            <div class="d-flex flex-wrap gap-2 justify-content-center p-3 bg-light rounded-3 border">
+              {% for letra in "A,B,C,D,E,F"|make_list %}
+                {% if letra != "," %}
+                  <label>
+                    <input type="checkbox" name="letras" value="{{ letra }}" class="letter-checkbox" {% if letra == 'A' %}checked{% endif %}>
+                    <span class="letra-btn">{{ letra }}</span>
+                  </label>
+                {% endif %}
+              {% endfor %}
+            </div>
           </div>
         </div>
         <div class="modal-footer border-top-0 p-4 pt-0">
-          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-          <button type="submit" class="btn btn-primary fw-bold">Crear Curso</button>
+          <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary fw-extrabold px-4" style="border-radius:10px; background:linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%); border:none;">Crear Curso</button>
         </div>
       </form>
     </div>
@@ -325,10 +468,8 @@
   document.addEventListener("DOMContentLoaded", function() {
     const mobileBtn = document.getElementById('mobileMenuBtn');
     const sidebar = document.getElementById('sidebar');
-    if(mobileBtn) {
-      mobileBtn.addEventListener('click', () => {
-        sidebar.classList.toggle('active');
-      });
+    if (mobileBtn) {
+      mobileBtn.addEventListener('click', () => sidebar.classList.toggle('active'));
     }
   });
 </script>

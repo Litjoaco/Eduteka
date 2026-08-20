@@ -4,403 +4,432 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configura tu colegio - Paso 2 - Eduteka</title>
+    <title>Configura tu colegio - Paso 2: Contacto & Ubicación — Eduteka</title>
     
-    <!-- Google Fonts: Inter -->
+    <!-- Google Fonts: Inter & Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet">
     
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{% static 'css/configuracion_colegio_paso2.css' %}">
-    <style>
-        /* Unificar el diseño del Stepper para que sea igual en todos los pasos */
-        .stepper .step {
-            background: transparent !important;
-            border-radius: 0 !important;
-            padding: 0 !important;
-        }
-        .stepper .step-icon {
-            width: 32px !important;
-            height: 32px !important;
-            border-radius: 50% !important; /* Siempre circulares, elimina efecto pastilla */
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            font-weight: 700 !important;
-            background-image: none !important; /* Elimina íconos de fondo */
-            text-indent: 0 !important; /* Mantiene el número visible */
-        }
-        .stepper .step.completed .step-icon {
-            background-color: #7b52d9 !important; /* Color morado */
-            border-color: #7b52d9 !important;
-            color: #ffffff !important;
-        }
-        /* Ocultar checkmarks (ticket positivo) inyectados mediante seudo-elementos */
-        .stepper .step.completed .step-icon::before,
-        .stepper .step.completed .step-icon::after {
-            display: none !important;
-            content: none !important;
-        }
-    </style>
+    <link rel="stylesheet" href="{% static 'css/configuracion_colegio_paso2.css' %}?v=6">
+    <link rel="stylesheet" href="{% static 'css/backbutton.css' %}">
 </head>
 <body>
 
-<div class="config-container">
-    
-    <!-- ==========================================
-         LEFT COLUMN 
-         ========================================== -->
-    <div class="left-column">
-        <div class="logo-container">
-            <img src="/static/img/logo.png" alt="Eduteka Logo" style="height: 100px; width: auto;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzdiNTJkOSIgcng9IjIwIi8+PHRleHQgeD0iNTAiIHk9IjY0IiBmb250LWZhbWlseT0iSW50ZXIiIGZvbnQtd2VpZ2h0PSI4MDAiIGZvbnQtc2l6ZT0iNDgiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5FPC90ZXh0Pjwvc3ZnPg=='">
-        </div>
-        
-        <div class="header-text-group">
-            <div class="step-pill">
-                <i class="bi bi-geo-alt-fill"></i> Paso 2 de 5
-            </div>
-            <h1>Configura tu colegio</h1>
-            <p class="desc-text">Ingresa la información institucional para que tu comunidad educativa pueda contactar y ubicar fácilmente al colegio.</p>
-        </div>
-        
-        <div class="illustration-wrapper">
-            <img src="{% static 'img/personaliza colegio 1.png' %}" alt="Ilustración Colegio" height: 100px; width: auto>
-        </div>
-        
-        <div class="plan-includes-card">
-            <h3>Tu plan incluye</h3>
-            <ul class="plan-includes-list">
-                <li><i class="bi bi-check-lg"></i> Información institucional</li>
-                <li><i class="bi bi-check-lg"></i> Datos de contacto visibles</li>
-                <li><i class="bi bi-check-lg"></i> Ubicación en la plataforma</li>
-            </ul>
-        </div>
-    </div>
-    
-    <!-- ==========================================
-         MAIN CARD (RIGHT) 
-         ========================================== -->
-    <div class="main-card">
-        
-        <!-- Compact Stepper -->
-        <div class="stepper">
-            <div class="step completed">
-                <div class="step-icon">1</div>
-                <div class="step-text">Identidad</div>
-            </div>
-            <div class="step active">
-                <div class="step-icon">2</div>
-                <div class="step-text">Contacto</div>
-            </div>
-            <div class="step">
-                <div class="step-icon">3</div>
-                <div class="step-text">Académica</div>
-            </div>
-            <div class="step">
-                <div class="step-icon">4</div>
-                <div class="step-text">Roles</div>
-            </div>
-            <div class="step">
-                <div class="step-icon">5</div>
-                <div class="step-text">Módulos</div>
-            </div>
-        </div>
-        
-        <!-- Form Header -->
-        <div class="form-section-header">
-            <div class="section-icon-wrapper">
-                <i class="bi bi-geo-alt"></i>
-            </div>
-            <div class="section-titles">
-                <h2>2. Información institucional</h2>
-                <p>Completa los datos de contacto y ubicación de tu institución.</p>
-            </div>
-        </div>
-        
-        <!-- Content Grid (Form + Preview) -->
-        <div class="content-grid">
-            
-            <!-- Fields Area -->
-            <div class="form-area">
-                {% if messages %}
-                    <div class="messages-container mb-4">
-                        {% for message in messages %}
-                            <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}" style="border-radius: 8px; font-size: 0.95rem;">
-                                <i class="bi bi-exclamation-circle-fill me-2"></i> {{ message }}
-                            </div>
-                        {% endfor %}
-                    </div>
-                {% endif %}
+    <!-- Botón Volver al paso 1 -->
+    <a href="{% url 'configuracion_colegio_paso1' colegio.id %}" class="back-button">
+        <i class="bi bi-arrow-left"></i> Volver al Paso 1
+    </a>
 
-                <form id="config-form-paso2" method="post" action="{% url 'configuracion_colegio_paso2' colegio.id %}">
-                    {% csrf_token %}
-                    
-                    <div class="form-grid">
-                        <div class="form-group full-width">
-                            <label class="form-label" for="correo">Correo institucional <span class="required">*</span></label>
-                            <div class="input-icon-wrapper">
-                                <i class="bi bi-envelope"></i>
-                                <input type="email" class="form-control with-icon" id="correo" name="correo" value="{{ colegio.correo_institucional|default:'' }}" placeholder="contacto@colegiolosandes.cl" required>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group full-width">
-                            <label class="form-label" for="direccion">Dirección <span class="required">*</span></label>
-                            <div class="input-icon-wrapper">
-                                <i class="bi bi-signpost-split"></i>
-                                <input type="text" class="form-control with-icon" id="direccion" name="direccion" value="{{ colegio.direccion|default:'' }}" placeholder="Av. Los Educaciones 1234" required>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label" for="telefono_principal">Teléfono principal <span class="required">*</span></label>
-                            <div class="input-icon-wrapper">
-                                <i class="bi bi-telephone"></i>
-                                <input type="text" class="form-control with-icon" id="telefono_principal" name="telefono_principal" value="{{ colegio.telefono|default:'' }}" placeholder="+56 9 1234 5678" required>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label" for="region">Región <span class="required">*</span></label>
-                            <div class="input-icon-wrapper">
-                                <i class="bi bi-map"></i>
-                                <select class="form-select with-icon" id="region" name="region" required>
-                                    <option value="" disabled selected>Seleccione una región</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label" for="comuna">Comuna / Ciudad <span class="required">*</span></label>
-                            <div class="input-icon-wrapper">
-                                <i class="bi bi-building"></i>
-                                <select class="form-select with-icon" id="comuna" name="comuna" required disabled>
-                                    <option value="" disabled selected>Seleccione una comuna</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label" for="telefono_alternativo">Teléfono alternativo (opcional)</label>
-                            <div class="input-icon-wrapper">
-                                <i class="bi bi-telephone-plus"></i>
-                                <input type="text" class="form-control with-icon" id="telefono_alternativo" name="telefono_alternativo" value="{{ colegio.telefono_alternativo|default:'' }}" placeholder="+56 2 2345 6789">
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label" for="sitio_web">Sitio web (opcional)</label>
-                            <div class="input-icon-wrapper">
-                                <i class="bi bi-globe"></i>
-                                <input type="url" class="form-control with-icon" id="sitio_web" name="sitio_web" value="{{ colegio.sitio_web|default:'' }}" placeholder="www.colegiolosandes.cl">
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label" for="pais">País <span class="required">*</span></label>
-                            <div class="input-icon-wrapper">
-                                <i class="bi bi-flag"></i>
-                                <input type="text" class="form-control with-icon" id="pais" name="pais" value="{{ colegio.pais|default:'Chile' }}" placeholder="Chile" required>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group full-width">
-                            <label class="form-label" for="referencia">Referencia (opcional)</label>
-                            <div class="input-icon-wrapper">
-                                <i class="bi bi-info-circle"></i>
-                                <input type="text" class="form-control with-icon" id="referencia" name="referencia" value="{{ colegio.referencia_direccion|default:'' }}" placeholder="Frente a la Plaza de la Educación">
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            
-            <!-- Real Profile Preview Area -->
-            <div class="preview-area">
-                <div class="preview-label">
-                    <i class="bi bi-eye-fill"></i> Así se verá en la plataforma
-                </div>
-                
-                <div class="mockup-card">
-                    <div class="mockup-header-bg">
-                        <div class="mockup-logo-placeholder">
-                            <i class="bi bi-building"></i>
-                        </div>
-                        <div class="mockup-title-area">
-                            <h4 id="prev-nombre-colegio">{{ colegio.nombre|default:"Colegio Los Andes" }}</h4>
-                            <span>Información Pública</span>
-                        </div>
-                    </div>
-                    
-                    <div class="mockup-body">
-                        
-                        <div class="mockup-info-row">
-                            <i class="bi bi-envelope mockup-info-icon"></i>
-                            <div class="mockup-info-text">
-                                <strong>Correo</strong>
-                                <span id="prev-correo">{{ colegio.correo_institucional|default:"contacto@colegiolosandes.cl" }}</span>
-                            </div>
-                        </div>
-                        
-                        <div class="mockup-info-row">
-                            <i class="bi bi-telephone mockup-info-icon"></i>
-                            <div class="mockup-info-text">
-                                <strong>Teléfono</strong>
-                                <span id="prev-telefono">{{ colegio.telefono|default:"+56 9 1234 5678" }}</span>
-                            </div>
-                        </div>
-                        
-                        <div class="mockup-info-row">
-                            <i class="bi bi-geo-alt mockup-info-icon"></i>
-                            <div class="mockup-info-text">
-                                <strong>Dirección</strong>
-                                <span id="prev-direccion">{{ colegio.direccion|default:"Av. Los Educaciones 1234" }}<br>{{ colegio.ciudad_comuna|default:"Santiago" }}, {{ colegio.region|default:"Metropolitana" }}<br>{{ colegio.pais|default:"Chile" }}</span>
-                            </div>
-                        </div>
-                        
-                        <div class="mockup-info-row">
-                            <i class="bi bi-globe mockup-info-icon"></i>
-                            <div class="mockup-info-text">
-                                <strong>Sitio Web</strong>
-                                <span id="prev-web">{{ colegio.sitio_web|default:"www.colegiolosandes.cl" }}</span>
-                            </div>
-                        </div>
-                        
-                    </div>
-                </div>
-            </div>
-            
-        </div> <!-- End Content Grid -->
+    <div class="config-container">
         
-        <!-- Bottom Actions & Tip -->
-        <div class="bottom-area">
-            <div class="tip-card">
-                <div class="tip-icon-bg">
-                    <i class="bi bi-lightbulb-fill"></i>
-                </div>
-                <p><strong>Consejo:</strong> Mantén tu información actualizada para que tu comunidad pueda contactarte sin problemas.</p>
+        <!-- ==========================================
+             LEFT COLUMN (Branding & Guidance)
+             ========================================== -->
+        <div class="left-column">
+            <div class="logo-container">
+                <img src="{% static 'img/logo.png' %}" alt="Eduteka Logo" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzdiNTJkOSIgcng9IjIwIi8+PHRleHQgeD0iNTAiIHk9IjY0IiBmb250LWZhbWlseT0iSW50ZXIiIGZvbnQtd2VpZ2h0PSI4MDAiIGZvbnQtc2l6ZT0iNDgiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5FPC90ZXh0Pjwvc3ZnPg=='">
             </div>
             
-            <div class="action-bar">
-                <div class="help-block">
-                    <span>¿Necesitas ayuda?</span>
-                    <a href="#" class="help-link">Ver guía de configuración <i class="bi bi-arrow-up-right"></i></a>
+            <div class="step-pill">
+                <i class="bi bi-geo-alt-fill"></i> Paso 2 de 5: Contacto & Ubicación
+            </div>
+
+            <h1>Ubicación y Contacto Oficial</h1>
+            <p class="desc-text">Ingresa los canales de atención y la dirección institucional para comunicarte con docentes, apoderados y el MINEDUC.</p>
+
+            <!-- Ilustración con Aura Luminosa -->
+            <div class="left-illustration-frame">
+                <div class="left-illustration-aura"></div>
+                <img src="{% static 'img/personaliza colegio 1.png' %}" alt="Contacto Colegio" class="img-fluid left-illustration-img">
+            </div>
+            
+            <div class="plan-includes-card">
+                <h3><i class="bi bi-shield-check text-primary"></i> Utilidad de estos datos</h3>
+                <ul class="plan-includes-list">
+                    <li><i class="bi bi-envelope-check"></i> Cabecera de correos y avisos automáticos.</li>
+                    <li><i class="bi bi-file-earmark-text"></i> Pie de firma en certificados oficiales.</li>
+                    <li><i class="bi bi-pin-map"></i> Ubicación georreferenciada del colegio.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- ==========================================
+             MAIN CARD (Right: Stepper + Form + Live Mockup)
+             ========================================== -->
+        <div class="main-card">
+            
+            <!-- Stepper Moderno de 5 Pasos -->
+            <div class="stepper-pro">
+                <div class="stepper-pro-line"></div>
+
+                <!-- Paso 1: Completado -->
+                <div class="stepper-pro-step completed">
+                    <div class="step-node-pro"><i class="bi bi-check2"></i></div>
+                    <span class="step-label-pro">1. Identidad ✓</span>
+                </div>
+
+                <!-- Paso 2: Activo -->
+                <div class="stepper-pro-step active">
+                    <div class="step-node-pro"><i class="bi bi-geo-alt"></i></div>
+                    <span class="step-label-pro">2. Contacto</span>
+                </div>
+
+                <!-- Paso 3 -->
+                <div class="stepper-pro-step">
+                    <div class="step-node-pro"><i class="bi bi-mortarboard"></i></div>
+                    <span class="step-label-pro">3. Académica</span>
+                </div>
+
+                <!-- Paso 4 -->
+                <div class="stepper-pro-step">
+                    <div class="step-node-pro"><i class="bi bi-people"></i></div>
+                    <span class="step-label-pro">4. Roles</span>
+                </div>
+
+                <!-- Paso 5 -->
+                <div class="stepper-pro-step">
+                    <div class="step-node-pro"><i class="bi bi-grid"></i></div>
+                    <span class="step-label-pro">5. Módulos</span>
+                </div>
+            </div>
+            
+            <!-- Form Header -->
+            <div class="form-section-header">
+                <div class="section-icon-wrapper">
+                    <i class="bi bi-geo-alt-fill"></i>
+                </div>
+                <div class="section-titles">
+                    <h2>2. Información de Contacto y Ubicación</h2>
+                    <p>Completa los datos de atención pública de <strong>{{ colegio.nombre }}</strong>.</p>
+                </div>
+            </div>
+            
+            <!-- Content Grid (Form + Live Contact Card) -->
+            <div class="content-grid">
+                
+                <!-- Columna Izquierda: Formulario -->
+                <div class="form-area">
+                    {% if messages %}
+                        <div class="messages-container mb-3">
+                            {% for message in messages %}
+                                <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}" style="border-radius: 12px; font-size: 0.9rem; padding: 0.85rem 1rem;">
+                                    <i class="bi bi-exclamation-circle-fill me-1"></i> {{ message }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <form id="config-form-paso2" method="post" action="{% url 'configuracion_colegio_paso2' colegio.id %}">
+                        {% csrf_token %}
+                        
+                        <!-- BLOQUE 1: CANALES OFICIALES DE COMUNICACIÓN -->
+                        <div class="form-group-block">
+                            <div class="form-block-title">
+                                <i class="bi bi-headset text-primary"></i> 1. Canales Oficiales de Contacto
+                            </div>
+                            
+                            <div class="form-grid-inner">
+                                <!-- Correo Institucional -->
+                                <div class="form-group full-width">
+                                    <label class="form-label" for="correo">Correo electrónico institucional *</label>
+                                    <div class="input-icon-wrapper">
+                                        <i class="bi bi-envelope"></i>
+                                        <input type="email" class="form-control-enhanced" id="correo" name="correo" value="{{ colegio.correo_institucional|default:'' }}" placeholder="contacto@colegio.cl" required>
+                                    </div>
+                                </div>
+                                
+                                <!-- Teléfono Principal -->
+                                <div class="form-group">
+                                    <label class="form-label" for="telefono_principal">Teléfono principal / Mesa central *</label>
+                                    <div class="input-icon-wrapper">
+                                        <i class="bi bi-telephone"></i>
+                                        <input type="text" class="form-control-enhanced" id="telefono_principal" name="telefono_principal" value="{{ colegio.telefono|default:'' }}" placeholder="+56 2 2345 6789" required>
+                                    </div>
+                                </div>
+                                
+                                <!-- Teléfono Alternativo -->
+                                <div class="form-group">
+                                    <label class="form-label" for="telefono_alternativo">Teléfono de urgencias (opcional)</label>
+                                    <div class="input-icon-wrapper">
+                                        <i class="bi bi-phone"></i>
+                                        <input type="text" class="form-control-enhanced" id="telefono_alternativo" name="telefono_alternativo" value="{{ colegio.telefono_alternativo|default:'' }}" placeholder="+56 9 8765 4321">
+                                    </div>
+                                </div>
+
+                                <!-- Sitio Web -->
+                                <div class="form-group full-width">
+                                    <label class="form-label" for="sitio_web">Sitio web institucional (opcional)</label>
+                                    <div class="input-icon-wrapper">
+                                        <i class="bi bi-globe"></i>
+                                        <input type="url" class="form-control-enhanced" id="sitio_web" name="sitio_web" value="{{ colegio.sitio_web|default:'' }}" placeholder="https://www.colegiosanbernardo.cl">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- BLOQUE 2: UBICACIÓN GEOGRÁFICA -->
+                        <div class="form-group-block">
+                            <div class="form-block-title">
+                                <i class="bi bi-pin-map-fill text-success"></i> 2. Dirección y Ubicación Física
+                            </div>
+
+                            <div class="form-grid-inner">
+                                <!-- Dirección -->
+                                <div class="form-group full-width">
+                                    <label class="form-label" for="direccion">Dirección del establecimiento (Calle y Número) *</label>
+                                    <div class="input-icon-wrapper">
+                                        <i class="bi bi-signpost-split"></i>
+                                        <input type="text" class="form-control-enhanced" id="direccion" name="direccion" value="{{ colegio.direccion|default:'' }}" placeholder="Av. Libertador Bernardo O'Higgins 1234" required>
+                                    </div>
+                                </div>
+
+                                <!-- Región -->
+                                <div class="form-group">
+                                    <label class="form-label" for="region">Región *</label>
+                                    <div class="input-icon-wrapper">
+                                        <i class="bi bi-map"></i>
+                                        <select class="form-select-enhanced" id="region" name="region" required>
+                                            <option value="" disabled selected>Seleccione región</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Comuna -->
+                                <div class="form-group">
+                                    <label class="form-label" for="comuna">Comuna / Ciudad *</label>
+                                    <div class="input-icon-wrapper">
+                                        <i class="bi bi-building"></i>
+                                        <select class="form-select-enhanced" id="comuna" name="comuna" required disabled>
+                                            <option value="" disabled selected>Seleccione comuna</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- País -->
+                                <div class="form-group">
+                                    <label class="form-label" for="pais">País *</label>
+                                    <div class="input-icon-wrapper">
+                                        <i class="bi bi-flag"></i>
+                                        <input type="text" class="form-control-enhanced" id="pais" name="pais" value="{{ colegio.pais|default:'Chile' }}" placeholder="Chile" required>
+                                    </div>
+                                </div>
+
+                                <!-- Referencia -->
+                                <div class="form-group">
+                                    <label class="form-label" for="referencia">Referencia de acceso (opcional)</label>
+                                    <div class="input-icon-wrapper">
+                                        <i class="bi bi-info-circle"></i>
+                                        <input type="text" class="form-control-enhanced" id="referencia" name="referencia" value="{{ colegio.referencia_direccion|default:'' }}" placeholder="Ej: Frente a Plaza de Armas">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
                 </div>
                 
-                <div class="buttons-group">
-                    <a href="{% url 'configuracion_colegio_paso1' colegio.id %}" class="btn-secondary">Volver al paso 1</a>
-                    <button type="button" class="btn-primary-gradient" onclick="document.getElementById('config-form-paso2').submit();">
-                        Guardar y continuar <i class="bi bi-arrow-right"></i>
+                <!-- Columna Derecha: Ficha de Contacto en Tiempo Real -->
+                <div class="preview-area">
+                    <div class="preview-label">
+                        <i class="bi bi-eye-fill"></i> Ficha de Contacto en Vivo
+                    </div>
+                    
+                    <div class="contact-card-mockup">
+                        <!-- Banner con color del colegio -->
+                        <div class="mockup-header-banner" style="background: linear-gradient(135deg, {{ colegio.color_principal|default:'#7C5CFA' }} 0%, #0D9488 100%);">
+                            <div class="mockup-logo-circle" {% if colegio.logo %}style="background-image: url('{{ colegio.logo.url }}');"{% endif %}>
+                                {% if not colegio.logo %}<i class="bi bi-building"></i>{% endif %}
+                            </div>
+                            <div>
+                                <h4 class="mockup-school-title" id="prev-nombre-colegio">{{ colegio.nombre|default:"Colegio San Bernardo" }}</h4>
+                                <span class="badge bg-white text-dark mt-1" style="font-size: 0.7rem; font-weight: 800;"><i class="bi bi-patch-check-fill text-success me-1"></i>Contacto Oficial</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Lista de Datos de Contacto Reactiva -->
+                        <div class="mockup-contact-list">
+                            
+                            <!-- Correo -->
+                            <div class="contact-item-row">
+                                <div class="contact-item-icon"><i class="bi bi-envelope-fill"></i></div>
+                                <div class="contact-item-details">
+                                    <span class="contact-item-label">Correo Institucional</span>
+                                    <span class="contact-item-value" id="prev-correo">{{ colegio.correo_institucional|default:"contacto@colegio.cl" }}</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Teléfono -->
+                            <div class="contact-item-row">
+                                <div class="contact-item-icon"><i class="bi bi-telephone-fill"></i></div>
+                                <div class="contact-item-details">
+                                    <span class="contact-item-label">Teléfono Principal</span>
+                                    <span class="contact-item-value" id="prev-telefono">{{ colegio.telefono|default:"+56 2 2345 6789" }}</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Dirección -->
+                            <div class="contact-item-row">
+                                <div class="contact-item-icon"><i class="bi bi-geo-alt-fill"></i></div>
+                                <div class="contact-item-details">
+                                    <span class="contact-item-label">Dirección y Comuna</span>
+                                    <span class="contact-item-value" id="prev-direccion">{{ colegio.direccion|default:"Av. Principal 1234" }}, {{ colegio.ciudad_comuna|default:"Santiago" }}, {{ colegio.region|default:"Región Metropolitana" }}</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Sitio Web -->
+                            <div class="contact-item-row">
+                                <div class="contact-item-icon"><i class="bi bi-globe2"></i></div>
+                                <div class="contact-item-details">
+                                    <span class="contact-item-label">Sitio Web Oficial</span>
+                                    <span class="contact-item-value" id="prev-web">{{ colegio.sitio_web|default:"https://www.colegio.cl" }}</span>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+                
+            </div> <!-- End Content Grid -->
+            
+            <!-- Bottom Actions & Tip -->
+            <div class="bottom-area">
+                <div class="tip-card">
+                    <div class="tip-icon-bg">
+                        <i class="bi bi-info-circle-fill"></i>
+                    </div>
+                    <p><strong>Importante:</strong> Esta información aparecerá al pie de los <strong>informes de notas y certificados de alumno regular</strong> que descarguen los apoderados.</p>
+                </div>
+                
+                <div class="action-bar">
+                    <a href="{% url 'configuracion_colegio_paso1' colegio.id %}" class="btn-secondary-outline">
+                        <i class="bi bi-arrow-left"></i> Volver al Paso 1
+                    </a>
+                    
+                    <button type="button" class="btn-primary-gradient" id="btnSubmitPaso2" onclick="submitPaso2Form()">
+                        <span id="btnSubmitPaso2Text">Guardar y Continuar al Paso 3</span>
+                        <i class="bi bi-arrow-right-short fs-3" id="btnSubmitPaso2Icon"></i>
+                        <span class="spinner-border spinner-border-sm d-none" id="btnSubmitPaso2Spinner" role="status"></span>
                     </button>
                 </div>
             </div>
+            
         </div>
-        
     </div>
-</div>
 
-<!-- Simple inline JS for Live Preview -->
-<script>
-    const chileData = {
-        "Arica y Parinacota": ["Arica", "Camarones", "Putre", "General Lagos"],
-        "Tarapacá": ["Iquique", "Alto Hospicio", "Pozo Almonte", "Camiña", "Colchane", "Huara", "Pica"],
-        "Antofagasta": ["Antofagasta", "Mejillones", "Sierra Gorda", "Taltal", "Calama", "Ollagüe", "San Pedro de Atacama", "Tocopilla", "María Elena"],
-        "Atacama": ["Copiapó", "Caldera", "Tierra Amarilla", "Chañaral", "Diego de Almagro", "Vallenar", "Alto del Carmen", "Freirina", "Huasco"],
-        "Coquimbo": ["La Serena", "Coquimbo", "Andacollo", "La Higuera", "Paihuano", "Vicuña", "Illapel", "Los Vilos", "Salamanca", "Ovalle", "Combarbalá", "Monte Patria", "Punitaqui", "Río Hurtado"],
-        "Valparaíso": ["Valparaíso", "Casablanca", "Concón", "Juan Fernández", "Puchuncaví", "Quintero", "Viña del Mar", "Isla de Pascua", "Los Andes", "Calle Larga", "La Ligua", "Cabildo", "Papudo", "Petorca", "Zapallar", "Quillota", "La Calera", "Hijuelas", "La Cruz", "Nogales", "San Antonio", "Algarrobo", "Cartagena", "El Quisco", "El Tabo", "Santo Domingo", "San Felipe", "Catemu", "Llaillay", "Panquehue", "Putaendo", "Santa María", "Quilpué", "Limache", "Olmué", "Villa Alemana"],
-        "Metropolitana de Santiago": ["Cerrillos", "Cerro Navia", "Conchalí", "El Bosque", "Estación Central", "Huechuraba", "Independencia", "La Cisterna", "La Florida", "La Granja", "La Pintana", "La Reina", "Las Condes", "Lo Barnechea", "Lo Espejo", "Lo Prado", "Macul", "Maipú", "Ñuñoa", "Pedro Aguirre Cerda", "Peñalolén", "Providencia", "Pudahuel", "Quilicura", "Quinta Normal", "Recoleta", "Renca", "Santiago", "San Joaquín", "San Miguel", "San Ramón", "Vitacura", "Puente Alto", "Pirque", "San José de Maipo", "Colina", "Lampa", "Tiltil", "San Bernardo", "Buin", "Calera de Tango", "Paine", "Melipilla", "Alhué", "Curacaví", "María Pinto", "San Pedro", "Talagante", "El Monte", "Isla de Maipo", "Padre Hurtado", "Peñaflor"],
-        "O'Higgins": ["Rancagua", "Codegua", "Coinco", "Coltauco", "Doñihue", "Graneros", "Las Cabras", "Machalí", "Malloa", "Mostazal", "Olivar", "Peumo", "Pichidegua", "Quinta de Tilcoco", "Rengo", "Requínoa", "San Vicente", "Pichilemu", "La Estrella", "Litueche", "Marchihue", "Navidad", "Paredones", "San Fernando", "Chépica", "Chimbarongo", "Lolol", "Nancagua", "Palmilla", "Peralillo", "Placilla", "Pumanque", "Santa Cruz"],
-        "Maule": ["Talca", "Constitución", "Curepto", "Empedrado", "Maule", "Pelarco", "Pencahue", "Río Claro", "San Clemente", "San Rafael", "Cauquenes", "Chanco", "Pelluhue", "Curicó", "Hualañé", "Licantén", "Molina", "Rauco", "Romeral", "Sagrada Familia", "Teno", "Vichuquén", "Linares", "Colbún", "Longaví", "Parral", "Retiro", "San Javier", "Villa Alegre", "Yerbas Buenas"],
-        "Ñuble": ["Cobquecura", "Coelemu", "Ninhue", "Portezuelo", "Quirihue", "Ránquil", "Treguaco", "Bulnes", "Chillán", "Chillán Viejo", "El Carmen", "Pemuco", "Pinto", "Quillón", "San Ignacio", "Yungay", "Coihueco", "Ñiquén", "San Carlos", "San Fabián", "San Nicolás"],
-        "Biobío": ["Concepción", "Coronel", "Chiguayante", "Florida", "Hualqui", "Lota", "Penco", "San Pedro de la Paz", "Santa Juana", "Talcahuano", "Tomé", "Hualpén", "Lebu", "Arauco", "Cañete", "Contulmo", "Curanilahue", "Los Álamos", "Tirúa", "Los Ángeles", "Antuco", "Cabrero", "Laja", "Mulchén", "Nacimiento", "Negrete", "Quilaco", "Quilleco", "San Rosendo", "Santa Bárbara", "Tucapel", "Yumbel", "Alto Biobío"],
-        "La Araucanía": ["Temuco", "Carahue", "Cunco", "Curarrehue", "Freire", "Galvarino", "Gorbea", "Lautaro", "Loncoche", "Melipeuco", "Nueva Imperial", "Padre las Casas", "Perquenco", "Pitrufquén", "Pucón", "Saavedra", "Teodoro Schmidt", "Toltén", "Vilcún", "Villarrica", "Cholchol", "Angol", "Collipulli", "Curacautín", "Ercilla", "Lonquimay", "Los Sauces", "Lumaco", "Purén", "Renaico", "Traiguén", "Victoria"],
-        "Los Ríos": ["Valdivia", "Corral", "Lanco", "Los Lagos", "Máfil", "Mariquina", "Paillaco", "Panguipulli", "La Unión", "Río Bueno", "Futrono", "Lago Ranco"],
-        "Los Lagos": ["Puerto Montt", "Calbuco", "Cochamó", "Fresia", "Frutillar", "Los Muermos", "Llanquihue", "Maullín", "Puerto Varas", "Castro", "Ancud", "Chonchi", "Curaco de Vélez", "Dalcahue", "Puqueldón", "Queilén", "Quellón", "Quemchi", "Quinchao", "Osorno", "Puerto Octay", "Purranque", "Puyehue", "Río Negro", "San Juan de la Costa", "San Pablo", "Chaitén", "Futaleufú", "Hualaihué", "Palena"],
-        "Aysén": ["Coihaique", "Lago Verde", "Aysén", "Cisnes", "Guaitecas", "Cochrane", "O'Higgins", "Tortel", "Chile Chico"],
-        "Magallanes": ["Punta Arenas", "Laguna Blanca", "Río Verde", "San Gregorio", "Cabo de Hornos", "Antártica", "Porvenir", "Primavera", "Timaukel", "Natales", "Torres del Paine"]
-    };
-
-    document.addEventListener('DOMContentLoaded', () => {
-        const updateText = (inputId, targetId, defaultText) => {
-            const input = document.getElementById(inputId);
-            const target = document.getElementById(targetId);
-            if(input && target) {
-                input.addEventListener('input', (e) => {
-                    target.innerHTML = e.target.value || defaultText;
-                });
-                // Disparar el evento para inicializar la vista previa con los datos que trae Django
-                input.dispatchEvent(new Event('input'));
-            }
+    <!-- Scripts y Datos de Chile -->
+    <script>
+        const chileData = {
+            "Arica y Parinacota": ["Arica", "Camarones", "Putre", "General Lagos"],
+            "Tarapacá": ["Iquique", "Alto Hospicio", "Pozo Almonte", "Camiña", "Colchane", "Huara", "Pica"],
+            "Antofagasta": ["Antofagasta", "Mejillones", "Sierra Gorda", "Taltal", "Calama", "Ollagüe", "San Pedro de Atacama", "Tocopilla", "María Elena"],
+            "Atacama": ["Copiapó", "Caldera", "Tierra Amarilla", "Chañaral", "Diego de Almagro", "Vallenar", "Alto del Carmen", "Freirina", "Huasco"],
+            "Coquimbo": ["La Serena", "Coquimbo", "Andacollo", "La Higuera", "Paihuano", "Vicuña", "Illapel", "Los Vilos", "Salamanca", "Ovalle", "Combarbalá", "Monte Patria", "Punitaqui", "Río Hurtado"],
+            "Valparaíso": ["Valparaíso", "Casablanca", "Concón", "Juan Fernández", "Puchuncaví", "Quintero", "Viña del Mar", "Isla de Pascua", "Los Andes", "Calle Larga", "La Ligua", "Cabildo", "Papudo", "Petorca", "Zapallar", "Quillota", "La Calera", "Hijuelas", "La Cruz", "Nogales", "San Antonio", "Algarrobo", "Cartagena", "El Quisco", "El Tabo", "Santo Domingo", "San Felipe", "Catemu", "Llaillay", "Panquehue", "Putaendo", "Santa María", "Quilpué", "Limache", "Olmué", "Villa Alemana"],
+            "Metropolitana de Santiago": ["Cerrillos", "Cerro Navia", "Conchalí", "El Bosque", "Estación Central", "Huechuraba", "Independencia", "La Cisterna", "La Florida", "La Granja", "La Pintana", "La Reina", "Las Condes", "Lo Barnechea", "Lo Espejo", "Lo Prado", "Macul", "Maipú", "Ñuñoa", "Pedro Aguirre Cerda", "Peñalolén", "Providencia", "Pudahuel", "Quilicura", "Quinta Normal", "Recoleta", "Renca", "Santiago", "San Joaquín", "San Miguel", "San Ramón", "Vitacura", "Puente Alto", "Pirque", "San José de Maipo", "Colina", "Lampa", "Tiltil", "San Bernardo", "Buin", "Calera de Tango", "Paine", "Melipilla", "Alhué", "Curacaví", "María Pinto", "San Pedro", "Talagante", "El Monte", "Isla de Maipo", "Padre Hurtado", "Peñaflor"],
+            "O'Higgins": ["Rancagua", "Codegua", "Coinco", "Coltauco", "Doñihue", "Graneros", "Las Cabras", "Machalí", "Malloa", "Mostazal", "Olivar", "Peumo", "Pichidegua", "Quinta de Tilcoco", "Rengo", "Requínoa", "San Vicente", "Pichilemu", "La Estrella", "Litueche", "Marchihue", "Navidad", "Paredones", "San Fernando", "Chépica", "Chimbarongo", "Lolol", "Nancagua", "Palmilla", "Peralillo", "Placilla", "Pumanque", "Santa Cruz"],
+            "Maule": ["Talca", "Constitución", "Curepto", "Empedrado", "Maule", "Pelarco", "Pencahue", "Río Claro", "San Clemente", "San Rafael", "Cauquenes", "Chanco", "Pelluhue", "Curicó", "Hualañé", "Licantén", "Molina", "Rauco", "Romeral", "Sagrada Familia", "Teno", "Vichuquén", "Linares", "Colbún", "Longaví", "Parral", "Retiro", "San Javier", "Villa Alegre", "Yerbas Buenas"],
+            "Ñuble": ["Cobquecura", "Coelemu", "Ninhue", "Portezuelo", "Quirihue", "Ránquil", "Treguaco", "Bulnes", "Chillán", "Chillán Viejo", "El Carmen", "Pemuco", "Pinto", "Quillón", "San Ignacio", "Yungay", "Coihueco", "Ñiquén", "San Carlos", "San Fabián", "San Nicolás"],
+            "Biobío": ["Concepción", "Coronel", "Chiguayante", "Florida", "Hualqui", "Lota", "Penco", "San Pedro de la Paz", "Santa Juana", "Talcahuano", "Tomé", "Hualpén", "Lebu", "Arauco", "Cañete", "Contulmo", "Curanilahue", "Los Álamos", "Tirúa", "Los Ángeles", "Antuco", "Cabrero", "Laja", "Mulchén", "Nacimiento", "Negrete", "Quilaco", "Quilleco", "San Rosendo", "Santa Bárbara", "Tucapel", "Yumbel", "Alto Biobío"],
+            "La Araucanía": ["Temuco", "Carahue", "Cunco", "Curarrehue", "Freire", "Galvarino", "Gorbea", "Lautaro", "Loncoche", "Melipeuco", "Nueva Imperial", "Padre las Casas", "Perquenco", "Pitrufquén", "Pucón", "Saavedra", "Teodoro Schmidt", "Toltén", "Vilcún", "Villarrica", "Cholchol", "Angol", "Collipulli", "Curacautín", "Ercilla", "Lonquimay", "Los Sauces", "Lumaco", "Purén", "Renaico", "Traiguén", "Victoria"],
+            "Los Ríos": ["Valdivia", "Corral", "Lanco", "Los Lagos", "Máfil", "Mariquina", "Paillaco", "Panguipulli", "La Unión", "Río Bueno", "Futrono", "Lago Ranco"],
+            "Los Lagos": ["Puerto Montt", "Calbuco", "Cochamó", "Fresia", "Frutillar", "Los Muermos", "Llanquihue", "Maullín", "Puerto Varas", "Castro", "Ancud", "Chonchi", "Curaco de Vélez", "Dalcahue", "Puqueldón", "Queilén", "Quellón", "Quemchi", "Quinchao", "Osorno", "Puerto Octay", "Purranque", "Puyehue", "Río Negro", "San Juan de la Costa", "San Pablo", "Chaitén", "Futaleufú", "Hualaihué", "Palena"],
+            "Aysén": ["Coihaique", "Lago Verde", "Aysén", "Cisnes", "Guaitecas", "Cochrane", "O'Higgins", "Tortel", "Chile Chico"],
+            "Magallanes": ["Punta Arenas", "Laguna Blanca", "Río Verde", "San Gregorio", "Cabo de Hornos", "Antártica", "Porvenir", "Primavera", "Timaukel", "Natales", "Torres del Paine"]
         };
 
-        updateText('correo', 'prev-correo', 'contacto@colegiolosandes.cl');
-        updateText('telefono_principal', 'prev-telefono', '+56 9 1234 5678');
-        updateText('sitio_web', 'prev-web', 'www.colegiolosandes.cl');
+        document.addEventListener('DOMContentLoaded', () => {
+            const updateText = (inputId, targetId, defaultText) => {
+                const input = document.getElementById(inputId);
+                const target = document.getElementById(targetId);
+                if(input && target) {
+                    input.addEventListener('input', (e) => {
+                        target.textContent = e.target.value || defaultText;
+                    });
+                }
+            };
 
-        const regionSelect = document.getElementById('region');
-        const comunaSelect = document.getElementById('comuna');
-        let preselectedRegion = "{{ colegio.region|default:''|escapejs }}";
-        let preselectedComuna = "{{ colegio.ciudad_comuna|default:''|escapejs }}";
+            updateText('correo', 'prev-correo', 'contacto@colegio.cl');
+            updateText('telefono_principal', 'prev-telefono', '+56 2 2345 6789');
+            updateText('sitio_web', 'prev-web', 'https://www.colegio.cl');
 
-        for (const region in chileData) {
-            const option = document.createElement('option');
-            option.value = region;
-            option.textContent = region;
-            if (region === preselectedRegion) option.selected = true;
-            regionSelect.appendChild(option);
-        }
+            const regionSelect = document.getElementById('region');
+            const comunaSelect = document.getElementById('comuna');
+            let preselectedRegion = "{{ colegio.region|default:''|escapejs }}";
+            let preselectedComuna = "{{ colegio.ciudad_comuna|default:''|escapejs }}";
 
-        function updateComunas() {
-            const selectedRegion = regionSelect.value;
-            comunaSelect.innerHTML = '<option value="" disabled selected>Seleccione una comuna</option>';
-            if (selectedRegion && chileData[selectedRegion]) {
-                comunaSelect.disabled = false;
-                chileData[selectedRegion].forEach(comuna => {
-                    const option = document.createElement('option');
-                    option.value = comuna;
-                    option.textContent = comuna;
-                    if (comuna === preselectedComuna) option.selected = true;
-                    comunaSelect.appendChild(option);
-                });
+            for (const region in chileData) {
+                const option = document.createElement('option');
+                option.value = region;
+                option.textContent = region;
+                if (region === preselectedRegion) option.selected = true;
+                regionSelect.appendChild(option);
+            }
+
+            function updateComunas() {
+                const selectedRegion = regionSelect.value;
+                comunaSelect.innerHTML = '<option value="" disabled selected>Seleccione comuna</option>';
+                if (selectedRegion && chileData[selectedRegion]) {
+                    comunaSelect.disabled = false;
+                    chileData[selectedRegion].forEach(comuna => {
+                        const option = document.createElement('option');
+                        option.value = comuna;
+                        option.textContent = comuna;
+                        if (comuna === preselectedComuna) option.selected = true;
+                        comunaSelect.appendChild(option);
+                    });
+                } else {
+                    comunaSelect.disabled = true;
+                }
+                updateAddress();
+            }
+
+            regionSelect.addEventListener('change', function() {
+                preselectedComuna = ''; 
+                updateComunas();
+            });
+
+            if (preselectedRegion) updateComunas();
+
+            // Dirección dinámica
+            const dirInput = document.getElementById('direccion');
+            const comInput = document.getElementById('comuna');
+            const regInput = document.getElementById('region');
+            const prevDir = document.getElementById('prev-direccion');
+
+            function updateAddress() {
+                const d = dirInput.value || 'Av. Principal 1234';
+                const c = (comInput && comInput.value) ? comInput.value : 'Santiago';
+                const r = (regInput && regInput.value) ? regInput.value : 'Región Metropolitana';
+                prevDir.textContent = `${d}, ${c}, ${r}`;
+            }
+
+            if (dirInput) dirInput.addEventListener('input', updateAddress);
+            if (comInput) comInput.addEventListener('change', updateAddress);
+            if (regInput) regInput.addEventListener('change', updateAddress);
+        });
+
+        function submitPaso2Form() {
+            const form = document.getElementById('config-form-paso2');
+            if (form.checkValidity()) {
+                const btn = document.getElementById('btnSubmitPaso2');
+                const txt = document.getElementById('btnSubmitPaso2Text');
+                const icon = document.getElementById('btnSubmitPaso2Icon');
+                const spinner = document.getElementById('btnSubmitPaso2Spinner');
+
+                btn.disabled = true;
+                txt.textContent = 'Guardando contacto y ubicación...';
+                icon.classList.add('d-none');
+                spinner.classList.remove('d-none');
+                form.submit();
             } else {
-                comunaSelect.disabled = true;
+                form.reportValidity();
             }
         }
-
-        regionSelect.addEventListener('change', function() {
-            preselectedComuna = ''; 
-            updateComunas();
-        });
-
-        if (preselectedRegion) updateComunas();
-
-        // Address requires multiple fields
-        const dirInput = document.getElementById('direccion');
-        const comInput = document.getElementById('comuna');
-        const regInput = document.getElementById('region');
-        const paisInput = document.getElementById('pais');
-        const prevDir = document.getElementById('prev-direccion');
-
-        const updateAddress = () => {
-            const d = dirInput.value || 'Av. Los Educaciones 1234';
-            const c = comInput.value || 'Santiago';
-            const r = regInput.value || 'Metropolitana';
-            const p = paisInput.value || 'Chile';
-            prevDir.innerHTML = `${d}<br>${c}, ${r}<br>${p}`;
-        };
-
-        [dirInput, comInput, regInput, paisInput].forEach(el => {
-            if(el) {
-                el.addEventListener('input', updateAddress);
-            }
-        });
-        updateAddress(); // Carga inicial
-    });
-</script>
-
+    </script>
 </body>
 </html>

@@ -1,0 +1,340 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ ensayo.titulo }} - SIMCE Eduteka</title>
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #7C5CFC;
+      --primary-soft: rgba(124, 92, 252, 0.08);
+      --primary-hover: #6747E3;
+      --secondary: #65CDBF;
+      --bg: #F8F9FD;
+      --white: #FFFFFF;
+      --dark: #151A35;
+      --gray-text: #687089;
+      --border: #BCC0CF;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+    }
+
+    * { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+    }
+
+    .wrapper { display: flex; flex: 1; position: relative; }
+
+    .topbar {
+      height: 70px;
+      background: rgba(255, 255, 255, 0.85) !important;
+      backdrop-filter: blur(12px) !important;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; position: sticky; top: 0; z-index: 98;
+    }
+    .content-body { padding: 2rem; flex-grow: 1; max-width: 1440px; margin: 0 auto; width: 100%; }
+
+    /* Hero Banner */
+    .hero-banner-ensayo {
+      background: linear-gradient(135deg, #7C5CFC 0%, #6344CE 50%, #4F46E5 100%);
+      border-radius: var(--radius-lg);
+      padding: 2.2rem 2.5rem;
+      color: var(--white);
+      margin-bottom: 2rem;
+      box-shadow: 0 12px 30px rgba(124, 92, 252, 0.25);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-banner-ensayo::before {
+      content: '';
+      position: absolute;
+      width: 320px; height: 320px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 70%);
+      top: -80px; right: -60px;
+      border-radius: 50%;
+    }
+
+    .hero-badge-pill {
+      background: rgba(255, 255, 255, 0.2);
+      color: #FFFFFF !important;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 20px;
+      padding: 0.35rem 0.85rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      backdrop-filter: blur(8px);
+    }
+
+    .hero-school-pill {
+      background: rgba(0, 0, 0, 0.2);
+      color: #FFFFFF !important;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 20px;
+      padding: 0.35rem 0.85rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      backdrop-filter: blur(8px);
+    }
+
+    .card-panel-ensayo {
+      background: var(--white);
+      border: 1px solid #E2E8F0;
+      border-radius: var(--radius-lg);
+      padding: 1.6rem 1.75rem;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.02);
+      margin-bottom: 1.5rem;
+    }
+
+    /* Progress bar niveles */
+    .progress-niveles {
+      height: 10px;
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+      background: #E2E8F0;
+    }
+
+    .badge-insuf { background: #FEE2E2; color: #DC2626; border: 1px solid #FECACA; font-weight: 700; border-radius: 6px; padding: 0.25rem 0.6rem; font-size: 0.78rem; }
+    .badge-elem { background: #FEF3C7; color: #D97706; border: 1px solid #FDE68A; font-weight: 700; border-radius: 6px; padding: 0.25rem 0.6rem; font-size: 0.78rem; }
+    .badge-adec { background: #DCFCE7; color: #16A34A; border: 1px solid #BBF7D0; font-weight: 700; border-radius: 6px; padding: 0.25rem 0.6rem; font-size: 0.78rem; }
+  </style>
+</head>
+<body>
+
+<div class="wrapper">
+  {% include 'colegios/_sidebar.html' with active_page='simce' %}
+
+  <div class="main-content">
+    <header class="topbar">
+      <div class="d-flex align-items-center gap-3">
+        <a href="{% url 'simce_dashboard' %}" class="btn btn-sm btn-light border" style="border-radius:8px;">
+          <i class="bi bi-arrow-left me-1"></i> Volver a SIMCE
+        </a>
+        <span class="fw-bold text-dark fs-5"><i class="bi bi-award text-primary me-2"></i>{{ ensayo.titulo }}</span>
+      </div>
+
+      <div class="topbar-right d-flex align-items-center gap-3">
+        <div class="topbar-date d-none d-sm-block text-muted small fw-semibold">
+          <i class="bi bi-calendar3 me-1"></i> {{ hoy|date:"l, d \d\e F \d\e Y"|title }}
+        </div>
+      </div>
+    </header>
+
+    <main class="content-body">
+      
+      <!-- HERO BANNER -->
+      <div class="hero-banner-ensayo">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-4 position-relative" style="z-index:1;">
+          <div>
+            <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+              <span class="hero-badge-pill">
+                <i class="bi bi-book-half"></i> {{ ensayo.get_asignatura_display }}
+              </span>
+              <span class="hero-school-pill">
+                <i class="bi bi-diagram-3"></i> {{ ensayo.curso.nombre }}
+              </span>
+              <span class="hero-school-pill">
+                <i class="bi bi-calendar-event"></i> {{ ensayo.fecha|date:"d \d\e F \d\e Y" }}
+              </span>
+            </div>
+            <h2 class="fw-extrabold text-white mb-1 fs-3">{{ ensayo.titulo }}</h2>
+            <p class="text-white text-opacity-85 small mb-0">
+              <i class="bi bi-question-circle me-1"></i> <strong>{{ ensayo.total_preguntas }}</strong> preguntas &nbsp;|&nbsp; 
+              <i class="bi bi-people me-1"></i> <strong>{{ resultados|length }}</strong> estudiantes evaluados &nbsp;|&nbsp; 
+              <i class="bi bi-trophy me-1"></i> Promedio: <strong>{{ ensayo.promedio_puntaje }} pts</strong> ({{ ensayo.promedio_logro }}% logro)
+            </p>
+          </div>
+
+          <div class="d-flex gap-2 flex-wrap">
+            <a href="{% url 'exportar_ensayo_excel' ensayo.id %}" class="btn btn-success fw-bold px-3 py-2 shadow-sm" style="border-radius:12px; background:#10B981; border:none;">
+              <i class="bi bi-file-earmark-excel me-1.5"></i> Exportar Resultados (.xlsx)
+            </a>
+
+            <form method="POST" action="{% url 'eliminar_ensayo_simce' ensayo.id %}" onsubmit="return confirm('¿Estás seguro de eliminar este ensayo SIMCE? Esta acción no se puede deshacer.')">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-outline-light fw-bold px-3 py-2" style="border-radius:12px;">
+                <i class="bi bi-trash me-1"></i> Eliminar Ensayo
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- DESGLOSE ESTADISTICO DEL ENSAYO -->
+      <div class="card-panel-ensayo mb-4">
+        <div class="row g-4 align-items-center">
+          <div class="col-md-4 text-center border-end">
+            <span class="text-muted extra-small text-uppercase fw-bold d-block">Puntaje Promedio SIMCE</span>
+            <span class="fs-2 fw-extrabold text-primary">{{ ensayo.promedio_puntaje }} <small class="fs-6 text-muted">/ 350</small></span>
+            <div class="text-muted extra-small mt-1">{{ ensayo.promedio_logro }}% de respuestas correctas</div>
+          </div>
+
+          <div class="col-md-8">
+            <span class="text-muted extra-small text-uppercase fw-bold d-block mb-2">Distribución de Estándares de Aprendizaje (MINEDUC)</span>
+            <div class="progress-niveles mb-2" style="height: 14px;">
+              <div class="bar-segment" data-pct="{{ desglose.pct_insuficiente }}" style="background:#EF4444;" title="Insuficiente: {{ desglose.pct_insuficiente }}%"></div>
+              <div class="bar-segment" data-pct="{{ desglose.pct_elemental }}" style="background:#F59E0B;" title="Elemental: {{ desglose.pct_elemental }}%"></div>
+              <div class="bar-segment" data-pct="{{ desglose.pct_adecuado }}" style="background:#10B981;" title="Adecuado: {{ desglose.pct_adecuado }}%"></div>
+            </div>
+            <div class="d-flex justify-content-between small">
+              <span class="badge-insuf">🔴 {{ desglose.insuficiente }} Insuficiente ({{ desglose.pct_insuficiente }}%)</span>
+              <span class="badge-elem">🟡 {{ desglose.elemental }} Elemental ({{ desglose.pct_elemental }}%)</span>
+              <span class="badge-adec">🟢 {{ desglose.adecuado }} Adecuado ({{ desglose.pct_adecuado }}%)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- PLANILLA DE REGISTRO / EDICION DE RESULTADOS -->
+      <form method="POST" action="{% url 'guardar_resultados_ensayo' ensayo.id %}">
+        {% csrf_token %}
+
+        <div class="card-panel-ensayo p-0 overflow-hidden">
+          <div class="d-flex justify-content-between align-items-center p-3 border-bottom bg-light">
+            <div>
+              <span class="fw-bold text-dark"><i class="bi bi-card-checklist text-primary me-1.5"></i> Nómina de Estudiantes y Registro de Respuestas</span>
+              <span class="text-muted small d-block">Ingresa las respuestas correctas obtenidas por cada estudiante (máximo {{ ensayo.total_preguntas }}).</span>
+            </div>
+            <button type="submit" class="btn btn-primary fw-extrabold px-4 py-2" style="border-radius:10px; background:linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%); border:none;">
+              <i class="bi bi-save-fill me-1.5"></i> Guardar y Recalcular Puntajes
+            </button>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-hover mb-0" style="vertical-align: middle;">
+              <thead class="table-light">
+                <tr>
+                  <th style="width: 40px;" class="ps-4">N°</th>
+                  <th>Estudiante</th>
+                  <th>Sección</th>
+                  <th style="width: 170px;" class="text-center">Resp. Correctas (de {{ ensayo.total_preguntas }})</th>
+                  <th class="text-center" style="width: 110px;">% Logro</th>
+                  <th class="text-center" style="width: 130px;">Puntaje SIMCE</th>
+                  <th class="text-center" style="width: 130px;">Nivel Oficial</th>
+                  <th>Observaciones Pedagógicas</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for r in resultados %}
+                  <tr>
+                    <td class="ps-4 text-muted small">{{ forloop.counter }}</td>
+                    <td>
+                      <div class="d-flex align-items-center gap-2.5">
+                        <img src="https://ui-avatars.com/api/?name={{ r.estudiante.nombre_completo|urlencode }}&background=E2E8F0&color=475569" style="width:34px; height:34px; border-radius:50%;">
+                        <div>
+                          <div class="fw-bold text-dark">{{ r.estudiante.nombre_completo }}</div>
+                          <span class="text-muted extra-small">RUT: {{ r.estudiante.rut|default:"-" }}</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      {% if r.estudiante.seccion %}
+                        <span class="badge px-2 py-1 fw-bold" style="background:#F0EDFF; color:#7C5CFC; border-radius:6px; font-size:0.75rem;">
+                          {{ r.estudiante.seccion.nombre }}
+                        </span>
+                      {% else %}
+                        <span class="text-muted small">-</span>
+                      {% endif %}
+                    </td>
+                    <td class="text-center">
+                      <div class="input-group input-group-sm justify-content-center">
+                        <input type="number" name="correctas_{{ r.id }}" id="inp_corr_{{ r.id }}" class="form-control form-control-sm text-center fw-extrabold" value="{{ r.respuestas_correctas }}" min="0" max="{{ ensayo.total_preguntas }}" style="max-width: 80px; border-radius:8px;" oninput="calcularEnVivo('{{ r.id }}', {{ ensayo.total_preguntas }})">
+                      </div>
+                    </td>
+                    <td class="text-center fw-bold" id="txt_logro_{{ r.id }}">
+                      {{ r.porcentaje_logro }}%
+                    </td>
+                    <td class="text-center">
+                      <span class="fs-6 fw-extrabold text-primary" id="txt_pts_{{ r.id }}">{{ r.puntaje_simce }} pts</span>
+                    </td>
+                    <td class="text-center" id="txt_badge_{{ r.id }}">
+                      {% if r.nivel_aprendizaje == 'insuficiente' %}
+                        <span class="badge-insuf">Insuficiente</span>
+                      {% elif r.nivel_aprendizaje == 'elemental' %}
+                        <span class="badge-elem">Elemental</span>
+                      {% else %}
+                        <span class="badge-adec">Adecuado</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      <input type="text" name="obs_{{ r.id }}" class="form-control form-control-sm" value="{{ r.observaciones|default:'' }}" placeholder="Nota UTP / Reforzamiento..." style="border-radius:6px;">
+                    </td>
+                  </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="8" class="text-center py-5 text-muted">
+                      No hay estudiantes registrados en este curso para calificar.
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="p-3 border-top bg-light d-flex justify-content-end">
+            <button type="submit" class="btn btn-primary fw-extrabold px-4 py-2" style="border-radius:10px; background:linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%); border:none;">
+              <i class="bi bi-save-fill me-1.5"></i> Guardar y Recalcular Puntajes
+            </button>
+          </div>
+        </div>
+      </form>
+
+    </main>
+  </div>
+</div>
+
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll('.bar-segment[data-pct]').forEach(function(el) {
+      el.style.width = (parseFloat(el.getAttribute('data-pct')) || 0) + '%';
+    });
+  });
+
+  function calcularEnVivo(resId, totalPreguntas) {
+    const input = document.getElementById('inp_corr_' + resId);
+    let correctas = parseInt(input.value) || 0;
+    if (correctas > totalPreguntas) correctas = totalPreguntas;
+    if (correctas < 0) correctas = 0;
+
+    const logro = (correctas / totalPreguntas) * 100.0;
+    const puntaje = Math.round(150 + (logro / 100.0) * 200);
+
+    document.getElementById('txt_logro_' + resId).textContent = logro.toFixed(1) + '%';
+    document.getElementById('txt_pts_' + resId).textContent = puntaje + ' pts';
+
+    const badgeCell = document.getElementById('txt_badge_' + resId);
+    if (puntaje < 235) {
+      badgeCell.innerHTML = '<span class="badge-insuf">Insuficiente</span>';
+    } else if (puntaje < 285) {
+      badgeCell.innerHTML = '<span class="badge-elem">Elemental</span>';
+    } else {
+      badgeCell.innerHTML = '<span class="badge-adec">Adecuado</span>';
+    }
+  }
+</script>
+</body>
+</html>
+

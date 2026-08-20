@@ -2,339 +2,510 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configura tu plan - Eduteka</title>
-    <!-- Google Fonts: Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Bootstrap CSS -->
-    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    
-    <!-- Custom Login/Register CSS -->
-    <link rel="stylesheet" href="{% static 'css/login.css' %}">
-    <link rel="stylesheet" href="{% static 'css/registrocolegio.css' %}">
-    <link rel="stylesheet" href="{% static 'css/registrocolegiopaso2.css' %}">
-    <link rel="stylesheet" href="{% static 'css/backbutton.css' %}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configura tu Plan & Módulos — Eduteka</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap CSS -->
+  <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="{% static 'css/login.css' %}">
+  <link rel="stylesheet" href="{% static 'css/registrocolegio.css' %}?v=5">
+  <link rel="stylesheet" href="{% static 'css/registrocolegiopaso2.css' %}?v=5">
+  <link rel="stylesheet" href="{% static 'css/backbutton.css' %}">
 </head>
-<body class="login-body" style="background: linear-gradient(135deg, #f0ebff 0%, #FAFAFF 100%);">
+<body class="login-body">
 
-    <!-- Botón volver -->
-    <a href="{% url 'registro_colegio' %}" class="back-button">
-        <i class="bi bi-arrow-left"></i> Volver
-    </a>
+  <!-- Botón volver al paso 1 -->
+  <a href="{% url 'registro_colegio' %}" class="back-button">
+    <i class="bi bi-arrow-left"></i> Volver al Paso 1
+  </a>
 
-    <!-- Formas de fondo orgánicas ampliadas -->
-    <div class="bg-shapes">
-        <div class="shape shape-1" style="width: 800px; height: 800px; opacity: 0.9; top: -200px; left: -200px;"></div>
-        <div class="shape shape-2" style="width: 900px; height: 900px; opacity: 0.8; bottom: -300px; right: -150px;"></div>
-        <div class="shape shape-3" style="width: 600px; height: 600px; opacity: 0.8; top: 30%; left: 20%;"></div>
-        <div class="shape shape-4" style="width: 500px; height: 500px; opacity: 0.7; top: 5%; right: 10%;"></div>
-        <div class="pattern-dots dots-1"></div>
-        <div class="pattern-dots dots-2"></div>
-    </div>
+  <!-- Formas de fondo orgánicas -->
+  <div class="bg-shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+    <div class="shape shape-4"></div>
+    <div class="pattern-dots dots-1"></div>
+    <div class="pattern-dots dots-2"></div>
+  </div>
 
-    <div class="container-fluid login-container px-lg-5" style="padding-top: 1.5rem; padding-bottom: 1.5rem; max-width: 1550px; min-height: 100vh; display: flex; align-items: center;">
-        <div class="row w-100 m-0 align-items-center justify-content-center">
-            
-            <!-- Columna Izquierda: Información -->
-            <div class="col-lg-5 d-none d-lg-flex flex-column justify-content-center welcome-section" style="padding-right: 1.5rem; position: relative;">
-                <div class="mb-2">
-                    <img src="{% static 'img/logo.png' %}" alt="Eduteka Logo" class="logo-blend" style="height: 140px;">
-                </div>
-                
-                <h1 class="welcome-title" style="font-size: 3rem; line-height: 1.1; margin-bottom: 1rem; font-weight: 800; letter-spacing: -0.03em;">Activa tu colegio <br><span style="color: #8B6FE8;">en Eduteka</span></h1>
-                <p class="welcome-desc" style="font-size: 1.1rem; margin-bottom: 0.8rem; color: #4B5563; line-height: 1.5;">Elige tu plan, selecciona los módulos que necesitas y deja lista tu institución para comenzar a operar.</p>
-                
-                <ul class="benefits-list mt-1 mb-4" style="gap: 1rem;">
-                    <li><span class="benefit-chip" style="font-size: 0.9rem; padding: 0.6rem 1.2rem; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px);"><i class="bi bi-check-circle-fill" style="color: #8B6FE8;"></i> Planes flexibles</span></li>
-                    <li><span class="benefit-chip" style="font-size: 0.9rem; padding: 0.6rem 1.2rem; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px);"><i class="bi bi-grid-fill" style="color: #8B6FE8;"></i> Módulos a medida</span></li>
-                    <li><span class="benefit-chip" style="font-size: 0.9rem; padding: 0.6rem 1.2rem; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px);"><i class="bi bi-lightning-charge-fill" style="color: #8B6FE8;"></i> Inicio rápido</span></li>
-                </ul>
+  <!-- Contenedor Panorámico y Cómodo -->
+  <div class="onboarding-container">
+    <div class="row w-100 m-0 align-items-center justify-content-center g-5">
 
-                <div class="illustration-wrapper" style="position: relative; margin-top: 0;">
-                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; height: 90%; background: radial-gradient(circle, rgba(139,111,232,0.4) 0%, rgba(255,255,255,0) 70%); filter: blur(55px); z-index: 1;"></div>
-                    <img src="{% static 'img/planes.png' %}" alt="Ilustración de la plataforma" class="img-fluid floating-illustration" style="max-height: 620px; object-fit: contain; position: relative; z-index: 2; margin-left: -8%; width: 125%;">
-                </div>
+      <!-- Columna Izquierda: Decoración Premium, Logo Grande y Beneficios del Plan -->
+      <div class="col-lg-5 col-xl-4 d-none d-lg-flex brand-hero-left">
+        
+        <!-- Logo Grande y Destacado -->
+        <div class="mb-4">
+          <img src="{% static 'img/logo.png' %}" alt="Eduteka Logo" class="brand-logo-large logo-blend">
+        </div>
+
+        <div class="brand-status-pill">
+          <i class="bi bi-layers-fill"></i> Paso 2 de 3: Personalización
+        </div>
+
+        <h1 class="welcome-title-pro">
+          Activa tu colegio <br><span style="color:#7C5CFC;">en Eduteka</span>
+        </h1>
+        <p class="welcome-desc-pro">
+          Selecciona el plan adecuado para <strong>{{ colegio.nombre }}</strong>. Los módulos se activarán automáticamente para comenzar a operar.
+        </p>
+
+        <!-- Stack de Beneficios Organizado -->
+        <div class="left-feature-stack">
+          
+          <div class="left-feature-card">
+            <div class="feature-card-icon" style="background:#ECFDF5; color:#10B981;">
+              <i class="bi bi-check-circle-fill"></i>
             </div>
-
-            <!-- Columna Derecha: Tarjeta de Formulario -->
-            <div class="col-12 col-md-11 col-lg-7">
-                <div class="register-card premium-card" style="padding: 1.8rem 2.2rem; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border-radius: 24px; box-shadow: 0 20px 50px rgba(21, 26, 53, 0.08); border: 1px solid rgba(255,255,255,0.6);">
-                    <div class="register-header text-center mb-3">
-                        <img src="{% static 'img/logo.png' %}" alt="Eduteka Logo" class="logo-blend" style="height: 80px; margin-bottom: 1.5rem;">
-                        <div class="step-badge" style="padding: 0.2rem 0.8rem; font-size: 0.75rem; margin-bottom: 0.3rem; background: #f0ebff; color: #8B6FE8;">Paso 2 de 2</div>
-                        <h2 style="font-weight: 800; color: #151A35; font-size: 1.4rem; margin-bottom: 0.1rem;">Configura tu plan</h2>
-                        <p style="color: #687089; font-size: 0.85rem; margin-bottom: 0;">Selecciona el nivel de servicio y los módulos que necesitas.</p>
-                    </div>
-
-                    <form action="{% url 'registro_colegio_paso2' colegio.id %}" method="POST" id="planForm">
-                        {% csrf_token %}
-                        
-                        <div class="d-flex justify-content-between align-items-end mb-2">
-                            <h6 class="fw-bold mb-0" style="color: #151A35; font-size: 0.95rem;">1. Selecciona tu plan</h6>
-                            <div class="billing-toggle d-flex p-1 rounded-pill" style="width: 220px;">
-                                <label class="flex-fill text-center mb-0 position-relative">
-                                    <input type="radio" name="tipo_facturacion" value="mensual" checked class="d-none">
-                                    <div class="billing-btn py-1 rounded-pill fw-bold" style="font-size: 0.75rem; cursor: pointer;">Mensual</div>
-                                </label>
-                                <label class="flex-fill text-center mb-0 position-relative">
-                                    <input type="radio" name="tipo_facturacion" value="anual" class="d-none">
-                                    <div class="billing-btn py-1 rounded-pill fw-bold" style="font-size: 0.75rem; cursor: pointer;">
-                                        Anual <span class="badge ms-1" style="font-size: 0.6rem; background-color: #65CDBF;">-15%</span>
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="plans-grid mb-3">
-                            <!-- Básico -->
-                            <label class="plan-card-compact">
-                                <input type="radio" name="plan" value="basico">
-                                <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <span class="plan-name fw-bold">Básico</span>
-                                    <span class="plan-price fw-bold" style="color: #687089;" id="price-basico">$49.900<span style="font-weight: 500; font-size: 0.65rem;"> /mes</span></span>
-                                </div>
-                                <p class="mb-0 text-muted" style="font-size: 0.7rem; line-height: 1.2;">Libro de clases, asistencia, notas, perfil y reportes básicos.</p>
-                            </label>
-
-                            <!-- Profesional -->
-                            <label class="plan-card-compact">
-                                <input type="radio" name="plan" value="profesional" checked>
-                                <div class="d-flex justify-content-between align-items-start mb-1">
-                                    <div class="d-flex align-items-center">
-                                        <span class="plan-name fw-bold">Profesional</span>
-                                        <span class="plan-badge ms-2">Recomendado</span>
-                                    </div>
-                                    <span class="plan-price fw-bold text-primary" style="color: #8B6FE8 !important;" id="price-profesional">$89.900<span style="font-weight: 500; font-size: 0.65rem;"> /mes</span></span>
-                                </div>
-                                <p class="mb-0 text-muted" style="font-size: 0.7rem; line-height: 1.2;">+ Calendario, reportes pro, roles y anotaciones.</p>
-                            </label>
-
-                            <!-- Institucional -->
-                            <label class="plan-card-compact">
-                                <input type="radio" name="plan" value="institucional">
-                                <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <span class="plan-name fw-bold">Institucional</span>
-                                    <span class="plan-price fw-bold" style="color: #687089;" id="price-institucional">$149.900<span style="font-weight: 500; font-size: 0.65rem;"> /mes</span></span>
-                                </div>
-                                <p class="mb-0 text-muted" style="font-size: 0.7rem; line-height: 1.2;">+ Contabilidad, proveedores, SIMCE y soporte.</p>
-                            </label>
-
-                            <!-- Personalizado -->
-                            <label class="plan-card-compact">
-                                <input type="radio" name="plan" value="personalizado">
-                                <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <span class="plan-name fw-bold">A medida</span>
-                                    <span class="plan-price fw-bold" style="color: #687089;">Cotizar</span>
-                                </div>
-                                <p class="mb-0 text-muted" style="font-size: 0.7rem; line-height: 1.2;">Integraciones, Mercado Público y migración.</p>
-                            </label>
-                        </div>
-
-                        <h6 class="fw-bold mb-2" style="color: #151A35; font-size: 0.95rem;">2. Módulos a activar</h6>
-                        <div class="modules-grid-compact mb-3">
-                            <label class="module-item">
-                                <input type="checkbox" name="modulos" value="libro_clases" checked>
-                                <i class="bi bi-book"></i>
-                                <span>Libro de clases</span>
-                            </label>
-                            <label class="module-item">
-                                <input type="checkbox" name="modulos" value="asistencia" checked>
-                                <i class="bi bi-person-check"></i>
-                                <span>Asistencia</span>
-                            </label>
-                            <label class="module-item">
-                                <input type="checkbox" name="modulos" value="perfil_alumno" checked>
-                                <i class="bi bi-person-vcard"></i>
-                                <span>Perfil alumno</span>
-                            </label>
-                            <label class="module-item">
-                                <input type="checkbox" name="modulos" value="calendario" checked>
-                                <i class="bi bi-calendar-event"></i>
-                                <span>Calendario</span>
-                            </label>
-                            <label class="module-item">
-                                <input type="checkbox" name="modulos" value="reportes" checked>
-                                <i class="bi bi-bar-chart"></i>
-                                <span>Reportes</span>
-                            </label>
-                            <label class="module-item">
-                                <input type="checkbox" name="modulos" value="contabilidad">
-                                <i class="bi bi-calculator"></i>
-                                <span>Contabilidad</span>
-                            </label>
-                            <label class="module-item">
-                                <input type="checkbox" name="modulos" value="proveedores">
-                                <i class="bi bi-truck"></i>
-                                <span>Proveedores</span>
-                            </label>
-                            <label class="module-item">
-                                <input type="checkbox" name="modulos" value="simce">
-                                <i class="bi bi-clipboard-data"></i>
-                                <span>SIMCE</span>
-                            </label>
-                        </div>
-
-                        <div class="summary-horizontal rounded-4 p-2 px-3 d-flex flex-wrap justify-content-between align-items-center mb-3">
-                            <div class="d-flex gap-4 mb-2 mb-sm-0">
-                                <div>
-                                    <span class="d-block text-muted text-uppercase" style="font-size: 0.6rem; font-weight: 700; letter-spacing: 0.5px;">Plan</span>
-                                    <strong id="summary-plan" style="font-size: 0.95rem; color: #151A35;">Profesional</strong>
-                                </div>
-                                <div>
-                                    <span class="d-block text-muted text-uppercase" style="font-size: 0.6rem; font-weight: 700; letter-spacing: 0.5px;">Facturación</span>
-                                    <strong id="summary-billing" style="font-size: 0.95rem; color: #151A35;">Mensual</strong>
-                                </div>
-                                <div>
-                                    <span class="d-block text-muted text-uppercase" style="font-size: 0.6rem; font-weight: 700; letter-spacing: 0.5px;">Módulos</span>
-                                    <strong id="summary-modules" style="font-size: 0.95rem; color: #151A35;">5 activos</strong>
-                                </div>
-                            </div>
-                            <div class="text-end ps-sm-3" style="border-left: 2px dashed #d1c7f5;">
-                                <span class="d-block text-muted text-uppercase" style="font-size: 0.6rem; font-weight: 700; letter-spacing: 0.5px;">Total estimado</span>
-                                <strong id="summary-total" style="font-size: 1.25rem; color: #8B6FE8; font-weight: 800; line-height: 1;">$89.900</strong>
-                                <span class="d-block text-muted" style="font-size: 0.65rem; font-weight: 500;" id="summary-period">/ mes - Inicio inmediato</span>
-                            </div>
-                        </div>
-
-                        <div class="d-flex flex-column gap-2">
-                            <div class="form-check m-0 d-flex justify-content-center align-items-center gap-2">
-                                <input class="form-check-input m-0" type="checkbox" id="termsCheck2" required style="width: 1.2em; height: 1.2em; cursor: pointer;">
-                                <label class="form-check-label" for="termsCheck2" style="font-size: 0.85rem; color: #687089;">
-                                    Acepto los <a href="#" style="color: #8B6FE8; font-weight: 700; text-decoration: none;">términos y condiciones</a>
-                                </label>
-                            </div>
-                            <button type="submit" class="btn btn-login w-100" style="background-color: #8B6FE8; border-color: #8B6FE8; color: white; padding: 0.7rem; font-size: 1rem; font-weight: 700; border-radius: 12px; box-shadow: 0 4px 15px rgba(139, 111, 232, 0.3);">
-                                Finalizar registro
-                            </button>
-                        </div>
-                        
-                        <div class="text-center mt-2">
-                            <a href="{% url 'registro_colegio' %}" style="font-size: 0.85rem; color: #687089; text-decoration: none; font-weight: 600;"><i class="bi bi-arrow-left"></i> Volver al paso anterior</a>
-                        </div>
-                    </form>
-                </div>
+            <div>
+              <div class="feature-card-title">Sin Contratos de Permanencia</div>
+              <div class="feature-card-desc">Planes flexibles que se adaptan al crecimiento de tu colegio.</div>
             </div>
+          </div>
+
+          <div class="left-feature-card">
+            <div class="feature-card-icon" style="background:#F0EDFF; color:#7C5CFC;">
+              <i class="bi bi-file-earmark-spreadsheet-fill"></i>
+            </div>
+            <div>
+              <div class="feature-card-title">Migración Asistida Incluida</div>
+              <div class="feature-card-desc">Carga tu nómina de estudiantes y profesores en 5 minutos.</div>
+            </div>
+          </div>
+
+          <div class="left-feature-card">
+            <div class="feature-card-icon" style="background:#EFF6FF; color:#2563EB;">
+              <i class="bi bi-headset"></i>
+            </div>
+            <div>
+              <div class="feature-card-title">Soporte VIP y Capacitación</div>
+              <div class="feature-card-desc">Atención preferencial por WhatsApp y talleres para docentes.</div>
+            </div>
+          </div>
 
         </div>
+
+        <!-- Ilustración con Aura Luminosa -->
+        <div class="illustration-hero-frame">
+          <div class="illustration-aura-glow"></div>
+          <img src="{% static 'img/planes.png' %}" alt="Planes Eduteka" class="img-fluid floating-illustration" style="max-height: 320px; object-fit: contain; position: relative; z-index: 2;">
+        </div>
+
+      </div>
+
+      <!-- Columna Derecha: Tarjeta Amplia de Formulario Paso 2 -->
+      <div class="col-12 col-lg-7 col-xl-8">
+        <div class="register-card-modern">
+
+          <!-- Stepper de 3 Pasos Espacioso -->
+          <div class="stepper-container">
+            <div class="stepper-progress-bar">
+              <div class="stepper-progress-fill" style="width: 50%;"></div>
+            </div>
+
+            <!-- Paso 1: Completado -->
+            <div class="stepper-step completed">
+              <div class="step-node"><i class="bi bi-check2"></i></div>
+              <span class="step-label" style="color:#10B981;">1. Institucional ✓</span>
+            </div>
+
+            <!-- Paso 2: Activo -->
+            <div class="stepper-step active">
+              <div class="step-node"><i class="bi bi-layers"></i></div>
+              <span class="step-label">2. Plan & Módulos</span>
+            </div>
+
+            <!-- Paso 3: Pendiente -->
+            <div class="stepper-step">
+              <div class="step-node">3</div>
+              <span class="step-label">3. Configuración</span>
+            </div>
+          </div>
+
+          <div class="text-center mb-4 pb-1">
+            <h2 class="fs-3 fw-extrabold text-dark mb-1">Configura tu Plan Institucional</h2>
+            <p class="text-muted mb-0">Selecciona el nivel de servicio y los módulos activos para <strong>{{ colegio.nombre }}</strong>.</p>
+          </div>
+
+          <form action="{% url 'registro_colegio_paso2' colegio.id %}" method="POST" id="planForm">
+            {% csrf_token %}
+
+            <!-- SECCIÓN 1: PLAN Y FACTURACIÓN -->
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-3">
+              <div class="d-flex align-items-center gap-2.5">
+                <div class="section-icon-badge">
+                  <i class="bi bi-cash-stack"></i>
+                </div>
+                <h6 class="form-section-title mb-0 fs-5">1. Selecciona tu Nivel de Servicio</h6>
+              </div>
+
+              <!-- Selector Facturación Mensual / Anual -->
+              <div class="billing-pill-box">
+                <label class="billing-pill-option">
+                  <input type="radio" name="tipo_facturacion" value="mensual" checked>
+                  <span class="billing-pill-label">Mensual</span>
+                </label>
+                <label class="billing-pill-option">
+                  <input type="radio" name="tipo_facturacion" value="anual">
+                  <span class="billing-pill-label">
+                    Anual <span class="badge bg-success-subtle text-success p-1 ms-1" style="font-size:0.7rem;">-15% Ahorro</span>
+                  </span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Grilla de Planes 4 Columnas en Desktop -->
+            <div class="plans-grid-modern">
+              
+              <!-- Plan Básico -->
+              <label class="plan-card-pro" id="cardPlanBasico">
+                <input type="radio" name="plan" value="basico">
+                <div>
+                  <div class="plan-name-pro">Básico</div>
+                  <p class="extra-small text-muted mb-2.5">Hasta 200 alumnos.</p>
+                  <ul class="list-unstyled extra-small text-muted mb-0 d-flex flex-column gap-1.5">
+                    <li><i class="bi bi-check2 text-success me-1"></i> Libro de clases digital</li>
+                    <li><i class="bi bi-check2 text-success me-1"></i> Asistencia diaria y notas</li>
+                    <li><i class="bi bi-check2 text-success me-1"></i> Ficha alumno y reportes</li>
+                  </ul>
+                </div>
+                <div class="mt-3 pt-2.5 border-top">
+                  <div class="plan-price-pro" id="priceBasico">$49.900 <small>/ mes</small></div>
+                </div>
+              </label>
+
+              <!-- Plan Profesional (Destacado) -->
+              <label class="plan-card-pro featured" id="cardPlanProfesional">
+                <div class="plan-ribbon-featured">⭐ Más Elegido</div>
+                <input type="radio" name="plan" value="profesional" checked>
+                <div>
+                  <div class="plan-name-pro text-primary">Profesional</div>
+                  <p class="extra-small text-muted mb-2.5">Hasta 700 alumnos.</p>
+                  <ul class="list-unstyled extra-small text-dark fw-semibold mb-0 d-flex flex-column gap-1.5">
+                    <li><i class="bi bi-check2-circle text-primary me-1"></i> <strong>Libro Digital + PIE</strong></li>
+                    <li><i class="bi bi-check2-circle text-primary me-1"></i> <strong>SIMCE & DIA</strong></li>
+                    <li><i class="bi bi-check2-circle text-primary me-1"></i> Calendario y actas</li>
+                  </ul>
+                </div>
+                <div class="mt-3 pt-2.5 border-top">
+                  <div class="plan-price-pro text-primary" id="priceProfesional">$89.900 <small>/ mes</small></div>
+                </div>
+              </label>
+
+              <!-- Plan Institucional -->
+              <label class="plan-card-pro" id="cardPlanInstitucional">
+                <input type="radio" name="plan" value="institucional">
+                <div>
+                  <div class="plan-name-pro">Institucional</div>
+                  <p class="extra-small text-muted mb-2.5">Alumnos ilimitados.</p>
+                  <ul class="list-unstyled extra-small text-muted mb-0 d-flex flex-column gap-1.5">
+                    <li><i class="bi bi-check2 text-success me-1"></i> <strong>Todos los módulos</strong></li>
+                    <li><i class="bi bi-check2 text-success me-1"></i> Finanzas & caja chica</li>
+                    <li><i class="bi bi-check2 text-success me-1"></i> Inventario & compras</li>
+                  </ul>
+                </div>
+                <div class="mt-3 pt-2.5 border-top">
+                  <div class="plan-price-pro" id="priceInstitucional">$149.900 <small>/ mes</small></div>
+                </div>
+              </label>
+
+              <!-- Plan A Medida / Personalizado -->
+              <label class="plan-card-pro" id="cardPlanPersonalizado">
+                <input type="radio" name="plan" value="personalizado">
+                <div>
+                  <div class="plan-name-pro">A Medida</div>
+                  <p class="extra-small text-muted mb-2.5">Redes de colegios.</p>
+                  <ul class="list-unstyled extra-small text-muted mb-0 d-flex flex-column gap-1.5">
+                    <li><i class="bi bi-check2 text-info me-1"></i> Módulos a libre elección</li>
+                    <li><i class="bi bi-check2 text-info me-1"></i> Integración a medida</li>
+                    <li><i class="bi bi-check2 text-info me-1"></i> Mercado Público</li>
+                  </ul>
+                </div>
+                <div class="mt-3 pt-2.5 border-top">
+                  <div class="plan-price-pro text-muted">A Cotizar</div>
+                </div>
+              </label>
+
+            </div>
+
+            <!-- SECCIÓN 2: MÓDULOS ACTIVOS -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div class="d-flex align-items-center gap-2.5">
+                <div class="section-icon-badge" style="background:#ECFDF5; color:#10B981;">
+                  <i class="bi bi-grid-fill"></i>
+                </div>
+                <h6 class="form-section-title mb-0 fs-5">2. Módulos que se activarán para tu colegio</h6>
+              </div>
+              <span class="badge bg-light text-dark border px-3 py-1.5 fw-bold" id="badgeModulesCount">5 módulos activos</span>
+            </div>
+
+            <!-- Grilla de Módulos (8 Módulos Espaciosos) -->
+            <div class="modules-grid-pro mb-4">
+              
+              <!-- Módulo 1: Libro de Clases -->
+              <label class="module-item-pro" title="Libro de clases y calificaciones">
+                <input type="checkbox" name="modulos" value="libro_clases" checked>
+                <div class="module-icon-wrap"><i class="bi bi-journal-bookmark-fill"></i></div>
+                <span>Libro de Clases</span>
+              </label>
+
+              <!-- Módulo 2: Asistencia -->
+              <label class="module-item-pro" title="Asistencia diaria y por bloque">
+                <input type="checkbox" name="modulos" value="asistencia" checked>
+                <div class="module-icon-wrap"><i class="bi bi-calendar-check-fill"></i></div>
+                <span>Asistencia Diaria</span>
+              </label>
+
+              <!-- Módulo 3: Perfil Alumno -->
+              <label class="module-item-pro" title="Ficha del estudiante y PIE">
+                <input type="checkbox" name="modulos" value="perfil_alumno" checked>
+                <div class="module-icon-wrap"><i class="bi bi-person-badge-fill"></i></div>
+                <span>Perfil Alumno & PIE</span>
+              </label>
+
+              <!-- Módulo 4: Calendario -->
+              <label class="module-item-pro" title="Calendario y eventos">
+                <input type="checkbox" name="modulos" value="calendario" checked>
+                <div class="module-icon-wrap"><i class="bi bi-calendar-event-fill"></i></div>
+                <span>Calendario Escolar</span>
+              </label>
+
+              <!-- Módulo 5: Reportes -->
+              <label class="module-item-pro" title="Reportes y certificados oficiales">
+                <input type="checkbox" name="modulos" value="reportes" checked>
+                <div class="module-icon-wrap"><i class="bi bi-bar-chart-fill"></i></div>
+                <span>Reportes & Actas</span>
+              </label>
+
+              <!-- Módulo 6: SIMCE -->
+              <label class="module-item-pro" title="Evaluaciones estandarizadas SIMCE & DIA">
+                <input type="checkbox" name="modulos" value="simce">
+                <div class="module-icon-wrap"><i class="bi bi-award-fill"></i></div>
+                <span>SIMCE & DIA</span>
+              </label>
+
+              <!-- Módulo 7: Contabilidad -->
+              <label class="module-item-pro" title="Control financiero y caja chica">
+                <input type="checkbox" name="modulos" value="contabilidad">
+                <div class="module-icon-wrap"><i class="bi bi-wallet2"></i></div>
+                <span>Finanzas & SEP</span>
+              </label>
+
+              <!-- Módulo 8: Proveedores -->
+              <label class="module-item-pro" title="Directorio de proveedores e inventario">
+                <input type="checkbox" name="modulos" value="proveedores">
+                <div class="module-icon-wrap"><i class="bi bi-truck"></i></div>
+                <span>Proveedores & Stock</span>
+              </label>
+
+            </div>
+
+            <!-- SECCIÓN 3: RESUMEN CHECKOUT EN TIEMPO REAL -->
+            <div class="checkout-summary-box">
+              <div class="row align-items-center gy-3">
+                <div class="col-sm-3 col-6 border-end border-secondary border-opacity-25">
+                  <div class="summary-col">
+                    <span class="summary-col-label">Colegio</span>
+                    <span class="summary-col-val text-truncate" title="{{ colegio.nombre }}">{{ colegio.nombre }}</span>
+                  </div>
+                </div>
+
+                <div class="col-sm-3 col-6 border-end border-secondary border-opacity-25">
+                  <div class="summary-col">
+                    <span class="summary-col-label">Plan Seleccionado</span>
+                    <span class="summary-col-val" id="summaryPlanName">Profesional</span>
+                  </div>
+                </div>
+
+                <div class="col-sm-2 col-6 border-end border-secondary border-opacity-25">
+                  <div class="summary-col">
+                    <span class="summary-col-label">Facturación</span>
+                    <span class="summary-col-val" id="summaryBillingMode">Mensual</span>
+                  </div>
+                </div>
+
+                <div class="col-sm-4 col-6 text-sm-end">
+                  <div class="summary-col">
+                    <span class="summary-col-label">Total a Facturar</span>
+                    <div class="summary-total-price" id="summaryTotalPrice">$89.900</div>
+                    <span class="extra-small text-white-50 mt-1 d-block" id="summaryPeriodDesc">/ mes • Activación Inmediata</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Términos -->
+            <div class="form-check mt-3 mb-4 d-flex justify-content-center align-items-center gap-2">
+              <input class="form-check-input m-0" type="checkbox" id="termsCheck2" required checked style="cursor:pointer; width:1.2em; height:1.2em;">
+              <label class="form-check-label small text-muted" for="termsCheck2">
+                Confirmo los módulos y acepto los <a href="#" class="text-primary fw-bold text-decoration-none">términos del servicio</a>.
+              </label>
+            </div>
+
+            <!-- Botón de Envío -->
+            <button type="submit" class="btn-submit-pro" id="btnSubmitPlan">
+              <span id="btnSubmitPlanText">Finalizar y Configurar mi Colegio</span>
+              <i class="bi bi-arrow-right-short fs-3" id="btnSubmitPlanIcon"></i>
+              <span class="spinner-border spinner-border-sm d-none" id="btnSubmitPlanSpinner" role="status"></span>
+            </button>
+
+            <div class="text-center mt-3">
+              <a href="{% url 'registro_colegio' %}" class="small text-muted text-decoration-none fw-bold">
+                <i class="bi bi-arrow-left"></i> Modificar datos institucionales del colegio
+              </a>
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+
     </div>
+  </div>
 
-    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
-    <script>
-        // Lógica dinámica para actualizar los módulos y el resumen según el plan
-        document.addEventListener('DOMContentLoaded', function() {
-            const planRadios = document.querySelectorAll('input[name="plan"]');
-            const billingRadios = document.querySelectorAll('input[name="tipo_facturacion"]');
-            const moduleCheckboxes = document.querySelectorAll('input[name="modulos"]');
-            
-            const summaryPlan = document.getElementById('summary-plan');
-            const summaryBilling = document.getElementById('summary-billing');
-            const summaryModules = document.getElementById('summary-modules');
-            const summaryTotal = document.getElementById('summary-total');
-            const summaryPeriod = document.getElementById('summary-period');
+  <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const planRadios = document.querySelectorAll('input[name="plan"]');
+      const billingRadios = document.querySelectorAll('input[name="tipo_facturacion"]');
+      const moduleCheckboxes = document.querySelectorAll('input[name="modulos"]');
 
-            const priceBasico = document.getElementById('price-basico');
-            const priceProfesional = document.getElementById('price-profesional');
-            const priceInstitucional = document.getElementById('price-institucional');
+      const summaryPlanName = document.getElementById('summaryPlanName');
+      const summaryBillingMode = document.getElementById('summaryBillingMode');
+      const summaryTotalPrice = document.getElementById('summaryTotalPrice');
+      const summaryPeriodDesc = document.getElementById('summaryPeriodDesc');
+      const badgeModulesCount = document.getElementById('badgeModulesCount');
 
-            const prices = {
-                basico: 49900,
-                profesional: 89900,
-                institucional: 149900,
-                personalizado: 0
-            };
+      const priceBasico = document.getElementById('priceBasico');
+      const priceProfesional = document.getElementById('priceProfesional');
+      const priceInstitucional = document.getElementById('priceInstitucional');
 
-            const names = {
-                basico: 'Básico',
-                profesional: 'Profesional',
-                institucional: 'Institucional',
-                personalizado: 'A medida'
-            };
+      const prices = {
+        basico: 49900,
+        profesional: 89900,
+        institucional: 149900,
+        personalizado: 0
+      };
 
-            const planModulesMap = {
-                basico: ['libro_clases', 'asistencia', 'perfil_alumno', 'reportes'],
-                profesional: ['libro_clases', 'asistencia', 'perfil_alumno', 'reportes', 'calendario'],
-                institucional: ['libro_clases', 'asistencia', 'perfil_alumno', 'reportes', 'calendario', 'contabilidad', 'proveedores', 'simce']
-            };
+      const names = {
+        basico: 'Básico',
+        profesional: 'Profesional',
+        institucional: 'Institucional',
+        personalizado: 'A Medida'
+      };
 
-            function updateModulesState() {
-                let selectedPlan = document.querySelector('input[name="plan"]:checked').value;
-                
-                moduleCheckboxes.forEach(cb => {
-                    if (selectedPlan === 'personalizado') {
-                        // En plan personalizado se puede elegir cualquier módulo
-                        cb.parentElement.style.opacity = '1';
-                        cb.parentElement.style.pointerEvents = 'auto';
-                        cb.onclick = null;
-                    } else {
-                        // En planes predefinidos, seleccionamos los módulos correspondientes
-                        let isIncluded = planModulesMap[selectedPlan].includes(cb.value);
-                        cb.checked = isIncluded;
-                        
-                        if (isIncluded) {
-                            cb.parentElement.style.opacity = '1';
-                            cb.parentElement.style.pointerEvents = 'auto';
-                            cb.onclick = function(e) { e.preventDefault(); }; // No se puede desmarcar
-                        } else {
-                            cb.parentElement.style.opacity = '0.5';
-                            cb.parentElement.style.pointerEvents = 'none'; // Evita hacer clic
-                            cb.onclick = function(e) { e.preventDefault(); };
-                        }
-                    }
-                });
-                
-                updateSummary();
+      const planModulesMap = {
+        basico: ['libro_clases', 'asistencia', 'perfil_alumno', 'reportes'],
+        profesional: ['libro_clases', 'asistencia', 'perfil_alumno', 'reportes', 'calendario', 'simce'],
+        institucional: ['libro_clases', 'asistencia', 'perfil_alumno', 'reportes', 'calendario', 'simce', 'contabilidad', 'proveedores']
+      };
+
+      function updateModulesState() {
+        const checkedPlanEl = document.querySelector('input[name="plan"]:checked');
+        const selectedPlan = checkedPlanEl ? checkedPlanEl.value : 'profesional';
+
+        moduleCheckboxes.forEach(cb => {
+          if (selectedPlan === 'personalizado') {
+            cb.parentElement.style.opacity = '1';
+            cb.parentElement.style.pointerEvents = 'auto';
+            cb.onclick = null;
+          } else {
+            const isIncluded = (planModulesMap[selectedPlan] || []).includes(cb.value);
+            cb.checked = isIncluded;
+
+            if (isIncluded) {
+              cb.parentElement.style.opacity = '1';
+              cb.parentElement.style.pointerEvents = 'auto';
+              cb.onclick = function(e) { e.preventDefault(); };
+            } else {
+              cb.parentElement.style.opacity = '0.45';
+              cb.parentElement.style.pointerEvents = 'none';
+              cb.onclick = function(e) { e.preventDefault(); };
             }
-
-            function updateSummary() {
-                let selectedPlan = document.querySelector('input[name="plan"]:checked').value;
-                let selectedBilling = document.querySelector('input[name="tipo_facturacion"]:checked').value;
-                let activeModules = document.querySelectorAll('input[name="modulos"]:checked').length;
-                
-                let basePrice = prices[selectedPlan];
-                let isYearly = selectedBilling === 'anual';
-                
-                let finalPrice = basePrice;
-                let periodText = '/ mes';
-
-                if (isYearly && basePrice > 0) {
-                    finalPrice = basePrice * 12 * 0.85; // Precio anual total con 15% de descuento
-                    periodText = '/ año';
-                    
-                    priceBasico.innerHTML = '$' + new Intl.NumberFormat('es-CL').format(Math.round(prices.basico * 0.85)) + '<span style="font-weight: 500; font-size: 0.65rem;"> /mes</span>';
-                    priceProfesional.innerHTML = '$' + new Intl.NumberFormat('es-CL').format(Math.round(prices.profesional * 0.85)) + '<span style="font-weight: 500; font-size: 0.65rem;"> /mes</span>';
-                    priceInstitucional.innerHTML = '$' + new Intl.NumberFormat('es-CL').format(Math.round(prices.institucional * 0.85)) + '<span style="font-weight: 500; font-size: 0.65rem;"> /mes</span>';
-                } else {
-                    priceBasico.innerHTML = '$' + new Intl.NumberFormat('es-CL').format(prices.basico) + '<span style="font-weight: 500; font-size: 0.65rem;"> /mes</span>';
-                    priceProfesional.innerHTML = '$' + new Intl.NumberFormat('es-CL').format(prices.profesional) + '<span style="font-weight: 500; font-size: 0.65rem;"> /mes</span>';
-                    priceInstitucional.innerHTML = '$' + new Intl.NumberFormat('es-CL').format(prices.institucional) + '<span style="font-weight: 500; font-size: 0.65rem;"> /mes</span>';
-                }
-
-                summaryPlan.textContent = names[selectedPlan];
-                summaryBilling.textContent = isYearly ? 'Anual' : 'Mensual';
-                summaryModules.textContent = activeModules + ' activos';
-                
-                if (selectedPlan === 'personalizado') {
-                    summaryTotal.innerHTML = 'A cotizar';
-                    summaryPeriod.textContent = 'Inicio sujeto a evaluación';
-                } else {
-                    let formattedPrice = new Intl.NumberFormat('es-CL').format(Math.round(finalPrice));
-                    summaryTotal.innerHTML = `$${formattedPrice}`;
-                    summaryPeriod.textContent = `${periodText} - Inicio inmediato`;
-                }
-            }
-
-            planRadios.forEach(radio => radio.addEventListener('change', updateModulesState));
-            billingRadios.forEach(radio => radio.addEventListener('change', updateSummary));
-            moduleCheckboxes.forEach(cb => cb.addEventListener('change', updateSummary));
-            
-            // Inicializar el estado al cargar la página
-            updateModulesState();
+          }
         });
-    </script>
+
+        updateSummary();
+      }
+
+      function updateSummary() {
+        const checkedPlanEl = document.querySelector('input[name="plan"]:checked');
+        const checkedBillingEl = document.querySelector('input[name="tipo_facturacion"]:checked');
+        const selectedPlan = checkedPlanEl ? checkedPlanEl.value : 'profesional';
+        const selectedBilling = checkedBillingEl ? checkedBillingEl.value : 'mensual';
+
+        const activeModules = document.querySelectorAll('input[name="modulos"]:checked').length;
+        if (badgeModulesCount) {
+          badgeModulesCount.textContent = activeModules + ' módulos activos';
+        }
+
+        const isYearly = selectedBilling === 'anual';
+        const basePrice = prices[selectedPlan] || 0;
+
+        // Actualizar etiquetas de precio de las cards
+        if (priceBasico) {
+          priceBasico.innerHTML = isYearly 
+            ? `$${Math.round(prices.basico * 0.85).toLocaleString('es-CL')} <small>/ mes (anual)</small>` 
+            : `$${prices.basico.toLocaleString('es-CL')} <small>/ mes</small>`;
+        }
+        if (priceProfesional) {
+          priceProfesional.innerHTML = isYearly 
+            ? `$${Math.round(prices.profesional * 0.85).toLocaleString('es-CL')} <small>/ mes (anual)</small>` 
+            : `$${prices.profesional.toLocaleString('es-CL')} <small>/ mes</small>`;
+        }
+        if (priceInstitucional) {
+          priceInstitucional.innerHTML = isYearly 
+            ? `$${Math.round(prices.institucional * 0.85).toLocaleString('es-CL')} <small>/ mes (anual)</small>` 
+            : `$${prices.institucional.toLocaleString('es-CL')} <small>/ mes</small>`;
+        }
+
+        // Actualizar card checkout
+        summaryPlanName.textContent = names[selectedPlan];
+        summaryBillingMode.textContent = isYearly ? 'Anual (-15%)' : 'Mensual';
+
+        if (selectedPlan === 'personalizado') {
+          summaryTotalPrice.textContent = 'A Cotizar';
+          summaryPeriodDesc.textContent = 'Sujeto a evaluación institucional';
+        } else {
+          const finalMonthlyPrice = isYearly ? Math.round(basePrice * 0.85) : basePrice;
+          summaryTotalPrice.textContent = `$${finalMonthlyPrice.toLocaleString('es-CL')}`;
+          summaryPeriodDesc.textContent = isYearly ? '/ mes (facturado anual) • Inicio Inmediato' : '/ mes • Inicio Inmediato';
+        }
+      }
+
+      planRadios.forEach(radio => radio.addEventListener('change', updateModulesState));
+      billingRadios.forEach(radio => radio.addEventListener('change', updateSummary));
+      moduleCheckboxes.forEach(cb => cb.addEventListener('change', updateSummary));
+
+      // Animación de Submit
+      const form = document.getElementById('planForm');
+      form.addEventListener('submit', function() {
+        const btn = document.getElementById('btnSubmitPlan');
+        const txt = document.getElementById('btnSubmitPlanText');
+        const icon = document.getElementById('btnSubmitPlanIcon');
+        const spinner = document.getElementById('btnSubmitPlanSpinner');
+
+        btn.disabled = true;
+        txt.textContent = 'Activando plan y configurando colegio...';
+        icon.classList.add('d-none');
+        spinner.classList.remove('d-none');
+      });
+
+      // Inicializar
+      updateModulesState();
+    });
+  </script>
 </body>
 </html>

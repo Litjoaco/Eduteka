@@ -4,9 +4,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Plan de Estudios (Asignaturas) - Eduteka</title>
+  <title>Plan de Estudios y Asignaturas - Eduteka</title>
   <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <style>
@@ -21,13 +21,11 @@
       --gray-text: #687089;
       --border: #BCC0CF;
       --radius-lg: 16px;
-      --radius-md: 10px;
+      --radius-md: 12px;
       --radius-sm: 8px;
     }
 
-    * {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-    }
+    * { font-family: 'Plus Jakarta Sans', sans-serif; }
 
     body {
       background-color: var(--bg);
@@ -36,148 +34,12 @@
       overflow-x: hidden;
     }
 
-    /* Floating modern blobs */
-    body::before {
-      content: '';
-      position: fixed;
-      top: -15%; left: 65%;
-      width: 50vw; height: 50vw;
-      background: radial-gradient(circle, rgba(124, 92, 252, 0.07) 0%, rgba(255,255,255,0) 70%);
-      z-index: -2;
-      pointer-events: none;
-    }
-    body::after {
-      content: '';
-      position: fixed;
-      top: 45%; left: -15%;
-      width: 40vw; height: 40vw;
-      background: radial-gradient(circle, rgba(101, 205, 191, 0.06) 0%, rgba(255,255,255,0) 70%);
-      z-index: -2;
-      pointer-events: none;
-    }
+    .wrapper { display: flex; width: 100%; align-items: stretch; }
 
-    .wrapper {
-      display: flex;
-      width: 100%;
-      align-items: stretch;
-    }
-
-    /* SIDEBAR */
-    .sidebar {
-      width: 260px;
-      background: var(--white);
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      position: fixed;
-      top: 0; bottom: 0; left: 0;
-      z-index: 1040;
-      transition: transform 0.3s ease;
-    }
-
-    @media (max-width: 991.98px) {
-      .sidebar {
-        position: absolute;
-        left: -260px;
-        top: 0;
-        bottom: 0;
-        z-index: 1050;
-      }
-      .sidebar.active {
-        left: 0;
-      }
-    }
-
-    .sidebar-logo {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 1.4rem 1.5rem 1rem;
-    }
-    .sidebar-logo img { max-height: 100px; width: auto; }
-
-    .sidebar-school {
-      margin: 0 .75rem .75rem;
-      background: linear-gradient(135deg, var(--primary-soft) 0%, #E8E2FF 100%);
-      border-radius: var(--radius-lg);
-      padding: .9rem 1rem;
-    }
-    .sidebar-school-name {
-      font-weight: 700;
-      font-size: .85rem;
-      color: var(--primary);
-      margin-bottom: 2px;
-    }
-    .sidebar-school-sub {
-      font-size: .75rem;
-      color: var(--primary-hover);
-      font-weight: 500;
-    }
-
-    .sidebar-nav {
-      flex: 1;
-      overflow-y: auto;
-      padding: .75rem .75rem 0;
-      scrollbar-width: none;
-    }
-    .sidebar-nav::-webkit-scrollbar { display: none; }
-
-    .nav-section-label {
-      font-size: .67rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      color: var(--gray-text);
-      padding: .5rem .75rem .3rem;
-      margin-top: .25rem;
-    }
-
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: .75rem;
-      padding: .6rem .85rem;
-      color: var(--gray-text);
-      font-weight: 500;
-      font-size: .88rem;
-      border-radius: var(--radius-md);
-      text-decoration: none;
-      transition: background .15s, color .15s;
-      margin-bottom: 2px;
-    }
-    .nav-item i { font-size: 1.05rem; flex-shrink: 0; }
-    .nav-item:hover { background: var(--bg); color: var(--dark); }
-    .nav-item.active {
-      background: var(--primary);
-      color: #fff;
-      font-weight: 600;
-      box-shadow: 0 4px 14px rgba(108,79,240,.3);
-    }
-    .nav-item.active i { color: #fff; }
-
-    .sidebar-footer {
-      padding: .75rem;
-      border-top: 1px solid var(--border);
-      margin-top: auto;
-    }
-
-    /* MAIN CONTENT */
-    .main-content {
-      margin-left: 248px;
-      width: calc(100% - 248px);
-
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      transition: all 0.3s;
-    }
-
-    /* TOPBAR */
     .topbar {
       height: 70px;
-      background: rgba(255, 255, 255, 0.8) !important;
+      background: rgba(255, 255, 255, 0.85) !important;
       backdrop-filter: blur(12px) !important;
-      -webkit-backdrop-filter: blur(12px) !important;
       border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
@@ -188,99 +50,126 @@
       z-index: 98;
     }
 
-    .topbar-date {
-      font-size: 0.85rem;
-      color: var(--gray-text);
-      font-weight: 600;
-    }
-
     .content-body {
       padding: 2rem;
-      flex-grow: 1;
-      animation: fadeInUp 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+      max-width: 1300px;
+      margin: 0 auto;
     }
 
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* CURSO PANELS */
-    .curso-block {
-      background: var(--white);
-      border: 1px solid var(--border);
+    /* KPI Summary Cards */
+    .kpi-card-academic {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
       border-radius: var(--radius-lg);
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.01);
+      padding: 1.25rem 1.5rem;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.02);
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      transition: all 0.2s ease;
+    }
+    .kpi-card-academic:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.05); }
+
+    .kpi-icon-academic {
+      width: 48px; height: 48px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.35rem; flex-shrink: 0;
     }
 
-    .curso-header {
+    /* Course Container Cards */
+    .course-panel {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: var(--radius-lg);
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.02);
+      overflow: hidden;
+    }
+
+    .course-panel-header {
+      background: linear-gradient(135deg, #FAFAFE 0%, #F3F0FF 100%);
+      border-bottom: 1px solid #EAE6FD;
+      padding: 1.2rem 1.75rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 0.75rem;
-      margin-bottom: 1.25rem;
+      flex-wrap: gap-3;
     }
 
-    .curso-title {
-      font-size: 1.1rem;
+    .course-panel-title {
+      font-size: 1.2rem;
       font-weight: 800;
-      color: var(--dark);
+      color: #0F172A;
       margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
     }
 
-    .asignatura-grid {
+    /* Subject Grid Cards */
+    .subjects-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
       gap: 1.25rem;
+      padding: 1.5rem;
     }
 
-    .asignatura-card {
-      border: 1px solid var(--border);
+    .subject-box {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
       border-radius: var(--radius-md);
-      padding: 1rem;
-      background: #FAF9FF;
+      padding: 1.2rem;
+      transition: all 0.2s ease;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      transition: all 0.2s ease;
+      position: relative;
+    }
+    .subject-box:hover {
+      border-color: #C5B6FF;
+      box-shadow: 0 6px 18px rgba(124, 92, 252, 0.08);
+      transform: translateY(-2px);
     }
 
-    .asignatura-card:hover {
-      border-color: var(--primary);
-      box-shadow: 0 4px 15px rgba(124, 92, 252, 0.05);
-      background-color: var(--white);
+    .subject-box-name {
+      font-weight: 800;
+      font-size: 1.02rem;
+      color: #1E293B;
+      margin-bottom: 0.5rem;
     }
 
-    .asignatura-name {
+    .teacher-badge-assigned {
+      background: #F0EDFF;
+      border: 1px solid #D8CEFF;
+      color: #7C5CFC;
+      border-radius: 10px;
+      padding: 0.45rem 0.75rem;
+      font-size: 0.85rem;
       font-weight: 700;
-      color: var(--dark);
-      font-size: 0.95rem;
-      margin-bottom: 0.25rem;
-    }
-
-    .asignatura-teacher {
-      font-size: 0.8rem;
-      color: var(--gray-text);
       display: flex;
       align-items: center;
-      gap: 0.35rem;
-      margin-bottom: 1rem;
+      gap: 0.5rem;
     }
 
-    /* RESPONSIVE */
-    @media (max-width: 992px) {
-      .sidebar { transform: translateX(-100%); }
-      .main-content { margin-left: 0; width: 100%; }
-      .sidebar.active { transform: translateX(0); }
+    .teacher-badge-unassigned {
+      background: #FFF1F2;
+      border: 1px dashed #FDA4AF;
+      color: #E11D48;
+      border-radius: 10px;
+      padding: 0.45rem 0.75rem;
+      font-size: 0.85rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-action-asig {
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 0.35rem 0.7rem;
     }
   </style>
 </head>
@@ -288,7 +177,6 @@
 
 <div class="wrapper">
   {% include 'colegios/_sidebar.html' with active_page='academico' %}
-
 
   <!-- MAIN CONTENT -->
   <div class="main-content">
@@ -298,6 +186,7 @@
         <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn" style="border:none; background:var(--primary-soft); color:var(--primary);">
           <i class="bi bi-list fs-5"></i>
         </button>
+        <span class="fw-bold text-dark fs-5"><i class="bi bi-journal-bookmark-fill text-primary me-2"></i>Gestión de Plan de Estudios</span>
       </div>
 
       <div class="topbar-right d-flex align-items-center gap-4">
@@ -309,107 +198,254 @@
 
     <!-- CONTENT BODY -->
     <main class="content-body">
-
-
-      <!-- Header & Action -->
+      
+      <!-- HERO & KPI SUMMARY -->
       <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
         <div>
-          <h2 class="fw-bold text-dark mb-0">Plan de Estudios e Asignaturas</h2>
-          <p class="text-muted mb-0">Organiza las asignaturas por curso y vincula a los docentes correspondientes.</p>
+          <h2 class="fw-extrabold text-dark mb-1" style="font-size: 1.6rem;">Plan de Estudios y Asignación Docente</h2>
+          <p class="text-muted small mb-0">Organiza las asignaturas de cada curso, asigna docentes y asegura la cobertura pedagógica institucional.</p>
         </div>
-        {% if is_admin %}
-          <div class="d-flex align-items-center gap-2">
-            <button class="btn btn-outline-primary d-flex align-items-center gap-2 px-4 py-2" style="border-radius: var(--radius-md); font-weight:700;" data-bs-toggle="modal" data-bs-target="#modalPrecarga">
-              <i class="bi bi-sparkles"></i> Cargar Plan Común
-            </button>
-            <a href="{% url 'crear_asignatura' %}" class="btn btn-primary d-flex align-items-center gap-2 px-4 py-2" style="border-radius: var(--radius-md); font-weight:700;">
-              <i class="bi bi-plus-lg"></i> Agregar Asignatura
-            </a>
-          </div>
-        {% endif %}
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+          <button class="btn btn-outline-primary fw-bold px-3.5 py-2" style="border-radius: 12px; background:#F0EDFF; border-color:#D8CEFF; color:#7C5CFC;" data-bs-toggle="modal" data-bs-target="#modalPrecarga">
+            <i class="bi bi-magic me-1.5"></i> ✨ Precargar Plan Mineduc
+          </button>
+          <a href="{% url 'crear_asignatura' %}" class="btn btn-primary fw-extrabold px-4 py-2 shadow-sm" style="border-radius: 12px; background: linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%); border:none;">
+            <i class="bi bi-plus-lg me-1.5"></i> Nueva Asignatura
+          </a>
+
+        </div>
       </div>
 
-      <!-- Plan de Estudios Content -->
+      <!-- KPI METRICS ROW -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-3 col-6">
+          <div class="kpi-card-academic">
+            <div class="kpi-icon-academic" style="background:#F0EDFF; color:#7C5CFC;"><i class="bi bi-book-half"></i></div>
+            <div>
+              <span class="text-muted extra-small text-uppercase fw-bold d-block">Total Asignaturas</span>
+              <span class="fs-4 fw-extrabold text-dark">{{ total_asignaturas }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 col-6">
+          <div class="kpi-card-academic">
+            <div class="kpi-icon-academic" style="background:#ECFDF5; color:#10B981;"><i class="bi bi-person-check-fill"></i></div>
+            <div>
+              <span class="text-muted extra-small text-uppercase fw-bold d-block">Con Docente Asignado</span>
+              <span class="fs-4 fw-extrabold text-success">{{ total_con_docente }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 col-6">
+          <div class="kpi-card-academic">
+            <div class="kpi-icon-academic" style="background:#FFF1F2; color:#E11D48;"><i class="bi bi-person-x-fill"></i></div>
+            <div>
+              <span class="text-muted extra-small text-uppercase fw-bold d-block">Sin Docente Asignado</span>
+              <span class="fs-4 fw-extrabold text-danger">{{ total_sin_docente }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 col-6">
+          <div class="kpi-card-academic">
+            <div class="kpi-icon-academic" style="background:#EFF6FF; color:#2563EB;"><i class="bi bi-pie-chart-fill"></i></div>
+            <div>
+              <span class="text-muted extra-small text-uppercase fw-bold d-block">Cobertura Docente</span>
+              <span class="fs-4 fw-extrabold text-primary">{{ cobertura }}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SEARCH FILTER -->
+      <div class="card p-3 rounded-4 border mb-4 bg-white shadow-sm">
+        <div class="row g-2 align-items-center">
+          <div class="col-md-8">
+            <div class="input-group">
+              <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+              <input type="text" id="asigSearchInput" class="form-control border-start-0 ps-0 shadow-none" placeholder="Buscar por nombre de asignatura o profesor..." onkeyup="filterSubjects()">
+            </div>
+          </div>
+          <div class="col-md-4 text-md-end text-muted small">
+            <i class="bi bi-info-circle me-1"></i> Asigna profesores con 1 clic en el botón de cada tarjeta.
+          </div>
+        </div>
+      </div>
+
+      <!-- LISTADO DE CURSOS Y ASIGNATURAS -->
       {% if plan_estudios %}
         {% for item in plan_estudios %}
-          <div class="curso-block">
-            <div class="curso-header">
-              <h3 class="curso-title"><i class="bi bi-journal-bookmark text-primary me-2"></i> {{ item.curso.nombre }}</h3>
-              <span class="badge bg-light text-secondary border px-3 py-1.5 fw-semibold" style="border-radius:20px;">
-                {{ item.cantidad }} asignaturas
-              </span>
+          <div class="course-panel course-block-filter" data-coursename="{{ item.curso.nombre|lower }}">
+            <div class="course-panel-header">
+              <div class="d-flex align-items-center gap-3">
+                <h3 class="course-panel-title">
+                  <i class="bi bi-layers-fill text-primary"></i> {{ item.curso.nombre }}
+                </h3>
+                <span class="badge bg-white text-dark border px-3 py-1.5 fw-bold" style="border-radius: 20px; font-size:0.78rem;">
+                  {{ item.cantidad }} Asignaturas
+                </span>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                {% if item.sin_docente > 0 %}
+                  <span class="badge px-3 py-1.5 fw-bold" style="background:#FFF1F2; color:#E11D48; border:1px solid #FDA4AF; border-radius:20px; font-size:0.75rem;">
+                    <i class="bi bi-exclamation-circle me-1"></i> {{ item.sin_docente }} sin profesor
+                  </span>
+                {% else %}
+                  <span class="badge px-3 py-1.5 fw-bold" style="background:#ECFDF5; color:#059669; border:1px solid #A7F3D0; border-radius:20px; font-size:0.75rem;">
+                    <i class="bi bi-check2-all me-1"></i> 100% Asignado
+                  </span>
+                {% endif %}
+              </div>
             </div>
 
-            <div class="asignatura-grid">
+            <div class="subjects-grid">
               {% if item.asignaturas %}
                 {% for asig in item.asignaturas %}
-                  <div class="asignatura-card">
+                  <div class="subject-box subject-card-filter" data-subjectname="{{ asig.nombre|lower }}" data-teachername="{% if asig.docente %}{{ asig.docente.get_full_name|default:asig.docente.username|lower }}{% else %}sin docente{% endif %}">
                     <div>
-                      <div class="d-flex justify-content-between align-items-start">
-                        <h4 class="asignatura-name">{{ asig.nombre }}</h4>
-                        {% if asig.activo %}
-                          <span class="badge bg-success-light text-success px-2 py-0.5 fw-semibold small" style="background-color: #ECFDF5; border: 1px solid #A7F3D0; border-radius: 4px; font-size:0.7rem;">Activo</span>
-                        {% else %}
-                          <span class="badge bg-danger-light text-danger px-2 py-0.5 fw-semibold small" style="background-color: #FFF1F2; border: 1px solid #FECDD3; border-radius: 4px; font-size:0.7rem;">Inactivo</span>
-                        {% endif %}
+                      <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="badge bg-light text-muted border px-2 py-1 fw-bold" style="font-size:0.72rem;">
+                          <i class="bi bi-clock-history me-1"></i>{{ asig.horas_semanales|default:4 }} hrs/sem
+                        </span>
+                        <div class="dropdown">
+                          <button class="btn btn-sm btn-light border-0 p-1 text-muted" type="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-three-dots-vertical"></i>
+                          </button>
+                          <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="font-size:0.85rem; border-radius:12px;">
+                            <li><a class="dropdown-item" href="{% url 'editar_asignatura' asig.id %}"><i class="bi bi-pencil me-2 text-primary"></i> Editar Materia</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="{% url 'eliminar_asignatura' asig.id %}" onclick="return confirm('¿Eliminar esta asignatura del plan de estudios?');"><i class="bi bi-trash me-2"></i> Eliminar</a></li>
+                          </ul>
+                        </div>
                       </div>
-                      <div class="asignatura-teacher">
-                        <i class="bi bi-person"></i>
+
+                      <h4 class="subject-box-name">{{ asig.nombre }}</h4>
+
+                      <!-- ESTADO DOCENTE -->
+                      <div class="mb-3">
                         {% if asig.docente %}
-                          Docente: {{ asig.docente.first_name|default:asig.docente.username }}
+                          <div class="teacher-badge-assigned">
+                            <i class="bi bi-person-fill-check fs-6"></i>
+                            <span class="text-truncate">{{ asig.docente.get_full_name|default:asig.docente.username }}</span>
+                          </div>
                         {% else %}
-                          <span class="text-danger fw-semibold">Sin docente asignado</span>
+                          <div class="teacher-badge-unassigned">
+                            <i class="bi bi-person-exclamation fs-6"></i>
+                            <span>Sin docente asignado</span>
+                          </div>
                         {% endif %}
                       </div>
                     </div>
 
-                    {% if is_admin %}
-                      <div class="d-flex gap-2 justify-content-end border-top pt-2 mt-2">
-                        <a href="{% url 'editar_asignatura' asig.id %}" class="btn btn-sm btn-outline-primary px-2.5" style="border-radius: var(--radius-sm); font-size:0.8rem;">
-                          <i class="bi bi-pencil-square"></i> Editar
-                        </a>
-                        <a href="{% url 'eliminar_asignatura' asig.id %}" class="btn btn-sm btn-outline-danger px-2.5" style="border-radius: var(--radius-sm); font-size:0.8rem;" onclick="return confirm('¿Estás seguro de eliminar esta asignatura?')">
-                          <i class="bi bi-trash"></i> Eliminar
-                        </a>
-                      </div>
-                    {% endif %}
+                    <!-- BOTON DE ASIGNACION RAPIDA -->
+                    <div class="border-top pt-2.5 mt-1 d-flex justify-content-between align-items-center">
+                      <button type="button" class="btn btn-sm btn-outline-primary btn-action-asig w-100 fw-bold py-1.5" 
+                              data-asig-id="{{ asig.id }}"
+                              data-asig-nombre="{{ asig.nombre }}"
+                              data-curso-nombre="{{ asig.curso.nombre }}"
+                              data-docente-id="{% if asig.docente %}{{ asig.docente.id }}{% endif %}"
+                              data-horas="{{ asig.horas_semanales|default:4 }}"
+                              onclick="openQuickAssignModalFromBtn(this)">
+                        <i class="bi bi-person-gear me-1"></i> {% if asig.docente %}Cambiar Docente{% else %}Asignar Docente{% endif %}
+                      </button>
+                    </div>
+
                   </div>
                 {% endfor %}
               {% else %}
-                <div class="text-muted small py-2">No hay asignaturas creadas para este curso escolar.</div>
+                <div class="col-12 p-4 text-center text-muted small">
+                  No hay asignaturas configuradas para {{ item.curso.nombre }}.
+                </div>
               {% endif %}
             </div>
           </div>
         {% endfor %}
       {% else %}
-        <div class="dashboard-panel text-center p-5">
-          <i class="bi bi-journals fs-1 text-muted d-block mb-3"></i>
-          <h5 class="fw-semibold text-secondary">No se registran cursos.</h5>
-          <p class="text-muted small">Configura los cursos de tu establecimiento en la base del colegio.</p>
+        <div class="card p-5 text-center bg-white border rounded-4 shadow-sm">
+          <i class="bi bi-journal-x fs-1 text-muted d-block mb-3"></i>
+          <h4 class="fw-bold text-dark">No hay cursos registrados en el colegio</h4>
+          <p class="text-muted small">Primero define la nómina de cursos para armar el plan de estudios.</p>
         </div>
       {% endif %}
+
     </main>
+  </div>
+</div>
+
+<!-- MODAL ASIGNACIÓN RÁPIDA DE DOCENTE -->
+<div class="modal fade" id="modalQuickAssign" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+      <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+        <div class="d-flex align-items-center gap-2">
+          <div class="rounded-3 d-flex align-items-center justify-content-center" style="width:38px; height:38px; background:#F0EDFF; color:#7C5CFC;">
+            <i class="bi bi-person-gear fs-5"></i>
+          </div>
+          <div>
+            <h5 class="modal-title fw-extrabold text-dark mb-0">Asignar Docente</h5>
+            <span class="text-muted small" id="quickAssignSubtitle">-</span>
+          </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <form id="quickAssignForm" method="POST" action="">
+        {% csrf_token %}
+        <div class="modal-body p-4">
+          <div class="mb-3">
+            <label class="form-label fw-bold text-dark small">Profesor a Cargo de la Asignatura</label>
+            <select class="form-select form-select-lg fw-semibold" id="quickDocenteSelect" name="docente_id" style="font-size:0.95rem; border-radius:10px;">
+              <option value="none">-- Sin profesor asignado (Vacante) --</option>
+              {% for doc in docentes_disponibles %}
+                <option value="{{ doc.id }}">
+                  {{ doc.get_full_name|default:doc.username }} ({{ doc.email }})
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold text-dark small">Horas Pedagógicas Semanales</label>
+            <input type="number" class="form-control fw-bold" id="quickHorasInput" name="horas_semanales" min="1" max="20" value="4" style="border-radius:10px;">
+          </div>
+        </div>
+
+        <div class="modal-footer border-top-0 p-4 pt-0">
+          <button type="button" class="btn btn-light fw-bold px-3 py-2" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary fw-extrabold px-4 py-2" style="border-radius:10px; background:linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%); border:none;">
+            <i class="bi bi-check2-circle me-1"></i> Guardar Asignación
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 
 <!-- MODAL PRECARGA PLAN COMÚN -->
 <div class="modal fade" id="modalPrecarga" tabindex="-1" aria-labelledby="modalPrecargaLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content" style="border-radius: var(--radius-lg); border: none; box-shadow: 0 15px 40px rgba(0,0,0,0.12);">
-      <div class="modal-header border-bottom-0 p-4">
-        <h5 class="modal-title fw-bold" id="modalPrecargaLabel"><i class="bi bi-sparkles text-primary me-2"></i> Precarga de Plan Común Escolar</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+      <div class="modal-header border-bottom-0 p-4 pb-0">
+        <div class="d-flex align-items-center gap-2">
+          <div class="rounded-3 d-flex align-items-center justify-content-center" style="width:38px; height:38px; background:#F0EDFF; color:#7C5CFC;">
+            <i class="bi bi-sparkles fs-5"></i>
+          </div>
+          <div>
+            <h5 class="modal-title fw-extrabold text-dark mb-0">Precarga de Plan Común Escolar</h5>
+            <span class="text-muted small">Mineduc Chile - Asignaturas Base</span>
+          </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
+
       <form method="POST" action="{% url 'precargar_asignaturas_base' %}">
         {% csrf_token %}
-        <div class="modal-body p-4 pt-0">
-          <p class="text-muted small mb-4">Selecciona las asignaturas estándar y los cursos donde deseas cargarlas. Las asignaturas que ya existen no serán duplicadas.</p>
+        <div class="modal-body p-4">
+          <p class="text-muted small mb-4">Selecciona las materias estándar y los cursos donde deseas cargarlas. Las asignaturas que ya existen no serán duplicadas.</p>
           
-          <div class="row">
-            <!-- Columna Asignaturas Base -->
-            <div class="col-md-6 mb-4">
-              <label class="form-label fw-bold text-dark mb-2">1. Seleccionar Asignaturas</label>
-              <div class="p-3 bg-light rounded border" style="max-height: 250px; overflow-y: auto; border-radius: var(--radius-md);">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small mb-2">1. Seleccionar Asignaturas</label>
+              <div class="p-3 bg-light rounded-3 border" style="max-height: 260px; overflow-y: auto;">
                 <div class="form-check mb-2">
                   <input class="form-check-input" type="checkbox" name="asignaturas_base" value="Matemáticas" id="asig_mate" checked>
                   <label class="form-check-label fw-semibold small" for="asig_mate">Matemáticas</label>
@@ -453,23 +489,27 @@
               </div>
             </div>
 
-            <!-- Columna Cursos Destino -->
-            <div class="col-md-6 mb-4">
-              <label class="form-label fw-bold text-dark mb-2">2. Seleccionar Cursos Destino</label>
-              <div class="p-3 bg-light rounded border" style="max-height: 250px; overflow-y: auto; border-radius: var(--radius-md);">
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small mb-2">2. Cursos de Destino</label>
+              <div class="p-3 bg-light rounded-3 border" style="max-height: 260px; overflow-y: auto;">
                 {% for item in plan_estudios %}
                   <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" name="cursos_destino" value="{{ item.curso.id }}" id="dest_{{ item.curso.id }}">
-                    <label class="form-check-label fw-semibold small" for="dest_{{ item.curso.id }}">{{ item.curso.nombre }}</label>
+                    <input class="form-check-input" type="checkbox" name="cursos_destino" value="{{ item.curso.id }}" id="curso_dest_{{ item.curso.id }}" checked>
+                    <label class="form-check-label fw-semibold small" for="curso_dest_{{ item.curso.id }}">
+                      {{ item.curso.nombre }}
+                    </label>
                   </div>
                 {% endfor %}
               </div>
             </div>
           </div>
         </div>
+
         <div class="modal-footer border-top-0 p-4 pt-0">
-          <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal" style="border-radius: var(--radius-md);">Cancelar</button>
-          <button type="submit" class="btn btn-primary px-4" style="border-radius: var(--radius-md); font-weight:700;">Generar Plan Común</button>
+          <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary fw-extrabold px-4" style="border-radius:10px; background:linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%); border:none;">
+            <i class="bi bi-sparkles me-1.5"></i> Cargar Asignaturas
+          </button>
         </div>
       </form>
     </div>
@@ -478,14 +518,54 @@
 
 <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 <script>
+  function openQuickAssignModalFromBtn(btn) {
+    const asigId = btn.getAttribute('data-asig-id');
+    const asigNombre = btn.getAttribute('data-asig-nombre');
+    const cursoNombre = btn.getAttribute('data-curso-nombre');
+    const currentDocenteId = btn.getAttribute('data-docente-id');
+    const currentHoras = btn.getAttribute('data-horas');
+    openQuickAssignModal(asigId, asigNombre, cursoNombre, currentDocenteId, currentHoras);
+  }
+
+  function openQuickAssignModal(asigId, asigNombre, cursoNombre, currentDocenteId, currentHoras) {
+    const form = document.getElementById('quickAssignForm');
+    form.action = `/colegios/asignaturas/asignar-docente/${asigId}/`;
+    
+    document.getElementById('quickAssignSubtitle').innerText = `${asigNombre} — ${cursoNombre}`;
+    document.getElementById('quickDocenteSelect').value = currentDocenteId || 'none';
+    document.getElementById('quickHorasInput').value = currentHoras || 4;
+
+    const modal = new bootstrap.Modal(document.getElementById('modalQuickAssign'));
+    modal.show();
+  }
+
+
+  function filterSubjects() {
+    const q = document.getElementById('asigSearchInput').value.toLowerCase().trim();
+    const courseBlocks = document.querySelectorAll('.course-block-filter');
+
+    courseBlocks.forEach(block => {
+      let hasVisible = false;
+      const cards = block.querySelectorAll('.subject-card-filter');
+      cards.forEach(card => {
+        const name = card.getAttribute('data-subjectname') || '';
+        const teacher = card.getAttribute('data-teachername') || '';
+        if (!q || name.includes(q) || teacher.includes(q)) {
+          card.style.display = 'flex';
+          hasVisible = true;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+      block.style.display = hasVisible ? 'block' : 'none';
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function() {
     const mobileBtn = document.getElementById('mobileMenuBtn');
     const sidebar = document.getElementById('sidebar');
-    
-    if(mobileBtn) {
-      mobileBtn.addEventListener('click', () => {
-        sidebar.classList.toggle('active');
-      });
+    if (mobileBtn) {
+      mobileBtn.addEventListener('click', () => sidebar.classList.toggle('active'));
     }
   });
 </script>

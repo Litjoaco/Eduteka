@@ -1,0 +1,566 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ taller.nombre }} - Eduteka</title>
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #7C5CFC;
+      --primary-soft: rgba(124, 92, 252, 0.08);
+      --primary-hover: #6747E3;
+      --secondary: #65CDBF;
+      --bg: #F8F9FD;
+      --white: #FFFFFF;
+      --dark: #151A35;
+      --gray-text: #687089;
+      --border: #BCC0CF;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+    }
+
+    * { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+    }
+
+    .wrapper { display: flex; flex: 1; position: relative; }
+
+    .topbar {
+      height: 70px;
+      background: rgba(255, 255, 255, 0.85) !important;
+      backdrop-filter: blur(12px) !important;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; position: sticky; top: 0; z-index: 98;
+    }
+    .content-body { padding: 2rem; flex-grow: 1; max-width: 1440px; margin: 0 auto; width: 100%; }
+
+    /* Hero Banner Taller Detalle */
+    .hero-banner-detalle {
+      background: linear-gradient(135deg, #7C5CFC 0%, #6344CE 50%, #4F46E5 100%);
+      border-radius: var(--radius-lg);
+      padding: 2.2rem 2.5rem;
+      color: var(--white);
+      margin-bottom: 2rem;
+      box-shadow: 0 12px 30px rgba(124, 92, 252, 0.25);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-banner-detalle::before {
+      content: '';
+      position: absolute;
+      width: 320px; height: 320px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 70%);
+      top: -80px; right: -60px;
+      border-radius: 50%;
+    }
+
+    .hero-badge-pill {
+      background: rgba(255, 255, 255, 0.2);
+      color: #FFFFFF !important;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 20px;
+      padding: 0.35rem 0.85rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      backdrop-filter: blur(8px);
+    }
+
+    .hero-school-pill {
+      background: rgba(0, 0, 0, 0.2);
+      color: #FFFFFF !important;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 20px;
+      padding: 0.35rem 0.85rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      backdrop-filter: blur(8px);
+    }
+
+    /* Tabs */
+    .nav-pills-taller .nav-link {
+      color: #64748B;
+      font-weight: 700;
+      font-size: 0.9rem;
+      padding: 0.65rem 1.4rem;
+      border-radius: 12px;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+    }
+    .nav-pills-taller .nav-link.active {
+      background: var(--primary);
+      color: var(--white);
+      box-shadow: 0 4px 14px rgba(124, 92, 252, 0.25);
+    }
+
+    /* Panels */
+    .card-panel-taller {
+      background: var(--white);
+      border: 1px solid #E2E8F0;
+      border-radius: var(--radius-lg);
+      padding: 1.6rem 1.75rem;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.02);
+      margin-bottom: 1.5rem;
+    }
+
+    /* Table */
+    .table-taller {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+    .table-taller th {
+      background: #F8FAFC;
+      color: #64748B;
+      font-weight: 800;
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid #E2E8F0;
+    }
+    .table-taller td {
+      padding: 0.9rem 1rem;
+      vertical-align: middle;
+      border-bottom: 1px solid #F1F5F9;
+      font-size: 0.88rem;
+    }
+    .table-taller tr:hover td {
+      background: #F8FAFC;
+    }
+  </style>
+</head>
+<body>
+
+<div class="wrapper">
+  {% include 'colegios/_sidebar.html' with active_page='talleres' %}
+
+  <div class="main-content">
+    <header class="topbar">
+      <div class="d-flex align-items-center gap-3">
+        <a href="{% url 'talleres_dashboard' %}" class="btn btn-sm btn-light border" style="border-radius:8px;">
+          <i class="bi bi-arrow-left me-1"></i> Volver a Talleres
+        </a>
+        <span class="fw-bold text-dark fs-5"><i class="bi {{ taller.icono|default:'bi-star-fill' }} text-primary me-2"></i>{{ taller.nombre }}</span>
+      </div>
+
+      <div class="topbar-right d-flex align-items-center gap-4">
+        <div class="topbar-date d-none d-sm-block text-muted small fw-semibold">
+          <i class="bi bi-calendar3 me-1"></i> {{ hoy|date:"l, d \d\e F \d\e Y"|title }}
+        </div>
+      </div>
+    </header>
+
+    <main class="content-body">
+      
+      <!-- HERO BANNER -->
+      <div class="hero-banner-detalle">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-4 position-relative" style="z-index:1;">
+          <div>
+            <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+              <span class="hero-badge-pill">
+                <i class="bi bi-tag-fill"></i> {{ taller.get_categoria_display }}
+              </span>
+              <span class="hero-school-pill">
+                <i class="bi bi-geo-alt-fill"></i> {{ taller.lugar }}
+              </span>
+              <span class="hero-school-pill">
+                <i class="bi bi-clock-fill"></i> {{ taller.dias_horario }}
+              </span>
+            </div>
+            <h2 class="fw-extrabold text-white mb-1 fs-3">{{ taller.nombre }}</h2>
+            <p class="text-white text-opacity-85 small mb-0">
+              <i class="bi bi-person-badge me-1"></i> Monitor a cargo: <strong>{{ taller.monitor_nombre }}</strong> &nbsp;|&nbsp; 
+              <i class="bi bi-people me-1"></i> <strong>{{ total_inscritos }}</strong> alumno(s) inscritos de diferentes cursos
+            </p>
+          </div>
+
+          <div class="d-flex gap-2 flex-wrap">
+            <a href="{% url 'tomar_asistencia_taller' taller.id %}" class="btn btn-success fw-bold px-3 py-2 shadow-sm" style="border-radius:12px; background:#10B981; border:none;">
+              <i class="bi bi-calendar-check-fill me-1"></i> Pasar Lista
+            </a>
+
+            <button type="button" class="btn btn-light fw-bold px-3 py-2 shadow-sm" style="border-radius:12px; color:#7C5CFC;" data-bs-toggle="modal" data-bs-target="#modalInscribirEstudiantes">
+              <i class="bi bi-person-plus-fill me-1"></i> Inscribir Alumnos
+            </button>
+
+            <button type="button" class="btn btn-outline-light fw-bold px-3 py-2" style="border-radius:12px;" data-bs-toggle="modal" data-bs-target="#modalEditarTaller">
+              <i class="bi bi-pencil-square me-1"></i> Editar Taller
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABS NAVEGACION: ALUMNOS / ASISTENCIA -->
+      <ul class="nav nav-pills nav-pills-taller gap-2 mb-4">
+        <li class="nav-item">
+          <button class="nav-link active" id="tab-alumnos" data-bs-toggle="pill" data-bs-target="#panel-alumnos">
+            <i class="bi bi-people-fill me-1.5"></i> Nómina de Alumnos Inscritos ({{ total_inscritos }})
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" id="tab-sesiones" data-bs-toggle="pill" data-bs-target="#panel-sesiones">
+            <i class="bi bi-calendar-range-fill me-1.5"></i> Historial de Asistencias ({{ total_sesiones }})
+          </button>
+        </li>
+      </ul>
+
+      <div class="tab-content">
+        
+        <!-- PANEL 1: NOMINA DE ALUMNOS INSCRITOS -->
+        <div class="tab-pane fade show active" id="panel-alumnos">
+          <div class="card-panel-taller p-0 overflow-hidden">
+            <div class="d-flex justify-content-between align-items-center p-3 border-bottom bg-light">
+              <div class="fw-bold text-dark">
+                <i class="bi bi-mortarboard me-1 text-primary"></i> Estudiantes de Distintos Cursos Matriculados en este Taller
+              </div>
+              <button type="button" class="btn btn-sm btn-primary fw-bold" data-bs-toggle="modal" data-bs-target="#modalInscribirEstudiantes" style="border-radius:8px;">
+                <i class="bi bi-plus-lg me-1"></i> Agregar Alumnos al Taller
+              </button>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table-taller">
+                <thead>
+                  <tr>
+                    <th>Estudiante</th>
+                    <th>Curso de Origen</th>
+                    <th>RUT</th>
+                    <th class="text-center">Asistencia Taller</th>
+                    <th>Fecha Inscripción</th>
+                    <th class="text-center">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for item in inscripciones_con_stats %}
+                    <tr>
+                      <td>
+                        <div class="d-flex align-items-center gap-2.5">
+                          <img src="https://ui-avatars.com/api/?name={{ item.estudiante.nombre_completo|urlencode }}&background=E2E8F0&color=475569" style="width:34px; height:34px; border-radius:50%; object-fit:cover;">
+                          <div>
+                            <div class="fw-bold text-dark">{{ item.estudiante.nombre_completo }}</div>
+                            {% if item.estudiante.es_pie %}
+                              <span class="badge bg-purple-subtle text-primary extra-small">🧩 PIE</span>
+                            {% endif %}
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        {% if item.estudiante.seccion %}
+                          <span class="badge px-2.5 py-1 fw-bold" style="background:#F0EDFF; color:#7C5CFC; border-radius:6px; font-size:0.78rem;">
+                            {{ item.estudiante.seccion.nombre }}
+                          </span>
+                        {% else %}
+                          <span class="text-muted small">Sin curso</span>
+                        {% endif %}
+                      </td>
+                      <td class="text-muted small fw-semibold">{{ item.estudiante.rut|default:"-" }}</td>
+                      <td class="text-center">
+                        <span class="fw-extrabold {% if item.porcentaje_asistencia >= 85 %}text-success{% elif item.porcentaje_asistencia >= 75 %}text-warning{% else %}text-danger{% endif %}" style="font-size:0.88rem;">
+                          {{ item.porcentaje_asistencia }}%
+                        </span>
+                      </td>
+                      <td class="text-muted small">{{ item.inscripcion.fecha_inscripcion|date:"d/m/Y" }}</td>
+                      <td class="text-center">
+                        <a href="{% url 'desinscribir_estudiante_taller' taller.id item.inscripcion.id %}" class="btn btn-sm btn-outline-danger py-0.5 px-2" style="border-radius:6px; font-size:0.75rem;" onclick="return confirm('¿Retirar a este alumno del taller?')">
+                          <i class="bi bi-person-dash me-1"></i> Desinscribir
+                        </a>
+                      </td>
+                    </tr>
+                  {% empty %}
+                    <tr>
+                      <td colspan="6" class="text-center py-5 text-muted">
+                        <i class="bi bi-people fs-2 d-block mb-2 text-muted"></i>
+                        Aún no hay estudiantes inscritos en este taller.
+                        <div class="mt-2">
+                          <button type="button" class="btn btn-sm btn-primary fw-bold" data-bs-toggle="modal" data-bs-target="#modalInscribirEstudiantes">
+                            <i class="bi bi-person-plus-fill me-1"></i> Inscribir Estudiantes Ahora
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL 2: HISTORIAL DE SESIONES DE ASISTENCIA -->
+        <div class="tab-pane fade" id="panel-sesiones">
+          <div class="card-panel-taller p-0 overflow-hidden">
+            <div class="d-flex justify-content-between align-items-center p-3 border-bottom bg-light">
+              <div class="fw-bold text-dark">
+                <i class="bi bi-calendar-check me-1 text-success"></i> Registro de Sesiones Realizadas y Lista Pasada
+              </div>
+              <a href="{% url 'tomar_asistencia_taller' taller.id %}" class="btn btn-sm btn-success fw-bold" style="border-radius:8px; background:#10B981; border:none;">
+                <i class="bi bi-calendar-plus me-1"></i> Nueva Lista de Asistencia
+              </a>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table-taller">
+                <thead>
+                  <tr>
+                    <th>Fecha de Sesión</th>
+                    <th>Contenido / Actividad Realizada</th>
+                    <th>Registrado Por</th>
+                    <th class="text-center">Asistencia Registrada</th>
+                    <th class="text-center">% Asistencia</th>
+                    <th class="text-center">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for s in sesiones %}
+                    <tr>
+                      <td class="fw-bold text-dark"><i class="bi bi-calendar-event text-primary me-1.5"></i>{{ s.fecha|date:"l, d \d\e F \d\e Y"|title }}</td>
+                      <td>
+                        <span class="fw-semibold text-dark">{{ s.contenido_actividad|default:"Sesión regular del taller" }}</span>
+                      </td>
+                      <td class="text-muted small">{{ s.registrado_por.first_name|default:s.registrado_por.username }}</td>
+                      <td class="text-center">
+                        <span class="badge bg-light text-dark border fw-bold">{{ s.detalles.count }} alumnos evaluados</span>
+                      </td>
+                      <td class="text-center">
+                        <span class="badge {% if s.porcentaje_asistencia >= 85 %}bg-success-subtle text-success border border-success-subtle{% else %}bg-warning-subtle text-warning border border-warning-subtle{% endif %} fw-extrabold px-2.5 py-1">
+                          {{ s.porcentaje_asistencia }}% Asistieron
+                        </span>
+                      </td>
+                      <td class="text-center">
+                        <div class="d-flex align-items-center justify-content-center gap-1">
+                          <a href="{% url 'detalle_sesion_taller' taller.id s.id %}" class="btn btn-sm btn-outline-primary py-0.5 px-2" style="border-radius:6px; font-size:0.75rem;">
+                            <i class="bi bi-eye me-1"></i> Ver Lista
+                          </a>
+                          <a href="{% url 'eliminar_sesion_taller' taller.id s.id %}" class="btn btn-sm btn-outline-danger py-0.5 px-1.5" style="border-radius:6px; font-size:0.75rem;" onclick="return confirm('¿Eliminar esta sesión de asistencia?')">
+                            <i class="bi bi-trash"></i>
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+                  {% empty %}
+                    <tr>
+                      <td colspan="6" class="text-center py-5 text-muted">
+                        <i class="bi bi-calendar-x fs-2 d-block mb-2 text-muted"></i>
+                        Aún no se han registrado sesiones de asistencia para este taller.
+                        <div class="mt-2">
+                          <a href="{% url 'tomar_asistencia_taller' taller.id %}" class="btn btn-sm btn-success fw-bold" style="border-radius:8px; background:#10B981; border:none;">
+                            <i class="bi bi-calendar-check me-1"></i> Pasar Primera Lista
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- MODAL INSCRIBIR ESTUDIANTES MULTICURSO -->
+<div class="modal fade" id="modalInscribirEstudiantes" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 shadow-lg" style="border-radius:16px;">
+      <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+        <h5 class="modal-title fw-extrabold text-dark"><i class="bi bi-person-plus-fill text-primary me-2"></i>Inscribir Alumnos en {{ taller.nombre }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="POST" action="{% url 'inscribir_estudiante_taller' taller.id %}">
+        {% csrf_token %}
+        <div class="modal-body p-4">
+          <p class="text-muted small">
+            Selecciona estudiantes de cualquier curso del colegio para incorporarlos a la nómina de este taller extracurricular.
+          </p>
+
+          <div class="row g-2 mb-3">
+            <div class="col-md-7">
+              <input type="text" id="filtroTextoEst" class="form-control" placeholder="Buscar por nombre o apellido..." onkeyup="filtrarTablaEstudiantes()">
+            </div>
+            <div class="col-md-5">
+              <select id="filtroCursoEst" class="form-select" onchange="filtrarPorCurso()">
+                <option value="">-- Todos los Cursos --</option>
+                {% for c in cursos %}
+                  <option value="{{ c.nombre }}">{{ c.nombre }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mb-2 px-1">
+            <span class="text-muted extra-small fw-bold">Alumnos Disponibles para Inscribir:</span>
+            <button type="button" class="btn btn-link btn-sm text-primary p-0 fw-bold extra-small text-decoration-none" onclick="seleccionarTodos(true)">Seleccionar Todos</button>
+          </div>
+
+          <div class="border rounded-3 p-2 overflow-auto" style="max-height: 320px; background:#F8FAFC;">
+            <table class="table table-sm table-hover mb-0" id="tablaEstDisponibles">
+              <tbody>
+                {% for est in estudiantes_disponibles %}
+                  <tr class="fila-estudiante" data-curso="{{ est.seccion.nombre|default:'' }}">
+                    <td style="width: 40px;" class="text-center">
+                      <input type="checkbox" name="estudiantes_ids" value="{{ est.id }}" class="form-check-input check-est">
+                    </td>
+                    <td>
+                      <div class="fw-bold text-dark small est-nombre">{{ est.nombre_completo }}</div>
+                    </td>
+                    <td>
+                      {% if est.seccion %}
+                        <span class="badge bg-white text-dark border extra-small">{{ est.seccion.nombre }}</span>
+                      {% else %}
+                        <span class="text-muted extra-small">Sin curso</span>
+                      {% endif %}
+                    </td>
+                    <td class="text-muted extra-small">{{ est.rut|default:"-" }}</td>
+                  </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="4" class="text-center py-4 text-muted small">
+                      Todos los alumnos del colegio ya se encuentran inscritos en este taller.
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+        <div class="modal-footer border-top-0 p-4 pt-0">
+          <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary fw-extrabold px-4" style="border-radius:10px; background:linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%); border:none;">Inscribir Seleccionados</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDITAR TALLER -->
+<div class="modal fade" id="modalEditarTaller" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 shadow-lg" style="border-radius:16px;">
+      <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+        <h5 class="modal-title fw-extrabold text-dark"><i class="bi bi-pencil-square text-primary me-2"></i>Editar Información del Taller</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="POST" action="{% url 'editar_taller' taller.id %}">
+        {% csrf_token %}
+        <div class="modal-body p-4">
+          <div class="row g-3 mb-3">
+            <div class="col-md-8">
+              <label class="form-label fw-bold text-dark small">Nombre del Taller</label>
+              <input type="text" name="nombre" class="form-control fw-bold" value="{{ taller.nombre }}" required style="border-radius:10px;">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-bold text-dark small">Categoría</label>
+              <select name="categoria" class="form-select fw-bold" style="border-radius:10px;">
+                {% for val, label in categorias_choices %}
+                  <option value="{{ val }}" {% if taller.categoria == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">Docente Monitor</label>
+              <select name="docente_encargado" class="form-select" style="border-radius:10px;">
+                <option value="">-- Sin docente asignado --</option>
+                {% for doc in docentes_disponibles %}
+                  <option value="{{ doc.id }}" {% if taller.docente_encargado_id == doc.id %}selected{% endif %}>{{ doc.first_name }} {{ doc.last_name }} ({{ doc.username }})</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">O Monitor Externo</label>
+              <input type="text" name="monitor_externo" class="form-control" value="{{ taller.monitor_externo|default:'' }}" style="border-radius:10px;">
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">Días y Horarios</label>
+              <input type="text" name="dias_horario" class="form-control" value="{{ taller.dias_horario }}" required style="border-radius:10px;">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-bold text-dark small">Lugar</label>
+              <input type="text" name="lugar" class="form-control" value="{{ taller.lugar }}" required style="border-radius:10px;">
+            </div>
+            <div class="col-md-2">
+              <label class="form-label fw-bold text-dark small">Cupo Máx.</label>
+              <input type="number" name="cupo_maximo" class="form-control fw-bold" value="{{ taller.cupo_maximo|default:30 }}" style="border-radius:10px;">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold text-dark small">Descripción</label>
+            <textarea name="descripcion" class="form-control" rows="2" style="border-radius:10px;">{{ taller.descripcion|default:'' }}</textarea>
+          </div>
+        </div>
+        <div class="modal-footer border-top-0 p-4 pt-0">
+          <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary fw-extrabold px-4" style="border-radius:10px; background:linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%); border:none;">Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+<script>
+  function filtrarTablaEstudiantes() {
+    const query = document.getElementById('filtroTextoEst').value.toLowerCase();
+    const curso = document.getElementById('filtroCursoEst').value.toLowerCase();
+    const filas = document.querySelectorAll('.fila-estudiante');
+
+    filas.forEach(fila => {
+      const nombre = fila.querySelector('.est-nombre').textContent.toLowerCase();
+      const cursoFila = (fila.getAttribute('data-curso') || '').toLowerCase();
+      const coincideNombre = nombre.includes(query);
+      const coincideCurso = !curso || cursoFila.includes(curso);
+
+      if (coincideNombre && coincideCurso) {
+        fila.style.display = '';
+      } else {
+        fila.style.display = 'none';
+      }
+    });
+  }
+
+  function filtrarPorCurso() {
+    filtrarTablaEstudiantes();
+  }
+
+  function seleccionarTodos(marcar) {
+    const checks = document.querySelectorAll('.check-est');
+    checks.forEach(c => {
+      if (c.closest('tr').style.display !== 'none') {
+        c.checked = marcar;
+      }
+    });
+  }
+</script>
+</body>
+</html>
