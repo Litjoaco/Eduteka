@@ -128,7 +128,17 @@ def registro_colegio_paso2_view(request, colegio_id):
     else:
         form = RegistroColegioPaso2Form()
         
-    return render(request, 'registrocolegiopaso2.html', {'form': form, 'colegio': colegio})
+    from planes.models import Plan, Modulo
+    planes = Plan.objects.filter(activo=True).prefetch_related('modulos').order_by('precio_mensual')
+    modulos = Modulo.objects.filter(activo=True).order_by('id')
+
+    return render(request, 'registrocolegiopaso2.html', {
+        'form': form, 
+        'colegio': colegio,
+        'planes': planes,
+        'modulos': modulos,
+        'modulos_disponibles': modulos
+    })
 
 def api_buscar_colegios(request):
     q = request.GET.get('q', '').lower()
@@ -2131,11 +2141,18 @@ def actualizar_modulo_colegio(request):
         modulo = data.get('modulo')
         estado = data.get('estado')
 
-        colegio = Colegio.objects.get(id=colegio_id)
-        config, created = ConfiguracionModulos.objects.get_or_create(colegio=colegio)
-
-        setattr(config, modulo, estado)
-        config.save()
+        if colegio_id:
+            colegio = Colegio.objects.get(id=colegio_id)
+            config, created = ConfiguracionModulos.objects.get_or_create(colegio=colegio)
+            if hasattr(config, modulo):
+                setattr(config, modulo, estado)
+                config.save()
+        else:
+            from planes.models import Modulo as ModuloModel
+            mod_obj = ModuloModel.objects.filter(nombre__icontains=modulo.replace('_', ' ')).first()
+            if mod_obj:
+                mod_obj.activo = estado
+                mod_obj.save()
 
         return JsonResponse({'status': 'ok', 'message': f'Módulo {modulo} actualizado'})
     except Exception as e:

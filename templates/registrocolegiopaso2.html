@@ -1,4 +1,4 @@
-{% load static %}
+{% load static humanize %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -166,78 +166,41 @@
               </div>
             </div>
 
-            <!-- Grilla de Planes 4 Columnas en Desktop -->
+            <!-- Grilla de Planes Dinámicos desde BD -->
             <div class="plans-grid-modern">
-              
-              <!-- Plan Básico -->
-              <label class="plan-card-pro" id="cardPlanBasico">
-                <input type="radio" name="plan" value="basico">
-                <div>
-                  <div class="plan-name-pro">Básico</div>
-                  <p class="extra-small text-muted mb-2.5">Hasta 200 alumnos.</p>
-                  <ul class="list-unstyled extra-small text-muted mb-0 d-flex flex-column gap-1.5">
-                    <li><i class="bi bi-check2 text-success me-1"></i> Libro de clases digital</li>
-                    <li><i class="bi bi-check2 text-success me-1"></i> Asistencia diaria y notas</li>
-                    <li><i class="bi bi-check2 text-success me-1"></i> Ficha alumno y reportes</li>
-                  </ul>
-                </div>
-                <div class="mt-3 pt-2.5 border-top">
-                  <div class="plan-price-pro" id="priceBasico">$49.900 <small>/ mes</small></div>
-                </div>
-              </label>
-
-              <!-- Plan Profesional (Destacado) -->
-              <label class="plan-card-pro featured" id="cardPlanProfesional">
+              {% for plan in planes %}
+              <label class="plan-card-pro {% if plan.recomendado %}featured{% endif %}" id="cardPlan{{ plan.id }}">
+                {% if plan.recomendado %}
                 <div class="plan-ribbon-featured">⭐ Más Elegido</div>
-                <input type="radio" name="plan" value="profesional" checked>
+                {% endif %}
+                <input type="radio" name="plan" value="{{ plan.id }}" {% if plan.recomendado or forloop.first %}checked{% endif %}>
                 <div>
-                  <div class="plan-name-pro text-primary">Profesional</div>
-                  <p class="extra-small text-muted mb-2.5">Hasta 700 alumnos.</p>
-                  <ul class="list-unstyled extra-small text-dark fw-semibold mb-0 d-flex flex-column gap-1.5">
-                    <li><i class="bi bi-check2-circle text-primary me-1"></i> <strong>Libro Digital + PIE</strong></li>
-                    <li><i class="bi bi-check2-circle text-primary me-1"></i> <strong>SIMCE & DIA</strong></li>
-                    <li><i class="bi bi-check2-circle text-primary me-1"></i> Calendario y actas</li>
-                  </ul>
-                </div>
-                <div class="mt-3 pt-2.5 border-top">
-                  <div class="plan-price-pro text-primary" id="priceProfesional">$89.900 <small>/ mes</small></div>
-                </div>
-              </label>
-
-              <!-- Plan Institucional -->
-              <label class="plan-card-pro" id="cardPlanInstitucional">
-                <input type="radio" name="plan" value="institucional">
-                <div>
-                  <div class="plan-name-pro">Institucional</div>
-                  <p class="extra-small text-muted mb-2.5">Alumnos ilimitados.</p>
-                  <ul class="list-unstyled extra-small text-muted mb-0 d-flex flex-column gap-1.5">
-                    <li><i class="bi bi-check2 text-success me-1"></i> <strong>Todos los módulos</strong></li>
-                    <li><i class="bi bi-check2 text-success me-1"></i> Finanzas & caja chica</li>
-                    <li><i class="bi bi-check2 text-success me-1"></i> Inventario & compras</li>
-                  </ul>
-                </div>
-                <div class="mt-3 pt-2.5 border-top">
-                  <div class="plan-price-pro" id="priceInstitucional">$149.900 <small>/ mes</small></div>
-                </div>
-              </label>
-
-              <!-- Plan A Medida / Personalizado -->
-              <label class="plan-card-pro" id="cardPlanPersonalizado">
-                <input type="radio" name="plan" value="personalizado">
-                <div>
-                  <div class="plan-name-pro">A Medida</div>
-                  <p class="extra-small text-muted mb-2.5">Redes de colegios.</p>
-                  <ul class="list-unstyled extra-small text-muted mb-0 d-flex flex-column gap-1.5">
+                  <div class="plan-name-pro {% if plan.recomendado %}text-primary{% endif %}">{{ plan.nombre }}</div>
+                  <p class="extra-small text-muted mb-2.5">{{ plan.descripcion|default:"Gestión institucional integral." }}</p>
+                  <ul class="list-unstyled extra-small {% if plan.recomendado %}text-dark fw-semibold{% else %}text-muted{% endif %} mb-0 d-flex flex-column gap-1.5">
+                    {% for mod in plan.modulos.all %}
+                    <li><i class="bi bi-check2{% if plan.recomendado %}-circle text-primary{% else %} text-success{% endif %} me-1"></i> {{ mod.nombre }}</li>
+                    {% empty %}
                     <li><i class="bi bi-check2 text-info me-1"></i> Módulos a libre elección</li>
                     <li><i class="bi bi-check2 text-info me-1"></i> Integración a medida</li>
-                    <li><i class="bi bi-check2 text-info me-1"></i> Mercado Público</li>
+                    {% endfor %}
                   </ul>
                 </div>
                 <div class="mt-3 pt-2.5 border-top">
-                  <div class="plan-price-pro text-muted">A Cotizar</div>
+                  {% if plan.precio_mensual > 0 %}
+                  <div class="plan-price-pro {% if plan.recomendado %}text-primary{% endif %}" id="priceCard{{ plan.id }}">
+                    ${{ plan.precio_mensual|intcomma }} <small>/ mes</small>
+                  </div>
+                  {% else %}
+                  <div class="plan-price-pro text-muted" id="priceCard{{ plan.id }}">A Cotizar</div>
+                  {% endif %}
                 </div>
               </label>
-
+              {% empty %}
+              <div class="col-12 text-center text-muted py-4">
+                <p>No se encontraron planes activos en el sistema.</p>
+              </div>
+              {% endfor %}
             </div>
 
             <!-- SECCIÓN 2: MÓDULOS ACTIVOS -->
@@ -248,68 +211,22 @@
                 </div>
                 <h6 class="form-section-title mb-0 fs-5">2. Módulos que se activarán para tu colegio</h6>
               </div>
-              <span class="badge bg-light text-dark border px-3 py-1.5 fw-bold" id="badgeModulesCount">5 módulos activos</span>
+              <span class="badge bg-light text-dark border px-3 py-1.5 fw-bold" id="badgeModulesCount">0 módulos activos</span>
             </div>
 
-            <!-- Grilla de Módulos (8 Módulos Espaciosos) -->
+            <!-- Grilla de Módulos Dinámicos desde BD -->
             <div class="modules-grid-pro mb-4">
-              
-              <!-- Módulo 1: Libro de Clases -->
-              <label class="module-item-pro" title="Libro de clases y calificaciones">
-                <input type="checkbox" name="modulos" value="libro_clases" checked>
-                <div class="module-icon-wrap"><i class="bi bi-journal-bookmark-fill"></i></div>
-                <span>Libro de Clases</span>
+              {% for modulo in modulos %}
+              <label class="module-item-pro" title="{{ modulo.descripcion|default:modulo.nombre }}">
+                <input type="checkbox" name="modulos" value="{{ modulo.id }}" data-modulo-id="{{ modulo.id }}">
+                <div class="module-icon-wrap">
+                  <i class="bi {{ modulo.icono|default:'bi-grid-fill' }}"></i>
+                </div>
+                <span>{{ modulo.nombre }}</span>
               </label>
-
-              <!-- Módulo 2: Asistencia -->
-              <label class="module-item-pro" title="Asistencia diaria y por bloque">
-                <input type="checkbox" name="modulos" value="asistencia" checked>
-                <div class="module-icon-wrap"><i class="bi bi-calendar-check-fill"></i></div>
-                <span>Asistencia Diaria</span>
-              </label>
-
-              <!-- Módulo 3: Perfil Alumno -->
-              <label class="module-item-pro" title="Ficha del estudiante y PIE">
-                <input type="checkbox" name="modulos" value="perfil_alumno" checked>
-                <div class="module-icon-wrap"><i class="bi bi-person-badge-fill"></i></div>
-                <span>Perfil Alumno & PIE</span>
-              </label>
-
-              <!-- Módulo 4: Calendario -->
-              <label class="module-item-pro" title="Calendario y eventos">
-                <input type="checkbox" name="modulos" value="calendario" checked>
-                <div class="module-icon-wrap"><i class="bi bi-calendar-event-fill"></i></div>
-                <span>Calendario Escolar</span>
-              </label>
-
-              <!-- Módulo 5: Reportes -->
-              <label class="module-item-pro" title="Reportes y certificados oficiales">
-                <input type="checkbox" name="modulos" value="reportes" checked>
-                <div class="module-icon-wrap"><i class="bi bi-bar-chart-fill"></i></div>
-                <span>Reportes & Actas</span>
-              </label>
-
-              <!-- Módulo 6: SIMCE -->
-              <label class="module-item-pro" title="Evaluaciones estandarizadas SIMCE & DIA">
-                <input type="checkbox" name="modulos" value="simce">
-                <div class="module-icon-wrap"><i class="bi bi-award-fill"></i></div>
-                <span>SIMCE & DIA</span>
-              </label>
-
-              <!-- Módulo 7: Contabilidad -->
-              <label class="module-item-pro" title="Control financiero y caja chica">
-                <input type="checkbox" name="modulos" value="contabilidad">
-                <div class="module-icon-wrap"><i class="bi bi-wallet2"></i></div>
-                <span>Finanzas & SEP</span>
-              </label>
-
-              <!-- Módulo 8: Proveedores -->
-              <label class="module-item-pro" title="Directorio de proveedores e inventario">
-                <input type="checkbox" name="modulos" value="proveedores">
-                <div class="module-icon-wrap"><i class="bi bi-truck"></i></div>
-                <span>Proveedores & Stock</span>
-              </label>
-
+              {% empty %}
+              <p class="text-muted small">No hay módulos registrados en la plataforma.</p>
+              {% endfor %}
             </div>
 
             <!-- SECCIÓN 3: RESUMEN CHECKOUT EN TIEMPO REAL -->
@@ -325,7 +242,7 @@
                 <div class="col-sm-3 col-6 border-end border-secondary border-opacity-25">
                   <div class="summary-col">
                     <span class="summary-col-label">Plan Seleccionado</span>
-                    <span class="summary-col-val" id="summaryPlanName">Profesional</span>
+                    <span class="summary-col-val" id="summaryPlanName">Cargando...</span>
                   </div>
                 </div>
 
@@ -339,7 +256,7 @@
                 <div class="col-sm-4 col-6 text-sm-end">
                   <div class="summary-col">
                     <span class="summary-col-label">Total a Facturar</span>
-                    <div class="summary-total-price" id="summaryTotalPrice">$89.900</div>
+                    <div class="summary-total-price" id="summaryTotalPrice">$0</div>
                     <span class="extra-small text-white-50 mt-1 d-block" id="summaryPeriodDesc">/ mes • Activación Inmediata</span>
                   </div>
                 </div>
@@ -388,41 +305,34 @@
       const summaryPeriodDesc = document.getElementById('summaryPeriodDesc');
       const badgeModulesCount = document.getElementById('badgeModulesCount');
 
-      const priceBasico = document.getElementById('priceBasico');
-      const priceProfesional = document.getElementById('priceProfesional');
-      const priceInstitucional = document.getElementById('priceInstitucional');
-
-      const prices = {
-        basico: 49900,
-        profesional: 89900,
-        institucional: 149900,
-        personalizado: 0
-      };
-
-      const names = {
-        basico: 'Básico',
-        profesional: 'Profesional',
-        institucional: 'Institucional',
-        personalizado: 'A Medida'
-      };
-
-      const planModulesMap = {
-        basico: ['libro_clases', 'asistencia', 'perfil_alumno', 'reportes'],
-        profesional: ['libro_clases', 'asistencia', 'perfil_alumno', 'reportes', 'calendario', 'simce'],
-        institucional: ['libro_clases', 'asistencia', 'perfil_alumno', 'reportes', 'calendario', 'simce', 'contabilidad', 'proveedores']
+      // Mapa dinámico generado con los datos de Django
+      const plansData = {
+        {% for plan in planes %}
+        "{{ plan.id }}": {
+          id: "{{ plan.id }}",
+          nombre: "{{ plan.nombre|escapejs }}",
+          precioMensual: {{ plan.precio_mensual }},
+          precioAnual: {{ plan.precio_anual }},
+          esPersonalizado: {% if plan.precio_mensual == 0 %}true{% else %}false{% endif %},
+          modulos: [{% for m in plan.modulos.all %}"{{ m.id }}"{% if not forloop.last %}, {% endif %}{% endfor %}]
+        }{% if not forloop.last %}, {% endif %}
+        {% endfor %}
       };
 
       function updateModulesState() {
         const checkedPlanEl = document.querySelector('input[name="plan"]:checked');
-        const selectedPlan = checkedPlanEl ? checkedPlanEl.value : 'profesional';
+        const selectedPlanId = checkedPlanEl ? checkedPlanEl.value : (Object.keys(plansData)[0] || '');
+        const currentPlan = plansData[selectedPlanId];
+
+        if (!currentPlan) return;
 
         moduleCheckboxes.forEach(cb => {
-          if (selectedPlan === 'personalizado') {
+          if (currentPlan.esPersonalizado) {
             cb.parentElement.style.opacity = '1';
             cb.parentElement.style.pointerEvents = 'auto';
             cb.onclick = null;
           } else {
-            const isIncluded = (planModulesMap[selectedPlan] || []).includes(cb.value);
+            const isIncluded = currentPlan.modulos.includes(cb.value);
             cb.checked = isIncluded;
 
             if (isIncluded) {
@@ -443,45 +353,52 @@
       function updateSummary() {
         const checkedPlanEl = document.querySelector('input[name="plan"]:checked');
         const checkedBillingEl = document.querySelector('input[name="tipo_facturacion"]:checked');
-        const selectedPlan = checkedPlanEl ? checkedPlanEl.value : 'profesional';
+        const selectedPlanId = checkedPlanEl ? checkedPlanEl.value : (Object.keys(plansData)[0] || '');
         const selectedBilling = checkedBillingEl ? checkedBillingEl.value : 'mensual';
+        const currentPlan = plansData[selectedPlanId];
 
         const activeModules = document.querySelectorAll('input[name="modulos"]:checked').length;
         if (badgeModulesCount) {
           badgeModulesCount.textContent = activeModules + ' módulos activos';
         }
 
-        const isYearly = selectedBilling === 'anual';
-        const basePrice = prices[selectedPlan] || 0;
+        const isYearly = (selectedBilling === 'anual');
 
-        // Actualizar etiquetas de precio de las cards
-        if (priceBasico) {
-          priceBasico.innerHTML = isYearly 
-            ? `$${Math.round(prices.basico * 0.85).toLocaleString('es-CL')} <small>/ mes (anual)</small>` 
-            : `$${prices.basico.toLocaleString('es-CL')} <small>/ mes</small>`;
-        }
-        if (priceProfesional) {
-          priceProfesional.innerHTML = isYearly 
-            ? `$${Math.round(prices.profesional * 0.85).toLocaleString('es-CL')} <small>/ mes (anual)</small>` 
-            : `$${prices.profesional.toLocaleString('es-CL')} <small>/ mes</small>`;
-        }
-        if (priceInstitucional) {
-          priceInstitucional.innerHTML = isYearly 
-            ? `$${Math.round(prices.institucional * 0.85).toLocaleString('es-CL')} <small>/ mes (anual)</small>` 
-            : `$${prices.institucional.toLocaleString('es-CL')} <small>/ mes</small>`;
-        }
+        // Actualizar etiquetas de precio de todas las cards
+        Object.keys(plansData).forEach(id => {
+          const p = plansData[id];
+          const priceLabel = document.getElementById('priceCard' + id);
+          if (priceLabel) {
+            if (p.esPersonalizado) {
+              priceLabel.textContent = 'A Cotizar';
+            } else {
+              let displayPrice = p.precioMensual;
+              if (isYearly) {
+                displayPrice = (p.precioAnual > 0) ? Math.round(p.precioAnual / 12) : Math.round(p.precioMensual * 0.85);
+                priceLabel.innerHTML = `$${displayPrice.toLocaleString('es-CL')} <small>/ mes (anual)</small>`;
+              } else {
+                priceLabel.innerHTML = `$${displayPrice.toLocaleString('es-CL')} <small>/ mes</small>`;
+              }
+            }
+          }
+        });
 
         // Actualizar card checkout
-        summaryPlanName.textContent = names[selectedPlan];
-        summaryBillingMode.textContent = isYearly ? 'Anual (-15%)' : 'Mensual';
+        if (currentPlan) {
+          summaryPlanName.textContent = currentPlan.nombre;
+          summaryBillingMode.textContent = isYearly ? 'Anual (-15%)' : 'Mensual';
 
-        if (selectedPlan === 'personalizado') {
-          summaryTotalPrice.textContent = 'A Cotizar';
-          summaryPeriodDesc.textContent = 'Sujeto a evaluación institucional';
-        } else {
-          const finalMonthlyPrice = isYearly ? Math.round(basePrice * 0.85) : basePrice;
-          summaryTotalPrice.textContent = `$${finalMonthlyPrice.toLocaleString('es-CL')}`;
-          summaryPeriodDesc.textContent = isYearly ? '/ mes (facturado anual) • Inicio Inmediato' : '/ mes • Inicio Inmediato';
+          if (currentPlan.esPersonalizado) {
+            summaryTotalPrice.textContent = 'A Cotizar';
+            summaryPeriodDesc.textContent = 'Sujeto a evaluación institucional';
+          } else {
+            let finalMonthlyPrice = currentPlan.precioMensual;
+            if (isYearly) {
+              finalMonthlyPrice = (currentPlan.precioAnual > 0) ? Math.round(currentPlan.precioAnual / 12) : Math.round(currentPlan.precioMensual * 0.85);
+            }
+            summaryTotalPrice.textContent = `$${finalMonthlyPrice.toLocaleString('es-CL')}`;
+            summaryPeriodDesc.textContent = isYearly ? '/ mes (facturado anual) • Inicio Inmediato' : '/ mes • Inicio Inmediato';
+          }
         }
       }
 
@@ -491,17 +408,19 @@
 
       // Animación de Submit
       const form = document.getElementById('planForm');
-      form.addEventListener('submit', function() {
-        const btn = document.getElementById('btnSubmitPlan');
-        const txt = document.getElementById('btnSubmitPlanText');
-        const icon = document.getElementById('btnSubmitPlanIcon');
-        const spinner = document.getElementById('btnSubmitPlanSpinner');
+      if (form) {
+        form.addEventListener('submit', function() {
+          const btn = document.getElementById('btnSubmitPlan');
+          const txt = document.getElementById('btnSubmitPlanText');
+          const icon = document.getElementById('btnSubmitPlanIcon');
+          const spinner = document.getElementById('btnSubmitPlanSpinner');
 
-        btn.disabled = true;
-        txt.textContent = 'Activando plan y configurando colegio...';
-        icon.classList.add('d-none');
-        spinner.classList.remove('d-none');
-      });
+          if (btn) btn.disabled = true;
+          if (txt) txt.textContent = 'Activando plan y configurando colegio...';
+          if (icon) icon.classList.add('d-none');
+          if (spinner) spinner.classList.remove('d-none');
+        });
+      }
 
       // Inicializar
       updateModulesState();

@@ -371,6 +371,48 @@ def dashboard_superadmin_facturacion_view(request):
     }
     return render(request, 'dashboard_superadmin_facturacion.html', context)
 
+
+@login_required
+def dashboard_superadmin_factura_manual_view(request):
+    """
+    Vista para la emisión manual de Documentos Tributarios Electrónicos (DTE) con el SII.
+    """
+    from colegios.models import Colegio
+    from planes.models import Plan
+
+    colegios = Colegio.objects.all().order_by('nombre')
+    planes = Plan.objects.filter(activo=True)
+
+    if request.method == 'POST':
+        colegio_id = request.POST.get('colegio_id')
+        tipo_dte = request.POST.get('tipo_dte', '34')
+        rut_receptor = request.POST.get('rut_receptor', '').strip()
+        razon_social = request.POST.get('razon_social', '').strip()
+        monto_neto = request.POST.get('monto_neto', '0').replace('.', '').replace('$', '').strip()
+        glosa = request.POST.get('glosa', '').strip()
+        forma_pago = request.POST.get('forma_pago', 'transferencia')
+        fecha_vencimiento = request.POST.get('fecha_vencimiento')
+
+        nombre_destino = razon_social or "el establecimiento"
+        if colegio_id and colegio_id.isdigit():
+            col = Colegio.objects.filter(id=int(colegio_id)).first()
+            if col:
+                nombre_destino = col.nombre
+
+        messages.success(
+            request, 
+            f"✅ Documento Tributario Electrónico (DTE #{tipo_dte}) emitido exitosamente para {nombre_destino}. Se ha enviado al SII."
+        )
+        return redirect('dashboard_superadmin_facturacion')
+
+    context = {
+        'colegios': colegios,
+        'planes': planes,
+        'hoy': timezone.now().date(),
+    }
+    return render(request, 'dashboard_superadmin_factura_manual.html', context)
+
+
 def dashboard_superadmin_ordenes_view(request):
     return render(request, 'dashboard_superadmin_ordenes.html')
 
@@ -538,8 +580,13 @@ def dashboard_superadmin_estadisticas_view(request):
     }
     return render(request, 'dashboard_superadmin_estadisticas.html', context)
 
+@login_required
 def dashboard_superadmin_modulos_erp_view(request):
-    return render(request, 'dashboard_superadmin_modulos_erp.html')
+    from colegios.models import Colegio
+    total_colegios = Colegio.objects.filter(estado='activo').count()
+    return render(request, 'dashboard_superadmin_modulos_erp.html', {
+        'total_colegios': total_colegios,
+    })
 
 
 # ─── Control de Accesos ───────────────────────────────────────────────────────

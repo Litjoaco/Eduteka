@@ -85,7 +85,7 @@
 
         .search-bar {
             position: relative;
-            width: 320px;
+            width: 340px;
         }
 
         .search-bar i {
@@ -182,6 +182,7 @@
         .module-card:hover {
             transform: translateY(-4px);
             box-shadow: 0 12px 25px rgba(124, 92, 252, 0.1);
+            border-color: #A38DFD;
         }
 
         .module-icon {
@@ -193,7 +194,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            font-size: 1.45rem;
             margin-bottom: 1rem;
         }
 
@@ -202,14 +203,31 @@
             color: white;
             font-weight: 600;
             border-radius: var(--radius-md);
-            padding: 0.5rem 1.25rem;
+            padding: 0.45rem 1rem;
             border: none;
             transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.85rem;
         }
+
         .btn-purple:hover {
             background-color: var(--primary-hover);
             color: white;
             box-shadow: 0 4px 12px rgba(124, 92, 252, 0.3);
+        }
+
+        .stat-pill {
+            background: white;
+            border: 1px solid var(--border);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-md);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 600;
         }
     </style>
 </head>
@@ -220,20 +238,20 @@
         {% include '_sidebar_superadmin.html' with active_page='modulos' %}
 
         <!-- Main Content -->
-        <main class="main-content">
+        <main class="main-content flex-grow-1 min-vw-0">
             <!-- Topbar -->
             <header class="topbar">
-                <div class="d-flex items-center gap-2">
-                    <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn" style="border:none; background:var(--primary-soft); color:var(--primary);">
-                        <i class="bi bi-list fs-5"></i>
-                    </button>
-                    <div class="search-bar">
-                        <i class="bi bi-search"></i>
-                        <input type="text" placeholder="Buscar módulos ERP...">
-                    </div>
+                <div class="search-bar">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="moduleSearchInput" placeholder="Buscar módulo por nombre o descripción..." oninput="filtrarModulos(this.value)">
                 </div>
 
                 <div class="topbar-right">
+                    <div class="stat-pill text-muted">
+                        <i class="bi bi-grid-3x3-gap-fill text-primary"></i>
+                        <span>16 Módulos del Sistema</span>
+                    </div>
+
                     <div class="user-profile">
                         <div class="user-avatar">AE</div>
                         <span class="user-name">Admin Eduteka</span>
@@ -246,133 +264,373 @@
 
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
                     <div>
-                        <h1 class="hero-title">Módulos ERP del Sistema</h1>
-                        <div class="hero-subtitle">Habilita y administra las funcionalidades activas por cliente</div>
+                        <div class="d-flex align-items-center gap-2">
+                            <h1 class="hero-title">Módulos ERP del Sistema</h1>
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1 small">Hub Central</span>
+                        </div>
+                        <div class="hero-subtitle">Centro de control, acceso directo y configuración modular de la plataforma</div>
                     </div>
-                    <button type="button" class="btn btn-purple">
-                        <i class="bi bi-plus-lg me-1"></i> Crear Módulo Personalizado
-                    </button>
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'dashboard_superadmin_planes' %}" class="btn btn-sm btn-outline-secondary rounded-pill px-3 d-inline-flex align-items-center">
+                            <i class="bi bi-layers-fill me-1"></i> Asignar en Planes
+                        </a>
+                        <a href="{% url 'crear_plan' %}" class="btn btn-purple rounded-pill px-3">
+                            <i class="bi bi-plus-lg me-1"></i> Nuevo Plan Modular
+                        </a>
+                    </div>
                 </div>
 
-                <!-- Grid de Módulos -->
-                <div class="row g-4 mb-4">
+                <!-- Grid de Módulos (Conectado a las Vistas Reales de la Aplicación) -->
+                <div class="row g-4 mb-4" id="modulesContainer">
 
-                    <!-- Módulo 1 -->
-                    <div class="col-12 col-md-6 col-xl-4">
+                    <!-- 1. LIBRO DE CLASES & CALIFICACIONES -->
+                    <div class="col-12 col-md-6 col-xl-4 module-item" data-nombre="libro de clases calificaciones notas actas mineduc">
                         <div class="module-card">
                             <div class="d-flex align-items-center justify-content-between">
                                 <div class="module-icon">
                                     <i class="bi bi-journal-bookmark-fill"></i>
                                 </div>
                                 <div class="form-check form-switch fs-4">
-                                    <input class="form-check-input toggle-modulo" type="checkbox" name="libro_clases" data-colegio-id="{{ colegio.id }}" checked>
+                                    <input class="form-check-input toggle-modulo" type="checkbox" name="libro_clases" checked>
                                 </div>
                             </div>
-                            <h3 class="fw-bold text-dark fs-5 mb-1">Libro de Clases Digital</h3>
-                            <p class="text-muted small mb-3 flex-grow-1">Control de asistencia, notas, planificaciones y libro de clases oficial MINEDUC.</p>
+                            <h3 class="fw-bold text-dark fs-5 mb-1">Libro de Clases & Calificaciones</h3>
+                            <p class="text-muted small mb-3 flex-grow-1">Planilla general de notas, evaluaciones ponderadas, boletín de notas y actas oficiales.</p>
                             <div class="pt-3 border-top d-flex justify-content-between align-items-center">
-                                <span class="badge bg-success-subtle text-success rounded-pill px-3 py-1">215 Colegios Activos</span>
-                                <button class="btn btn-sm btn-light border rounded-pill">Ajustes</button>
+                                <span class="badge bg-success-subtle text-success rounded-pill px-3 py-1">Módulo Núcleo</span>
+                                <a href="{% url 'libro_calificaciones' %}" class="btn btn-purple">
+                                    <i class="bi bi-box-arrow-up-right me-1"></i> Entrar
+                                </a>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Módulo 2 -->
-                    <div class="col-12 col-md-6 col-xl-4">
+                    <!-- 2. ASISTENCIA ESCOLAR EN VIVO -->
+                    <div class="col-12 col-md-6 col-xl-4 module-item" data-nombre="asistencia atrasos justificaciones lista sige">
+                        <div class="module-card">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="module-icon" style="background:#ECFDF5; color:#10B981;">
+                                    <i class="bi bi-calendar-check-fill"></i>
+                                </div>
+                                <div class="form-check form-switch fs-4">
+                                    <input class="form-check-input toggle-modulo" type="checkbox" name="asistencia" checked>
+                                </div>
+                            </div>
+                            <h3 class="fw-bold text-dark fs-5 mb-1">Asistencia en Vivo & Atrasos</h3>
+                            <p class="text-muted small mb-3 flex-grow-1">Pase de lista en 1 clic, asistencia diaria y por bloques, justificaciones y exportación oficial SIGE.</p>
+                            <div class="pt-3 border-top d-flex justify-content-between align-items-center">
+                                <span class="badge bg-success-subtle text-success rounded-pill px-3 py-1">En Tiempo Real</span>
+                                <a href="{% url 'registrar_asistencia' %}" class="btn btn-purple">
+                                    <i class="bi bi-box-arrow-up-right me-1"></i> Entrar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. CONVIVENCIA ESCOLAR & HOJA DE VIDA -->
+                    <div class="col-12 col-md-6 col-xl-4 module-item" data-nombre="convivencia escolar comunidad anotaciones hoja de vida protocolos">
                         <div class="module-card">
                             <div class="d-flex align-items-center justify-content-between">
                                 <div class="module-icon" style="background:var(--secondary-soft); color:#148A7A;">
                                     <i class="bi bi-shield-check"></i>
                                 </div>
                                 <div class="form-check form-switch fs-4">
-                                    <input class="form-check-input toggle-modulo" type="checkbox" name="comunidad" data-colegio-id="{{ colegio.id }}" checked>
+                                    <input class="form-check-input toggle-modulo" type="checkbox" name="comunidad" checked>
                                 </div>
                             </div>
                             <h3 class="fw-bold text-dark fs-5 mb-1">Convivencia Escolar / Comunidad</h3>
-                            <p class="text-muted small mb-3 flex-grow-1">Gestión de anotaciones, protocolos de convivencia y registro de medidas disciplinarias.</p>
+                            <p class="text-muted small mb-3 flex-grow-1">Registro de anotaciones positivas y negativas, hojas de vida de estudiantes y protocolos formativos.</p>
                             <div class="pt-3 border-top d-flex justify-content-between align-items-center">
-                                <span class="badge bg-success-subtle text-success rounded-pill px-3 py-1">180 Colegios Activos</span>
-                                <button class="btn btn-sm btn-light border rounded-pill">Ajustes</button>
+                                <span class="badge bg-success-subtle text-success rounded-pill px-3 py-1">Formativo</span>
+                                <a href="{% url 'convivencia_hub' %}" class="btn btn-purple">
+                                    <i class="bi bi-box-arrow-up-right me-1"></i> Entrar
+                                </a>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Módulo 3 -->
-                    <div class="col-12 col-md-6 col-xl-4">
+                    <!-- 4. CONTABILIDAD Y FINANZAS -->
+                    <div class="col-12 col-md-6 col-xl-4 module-item" data-nombre="contabilidad finanzas caja chica sep facturas ingresos egresos">
                         <div class="module-card">
                             <div class="d-flex align-items-center justify-content-between">
                                 <div class="module-icon" style="background:#FFFBEB; color:#D97706;">
                                     <i class="bi bi-wallet2"></i>
                                 </div>
                                 <div class="form-check form-switch fs-4">
-                                    <input class="form-check-input toggle-modulo" type="checkbox" name="contabilidad" data-colegio-id="{{ colegio.id }}" checked>
+                                    <input class="form-check-input toggle-modulo" type="checkbox" name="contabilidad" checked>
                                 </div>
                             </div>
-                            <h3 class="fw-bold text-dark fs-5 mb-1">Contabilidad y Finanzas</h3>
-                            <p class="text-muted small mb-3 flex-grow-1">Pagos de colegiaturas, presupuestos, flujo de caja y rendición de cuentas.</p>
+                            <h3 class="fw-bold text-dark fs-5 mb-1">Contabilidad & Finanzas</h3>
+                            <p class="text-muted small mb-3 flex-grow-1">Control de ingresos y egresos, caja chica, rendición de cuentas SEP, centros de costo y facturas.</p>
                             <div class="pt-3 border-top d-flex justify-content-between align-items-center">
-                                <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-1">120 Colegios Activos</span>
-                                <button class="btn btn-sm btn-light border rounded-pill">Ajustes</button>
+                                <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-1">Financiero</span>
+                                <a href="{% url 'finanzas_dashboard' %}" class="btn btn-purple">
+                                    <i class="bi bi-box-arrow-up-right me-1"></i> Entrar
+                                </a>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Módulo 4 -->
-                    <div class="col-12 col-md-6 col-xl-4">
+                    <!-- 5. SIMCE Y DIAGNÓSTICO INTEGRAL (DIA) -->
+                    <div class="col-12 col-md-6 col-xl-4 module-item" data-nombre="simce dia ensayos diagnostico integral gse">
                         <div class="module-card">
                             <div class="d-flex align-items-center justify-content-between">
-                                <div class="module-icon">
-                                    <i class="bi bi-award"></i>
+                                <div class="module-icon" style="background:#F5F3FF; color:#7C3AED;">
+                                    <i class="bi bi-award-fill"></i>
                                 </div>
                                 <div class="form-check form-switch fs-4">
-                                    <input class="form-check-input toggle-modulo" type="checkbox" name="simce" data-colegio-id="{{ colegio.id }}" checked>
+                                    <input class="form-check-input toggle-modulo" type="checkbox" name="simce" checked>
                                 </div>
                             </div>
-                            <h3 class="fw-bold text-dark fs-5 mb-1">SIMCE y Ensayos</h3>
-                            <p class="text-muted small mb-3 flex-grow-1">Evaluación de contenidos pedagógicos y ensayos SIMCE estandarizados.</p>
+                            <h3 class="fw-bold text-dark fs-5 mb-1">SIMCE & Diagnóstico DIA</h3>
+                            <p class="text-muted small mb-3 flex-grow-1">Simulacros oficiales, tabulación de resultados, clasificación por estándares y comparación con GSE.</p>
                             <div class="pt-3 border-top d-flex justify-content-between align-items-center">
-                                <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1">50 Colegios (Premium)</span>
-                                <button class="btn btn-sm btn-light border rounded-pill">Ajustes</button>
+                                <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1">Pedagógico</span>
+                                <a href="{% url 'simce_dashboard' %}" class="btn btn-purple">
+                                    <i class="bi bi-box-arrow-up-right me-1"></i> Entrar
+                                </a>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Módulo 5 -->
-                    <div class="col-12 col-md-6 col-xl-4">
-                        <div class="module-card">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div class="module-icon" style="background:#FEF2F2; color:#EF4444;">
-                                    <i class="bi bi-building-add"></i>
-                                </div>
-                                <div class="form-check form-switch fs-4">
-                                    <input class="form-check-input toggle-modulo" type="checkbox" name="mercado_publico" data-colegio-id="{{ colegio.id }}">
-                                </div>
-                            </div>
-                            <h3 class="fw-bold text-dark fs-5 mb-1">Mercado Público Integración</h3>
-                            <p class="text-muted small mb-3 flex-grow-1">Sincronización directa con órdenes de compra y licitaciones del estado.</p>
-                            <div class="pt-3 border-top d-flex justify-content-between align-items-center">
-                                <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-1">En Beta</span>
-                                <button class="btn btn-sm btn-light border rounded-pill">Ajustes</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Módulo 6 -->
-                    <div class="col-12 col-md-6 col-xl-4">
+                    <!-- 6. INVENTARIO Y STOCK ESCOLAR -->
+                    <div class="col-12 col-md-6 col-xl-4 module-item" data-nombre="inventario stock activos materiales bodegas">
                         <div class="module-card">
                             <div class="d-flex align-items-center justify-content-between">
                                 <div class="module-icon" style="background:#F0FDF4; color:#16A34A;">
-                                    <i class="bi bi-box-seam"></i>
+                                    <i class="bi bi-box-seam-fill"></i>
                                 </div>
                                 <div class="form-check form-switch fs-4">
-                                    <input class="form-check-input toggle-modulo" type="checkbox" name="proveedores" data-colegio-id="{{ colegio.id }}">
+                                    <input class="form-check-input toggle-modulo" type="checkbox" name="inventario" checked>
                                 </div>
                             </div>
-                            <h3 class="fw-bold text-dark fs-5 mb-1">Proveedores y Compras</h3>
-                            <p class="text-muted small mb-3 flex-grow-1">Gestión de órdenes de compra, catálogo de proveedores y cotizaciones.</p>
+                            <h3 class="fw-bold text-dark fs-5 mb-1">Inventario & Activos Escolares</h3>
+                            <p class="text-muted small mb-3 flex-grow-1">Gestión de insumos pedagógicos, equipamiento tecnológico, ajustes de stock y alertas de reposición.</p>
                             <div class="pt-3 border-top d-flex justify-content-between align-items-center">
-                                <span class="badge bg-success-subtle text-success rounded-pill px-3 py-1">Módulo Adicional</span>
-                                <button class="btn btn-sm btn-light border rounded-pill">Ajustes</button>
+                                <span class="badge bg-success-subtle text-success rounded-pill px-3 py-1">Logística</span>
+                                <a href="{% url 'inventario_dashboard' %}" class="btn btn-purple">
+                                    <i class="bi bi-box-arrow-up-right me-1"></i> Entrar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 7. DIRECTORIO DE PROVEEDORES & COMPRAS -->
+                    <div class="col-12 col-md-6 col-xl-4 module-item" data-nombre="proveedores compras cotizaciones servicios">
+                        <div class="module-card">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="module-icon" style="background:#EFF6FF; color:#2563EB;">
+                                    <i class="bi bi-truck"></i>
+                                </div>
+                                <div class="form-check form-switch fs-4">
+                                    <input class="form-check-input toggle-modulo" type="checkbox" name="proveedores" checked>
+                                </div>
+                            </div>
+                            <h3 class="fw-bold text-dark fs-5 mb-1">Directorio de Proveedores</h3>
+                            <p class="text-muted small mb-3 flex-grow-1">Catálogo de proveedores del establecimiento, órdenes de compra, cotizaciones y evaluación comercial.</p>
+                            <div class="pt-3 border-top d-flex justify-content-between align-items-center">
+                                <span class="badge bg-info-subtle text-info rounded-pill px-3 py-1">Adquisiciones</span>
+                                <a href="{% url 'proveedores_directorio' %}" class="btn btn-purple">
+                                    <i class="bi bi-box-arrow-up-right me-1"></i> Entrar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 8. TALLERES EXTRACURRICULARES (ACLES) -->
+                    <div class="col-12 col-md-6 col-xl-4 module-item" data-nombre="talleres acles extraprogramaticos deportes academias">
+                        <div class="module-card">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="module-icon" style="background:#FAF5FF; color:#9333EA;">
+                                    <i class="bi bi-palette2"></i>
+                                </div>
+                                <div class="form-check form-switch fs-4">
+                                    <input class="form-check-input toggle-modulo" type="checkbox" name="talleres" checked>
+                                </div>
+                            </div>
+                            <h3 class="fw-bold text-dark fs-5 mb-1">Talleres ACLES & Academias</h3>
+                            <p class="text-muted small mb-3 flex-grow-1">Inscripción a talleres deportivos, artísticos y científicos, asignación de instructores y control de sesiones.</p>
+                            <div class="pt-3 border-top d-flex justify-content-between align-items-center">
+                                <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1">Extracurricular</span>
+                                <a href="{% url 'talleres_dashboard' %}" class="btn btn-purple">
+                                    <i class="bi bi-box-arrow-up-right me-1"></i> Entrar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 9. AGENDA Y CALENDARIO ESCOLAR -->
+                    <div class="col-12 col-md-6 col-xl-4 module-item" data-nombre="calendario escolar agenda eventos reuniones feriados">
+                        <div class="module-card">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="module-icon" style="background:#ECFDF5; color:#059669;">
+                                    <i class="bi bi-calendar-event-fill"></i>
+                                </div>
+                                <div class="form-check form-switch fs-4">
+                                    <input class="form-check-input toggle-modulo" type="checkbox" name="calendario" checked>
+                                </div>
+                            </div>
+                            <h3 class="fw-bold text-dark fs-5 mb-1">Agenda & Calendario Escolar</h3>
+                            <p class="text-muted small mb-3 flex-grow-1">Planificación institucional de actos, reuniones de apoderados, consejos docentes y exportación iCal.</p>
+                            <div class="pt-3 border-top d-flex justify-content-between align-items-center">
+                                <span class="badge bg-success-subtle text-success rounded-pill px-3 py-1">Planificación</span>
+                                <a href="{% url 'calendario_escolar' %}" class="btn btn-purple">
+                                    <i class="bi bi-box-arrow-up-right me-1"></i> Entrar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 10. CURSOS, NIVELES Y SECCIONES -->
+                    <div class="col-12 col-md-6 col-xl-4 module-item" data-nombre="cursos secciones niveles salas profesores jefes">
+                        <div class="module-card">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="module-icon" style="background:#EEF2FF; color:#4F46E5;">
+                                    <i class="bi bi-diagram-3-fill"></i>
+                                </div>
+                                <div class="form-check form-switch fs-4">
+                                    <input class="form-check-input toggle-modulo" type="checkbox" name="cursos" checked>
+                                </div>
+                            </div>
+                            <h3 class="fw-bold text-dark fs-5 mb-1">Cursos, Niveles & Secciones</h3>
+                            <p class="text-muted small mb-3 flex-grow-1">Estructuración de niveles educativos, administración de salas y asignación de profesores jefes.</p>
+                            <div class="pt-3 border-top d-flex justify-content-between align-items-center">
+                                <span class="badge bg-secondary-subtle text-dark rounded-pill px-3 py-1">Académico</span>
+                                <a href="{% url 'listar_cursos' %}" class="btn btn-purple">
+                                    <i class="bi bi-box-arrow-up-right me-1"></i> Entrar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 11. GESTIÓN CURRICULAR & ASIGNATURAS -->
+                    <div class="col-12 col-md-6 col-xl-4 module-item" data-nombre="asignaturas materias horas pedagogicas docentes carga horaria">
+                        <div class="module-card">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="module-icon" style="background:#FEF3C7; color:#D97706;">
+                                    <i class="bi bi-book-half"></i>
+                                </div>
+                                <div class="form-check form-switch fs-4">
+                                    <input class="form-check-input toggle-modulo" type="checkbox" name="asignaturas" checked>
+                                </div>
+                            </div>
+                            <h3 class="fw-bold text-dark fs-5 mb-1">Gestión Curricular & Asignaturas</h3>
+                            <p class="text-muted small mb-3 flex-grow-1">Catálogo de materias oficiales MINEDUC, asignación de docentes por asignatura y carga horaria semanal.</p>
+                            <div class="pt-3 border-top d-flex justify-content-between align-items-center">
+                                <span class="badge bg-secondary-subtle text-dark rounded-pill px-3 py-1">Curricular</span>
+                                <a href="{% url 'listar_asignaturas' %}" class="btn btn-purple">
+                                    <i class="bi bi-box-arrow-up-right me-1"></i> Entrar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 12. GESTIÓN DE ESTUDIANTES & MATRÍCULA -->
+                    <div class="col-12 col-md-6 col-xl-4 module-item" data-nombre="estudiantes alumnos matricula nomina apoderados pie">
+                        <div class="module-card">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="module-icon" style="background:#EFF6FF; color:#3B82F6;">
+                                    <i class="bi bi-people-fill"></i>
+                                </div>
+                                <div class="form-check form-switch fs-4">
+                                    <input class="form-check-input toggle-modulo" type="checkbox" name="estudiantes" checked>
+                                </div>
+                            </div>
+                            <h3 class="fw-bold text-dark fs-5 mb-1">Estudiantes & Matrícula</h3>
+                            <p class="text-muted small mb-3 flex-grow-1">Nómina integral de alumnos matriculados, ficha escolar, registro de apoderados y asignación de cursos.</p>
+                            <div class="pt-3 border-top d-flex justify-content-between align-items-center">
+                                <span class="badge bg-secondary-subtle text-dark rounded-pill px-3 py-1">Alumnado</span>
+                                <a href="{% url 'listar_estudiantes' %}" class="btn btn-purple">
+                                    <i class="bi bi-box-arrow-up-right me-1"></i> Entrar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 13. PERSONAL, DOCENTES & ROLES -->
+                    <div class="col-12 col-md-6 col-xl-4 module-item" data-nombre="personal docentes profesores roles permisos funcionarios">
+                        <div class="module-card">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="module-icon" style="background:#ECFDF5; color:#059669;">
+                                    <i class="bi bi-person-badge-fill"></i>
+                                </div>
+                                <div class="form-check form-switch fs-4">
+                                    <input class="form-check-input toggle-modulo" type="checkbox" name="personal" checked>
+                                </div>
+                            </div>
+                            <h3 class="fw-bold text-dark fs-5 mb-1">Personal, Docentes & Roles</h3>
+                            <p class="text-muted small mb-3 flex-grow-1">Directorio de profesores y administrativos, configuración de permisos individuales y roles de acceso.</p>
+                            <div class="pt-3 border-top d-flex justify-content-between align-items-center">
+                                <span class="badge bg-secondary-subtle text-dark rounded-pill px-3 py-1">Equipo</span>
+                                <a href="{% url 'listar_personal' %}" class="btn btn-purple">
+                                    <i class="bi bi-box-arrow-up-right me-1"></i> Entrar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 14. CENTRO DE REPORTES & ANALÍTICAS -->
+                    <div class="col-12 col-md-6 col-xl-4 module-item" data-nombre="reportes estadisticas analiticas excel graficos certificados">
+                        <div class="module-card">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="module-icon" style="background:#FDF2F8; color:#DB2777;">
+                                    <i class="bi bi-bar-chart-line-fill"></i>
+                                </div>
+                                <div class="form-check form-switch fs-4">
+                                    <input class="form-check-input toggle-modulo" type="checkbox" name="reportes" checked>
+                                </div>
+                            </div>
+                            <h3 class="fw-bold text-dark fs-5 mb-1">Centro de Reportes & Analíticas</h3>
+                            <p class="text-muted small mb-3 flex-grow-1">Boletines de notas, informes de rendimiento, tasas de asistencia y exportador masivo a Excel.</p>
+                            <div class="pt-3 border-top d-flex justify-content-between align-items-center">
+                                <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-1">Analítica</span>
+                                <a href="{% url 'centro_reportes' %}" class="btn btn-purple">
+                                    <i class="bi bi-box-arrow-up-right me-1"></i> Entrar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 15. FACTURACIÓN ELECTRÓNICA & SII -->
+                    <div class="col-12 col-md-6 col-xl-4 module-item" data-nombre="facturacion electronica sii dte boletas cobros">
+                        <div class="module-card">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="module-icon">
+                                    <i class="bi bi-receipt"></i>
+                                </div>
+                                <div class="form-check form-switch fs-4">
+                                    <input class="form-check-input toggle-modulo" type="checkbox" name="facturacion" checked>
+                                </div>
+                            </div>
+                            <h3 class="fw-bold text-dark fs-5 mb-1">Facturación Electrónica & SII</h3>
+                            <p class="text-muted small mb-3 flex-grow-1">Emisión de Documentos Tributarios Electrónicos (DTE 33/34), cobro automático y timbraje ante el SII.</p>
+                            <div class="pt-3 border-top d-flex justify-content-between align-items-center">
+                                <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1">Tributario</span>
+                                <a href="{% url 'dashboard_superadmin_facturacion' %}" class="btn btn-purple">
+                                    <i class="bi bi-box-arrow-up-right me-1"></i> Entrar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 16. COMUNICADOS Y NOTIFICACIONES MASIVAS -->
+                    <div class="col-12 col-md-6 col-xl-4 module-item" data-nombre="comunicados avisos notificaciones circulares masivas">
+                        <div class="module-card">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="module-icon" style="background:#FFF7ED; color:#EA580C;">
+                                    <i class="bi bi-megaphone-fill"></i>
+                                </div>
+                                <div class="form-check form-switch fs-4">
+                                    <input class="form-check-input toggle-modulo" type="checkbox" name="comunicados" checked>
+                                </div>
+                            </div>
+                            <h3 class="fw-bold text-dark fs-5 mb-1">Comunicados Institucionales</h3>
+                            <p class="text-muted small mb-3 flex-grow-1">Publicación de avisos urgentes, circulares oficiales y canales de mensajería para toda la comunidad.</p>
+                            <div class="pt-3 border-top d-flex justify-content-between align-items-center">
+                                <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-1">Canales</span>
+                                <a href="{% url 'dashboard_superadmin_comunicados' %}" class="btn btn-purple">
+                                    <i class="bi bi-box-arrow-up-right me-1"></i> Entrar
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -384,7 +642,7 @@
     </div>
 
     <!-- Scripts Bootstrap -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
     <script>
         function getCookie(name) {
             let cookieValue = null;
@@ -401,19 +659,24 @@
             return cookieValue;
         }
 
-        document.addEventListener('DOMContentLoaded', function () {
-            const mobileBtn = document.getElementById('mobileMenuBtn');
-            const sidebar = document.getElementById('sidebar');
-            if (mobileBtn && sidebar) {
-                mobileBtn.addEventListener('click', function () {
-                    sidebar.classList.toggle('active');
-                });
-            }
+        function filtrarModulos(query) {
+            const term = query.toLowerCase().trim();
+            const items = document.querySelectorAll('.module-item');
+            items.forEach(item => {
+                const keywords = item.getAttribute('data-nombre') || '';
+                const text = item.innerText.toLowerCase();
+                if (keywords.includes(term) || text.includes(term)) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
 
+        document.addEventListener('DOMContentLoaded', function () {
             const toggles = document.querySelectorAll('.toggle-modulo');
             toggles.forEach(toggle => {
                 toggle.addEventListener('change', function () {
-                    const colegioId = this.dataset.colegioId;
                     const moduloNombre = this.name;
                     const nuevoEstado = this.checked;
 
@@ -424,17 +687,11 @@
                             'X-CSRFToken': getCookie('csrftoken')
                         },
                         body: JSON.stringify({
-                            colegio_id: colegioId,
                             modulo: moduloNombre,
                             estado: nuevoEstado
                         })
                     })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! Status: ${response.status}`);
-                        }
-                        return response.json();
-                    })
+                    .then(response => response.json())
                     .then(data => {
                         console.log('✅ Estado del módulo actualizado:', data);
                     })

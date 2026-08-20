@@ -8,6 +8,7 @@ urlpatterns = [
     path('superadmin/colegios/', views.dashboard_superadmin_colegios_view, name='dashboard_superadmin_colegios'),
     path('superadmin/planes/', views.dashboard_superadmin_planes_view, name='dashboard_superadmin_planes'),
     path('superadmin/facturacion/', views.dashboard_superadmin_facturacion_view, name='dashboard_superadmin_facturacion'),
+    path('superadmin/facturacion/emitir-manual/', views.dashboard_superadmin_factura_manual_view, name='emitir_factura_manual'),
     path('superadmin/ordenes/', views.dashboard_superadmin_ordenes_view, name='dashboard_superadmin_ordenes'),
     path('superadmin/modulos-erp/', views.dashboard_superadmin_modulos_erp_view, name='dashboard_superadmin_modulos_erp'),
     path('superadmin/configuracion/', views.dashboard_superadmin_configuracion_view, name='dashboard_superadmin_configuracion'),

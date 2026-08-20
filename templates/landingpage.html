@@ -1,4 +1,4 @@
-{% load static %}
+{% load static humanize %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -535,87 +535,52 @@
       </div>
 
       <div class="row g-4 align-items-stretch justify-content-center">
-        
-        <!-- Plan Básico -->
-        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
-          <div class="pricing-card-v2">
-            <h4 class="fw-extrabold mb-1">Plan Básico</h4>
-            <p class="small text-muted mb-4">Para jardines y escuelas pequeñas que buscan digitalizar su libro de clases.</p>
+        {% for plan in planes %}
+        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="{{ forloop.counter }}00">
+          <div class="pricing-card-v2 {% if plan.recomendado %}featured{% endif %}">
+            {% if plan.recomendado %}
+            <div class="popular-ribbon">⭐ Más Elegido por Colegios</div>
+            {% endif %}
+
+            <h4 class="fw-extrabold mb-1 {% if plan.recomendado %}text-primary{% endif %}">{{ plan.nombre }}</h4>
+            <p class="small text-muted mb-4">{{ plan.descripcion|default:"Solución moderna e integral para la gestión escolar." }}</p>
 
             <div class="mb-4">
-              <span class="fs-1 fw-extrabold text-dark price-val" data-mensual="$49.900" data-anual="$42.400">$42.400</span>
+              {% if plan.precio_mensual > 0 %}
+              <span class="fs-1 fw-extrabold {% if plan.recomendado %}text-primary{% else %}text-dark{% endif %} price-val" 
+                    data-mensual="${{ plan.precio_mensual|intcomma }}" 
+                    data-anual="${{ plan.precio_anual|intcomma }}">
+                ${{ plan.precio_anual|intcomma }}
+              </span>
               <span class="text-muted small">/ mes + IVA</span>
+              {% else %}
+              <span class="fs-1 fw-extrabold text-muted">A Cotizar</span>
+              <span class="text-muted small d-block">Según requerimientos</span>
+              {% endif %}
             </div>
 
-            <ul class="list-unstyled small text-muted d-flex flex-column gap-2.5 mb-4 flex-grow-1">
-              <li><i class="bi bi-check-circle-fill text-success me-2"></i> Hasta 200 estudiantes</li>
+            <ul class="list-unstyled small {% if plan.recomendado %}text-dark fw-semibold{% else %}text-muted{% endif %} d-flex flex-column gap-2.5 mb-4 flex-grow-1">
+              {% for mod in plan.modulos.all %}
+              <li><i class="bi bi-check-circle-fill {% if plan.recomendado %}text-primary{% else %}text-success{% endif %} me-2"></i> {{ mod.nombre }}</li>
+              {% empty %}
               <li><i class="bi bi-check-circle-fill text-success me-2"></i> Libro de clases digital estándar</li>
               <li><i class="bi bi-check-circle-fill text-success me-2"></i> Asistencia diaria y atrasos</li>
               <li><i class="bi bi-check-circle-fill text-success me-2"></i> Registro de notas y promedios</li>
-              <li><i class="bi bi-x-circle text-muted me-2"></i> Simulador SIMCE & DIA</li>
-              <li><i class="bi bi-x-circle text-muted me-2"></i> Finanzas & Directorio Proveedores</li>
+              <li><i class="bi bi-check-circle-fill text-success me-2"></i> Reportes y certificados oficiales</li>
+              {% endfor %}
             </ul>
 
-            <a href="{% url 'registro_colegio' %}" class="btn btn-eduteka-outline w-100 py-2.5 justify-content-center">
-              Elegir Plan Básico
+            <a href="{% url 'registro_colegio' %}" class="btn {% if plan.recomendado %}btn-eduteka-primary w-100 py-3 justify-content-center shadow{% else %}btn-eduteka-outline w-100 py-2.5 justify-content-center{% endif %}">
+              Elegir {{ plan.nombre }}
             </a>
           </div>
         </div>
-
-        <!-- Plan Profesional (Featured) -->
-        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
-          <div class="pricing-card-v2 featured">
-            <div class="popular-ribbon">⭐ Más Elegido por Colegios</div>
-
-            <h4 class="fw-extrabold mb-1 text-primary">Plan Profesional</h4>
-            <p class="small text-muted mb-4">Para colegios y liceos que requieren control curricular, SIMCE y ACLES.</p>
-
-            <div class="mb-4">
-              <span class="fs-1 fw-extrabold text-primary price-val" data-mensual="$89.900" data-anual="$76.400">$76.400</span>
-              <span class="text-muted small">/ mes + IVA</span>
-            </div>
-
-            <ul class="list-unstyled small text-dark fw-semibold d-flex flex-column gap-2.5 mb-4 flex-grow-1">
-              <li><i class="bi bi-check-circle-fill text-primary me-2"></i> Hasta 700 estudiantes</li>
-              <li><i class="bi bi-check-circle-fill text-primary me-2"></i> <strong>Libro de Clases Full + Acompañamiento PIE</strong></li>
-              <li><i class="bi bi-check-circle-fill text-primary me-2"></i> <strong>Módulo SIMCE & Diagnóstico Integral DIA</strong></li>
-              <li><i class="bi bi-check-circle-fill text-primary me-2"></i> Talleres Extracurriculares (ACLES)</li>
-              <li><i class="bi bi-check-circle-fill text-primary me-2"></i> Convivencia escolar y hoja de vida</li>
-              <li><i class="bi bi-check-circle-fill text-primary me-2"></i> Exportación oficial Excel y actas SIGE</li>
-            </ul>
-
-            <a href="{% url 'registro_colegio' %}" class="btn btn-eduteka-primary w-100 py-3 justify-content-center shadow">
-              Comenzar con Profesional
-            </a>
-          </div>
+        {% empty %}
+        <div class="col-12 text-center text-muted py-5">
+          <i class="bi bi-layers fs-1 text-muted d-block mb-2"></i>
+          <p class="mb-0">Cargando planes y tarifas disponibles...</p>
         </div>
-
-        <!-- Plan Institucional -->
-        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
-          <div class="pricing-card-v2">
-            <h4 class="fw-extrabold mb-1">Plan Institucional</h4>
-            <p class="small text-muted mb-4">La suite corporativa total con control financiero, inventario y soporte 24/7.</p>
-
-            <div class="mb-4">
-              <span class="fs-1 fw-extrabold text-dark price-val" data-mensual="$149.900" data-anual="$127.400">$127.400</span>
-              <span class="text-muted small">/ mes + IVA</span>
-            </div>
-
-            <ul class="list-unstyled small text-muted d-flex flex-column gap-2.5 mb-4 flex-grow-1">
-              <li><i class="bi bi-check-circle-fill text-success me-2"></i> Estudiantes ilimitados</li>
-              <li><i class="bi bi-check-circle-fill text-success me-2"></i> <strong>Todos los módulos activos</strong></li>
-              <li><i class="bi bi-check-circle-fill text-success me-2"></i> Control financiero, caja chica y rendiciones</li>
-              <li><i class="bi bi-check-circle-fill text-success me-2"></i> Inventario & Directorio de Proveedores</li>
-              <li><i class="bi bi-check-circle-fill text-success me-2"></i> Soporte preferencial WhatsApp 24/7</li>
-              <li><i class="bi bi-check-circle-fill text-success me-2"></i> Capacitación presencial y online ilimitada</li>
-            </ul>
-
-            <a href="{% url 'registro_colegio' %}" class="btn btn-eduteka-outline w-100 py-2.5 justify-content-center">
-              Elegir Institucional
-            </a>
-          </div>
-        </div>
-
+        {% endfor %}
       </div>
     </div>
   </section>

@@ -1,4 +1,6 @@
 from django.shortcuts import render
+from planes.models import Plan
 
 def landing_page(request):
-    return render(request, 'landingpage.html')
+    planes = Plan.objects.filter(activo=True).prefetch_related('modulos').order_by('precio_mensual')
+    return render(request, 'landingpage.html', {'planes': planes})

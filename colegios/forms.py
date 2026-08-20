@@ -102,21 +102,41 @@ class RegistroColegioPaso2Form(forms.Form):
             self.fields['modulos'].choices = [(m, m) for m in self.data.getlist('modulos')]
 
     def clean_plan(self):
-        plan_key = self.cleaned_data.get('plan')
-        nombre_real = self.PLAN_MAPPING.get(plan_key, plan_key.capitalize())
-        try:
-            return Plan.objects.get(nombre__iexact=nombre_real)
-        except Plan.DoesNotExist:
-            raise forms.ValidationError(f"El plan seleccionado '{nombre_real}' no existe en el sistema.")
+        plan_val = self.cleaned_data.get('plan')
+        if not plan_val:
+            raise forms.ValidationError("Debe seleccionar un plan.")
+        
+        # 1. Si viene como ID numérico
+        if str(plan_val).isdigit():
+            plan_obj = Plan.objects.filter(id=int(plan_val)).first()
+            if plan_obj:
+                return plan_obj
+
+        # 2. Si viene como string / nombre
+        nombre_real = self.PLAN_MAPPING.get(plan_val, plan_val)
+        plan_obj = Plan.objects.filter(nombre__iexact=nombre_real).first()
+        if not plan_obj:
+            plan_obj = Plan.objects.filter(nombre__icontains=nombre_real).first()
+        
+        if plan_obj:
+            return plan_obj
+
+        raise forms.ValidationError(f"El plan seleccionado '{plan_val}' no existe en el sistema.")
 
     def clean_modulos(self):
         modulos_keys = self.cleaned_data.get('modulos', [])
         modulos = []
         for key in modulos_keys:
-            nombre_real = self.MODULO_MAPPING.get(key, key.replace('_', ' ').capitalize())
-            try:
-                modulos.append(Modulo.objects.get(nombre__iexact=nombre_real))
-            except Modulo.DoesNotExist:
-                # Si no existe, lo ignoramos o podrías lanzar error. Para robustez, mejor ignorar o crear si es vital.
-                pass
+            if str(key).isdigit():
+                mod = Modulo.objects.filter(id=int(key)).first()
+                if mod:
+                    modulos.append(mod)
+                    continue
+
+            nombre_real = self.MODULO_MAPPING.get(key, key.replace('_', ' ').strip())
+            mod = Modulo.objects.filter(nombre__iexact=nombre_real).first()
+            if not mod:
+                mod = Modulo.objects.filter(nombre__icontains=nombre_real).first()
+            if mod:
+                modulos.append(mod)
         return modulos
