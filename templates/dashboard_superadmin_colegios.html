@@ -297,10 +297,16 @@
                     <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn" style="border:none; background:var(--primary-soft); color:var(--primary);">
                         <i class="bi bi-list fs-5"></i>
                     </button>
-                    <div class="search-bar">
+                    <form method="GET" action="{% url 'dashboard_superadmin_colegios' %}" class="search-bar d-flex align-items-center">
                         <i class="bi bi-search"></i>
-                        <input type="text" placeholder="Buscar colegios, órdenes, planes...">
-                    </div>
+                        <input type="text" name="q" value="{{ q }}" placeholder="Buscar colegios, RUT, email...">
+                        {% if estado_filtro and estado_filtro != 'todos' %}
+                            <input type="hidden" name="estado" value="{{ estado_filtro }}">
+                        {% endif %}
+                        {% if plan_filtro and plan_filtro != 'todos' %}
+                            <input type="hidden" name="plan" value="{{ plan_filtro }}">
+                        {% endif %}
+                    </form>
                 </div>
 
                 <div class="topbar-right">
@@ -340,17 +346,17 @@
                 <!-- Filters -->
                 <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
                     <div class="d-flex flex-wrap gap-2">
-                        <span class="filter-pill active">Todos</span>
-                        <span class="filter-pill">Activos</span>
-                        <span class="filter-pill">En Prueba</span>
-                        <span class="filter-pill">Morosos</span>
+                        <a href="?estado=todos{% if q %}&q={{ q }}{% endif %}{% if plan_filtro %}&plan={{ plan_filtro }}{% endif %}" class="filter-pill {% if estado_filtro == 'todos' or not estado_filtro %}active{% endif %}">Todos ({{ total_colegios }})</a>
+                        <a href="?estado=activos{% if q %}&q={{ q }}{% endif %}{% if plan_filtro %}&plan={{ plan_filtro }}{% endif %}" class="filter-pill {% if estado_filtro == 'activos' %}active{% endif %}">Activos ({{ colegios_activos }})</a>
+                        <a href="?estado=pendientes{% if q %}&q={{ q }}{% endif %}{% if plan_filtro %}&plan={{ plan_filtro }}{% endif %}" class="filter-pill {% if estado_filtro == 'pendientes' %}active{% endif %}">Pendientes ({{ colegios_pendientes }})</a>
+                        <a href="?estado=inactivos{% if q %}&q={{ q }}{% endif %}{% if plan_filtro %}&plan={{ plan_filtro }}{% endif %}" class="filter-pill {% if estado_filtro == 'inactivos' %}active{% endif %}">Inactivos</a>
                     </div>
                     <div>
-                        <select class="form-select form-select-sm rounded-pill px-3 border" style="width: auto;">
-                            <option selected>Filtrar por Plan (Todos)</option>
-                            <option>Plan Básico</option>
-                            <option>Plan Estándar</option>
-                            <option>Plan Premium</option>
+                        <select class="form-select form-select-sm rounded-pill px-3 border" onchange="location = this.value;" style="width: auto;">
+                            <option value="?plan=todos{% if q %}&q={{ q }}{% endif %}{% if estado_filtro %}&estado={{ estado_filtro }}{% endif %}" {% if not plan_filtro or plan_filtro == 'todos' %}selected{% endif %}>Filtrar por Plan (Todos)</option>
+                            {% for p in planes %}
+                            <option value="?plan={{ p.id }}{% if q %}&q={{ q }}{% endif %}{% if estado_filtro %}&estado={{ estado_filtro }}{% endif %}" {% if plan_filtro == p.id|stringformat:"s" %}selected{% endif %}>{{ p.nombre }}</option>
+                            {% endfor %}
                         </select>
                     </div>
                 </div>
@@ -375,55 +381,73 @@
                                 <tr>
                                     <td>
                                         <div class="d-flex align-items-center gap-3">
-                                            <div class="school-icon-badge">
-                                                {{ colegio.nombre|slice:":2"|upper }}
-                                            </div>
+                                            {% if colegio.logo %}
+                                                <img src="{{ colegio.logo.url }}" alt="{{ colegio.nombre }}" class="rounded-3" style="width:38px;height:38px;object-fit:cover;">
+                                            {% else %}
+                                                <div class="school-icon-badge">
+                                                    {{ colegio.nombre|slice:":2"|upper }}
+                                                </div>
+                                            {% endif %}
                                             <div>
                                                 <div class="fw-bold text-dark">{{ colegio.nombre }}</div>
-                                                <div class="text-muted small">{{ colegio.ciudad_comuna|default:"Sin comuna" }}</div>
+                                                <div class="text-muted small">
+                                                    {{ colegio.ciudad_comuna|default:"Sin comuna" }}
+                                                    {% if colegio.nombre_administrador %} · <i class="bi bi-person"></i> {{ colegio.nombre_administrador }}{% endif %}
+                                                </div>
                                             </div>
                                         </div>
                                     </td>
                                     <td class="text-muted fw-semibold">{{ colegio.nombre_corto|default:"Sin RUT" }}</td>
-                                    <td>{{ colegio.get_cantidad_alumnos_display }}</td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border fw-semibold">{{ colegio.get_cantidad_alumnos_display|default:colegio.cantidad_alumnos }}</span>
+                                    </td>
                                     <td>
                                         {% if colegio.configuracion_completa %}
-                                        <span class="pill pill-green"><i class="bi bi-check-circle-fill"></i> Completado</span>
+                                            <span class="pill pill-green"><i class="bi bi-check-circle-fill"></i> Completado</span>
                                         {% else %}
-                                        <span class="pill pill-yellow"><i class="bi bi-clock-history"></i> Pendiente</span>
+                                            <span class="pill pill-yellow"><i class="bi bi-clock-history"></i> Paso {{ colegio.paso_configuracion_actual|default:"1" }}</span>
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <span class="fw-bold text-dark">
-                                            {% if colegio.suscripcion %}
-                                                {{ colegio.suscripcion.plan.nombre }}
-                                            {% else %}
-                                                Sin Plan
-                                            {% endif %}
-                                        </span>
+                                        {% if colegio.suscripcion %}
+                                            <span class="fw-bold text-primary">{{ colegio.suscripcion.plan.nombre }}</span>
+                                            <div class="text-muted" style="font-size:0.75rem;">{{ colegio.suscripcion.get_tipo_facturacion_display }}</div>
+                                        {% else %}
+                                            <span class="text-muted small">Sin Plan</span>
+                                        {% endif %}
                                     </td>
                                     <td>
                                         {% if colegio.estado == 'activo' %}
                                             <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">Activo</span>
                                         {% elif colegio.estado == 'inactivo' or colegio.estado == 'suspendido' %}
-                                            <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2">Inactivo</span>
+                                            <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2">{{ colegio.get_estado_display }}</span>
                                         {% else %}
                                             <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">{{ colegio.get_estado_display }}</span>
                                         {% endif %}
                                     </td>
-                                     <td class="text-end">
-                                         <a href="{% url 'ver_detalle_colegio' colegio.id %}" class="btn btn-sm btn-outline-primary rounded-pill me-1" title="Ver Detalles">
-                                             <i class="bi bi-eye"></i>
-                                         </a>
-                                         <a href="{% url 'editar_colegio' colegio.id %}" class="btn btn-sm btn-light border rounded-pill" title="Editar">
-                                             <i class="bi bi-pencil"></i>
-                                         </a>
-                                     </td>
+                                    <td class="text-end">
+                                        <div class="btn-group">
+                                            <a href="{% url 'ver_detalle_colegio' colegio.id %}" class="btn btn-sm btn-outline-primary rounded-pill me-1" title="Ver Detalles">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a href="{% url 'editar_colegio' colegio.id %}" class="btn btn-sm btn-light border rounded-pill me-1" title="Editar Ficha">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a href="{% url 'editar_suscripcion_colegio' colegio.id %}" class="btn btn-sm btn-light border rounded-pill" title="Editar Suscripción">
+                                                <i class="bi bi-credit-card"></i>
+                                            </a>
+                                        </div>
+                                    </td>
                                 </tr>
                                 {% empty %}
                                 <tr>
-                                    <td colspan="7" class="text-center py-4 text-muted">
-                                        <i class="bi bi-info-circle me-1"></i> No hay colegios registrados en el sistema.
+                                    <td colspan="7" class="text-center py-5 text-muted">
+                                        <i class="bi bi-building-exclamation fs-3 d-block mb-2 text-secondary"></i>
+                                        <strong>No se encontraron colegios registrados</strong>
+                                        {% if q or estado_filtro != 'todos' or plan_filtro %}
+                                            <p class="small mb-2">Prueba cambiando los criterios de búsqueda o filtros.</p>
+                                            <a href="{% url 'dashboard_superadmin_colegios' %}" class="btn btn-sm btn-outline-primary rounded-pill">Limpiar Filtros</a>
+                                        {% endif %}
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -459,37 +483,38 @@
                                 <label for="rut" class="form-label fw-semibold small text-muted">RUT <span class="text-muted font-normal">(sin puntos)</span></label>
                                 <input type="text" name="rut" id="rut" class="form-control rounded-3" placeholder="Ej: 76123456-K">
                             </div>
-                            <div class="col-12 col-md-8">
+                            <div class="col-12 col-md-6">
                                 <label for="direccion" class="form-label fw-semibold small text-muted">Dirección</label>
-                                <input type="text" name="direccion" id="direccion" class="form-control rounded-3">
+                                <input type="text" name="direccion" id="direccion" class="form-control rounded-3" placeholder="Ej: Av. Principal 123">
                             </div>
-                            <div class="col-12 col-md-4">
-                                <label for="cp" class="form-label fw-semibold small text-muted">Código Postal</label>
-                                <input type="text" name="cp" id="cp" class="form-control rounded-3">
+                            <div class="col-12 col-md-6">
+                                <label for="ciudad" class="form-label fw-semibold small text-muted">Ciudad / Comuna</label>
+                                <input type="text" name="ciudad" id="ciudad" class="form-control rounded-3" placeholder="Ej: Santiago">
                             </div>
                             <div class="col-12"><hr class="my-2"></div>
-                            <div class="col-12 col-md-6">
-                                <label for="contacto" class="form-label fw-semibold small text-muted">Persona de Contacto</label>
+                            <div class="col-12 col-md-4">
+                                <label for="contacto" class="form-label fw-semibold small text-muted">Persona de Contacto / Admin</label>
                                 <input type="text" name="contacto" id="contacto" class="form-control rounded-3" placeholder="Nombre completo">
                             </div>
-                            <div class="col-12 col-md-6">
+                            <div class="col-12 col-md-4">
                                 <label for="email" class="form-label fw-semibold small text-muted">Email Administrativo</label>
                                 <input type="email" name="email" id="email" class="form-control rounded-3" placeholder="admin@colegio.cl">
                             </div>
-                            <div class="col-6 col-md-3">
-                                <label for="alumnos" class="form-label fw-semibold small text-muted">N° Alumnos</label>
-                                <input type="number" name="alumnos" id="alumnos" class="form-control rounded-3">
-                            </div>
-                            <div class="col-6 col-md-3">
-                                <label for="profesores" class="form-label fw-semibold small text-muted">N° Profesores</label>
-                                <input type="number" name="profesores" id="profesores" class="form-control rounded-3">
+                            <div class="col-12 col-md-4">
+                                <label for="telefono" class="form-label fw-semibold small text-muted">Teléfono de Contacto</label>
+                                <input type="text" name="telefono" id="telefono" class="form-control rounded-3" placeholder="+56 9 1234 5678">
                             </div>
                             <div class="col-12 col-md-6">
-                                <label for="plan" class="form-label fw-semibold small text-muted">Plan de Suscripción</label>
-                                <select id="plan" name="plan" class="form-select rounded-3">
-                                    <option>Plan Básico (hasta 500 alumnos)</option>
-                                    <option>Plan Estándar (hasta 1500 alumnos)</option>
-                                    <option>Plan Premium (Ilimitado)</option>
+                                <label for="alumnos" class="form-label fw-semibold small text-muted">N° Estimado de Alumnos</label>
+                                <input type="number" name="alumnos" id="alumnos" class="form-control rounded-3" placeholder="Ej: 450">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label for="plan_id" class="form-label fw-semibold small text-muted">Plan de Suscripción</label>
+                                <select id="plan_id" name="plan_id" class="form-select rounded-3">
+                                    <option value="">Sin Suscripción Inicial</option>
+                                    {% for p in planes %}
+                                    <option value="{{ p.id }}">{{ p.nombre }} (${{ p.precio_mensual|default:"0" }}/mes)</option>
+                                    {% endfor %}
                                 </select>
                             </div>
                         </div>

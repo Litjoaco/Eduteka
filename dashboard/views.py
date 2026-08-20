@@ -188,10 +188,13 @@ def dashboard_superadmin_view(request):
 
 def dashboard_superadmin_colegios_view(request):
     if request.method == 'POST':
-        nombre = request.POST.get('nombre')
-        contacto = request.POST.get('contacto', 'Sin Contacto')
-        email = request.POST.get('email', 'admin@colegio.cl')
-        direccion = request.POST.get('direccion', '')
+        nombre = request.POST.get('nombre', '').strip()
+        rut = request.POST.get('rut', '').strip()
+        contacto = request.POST.get('contacto', 'Sin Contacto').strip()
+        email = request.POST.get('email', 'admin@colegio.cl').strip()
+        direccion = request.POST.get('direccion', '').strip()
+        ciudad = request.POST.get('ciudad', 'Santiago').strip()
+        telefono = request.POST.get('telefono', '+56 9 1234 5678').strip()
         
         # Mapeo simple de cantidad de alumnos al choice del modelo
         alumnos_raw = request.POST.get('alumnos', '0')
@@ -209,23 +212,83 @@ def dashboard_superadmin_colegios_view(request):
         else:
             cantidad_alumnos = 'mas_600'
 
-        Colegio.objects.create(
+        colegio = Colegio.objects.create(
             nombre=nombre,
+            nombre_corto=rut,
             nombre_administrador=contacto,
             correo_institucional=email,
             direccion=direccion,
-            telefono='000000000', # Dummy
-            ciudad_comuna='Santiago', # Dummy
-            tipo_institucion='particular', # Dummy
+            telefono=telefono,
+            ciudad_comuna=ciudad,
+            tipo_institucion='particular',
             cantidad_alumnos=cantidad_alumnos,
             estado='activo',
             configuracion_completa=True
         )
-        messages.success(request, 'Colegio creado exitosamente.')
+
+        plan_id = request.POST.get('plan_id')
+        if plan_id:
+            try:
+                plan_obj = Plan.objects.get(id=plan_id)
+                Suscripcion.objects.create(
+                    colegio=colegio,
+                    plan=plan_obj,
+                    tipo_facturacion='mensual',
+                    monto=plan_obj.precio_mensual,
+                    estado='activa'
+                )
+            except (Plan.DoesNotExist, ValueError):
+                pass
+
+        messages.success(request, f'Colegio "{colegio.nombre}" registrado exitosamente.')
         return redirect('dashboard_superadmin_colegios')
 
-    colegios = Colegio.objects.all().order_by('-fecha_creacion')
-    return render(request, 'dashboard_superadmin_colegios.html', {'colegios': colegios})
+    # Consulta de colegios optimizada con select_related
+    colegios = Colegio.objects.all().select_related('suscripcion', 'suscripcion__plan', 'administrador').order_by('-fecha_creacion')
+
+    # Búsqueda por texto (nombre, rut, email, administrador, comuna)
+    q = request.GET.get('q', '').strip()
+    if q:
+        colegios = colegios.filter(
+            Q(nombre__icontains=q) |
+            Q(nombre_corto__icontains=q) |
+            Q(correo_institucional__icontains=q) |
+            Q(ciudad_comuna__icontains=q) |
+            Q(nombre_administrador__icontains=q)
+        )
+
+    # Filtrado por estado
+    estado_filtro = request.GET.get('estado', 'todos')
+    if estado_filtro == 'activos':
+        colegios = colegios.filter(estado='activo')
+    elif estado_filtro == 'pendientes':
+        colegios = colegios.filter(estado__in=['pendiente_configuracion', 'pendiente_pago'])
+    elif estado_filtro == 'inactivos':
+        colegios = colegios.filter(estado__in=['inactivo', 'suspendido'])
+
+    # Filtrado por plan
+    plan_filtro = request.GET.get('plan', '')
+    if plan_filtro and plan_filtro != 'todos':
+        colegios = colegios.filter(suscripcion__plan_id=plan_filtro)
+
+    planes = Plan.objects.all()
+
+    # Métricas para tarjetas/indicadores
+    total_colegios = Colegio.objects.count()
+    colegios_activos = Colegio.objects.filter(estado='activo').count()
+    colegios_pendientes = Colegio.objects.filter(estado__in=['pendiente_configuracion', 'pendiente_pago']).count()
+
+    context = {
+        'colegios': colegios,
+        'planes': planes,
+        'q': q,
+        'estado_filtro': estado_filtro,
+        'plan_filtro': plan_filtro,
+        'total_colegios': total_colegios,
+        'colegios_activos': colegios_activos,
+        'colegios_pendientes': colegios_pendientes,
+    }
+    return render(request, 'dashboard_superadmin_colegios.html', context)
 
 def dashboard_superadmin_planes_view(request):
     from planes.models import Plan
@@ -597,8 +660,270 @@ def dashboard_superadmin_roles_view(request):
 
 
 def dashboard_superadmin_usuarios_view(request):
-    """Maqueta visual de Usuarios Globales (pendiente de implementación)."""
-    return render(request, 'dashboard_superadmin_usuarios.html')
+    """
+    Panel de Gestión Global de Usuarios del Super Admin.
+    Permite listar, buscar, filtrar por colegio/rol/estado, crear, editar,
+    suspender/activar usuarios y exportar a CSV.
+    """
+    from usuarios.models import PerfilUsuario
+
+    if request.method == 'POST':
+        accion = request.POST.get('accion')
+
+        # ── CREAR NUEVO USUARIO
+        if accion == 'crear_usuario':
+            nombre_completo = request.POST.get('nombre_completo', '').strip()
+            rut = request.POST.get('rut', '').strip()
+            email = request.POST.get('email', '').strip()
+            telefono = request.POST.get('telefono', '').strip()
+            colegio_id = request.POST.get('colegio_id')
+            rol_nombre = request.POST.get('rol_nombre', 'Profesor').strip()
+            estado_val = request.POST.get('estado', 'Activo')
+            password = request.POST.get('password', '').strip() or 'Eduteka2026!'
+
+            if not email:
+                messages.error(request, 'El correo institucional es obligatorio.')
+                return redirect('dashboard_superadmin_usuarios')
+
+            if User.objects.filter(Q(username=email) | Q(email=email)).exists():
+                messages.error(request, f'Ya existe un usuario registrado con el correo {email}.')
+                return redirect('dashboard_superadmin_usuarios')
+
+            # Crear User nativo
+            partes = nombre_completo.split(' ', 1)
+            first_name = partes[0] if partes else ''
+            last_name = partes[1] if len(partes) > 1 else ''
+
+            is_active = (estado_val.lower() == 'activo')
+            user = User.objects.create_user(
+                username=email,
+                email=email,
+                first_name=first_name,
+                last_name=last_name,
+                password=password,
+                is_active=is_active
+            )
+
+            # Perfil
+            PerfilUsuario.objects.create(
+                usuario=user,
+                nombre_completo=nombre_completo or email,
+                rut=rut,
+                telefono=telefono
+            )
+
+            # Asignar a Colegio y Rol si aplica
+            if colegio_id:
+                try:
+                    colegio_obj = Colegio.objects.get(id=colegio_id)
+                    rol_obj = RolColegio.objects.filter(colegio=colegio_obj, nombre__iexact=rol_nombre).first()
+                    if not rol_obj:
+                        rol_obj = RolColegio.objects.create(
+                            colegio=colegio_obj,
+                            nombre=rol_nombre,
+                            descripcion=f'Rol {rol_nombre} asignado automáticamente',
+                            activo=True
+                        )
+                    MiembroColegio.objects.create(
+                        usuario=user,
+                        colegio=colegio_obj,
+                        rol=rol_obj,
+                        activo=is_active
+                    )
+                except Colegio.DoesNotExist:
+                    pass
+
+            messages.success(request, f'Usuario {nombre_completo or email} creado con éxito.')
+            return redirect('dashboard_superadmin_usuarios')
+
+        # ── EDITAR USUARIO EXISTENTE
+        elif accion == 'editar_usuario':
+            usuario_id = request.POST.get('usuario_id')
+            user = get_object_or_404(User, id=usuario_id)
+
+            nombre_completo = request.POST.get('nombre_completo', '').strip()
+            rut = request.POST.get('rut', '').strip()
+            email = request.POST.get('email', '').strip()
+            telefono = request.POST.get('telefono', '').strip()
+            colegio_id = request.POST.get('colegio_id')
+            rol_nombre = request.POST.get('rol_nombre', '').strip()
+            estado_val = request.POST.get('estado', 'Activo')
+
+            # Actualizar User
+            if email and email != user.email:
+                if not User.objects.filter(Q(username=email) | Q(email=email)).exclude(id=user.id).exists():
+                    user.email = email
+                    user.username = email
+
+            partes = nombre_completo.split(' ', 1)
+            user.first_name = partes[0] if partes else ''
+            user.last_name = partes[1] if len(partes) > 1 else ''
+            user.is_active = (estado_val.lower() == 'activo')
+            user.save()
+
+            # Actualizar Perfil
+            perfil, _ = PerfilUsuario.objects.get_or_create(usuario=user)
+            perfil.nombre_completo = nombre_completo or user.email
+            perfil.rut = rut
+            perfil.telefono = telefono
+            perfil.save()
+
+            # Actualizar Membresía
+            if colegio_id:
+                try:
+                    colegio_obj = Colegio.objects.get(id=colegio_id)
+                    rol_obj = None
+                    if rol_nombre:
+                        rol_obj = RolColegio.objects.filter(colegio=colegio_obj, nombre__iexact=rol_nombre).first()
+                        if not rol_obj:
+                            rol_obj = RolColegio.objects.create(colegio=colegio_obj, nombre=rol_nombre, activo=True)
+
+                    miembro = MiembroColegio.objects.filter(usuario=user).first()
+                    if miembro:
+                        miembro.colegio = colegio_obj
+                        if rol_obj:
+                            miembro.rol = rol_obj
+                        miembro.activo = user.is_active
+                        miembro.save()
+                    else:
+                        MiembroColegio.objects.create(
+                            usuario=user,
+                            colegio=colegio_obj,
+                            rol=rol_obj,
+                            activo=user.is_active
+                        )
+                except Colegio.DoesNotExist:
+                    pass
+
+            messages.success(request, f'Usuario {perfil.nombre_completo} actualizado con éxito.')
+            return redirect('dashboard_superadmin_usuarios')
+
+        # ── SUSPENDER / ACTIVAR ACCESO
+        elif accion in ['toggle_estado', 'suspender_usuario', 'bloquear_usuario']:
+            usuario_id = request.POST.get('usuario_id')
+            user = get_object_or_404(User, id=usuario_id)
+            user.is_active = not user.is_active
+            user.save()
+
+            # Sincronizar membresías si tiene
+            MiembroColegio.objects.filter(usuario=user).update(activo=user.is_active)
+
+            estado_str = "activado" if user.is_active else "suspendido"
+            messages.info(request, f'Acceso de usuario {user.username} ha sido {estado_str}.')
+            return redirect('dashboard_superadmin_usuarios')
+
+    # ── GET: CONSULTA Y FILTRADO
+    q = request.GET.get('q', '').strip()
+    filtro_colegio = request.GET.get('colegio', '').strip()
+    filtro_rol = request.GET.get('rol', '').strip()
+    filtro_estado = request.GET.get('estado', '').strip()
+
+    # QuerySet base optimizado
+    users_qs = User.objects.all().select_related('perfil').prefetch_related(
+        'membresias_colegio__colegio',
+        'membresias_colegio__rol',
+        'colegios_administrados'
+    ).order_by('-date_joined')
+
+    # Búsqueda
+    if q:
+        users_qs = users_qs.filter(
+            Q(username__icontains=q) |
+            Q(email__icontains=q) |
+            Q(first_name__icontains=q) |
+            Q(last_name__icontains=q) |
+            Q(perfil__nombre_completo__icontains=q) |
+            Q(perfil__rut__icontains=q)
+        )
+
+    # Filtro Colegio
+    if filtro_colegio:
+        users_qs = users_qs.filter(
+            Q(membresias_colegio__colegio__id=filtro_colegio) |
+            Q(membresias_colegio__colegio__nombre__icontains=filtro_colegio) |
+            Q(colegios_administrados__id=filtro_colegio) |
+            Q(colegios_administrados__nombre__icontains=filtro_colegio)
+        ).distinct()
+
+    # Filtro Rol
+    if filtro_rol:
+        if filtro_rol.lower() in ['super admin', 'superadmin']:
+            users_qs = users_qs.filter(is_superuser=True)
+        elif filtro_rol.lower() in ['director', 'administrador']:
+            users_qs = users_qs.filter(
+                Q(colegios_administrados__isnull=False) |
+                Q(membresias_colegio__rol__nombre__icontains='director') |
+                Q(membresias_colegio__rol__nombre__icontains='admin')
+            ).distinct()
+        else:
+            users_qs = users_qs.filter(membresias_colegio__rol__nombre__icontains=filtro_rol).distinct()
+
+    # Filtro Estado
+    if filtro_estado:
+        if filtro_estado.lower() == 'activo':
+            users_qs = users_qs.filter(is_active=True)
+        elif filtro_estado.lower() in ['inactivo', 'suspendido']:
+            users_qs = users_qs.filter(is_active=False)
+
+    # ── EXPORTACIÓN CSV
+    if request.GET.get('exportar') == 'true' or request.GET.get('export') == 'csv':
+        response = HttpResponse(content_type='text/csv; charset=utf-8')
+        response['Content-Disposition'] = 'attachment; filename="usuarios_globales_eduteka.csv"'
+        response.write('\ufeff'.encode('utf8'))
+        writer = csv.writer(response)
+        writer.writerow(['ID', 'Nombre Completo', 'RUT', 'Correo Electrónico', 'Colegio', 'Rol', 'Estado', 'Último Acceso', 'Fecha Registro'])
+        for u in users_qs:
+            nom = getattr(u, 'perfil', None) and u.perfil.nombre_completo or u.get_full_name() or u.username
+            rut = getattr(u, 'perfil', None) and u.perfil.rut or ''
+            col = u.colegios_administrados.first() or (u.membresias_colegio.first() and u.membresias_colegio.first().colegio)
+            col_nombre = col.nombre if col else 'Sin Colegio'
+            if u.is_superuser:
+                rol_txt = 'Super Admin'
+            elif u.colegios_administrados.exists():
+                rol_txt = 'Director / Admin'
+            elif u.membresias_colegio.first() and u.membresias_colegio.first().rol:
+                rol_txt = u.membresias_colegio.first().rol.nombre
+            else:
+                rol_txt = 'Usuario'
+            est = 'Activo' if u.is_active else 'Suspendido'
+            last_l = u.last_login.strftime('%Y-%m-%d %H:%M') if u.last_login else 'Nunca'
+            joined = u.date_joined.strftime('%Y-%m-%d') if u.date_joined else ''
+            writer.writerow([u.id, nom, rut, u.email or u.username, col_nombre, rol_txt, est, last_l, joined])
+        return response
+
+    # ── KPIs Métricas
+    total_usuarios = User.objects.count()
+    total_docentes = MiembroColegio.objects.filter(
+        Q(rol__nombre__icontains='profesor') |
+        Q(rol__nombre__icontains='docente') |
+        Q(rol__nombre__icontains='utp') |
+        Q(rol__nombre__icontains='director')
+    ).values('usuario').distinct().count()
+
+    total_estudiantes_apoderados = MiembroColegio.objects.filter(
+        Q(rol__nombre__icontains='alumno') |
+        Q(rol__nombre__icontains='estudiante') |
+        Q(rol__nombre__icontains='apoderado')
+    ).values('usuario').distinct().count()
+
+    total_inactivos = User.objects.filter(is_active=False).count()
+
+    # Preparar lista de colegios para los selects
+    colegios = Colegio.objects.all().order_by('nombre')
+
+    context = {
+        'usuarios': users_qs,
+        'total_usuarios': total_usuarios,
+        'total_docentes': total_docentes,
+        'total_estudiantes_apoderados': total_estudiantes_apoderados,
+        'total_inactivos': total_inactivos,
+        'colegios': colegios,
+        'q': q,
+        'filtro_colegio': filtro_colegio,
+        'filtro_rol': filtro_rol,
+        'filtro_estado': filtro_estado,
+    }
+    return render(request, 'dashboard_superadmin_usuarios.html', context)
 
 
 def dashboard_superadmin_solicitudes_view(request):

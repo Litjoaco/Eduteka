@@ -266,16 +266,15 @@
                     style="border:none;background:var(--primary-soft);color:var(--primary);">
                     <i class="bi bi-list fs-5"></i>
                 </button>
-                <div class="search-bar">
+                <form method="GET" action="{% url 'dashboard_superadmin_usuarios' %}" class="search-bar d-flex align-items-center">
                     <i class="bi bi-search"></i>
-                    <input type="text" id="globalSearch" placeholder="Buscar por nombre, RUT, correo...">
-                </div>
+                    <input type="text" name="q" id="globalSearch" value="{{ q }}" placeholder="Buscar por nombre, RUT, correo...">
+                    {% if filtro_colegio %}<input type="hidden" name="colegio" value="{{ filtro_colegio }}">{% endif %}
+                    {% if filtro_rol %}<input type="hidden" name="rol" value="{{ filtro_rol }}">{% endif %}
+                    {% if filtro_estado %}<input type="hidden" name="estado" value="{{ filtro_estado }}">{% endif %}
+                </form>
             </div>
             <div class="topbar-right">
-                <button style="background:none;border:none;color:var(--gray-text);font-size:1.1rem;position:relative;cursor:pointer;">
-                    <i class="bi bi-bell"></i>
-                    <span style="position:absolute;top:0;right:0;width:7px;height:7px;background:#F76F7A;border-radius:50%;border:2px solid white;"></span>
-                </button>
                 <div class="user-profile">
                     <div class="user-avatar">AE</div>
                     <span class="user-name">Admin Eduteka</span>
@@ -284,6 +283,18 @@
         </header>
 
         <div class="content-area">
+
+            <!-- Django Messages -->
+            {% if messages %}
+                <div class="mb-4">
+                    {% for message in messages %}
+                        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show rounded-4" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
 
             <!-- HERO HEADER -->
             <div class="d-flex align-items-start justify-content-between mb-4 flex-wrap gap-3">
@@ -299,7 +310,7 @@
                     </p>
                 </div>
                 <div class="d-flex gap-2 flex-wrap">
-                    <a href="#" class="btn-outline-custom" onclick="exportUsers(event)">
+                    <a href="?exportar=true{% if q %}&q={{ q }}{% endif %}{% if filtro_colegio %}&colegio={{ filtro_colegio }}{% endif %}{% if filtro_rol %}&rol={{ filtro_rol }}{% endif %}{% if filtro_estado %}&estado={{ filtro_estado }}{% endif %}" class="btn-outline-custom">
                         <i class="bi bi-download"></i> Exportar CSV
                     </a>
                     <button class="btn-primary-custom" onclick="openCreateUserModal()">
@@ -314,7 +325,7 @@
                     <div class="stat-card">
                         <div class="stat-icon purple"><i class="bi bi-people"></i></div>
                         <div>
-                            <div class="stat-value">248</div>
+                            <div class="stat-value">{{ total_usuarios }}</div>
                             <div class="stat-label">Total Usuarios</div>
                         </div>
                     </div>
@@ -323,7 +334,7 @@
                     <div class="stat-card">
                         <div class="stat-icon teal"><i class="bi bi-journal-bookmark-fill"></i></div>
                         <div>
-                            <div class="stat-value">48</div>
+                            <div class="stat-value">{{ total_docentes }}</div>
                             <div class="stat-label">Docentes / UTP</div>
                         </div>
                     </div>
@@ -332,7 +343,7 @@
                     <div class="stat-card">
                         <div class="stat-icon amber"><i class="bi bi-mortarboard-fill"></i></div>
                         <div>
-                            <div class="stat-value">184</div>
+                            <div class="stat-value">{{ total_estudiantes_apoderados }}</div>
                             <div class="stat-label">Estudiantes y Apoderados</div>
                         </div>
                     </div>
@@ -341,7 +352,7 @@
                     <div class="stat-card">
                         <div class="stat-icon rose"><i class="bi bi-person-x-fill"></i></div>
                         <div>
-                            <div class="stat-value">3</div>
+                            <div class="stat-value">{{ total_inactivos }}</div>
                             <div class="stat-label">Cuentas Suspendidas / Inactivas</div>
                         </div>
                     </div>
@@ -363,40 +374,38 @@
                     <div class="d-flex align-items-center gap-2 flex-wrap">
                         <div class="table-search">
                             <i class="bi bi-search"></i>
-                            <input type="text" id="tableSearch" placeholder="Buscar nombre, RUT, correo..." oninput="filterTable()">
+                            <input type="text" id="tableSearch" value="{{ q }}" placeholder="Filtrar por texto..." oninput="filterTable()">
                         </div>
 
                         <!-- Filtro por Colegio -->
                         <select id="filterColegio" class="form-control-custom"
                             style="width:auto;padding:.45rem .85rem;font-size:.82rem;" onchange="filterTable()">
-                            <option value="">Filtrar por Colegio</option>
-                            <option value="Liceo Santa María">Liceo Santa María</option>
-                            <option value="Colegio Los Alerces">Colegio Los Alerces</option>
-                            <option value="Instituto Profesional del Norte">Instituto Profesional del Norte</option>
-                            <option value="Colegio San Agustín">Colegio San Agustín</option>
-                            <option value="Escuela Básica El Porvenir">Escuela Básica El Porvenir</option>
+                            <option value="">Filtrar por Colegio (Todos)</option>
+                            {% for col in colegios %}
+                            <option value="{{ col.nombre }}" {% if filtro_colegio == col.nombre or filtro_colegio == col.id|stringformat:"s" %}selected{% endif %}>{{ col.nombre }}</option>
+                            {% endfor %}
                         </select>
 
                         <!-- Filtro por Rol -->
                         <select id="filterRol" class="form-control-custom"
                             style="width:auto;padding:.45rem .85rem;font-size:.82rem;" onchange="filterTable()">
-                            <option value="">Filtrar por Rol</option>
-                            <option value="Director">Director</option>
-                            <option value="Profesor">Profesor</option>
-                            <option value="UTP">UTP</option>
-                            <option value="Inspector">Inspector</option>
-                            <option value="Alumno">Alumno</option>
-                            <option value="Apoderado">Apoderado</option>
-                            <option value="Administrador">Administrador</option>
+                            <option value="">Filtrar por Rol (Todos)</option>
+                            <option value="Super Admin" {% if filtro_rol == 'Super Admin' %}selected{% endif %}>Super Admin</option>
+                            <option value="Director" {% if filtro_rol == 'Director' %}selected{% endif %}>Director</option>
+                            <option value="Profesor" {% if filtro_rol == 'Profesor' %}selected{% endif %}>Profesor</option>
+                            <option value="UTP" {% if filtro_rol == 'UTP' %}selected{% endif %}>UTP</option>
+                            <option value="Inspector" {% if filtro_rol == 'Inspector' %}selected{% endif %}>Inspector</option>
+                            <option value="Alumno" {% if filtro_rol == 'Alumno' %}selected{% endif %}>Alumno</option>
+                            <option value="Apoderado" {% if filtro_rol == 'Apoderado' %}selected{% endif %}>Apoderado</option>
+                            <option value="Administrador" {% if filtro_rol == 'Administrador' %}selected{% endif %}>Administrador</option>
                         </select>
 
                         <!-- Filtro por Estado -->
                         <select id="filterEstado" class="form-control-custom"
                             style="width:auto;padding:.45rem .85rem;font-size:.82rem;" onchange="filterTable()">
-                            <option value="">Estado</option>
-                            <option value="Activo">Activo</option>
-                            <option value="Inactivo">Inactivo</option>
-                            <option value="Suspendido">Suspendido</option>
+                            <option value="">Estado (Todos)</option>
+                            <option value="Activo" {% if filtro_estado == 'activo' or filtro_estado == 'Activo' %}selected{% endif %}>Activo</option>
+                            <option value="Suspendido" {% if filtro_estado == 'inactivo' or filtro_estado == 'suspendido' or filtro_estado == 'Suspendido' %}selected{% endif %}>Suspendido / Inactivo</option>
                         </select>
                     </div>
                 </div>
@@ -414,187 +423,104 @@
                             </tr>
                         </thead>
                         <tbody id="usersBody">
-
-                            <!-- Usuario 1: Director -->
-                            <tr data-colegio="Liceo Santa María" data-rol="Director" data-estado="Activo">
+                            {% for usuario in usuarios %}
+                            <tr data-colegio="{% if usuario.colegios_administrados.first %}{{ usuario.colegios_administrados.first.nombre }}{% elif usuario.membresias_colegio.first %}{{ usuario.membresias_colegio.first.colegio.nombre }}{% else %}Sin Colegio{% endif %}"
+                                data-rol="{% if usuario.is_superuser %}Super Admin{% elif usuario.colegios_administrados.exists %}Director{% elif usuario.membresias_colegio.first.rol %}{{ usuario.membresias_colegio.first.rol.nombre }}{% else %}Usuario{% endif %}"
+                                data-estado="{% if usuario.is_active %}Activo{% else %}Suspendido{% endif %}">
                                 <td>
                                     <div class="user-cell">
-                                        <div class="user-avatar-circle" style="background:linear-gradient(135deg,#7C5CFC,#6344CE);">
-                                            CM
+                                        <div class="user-avatar-circle" style="background:linear-gradient(135deg, {% cycle '#7C5CFC,#6344CE' '#3B82F6,#1D4ED8' '#10B981,#047857' '#F59E0B,#D97706' '#EC4899,#BE185D' '#8B5CF6,#7C3AED' %});">
+                                            {{ usuario.perfil.nombre_completo|default:usuario.get_full_name|default:usuario.username|slice:":2"|upper }}
                                         </div>
                                         <div>
-                                            <div class="user-name-text">Carlos Mendoza Silva</div>
-                                            <div class="user-subtext">RUT: 14.321.654-K • c.mendoza@santamaria.cl</div>
+                                            <div class="user-name-text">
+                                                {{ usuario.perfil.nombre_completo|default:usuario.get_full_name|default:usuario.username }}
+                                            </div>
+                                            <div class="user-subtext">
+                                                {% if usuario.perfil.rut %}RUT: {{ usuario.perfil.rut }} • {% endif %}{{ usuario.email|default:usuario.username }}
+                                            </div>
                                         </div>
                                     </div>
                                 </td>
                                 <td>
-                                    <div style="font-size:.84rem;font-weight:600;color:var(--dark);">Liceo Santa María</div>
-                                    <div style="font-size:.74rem;color:var(--gray-text);">Región Metropolitana</div>
+                                    {% if usuario.colegios_administrados.first %}
+                                        <div style="font-size:.84rem;font-weight:600;color:var(--dark);">{{ usuario.colegios_administrados.first.nombre }}</div>
+                                        <div style="font-size:.74rem;color:var(--gray-text);">{{ usuario.colegios_administrados.first.ciudad_comuna|default:"Chile" }}</div>
+                                    {% elif usuario.membresias_colegio.first %}
+                                        <div style="font-size:.84rem;font-weight:600;color:var(--dark);">{{ usuario.membresias_colegio.first.colegio.nombre }}</div>
+                                        <div style="font-size:.74rem;color:var(--gray-text);">{{ usuario.membresias_colegio.first.colegio.ciudad_comuna|default:"Chile" }}</div>
+                                    {% else %}
+                                        <div style="font-size:.84rem;font-weight:600;color:var(--gray-text);">Global / Sin Colegio</div>
+                                    {% endif %}
                                 </td>
                                 <td>
-                                    <span class="role-chip chip-director"><span class="dot"></span>Director</span>
+                                    {% if usuario.is_superuser %}
+                                        <span class="role-chip chip-admin"><span class="dot"></span>Super Admin</span>
+                                    {% elif usuario.colegios_administrados.exists %}
+                                        <span class="role-chip chip-director"><span class="dot"></span>Director / Admin</span>
+                                    {% elif usuario.membresias_colegio.first.rol %}
+                                        {% with r=usuario.membresias_colegio.first.rol.nombre|lower %}
+                                            {% if 'profesor' in r or 'docente' in r %}
+                                                <span class="role-chip chip-profesor"><span class="dot"></span>{{ usuario.membresias_colegio.first.rol.nombre }}</span>
+                                            {% elif 'utp' in r %}
+                                                <span class="role-chip chip-utp"><span class="dot"></span>{{ usuario.membresias_colegio.first.rol.nombre }}</span>
+                                            {% elif 'director' in r or 'administrador' in r %}
+                                                <span class="role-chip chip-director"><span class="dot"></span>{{ usuario.membresias_colegio.first.rol.nombre }}</span>
+                                            {% elif 'alumno' in r or 'estudiante' in r %}
+                                                <span class="role-chip chip-alumno"><span class="dot"></span>{{ usuario.membresias_colegio.first.rol.nombre }}</span>
+                                            {% elif 'apoderado' in r %}
+                                                <span class="role-chip chip-apoderado"><span class="dot"></span>{{ usuario.membresias_colegio.first.rol.nombre }}</span>
+                                            {% elif 'inspector' in r %}
+                                                <span class="role-chip chip-inspector"><span class="dot"></span>{{ usuario.membresias_colegio.first.rol.nombre }}</span>
+                                            {% else %}
+                                                <span class="role-chip chip-profesor"><span class="dot"></span>{{ usuario.membresias_colegio.first.rol.nombre }}</span>
+                                            {% endif %}
+                                        {% endwith %}
+                                    {% else %}
+                                        <span class="role-chip chip-alumno"><span class="dot"></span>Usuario General</span>
+                                    {% endif %}
                                 </td>
                                 <td>
-                                    <div style="font-size:.82rem;color:var(--dark);">Hoy, 10:42 AM</div>
-                                    <div style="font-size:.72rem;color:var(--gray-text);">IP: 190.160.45.12</div>
+                                    {% if usuario.last_login %}
+                                        <div style="font-size:.82rem;color:var(--dark);">{{ usuario.last_login|date:"d M Y, H:i" }}</div>
+                                    {% else %}
+                                        <div style="font-size:.78rem;color:var(--gray-text);">Sin registro previo</div>
+                                    {% endif %}
                                 </td>
                                 <td>
-                                    <span class="status-badge status-activo"><i class="bi bi-circle-fill" style="font-size:.45rem;"></i> Activo</span>
+                                    {% if usuario.is_active %}
+                                        <span class="status-badge status-activo"><i class="bi bi-circle-fill" style="font-size:.45rem;"></i> Activo</span>
+                                    {% else %}
+                                        <span class="status-badge status-suspendido"><i class="bi bi-x-circle-fill" style="font-size:.45rem;"></i> Suspendido</span>
+                                    {% endif %}
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center justify-content-center gap-1">
-                                        <button class="action-btn view" title="Ver perfil" onclick="openDetailModal('Carlos Mendoza Silva', 'Director')"><i class="bi bi-eye"></i></button>
-                                        <button class="action-btn edit" title="Editar usuario" onclick="openEditUserModal('Carlos Mendoza Silva')"><i class="bi bi-pencil"></i></button>
-                                        <button class="action-btn block" title="Bloquear / Suspender" onclick="confirmBlockUser('Carlos Mendoza Silva')"><i class="bi bi-slash-circle"></i></button>
+                                        <button type="button" class="action-btn edit" title="Editar usuario"
+                                            onclick="openEditUserModal('{{ usuario.id }}', '{{ usuario.perfil.nombre_completo|default:usuario.get_full_name|default:usuario.username|escapejs }}', '{{ usuario.perfil.rut|default:''|escapejs }}', '{{ usuario.email|default:usuario.username|escapejs }}', '{{ usuario.perfil.telefono|default:''|escapejs }}', '{% if usuario.colegios_administrados.first %}{{ usuario.colegios_administrados.first.id }}{% elif usuario.membresias_colegio.first %}{{ usuario.membresias_colegio.first.colegio.id }}{% endif %}', '{% if usuario.is_superuser %}Super Admin{% elif usuario.colegios_administrados.exists %}Director{% elif usuario.membresias_colegio.first.rol %}{{ usuario.membresias_colegio.first.rol.nombre|escapejs }}{% else %}Profesor{% endif %}', '{% if usuario.is_active %}Activo{% else %}Suspendido{% endif %}')">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button type="button" class="action-btn block" title="{% if usuario.is_active %}Suspender acceso{% else %}Activar acceso{% endif %}"
+                                            onclick="confirmBlockUser('{{ usuario.id }}', '{{ usuario.perfil.nombre_completo|default:usuario.get_full_name|default:usuario.username|escapejs }}', {% if usuario.is_active %}true{% else %}false{% endif %})">
+                                            {% if usuario.is_active %}
+                                                <i class="bi bi-slash-circle"></i>
+                                            {% else %}
+                                                <i class="bi bi-check-circle text-success"></i>
+                                            {% endif %}
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
-
-                            <!-- Usuario 2: Profesor -->
-                            <tr data-colegio="Colegio Los Alerces" data-rol="Profesor" data-estado="Activo">
-                                <td>
-                                    <div class="user-cell">
-                                        <div class="user-avatar-circle" style="background:linear-gradient(135deg,#3B82F6,#1D4ED8);">
-                                            MT
-                                        </div>
-                                        <div>
-                                            <div class="user-name-text">María José Torres</div>
-                                            <div class="user-subtext">RUT: 16.789.123-5 • mj.torres@alerces.cl</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div style="font-size:.84rem;font-weight:600;color:var(--dark);">Colegio Los Alerces</div>
-                                    <div style="font-size:.74rem;color:var(--gray-text);">Valparaíso</div>
-                                </td>
-                                <td>
-                                    <span class="role-chip chip-profesor"><span class="dot"></span>Profesor</span>
-                                </td>
-                                <td>
-                                    <div style="font-size:.82rem;color:var(--dark);">Hoy, 09:15 AM</div>
-                                    <div style="font-size:.72rem;color:var(--gray-text);">IP: 201.238.10.88</div>
-                                </td>
-                                <td>
-                                    <span class="status-badge status-activo"><i class="bi bi-circle-fill" style="font-size:.45rem;"></i> Activo</span>
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center justify-content-center gap-1">
-                                        <button class="action-btn view" title="Ver perfil" onclick="openDetailModal('María José Torres', 'Profesor')"><i class="bi bi-eye"></i></button>
-                                        <button class="action-btn edit" title="Editar usuario" onclick="openEditUserModal('María José Torres')"><i class="bi bi-pencil"></i></button>
-                                        <button class="action-btn block" title="Bloquear / Suspender" onclick="confirmBlockUser('María José Torres')"><i class="bi bi-slash-circle"></i></button>
-                                    </div>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    <i class="bi bi-people fs-3 d-block mb-2 text-secondary"></i>
+                                    <strong>No se encontraron usuarios registrados</strong>
+                                    <p class="small mb-2">Prueba cambiando los criterios de búsqueda o filtros.</p>
+                                    <a href="{% url 'dashboard_superadmin_usuarios' %}" class="btn btn-sm btn-outline-primary rounded-pill">Limpiar Filtros</a>
                                 </td>
                             </tr>
-
-                            <!-- Usuario 3: UTP -->
-                            <tr data-colegio="Instituto Profesional del Norte" data-rol="UTP" data-estado="Activo">
-                                <td>
-                                    <div class="user-cell">
-                                        <div class="user-avatar-circle" style="background:linear-gradient(135deg,#10B981,#047857);">
-                                            RG
-                                        </div>
-                                        <div>
-                                            <div class="user-name-text">Roberto Gómez Lagos</div>
-                                            <div class="user-subtext">RUT: 12.456.789-0 • r.gomez@ipnorte.cl</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div style="font-size:.84rem;font-weight:600;color:var(--dark);">Instituto Profesional del Norte</div>
-                                    <div style="font-size:.74rem;color:var(--gray-text);">Antofagasta</div>
-                                </td>
-                                <td>
-                                    <span class="role-chip chip-utp"><span class="dot"></span>UTP</span>
-                                </td>
-                                <td>
-                                    <div style="font-size:.82rem;color:var(--dark);">Ayer, 18:30 PM</div>
-                                    <div style="font-size:.72rem;color:var(--gray-text);">IP: 186.105.12.4</div>
-                                </td>
-                                <td>
-                                    <span class="status-badge status-activo"><i class="bi bi-circle-fill" style="font-size:.45rem;"></i> Activo</span>
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center justify-content-center gap-1">
-                                        <button class="action-btn view" title="Ver perfil" onclick="openDetailModal('Roberto Gómez Lagos', 'UTP')"><i class="bi bi-eye"></i></button>
-                                        <button class="action-btn edit" title="Editar usuario" onclick="openEditUserModal('Roberto Gómez Lagos')"><i class="bi bi-pencil"></i></button>
-                                        <button class="action-btn block" title="Bloquear / Suspender" onclick="confirmBlockUser('Roberto Gómez Lagos')"><i class="bi bi-slash-circle"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- Usuario 4: Alumno -->
-                            <tr data-colegio="Colegio San Agustín" data-rol="Alumno" data-estado="Inactivo">
-                                <td>
-                                    <div class="user-cell">
-                                        <div class="user-avatar-circle" style="background:linear-gradient(135deg,#F59E0B,#D97706);">
-                                            SV
-                                        </div>
-                                        <div>
-                                            <div class="user-name-text">Sofía Valenzuela</div>
-                                            <div class="user-subtext">RUT: 21.654.987-1 • s.valenzuela@sanagustin.cl</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div style="font-size:.84rem;font-weight:600;color:var(--dark);">Colegio San Agustín</div>
-                                    <div style="font-size:.74rem;color:var(--gray-text);">Biobío</div>
-                                </td>
-                                <td>
-                                    <span class="role-chip chip-alumno"><span class="dot"></span>Alumno</span>
-                                </td>
-                                <td>
-                                    <div style="font-size:.82rem;color:var(--dark);">Hace 3 días</div>
-                                    <div style="font-size:.72rem;color:var(--gray-text);">IP: 190.45.88.20</div>
-                                </td>
-                                <td>
-                                    <span class="status-badge status-inactivo"><i class="bi bi-clock-history" style="font-size:.45rem;"></i> Inactivo</span>
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center justify-content-center gap-1">
-                                        <button class="action-btn view" title="Ver perfil" onclick="openDetailModal('Sofía Valenzuela', 'Alumno')"><i class="bi bi-eye"></i></button>
-                                        <button class="action-btn edit" title="Editar usuario" onclick="openEditUserModal('Sofía Valenzuela')"><i class="bi bi-pencil"></i></button>
-                                        <button class="action-btn block" title="Bloquear / Suspender" onclick="confirmBlockUser('Sofía Valenzuela')"><i class="bi bi-slash-circle"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- Usuario 5: Inspector (Suspendido) -->
-                            <tr data-colegio="Escuela Básica El Porvenir" data-rol="Inspector" data-estado="Suspendido">
-                                <td>
-                                    <div class="user-cell">
-                                        <div class="user-avatar-circle" style="background:linear-gradient(135deg,#EF4444,#DC2626);">
-                                            GU
-                                        </div>
-                                        <div>
-                                            <div class="user-name-text">Gonzalo Ugarte Pizarro</div>
-                                            <div class="user-subtext">RUT: 15.111.222-3 • g.ugarte@porvenir.cl</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div style="font-size:.84rem;font-weight:600;color:var(--dark);">Escuela Básica El Porvenir</div>
-                                    <div style="font-size:.74rem;color:var(--gray-text);">Maule</div>
-                                </td>
-                                <td>
-                                    <span class="role-chip chip-inspector"><span class="dot"></span>Inspector</span>
-                                </td>
-                                <td>
-                                    <div style="font-size:.82rem;color:var(--dark);">10 Jul 2026</div>
-                                    <div style="font-size:.72rem;color:var(--gray-text);">IP: 200.75.12.1</div>
-                                </td>
-                                <td>
-                                    <span class="status-badge status-suspendido"><i class="bi bi-x-circle-fill" style="font-size:.45rem;"></i> Suspendido</span>
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center justify-content-center gap-1">
-                                        <button class="action-btn view" title="Ver perfil" onclick="openDetailModal('Gonzalo Ugarte Pizarro', 'Inspector')"><i class="bi bi-eye"></i></button>
-                                        <button class="action-btn edit" title="Editar usuario" onclick="openEditUserModal('Gonzalo Ugarte Pizarro')"><i class="bi bi-pencil"></i></button>
-                                        <button class="action-btn block" title="Bloquear / Suspender" onclick="confirmBlockUser('Gonzalo Ugarte Pizarro')"><i class="bi bi-check-circle text-success"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
@@ -602,10 +528,10 @@
                 <!-- Table Footer -->
                 <div style="padding:.85rem 1.5rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;">
                     <span style="font-size:.78rem;color:var(--gray-text);" id="tableCount">
-                        Mostrando <strong>5</strong> usuarios en total
+                        Mostrando <strong>{{ usuarios|length }}</strong> usuarios en total
                     </span>
                     <div class="d-flex gap-2">
-                        <a href="#" class="btn-outline-custom" style="font-size:.78rem;padding:.35rem .85rem;" onclick="exportUsers(event)">
+                        <a href="?exportar=true{% if q %}&q={{ q }}{% endif %}{% if filtro_colegio %}&colegio={{ filtro_colegio }}{% endif %}{% if filtro_rol %}&rol={{ filtro_rol }}{% endif %}{% if filtro_estado %}&estado={{ filtro_estado }}{% endif %}" class="btn-outline-custom" style="font-size:.78rem;padding:.35rem .85rem;">
                             <i class="bi bi-download"></i> Exportar Listado
                         </a>
                     </div>
@@ -620,93 +546,104 @@
 <!-- ════ MODAL: CREAR / EDITAR USUARIO ════════════════════════════════════ -->
 <div class="modal-overlay" id="modalUsuario">
     <div class="modal-box">
-        <div class="d-flex align-items-center justify-content-between mb-3">
-            <div>
-                <div class="modal-title" id="modalUsuarioTitle">Crear Nuevo Usuario Global</div>
-                <div class="modal-subtitle" id="modalUsuarioSubtitle">Asigna el usuario a un colegio cliente y define su rol de acceso.</div>
-            </div>
-            <button onclick="closeModal('modalUsuario')"
-                style="background:none;border:none;font-size:1.3rem;color:var(--gray-text);cursor:pointer;line-height:1;">&times;</button>
-        </div>
+        <form method="POST" action="{% url 'dashboard_superadmin_usuarios' %}">
+            {% csrf_token %}
+            <input type="hidden" name="accion" id="formAccion" value="crear_usuario">
+            <input type="hidden" name="usuario_id" id="formUsuarioId" value="">
 
-        <div class="row g-3">
-            <div class="col-12 col-md-6">
-                <label class="form-label-custom">Nombre Completo</label>
-                <input type="text" class="form-control-custom" id="inputNombreUsuario" placeholder="Ej: Juan Pérez Soto">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <div>
+                    <div class="modal-title" id="modalUsuarioTitle">Crear Nuevo Usuario Global</div>
+                    <div class="modal-subtitle" id="modalUsuarioSubtitle">Asigna el usuario a un colegio cliente y define su rol de acceso.</div>
+                </div>
+                <button type="button" onclick="closeModal('modalUsuario')"
+                    style="background:none;border:none;font-size:1.3rem;color:var(--gray-text);cursor:pointer;line-height:1;">&times;</button>
             </div>
-            <div class="col-12 col-md-6">
-                <label class="form-label-custom">RUT</label>
-                <input type="text" class="form-control-custom" id="inputRutUsuario" placeholder="12.345.678-9">
-            </div>
-            <div class="col-12">
-                <label class="form-label-custom">Correo Institucional</label>
-                <input type="email" class="form-control-custom" id="inputCorreoUsuario" placeholder="correo@colegio.cl">
-            </div>
-            <div class="col-12 col-md-6">
-                <label class="form-label-custom">Colegio Cliente</label>
-                <select class="form-control-custom">
-                    <option value="">Seleccionar colegio...</option>
-                    <option>Liceo Santa María</option>
-                    <option>Colegio Los Alerces</option>
-                    <option>Instituto Profesional del Norte</option>
-                    <option>Colegio San Agustín</option>
-                    <option>Escuela Básica El Porvenir</option>
-                </select>
-            </div>
-            <div class="col-12 col-md-6">
-                <label class="form-label-custom">Rol Asignado</label>
-                <select class="form-control-custom">
-                    <option value="">Seleccionar rol...</option>
-                    <option>Director</option>
-                    <option>Profesor</option>
-                    <option>UTP</option>
-                    <option>Inspector</option>
-                    <option>Alumno</option>
-                    <option>Apoderado</option>
-                    <option>Administrador</option>
-                </select>
-            </div>
-            <div class="col-12 col-md-6">
-                <label class="form-label-custom">Estado Inicial</label>
-                <select class="form-control-custom">
-                    <option>Activo</option>
-                    <option>Inactivo</option>
-                    <option>Suspendido</option>
-                </select>
-            </div>
-            <div class="col-12 col-md-6">
-                <label class="form-label-custom">Contraseña Temporal</label>
-                <input type="password" class="form-control-custom" placeholder="••••••••">
-            </div>
-        </div>
 
-        <div class="d-flex gap-2 justify-content-end pt-3 mt-3" style="border-top:1px solid var(--border);">
-            <button onclick="closeModal('modalUsuario')" class="btn-outline-custom">Cancelar</button>
-            <button class="btn-primary-custom"><i class="bi bi-floppy"></i> Guardar Usuario</button>
-        </div>
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <label class="form-label-custom">Nombre Completo</label>
+                    <input type="text" name="nombre_completo" class="form-control-custom" id="inputNombreUsuario" placeholder="Ej: Juan Pérez Soto" required>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label class="form-label-custom">RUT</label>
+                    <input type="text" name="rut" class="form-control-custom" id="inputRutUsuario" placeholder="12.345.678-9">
+                </div>
+                <div class="col-12">
+                    <label class="form-label-custom">Correo Institucional</label>
+                    <input type="email" name="email" class="form-control-custom" id="inputCorreoUsuario" placeholder="correo@colegio.cl" required>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label class="form-label-custom">Teléfono</label>
+                    <input type="text" name="telefono" class="form-control-custom" id="inputTelefonoUsuario" placeholder="+56 9 1234 5678">
+                </div>
+                <div class="col-12 col-md-6">
+                    <label class="form-label-custom">Colegio Cliente</label>
+                    <select name="colegio_id" id="selectColegioUsuario" class="form-control-custom">
+                        <option value="">Seleccionar colegio...</option>
+                        {% for col in colegios %}
+                        <option value="{{ col.id }}">{{ col.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label class="form-label-custom">Rol Asignado</label>
+                    <select name="rol_nombre" id="selectRolUsuario" class="form-control-custom">
+                        <option value="Director">Director</option>
+                        <option value="Profesor" selected>Profesor</option>
+                        <option value="UTP">UTP</option>
+                        <option value="Inspector">Inspector</option>
+                        <option value="Alumno">Alumno</option>
+                        <option value="Apoderado">Apoderado</option>
+                        <option value="Administrador">Administrador</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label class="form-label-custom">Estado Inicial</label>
+                    <select name="estado" id="selectEstadoUsuario" class="form-control-custom">
+                        <option value="Activo">Activo</option>
+                        <option value="Suspendido">Suspendido / Inactivo</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-6" id="divPassword">
+                    <label class="form-label-custom">Contraseña Temporal</label>
+                    <input type="password" name="password" class="form-control-custom" placeholder="••••••••">
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 justify-content-end pt-3 mt-3" style="border-top:1px solid var(--border);">
+                <button type="button" onclick="closeModal('modalUsuario')" class="btn-outline-custom">Cancelar</button>
+                <button type="submit" class="btn-primary-custom"><i class="bi bi-floppy"></i> Guardar Usuario</button>
+            </div>
+        </form>
     </div>
 </div>
 
 <!-- ════ MODAL: CONFIRMAR BLOQUEO / SUSPENSIÓN ════════════════════════════ -->
 <div class="modal-overlay" id="modalBlock">
     <div class="modal-box" style="width:440px;text-align:center;">
-        <div style="width:56px;height:56px;background:#FEF3C7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
-            <i class="bi bi-slash-circle-fill" style="color:#D97706;font-size:1.4rem;"></i>
-        </div>
-        <div class="modal-title" style="margin-bottom:.35rem;">
-            Cambiar Estado de Acceso
-        </div>
-        <p style="font-size:.84rem;color:var(--gray-text);line-height:1.6;">
-            ¿Deseas modificar el acceso para el usuario <strong id="blockUserName" style="color:var(--dark);"></strong>?
-            Al suspenderlo no podrá iniciar sesión en la plataforma.
-        </p>
-        <div class="d-flex gap-2 justify-content-center mt-3">
-            <button onclick="closeModal('modalBlock')" class="btn-outline-custom">Cancelar</button>
-            <button id="btnConfirmBlock"
-                style="display:inline-flex;align-items:center;gap:.45rem;padding:.55rem 1.25rem;background:#D97706;color:#fff;border:none;border-radius:var(--radius-md);font-weight:600;font-size:.85rem;cursor:pointer;transition:background .2s;">
-                <i class="bi bi-slash-circle"></i> Suspender Acceso
-            </button>
-        </div>
+        <form method="POST" action="{% url 'dashboard_superadmin_usuarios' %}">
+            {% csrf_token %}
+            <input type="hidden" name="accion" value="toggle_estado">
+            <input type="hidden" name="usuario_id" id="blockUsuarioId" value="">
+
+            <div style="width:56px;height:56px;background:#FEF3C7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
+                <i class="bi bi-slash-circle-fill" style="color:#D97706;font-size:1.4rem;"></i>
+            </div>
+            <div class="modal-title" style="margin-bottom:.35rem;" id="blockModalTitle">
+                Cambiar Estado de Acceso
+            </div>
+            <p style="font-size:.84rem;color:var(--gray-text);line-height:1.6;" id="blockModalDesc">
+                ¿Deseas modificar el acceso para el usuario <strong id="blockUserName" style="color:var(--dark);"></strong>?
+            </p>
+            <div class="d-flex gap-2 justify-content-center mt-3">
+                <button type="button" onclick="closeModal('modalBlock')" class="btn-outline-custom">Cancelar</button>
+                <button type="submit" id="btnConfirmBlock"
+                    style="display:inline-flex;align-items:center;gap:.45rem;padding:.55rem 1.25rem;background:#D97706;color:#fff;border:none;border-radius:var(--radius-md);font-weight:600;font-size:.85rem;cursor:pointer;transition:background .2s;">
+                    <i class="bi bi-slash-circle"></i> Confirmar Cambio
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -729,36 +666,59 @@
     });
 
     function openCreateUserModal() {
+        document.getElementById('formAccion').value = 'crear_usuario';
+        document.getElementById('formUsuarioId').value = '';
         document.getElementById('modalUsuarioTitle').textContent    = 'Crear Nuevo Usuario Global';
         document.getElementById('modalUsuarioSubtitle').textContent = 'Asigna el usuario a un colegio cliente y define su rol de acceso.';
         document.getElementById('inputNombreUsuario').value = '';
         document.getElementById('inputRutUsuario').value    = '';
         document.getElementById('inputCorreoUsuario').value = '';
+        document.getElementById('inputTelefonoUsuario').value = '';
+        document.getElementById('selectColegioUsuario').value = '';
+        document.getElementById('selectRolUsuario').value = 'Profesor';
+        document.getElementById('selectEstadoUsuario').value = 'Activo';
+        document.getElementById('divPassword').style.display = 'block';
         openModal('modalUsuario');
     }
 
-    function openEditUserModal(nombre) {
+    function openEditUserModal(id, nombre, rut, email, telefono, colegioId, rol, estado) {
+        document.getElementById('formAccion').value = 'editar_usuario';
+        document.getElementById('formUsuarioId').value = id;
         document.getElementById('modalUsuarioTitle').textContent    = 'Editar Usuario: ' + nombre;
         document.getElementById('modalUsuarioSubtitle').textContent = 'Modifica los datos y permisos de este usuario.';
         document.getElementById('inputNombreUsuario').value = nombre;
+        document.getElementById('inputRutUsuario').value    = rut || '';
+        document.getElementById('inputCorreoUsuario').value = email || '';
+        document.getElementById('inputTelefonoUsuario').value = telefono || '';
+        if (colegioId) {
+            document.getElementById('selectColegioUsuario').value = colegioId;
+        }
+        if (rol) {
+            document.getElementById('selectRolUsuario').value = rol;
+        }
+        document.getElementById('selectEstadoUsuario').value = (estado === 'Activo') ? 'Activo' : 'Suspendido';
+        document.getElementById('divPassword').style.display = 'none';
         openModal('modalUsuario');
     }
 
-    function openDetailModal(nombre, rol) {
-        openEditUserModal(nombre);
-    }
-
-    function confirmBlockUser(nombre) {
+    function confirmBlockUser(id, nombre, isActive) {
+        document.getElementById('blockUsuarioId').value = id;
         document.getElementById('blockUserName').textContent = nombre;
+        if (isActive) {
+            document.getElementById('blockModalTitle').textContent = 'Suspender Acceso de Usuario';
+            document.getElementById('blockModalDesc').innerHTML = '¿Deseas suspender a <strong style="color:var(--dark);">' + nombre + '</strong>? No podrá iniciar sesión en la plataforma.';
+            document.getElementById('btnConfirmBlock').style.background = '#DC2626';
+            document.getElementById('btnConfirmBlock').innerHTML = '<i class="bi bi-slash-circle"></i> Suspender Acceso';
+        } else {
+            document.getElementById('blockModalTitle').textContent = 'Activar Acceso de Usuario';
+            document.getElementById('blockModalDesc').innerHTML = '¿Deseas reactivar el acceso para <strong style="color:var(--dark);">' + nombre + '</strong>?';
+            document.getElementById('btnConfirmBlock').style.background = '#059669';
+            document.getElementById('btnConfirmBlock').innerHTML = '<i class="bi bi-check-circle"></i> Activar Acceso';
+        }
         openModal('modalBlock');
     }
 
-    function exportUsers(e) {
-        e.preventDefault();
-        alert('Generando reporte CSV de usuarios globales...');
-    }
-
-    // ── Filtrado de tabla
+    // ── Filtrado en tiempo real de la tabla
     function filterTable() {
         const q       = (document.getElementById('tableSearch').value || '').toLowerCase();
         const colegio = (document.getElementById('filterColegio').value || '').toLowerCase();
@@ -784,15 +744,11 @@
             if (show) vis++;
         });
 
-        document.getElementById('tableCount').innerHTML =
-            'Mostrando <strong>' + vis + '</strong> de <strong>' + rows.length + '</strong> usuarios';
+        const countEl = document.getElementById('tableCount');
+        if (countEl) {
+            countEl.innerHTML = 'Mostrando <strong>' + vis + '</strong> de <strong>' + rows.length + '</strong> usuarios';
+        }
     }
-
-    // Búsqueda global desde topbar
-    document.getElementById('globalSearch').addEventListener('input', function () {
-        document.getElementById('tableSearch').value = this.value;
-        filterTable();
-    });
 </script>
 
 </body>
