@@ -1,0 +1,488 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Talleres Extracurriculares (ACLES) - Eduteka</title>
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #7C5CFC;
+      --primary-soft: rgba(124, 92, 252, 0.08);
+      --primary-hover: #6747E3;
+      --secondary: #65CDBF;
+      --bg: #F8F9FD;
+      --white: #FFFFFF;
+      --dark: #151A35;
+      --gray-text: #687089;
+      --border: #BCC0CF;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+    }
+
+    * { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+    }
+
+    .wrapper { display: flex; flex: 1; position: relative; }
+
+    .topbar {
+      height: 70px;
+      background: rgba(255, 255, 255, 0.85) !important;
+      backdrop-filter: blur(12px) !important;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; position: sticky; top: 0; z-index: 98;
+    }
+    .content-body { padding: 2rem; flex-grow: 1; max-width: 1440px; margin: 0 auto; width: 100%; }
+
+    /* Hero Banner Talleres */
+    .hero-banner-talleres {
+      background: linear-gradient(135deg, #7C5CFC 0%, #6344CE 50%, #4F46E5 100%);
+      border-radius: var(--radius-lg);
+      padding: 2.2rem 2.5rem;
+      color: var(--white);
+      margin-bottom: 2rem;
+      box-shadow: 0 12px 30px rgba(124, 92, 252, 0.25);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-banner-talleres::before {
+      content: '';
+      position: absolute;
+      width: 320px; height: 320px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 70%);
+      top: -80px; right: -60px;
+      border-radius: 50%;
+    }
+
+    .hero-badge-pill {
+      background: rgba(255, 255, 255, 0.2);
+      color: #FFFFFF !important;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 20px;
+      padding: 0.35rem 0.85rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      backdrop-filter: blur(8px);
+    }
+
+    .hero-school-pill {
+      background: rgba(0, 0, 0, 0.2);
+      color: #FFFFFF !important;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 20px;
+      padding: 0.35rem 0.85rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      backdrop-filter: blur(8px);
+    }
+
+    /* KPI Cards */
+    .kpi-grid-taller {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+    .kpi-card-taller {
+      background: var(--white);
+      border: 1px solid #E2E8F0;
+      border-radius: var(--radius-lg);
+      padding: 1.35rem 1.5rem;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.02);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.25s ease;
+    }
+    .kpi-card-taller:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    }
+    .kpi-card-taller::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3.5px;
+      background: var(--acc-color, var(--primary));
+    }
+    .kpi-card-taller.purple { --acc-color: #7C5CFC; }
+    .kpi-card-taller.blue { --acc-color: #3B82F6; }
+    .kpi-card-taller.green { --acc-color: #10B981; }
+
+    /* Workshop Cards Grid */
+    .talleres-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .taller-card {
+      background: var(--white);
+      border: 1px solid #E2E8F0;
+      border-radius: var(--radius-lg);
+      padding: 1.6rem 1.6rem;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.02);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.25s ease;
+      position: relative;
+    }
+    .taller-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(124, 92, 252, 0.08);
+      border-color: #CBD5E1;
+    }
+
+    .taller-icon-box {
+      width: 48px; height: 48px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+
+    .taller-detail-item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.85rem;
+      color: #475569;
+      margin-bottom: 0.45rem;
+    }
+    .taller-detail-item i {
+      color: var(--primary);
+      font-size: 1rem;
+      width: 18px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<div class="wrapper">
+  {% include 'colegios/_sidebar.html' with active_page='talleres' %}
+
+  <div class="main-content">
+    <header class="topbar">
+      <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn" style="border:none; background:var(--primary-soft); color:var(--primary);">
+          <i class="bi bi-list fs-5"></i>
+        </button>
+        <span class="fw-bold text-dark fs-5"><i class="bi bi-star-fill text-warning me-2"></i>Talleres Extracurriculares (ACLES)</span>
+      </div>
+
+      <div class="topbar-right d-flex align-items-center gap-4">
+        <div class="topbar-date d-none d-sm-block text-muted small fw-semibold">
+          <i class="bi bi-calendar3 me-1"></i> {{ hoy|date:"l, d \d\e F \d\e Y"|title }}
+        </div>
+      </div>
+    </header>
+
+    <main class="content-body">
+      
+      <!-- HERO BANNER -->
+      <div class="hero-banner-talleres">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-4 position-relative" style="z-index:1;">
+          <div>
+            <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+              <span class="hero-badge-pill">
+                <i class="bi bi-star-fill text-warning"></i> Actividades Extraprogramáticas (ACLES)
+              </span>
+              <span class="hero-school-pill">
+                <i class="bi bi-building"></i> {{ colegio.nombre }} • Período {{ periodo.anio_lectivo|default:2026 }}
+              </span>
+            </div>
+            <h2 class="fw-extrabold text-white mb-1 fs-3">Gestión de Talleres & Asistencia Multicurso</h2>
+            <p class="text-white text-opacity-85 small mb-0">
+              Crea talleres formativos, deportivos y artísticos, inscribe estudiantes de distintos cursos y registra asistencia por sesión.
+            </p>
+          </div>
+
+          <div class="d-flex gap-2 flex-wrap">
+            <button type="button" class="btn btn-light fw-bold px-3 py-2 shadow-sm" style="border-radius:12px; color:#7C5CFC;" data-bs-toggle="modal" data-bs-target="#modalNuevoTaller">
+              <i class="bi bi-plus-lg me-1"></i> Nuevo Taller
+            </button>
+
+            <a href="{% url 'listar_cursos' %}" class="btn btn-outline-light fw-bold px-3 py-2" style="border-radius:12px;">
+              <i class="bi bi-diagram-3 me-1"></i> Ver Cursos & Secciones
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3 KPIS -->
+      <div class="kpi-grid-taller">
+        <div class="kpi-card-taller purple">
+          <span class="text-muted extra-small text-uppercase fw-bold d-block">Talleres Activos</span>
+          <span class="fs-3 fw-extrabold text-dark mt-1 d-block">{{ total_talleres }}</span>
+          <span class="text-muted extra-small mt-1 d-block">Deportivos, artísticos y científicos</span>
+        </div>
+
+        <div class="kpi-card-taller blue">
+          <span class="text-muted extra-small text-uppercase fw-bold d-block">Estudiantes Participantes</span>
+          <span class="fs-3 fw-extrabold text-primary mt-1 d-block">{{ total_inscripciones }}</span>
+          <span class="text-muted extra-small mt-1 d-block">Inscripciones multicurso registradas</span>
+        </div>
+
+        <div class="kpi-card-taller green">
+          <span class="text-muted extra-small text-uppercase fw-bold d-block">Sesiones de Asistencia</span>
+          <span class="fs-3 fw-extrabold text-success mt-1 d-block">{{ total_sesiones }}</span>
+          <span class="text-muted extra-small mt-1 d-block">Listas pasadas en talleres</span>
+        </div>
+      </div>
+
+      <!-- FILTROS -->
+      <div class="card p-3 mb-4 border-0 shadow-sm" style="border-radius:14px;">
+        <form method="GET" action="{% url 'talleres_dashboard' %}" class="row g-2 align-items-center">
+          <div class="col-md-5">
+            <div class="input-group">
+              <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+              <input type="text" name="q" class="form-control border-start-0" placeholder="Buscar taller, profesor monitor, lugar..." value="{{ busqueda }}">
+            </div>
+          </div>
+          <div class="col-md-4">
+            <select name="categoria" class="form-select" onchange="this.form.submit();">
+              <option value="">-- Todas las Categorías --</option>
+              {% for val, label in categorias_choices %}
+                <option value="{{ val }}" {% if categoria_filtro == val %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-3 d-flex gap-2">
+            <button type="submit" class="btn btn-primary fw-bold w-100" style="border-radius:10px;"><i class="bi bi-search"></i> Filtrar</button>
+            <a href="{% url 'talleres_dashboard' %}" class="btn btn-outline-secondary" style="border-radius:10px;"><i class="bi bi-x-lg"></i></a>
+          </div>
+        </form>
+      </div>
+
+      <!-- GRID DE TALLERES -->
+      <div class="talleres-grid">
+        {% for t in talleres %}
+          <div class="taller-card">
+            <div>
+              <!-- HEADER DE LA CARD -->
+              <div class="d-flex justify-content-between align-items-start mb-3">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="taller-icon-box" data-color="{{ t.color|default:'#7C5CFC' }}" style="background:rgba(124,92,252,0.1);">
+                    <i class="bi {{ t.icono|default:'bi-star-fill' }}"></i>
+                  </div>
+                  <div>
+
+                    <span class="badge px-2 py-0.5 mb-1" style="background:rgba(124,92,252,0.08); color:#7C5CFC; border-radius:6px; font-size:0.75rem; font-weight:700;">
+                      {{ t.get_categoria_display }}
+                    </span>
+                    <h5 class="fw-extrabold text-dark mb-0">{{ t.nombre }}</h5>
+                  </div>
+                </div>
+
+                <div class="dropdown">
+                  <button class="btn btn-sm btn-light border-0" type="button" data-bs-toggle="dropdown" style="border-radius:8px;">
+                    <i class="bi bi-three-dots-vertical"></i>
+                  </button>
+                  <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" style="border-radius:10px;">
+                    <li><a class="dropdown-item small" href="{% url 'detalle_taller' t.id %}"><i class="bi bi-eye me-2 text-primary"></i>Ver Detalles & Alumnos</a></li>
+                    <li><a class="dropdown-item small" href="{% url 'tomar_asistencia_taller' t.id %}"><i class="bi bi-calendar-check me-2 text-success"></i>Tomar Asistencia</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item small text-danger" href="{% url 'eliminar_taller' t.id %}" onclick="return confirm('¿Archivar este taller?')"><i class="bi bi-trash me-2"></i>Archivar</a></li>
+                  </ul>
+                </div>
+              </div>
+
+              <!-- DETALLES DEL TALLER -->
+              <div class="p-3 bg-light rounded-3 mb-3 border">
+                <div class="taller-detail-item">
+                  <i class="bi bi-person-badge-fill"></i>
+                  <span><strong>Monitor:</strong> {{ t.monitor_nombre }}</span>
+                </div>
+
+                <div class="taller-detail-item">
+                  <i class="bi bi-clock-fill"></i>
+                  <span><strong>Horario:</strong> {{ t.dias_horario }}</span>
+                </div>
+
+                <div class="taller-detail-item">
+                  <i class="bi bi-geo-alt-fill"></i>
+                  <span class="text-truncate"><strong>Lugar:</strong> {{ t.lugar }}</span>
+                </div>
+
+                {% if t.descripcion %}
+                  <div class="extra-small text-muted mt-2 pt-2 border-top">
+                    {{ t.descripcion|truncatechars:85 }}
+                  </div>
+                {% endif %}
+              </div>
+
+              <!-- BARRA DE CUPOS / INSCRITOS -->
+              <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span class="text-muted extra-small text-uppercase fw-bold">Inscritos Multicurso:</span>
+                  <span class="fw-extrabold small text-dark">{{ t.num_inscritos }} {% if t.cupo_maximo %}/ {{ t.cupo_maximo }}{% endif %}</span>
+                </div>
+                {% if t.cupo_maximo %}
+                  <div class="progress" style="height: 6px; border-radius: 10px; background:#E2E8F0;">
+                    <div class="progress-bar bar-pct" data-pct="{% widthratio t.num_inscritos t.cupo_maximo 100 %}" style="background:linear-gradient(90deg, #7C5CFC 0%, #65CDBF 100%);"></div>
+                  </div>
+                {% endif %}
+
+              </div>
+            </div>
+
+            <!-- BOTONES DE ACCION -->
+            <div class="d-flex gap-2 pt-3 border-top mt-auto">
+              <a href="{% url 'tomar_asistencia_taller' t.id %}" class="btn btn-sm btn-success fw-bold flex-grow-1" style="border-radius:10px; background:#10B981; border:none; padding:0.5rem;">
+                <i class="bi bi-calendar-check me-1"></i> Pasar Lista
+              </a>
+
+              <a href="{% url 'detalle_taller' t.id %}" class="btn btn-sm btn-outline-primary fw-bold flex-grow-1" style="border-radius:10px; padding:0.5rem;">
+                <i class="bi bi-people-fill me-1"></i> Alumnos ({{ t.num_inscritos }})
+              </a>
+            </div>
+          </div>
+        {% empty %}
+          <div class="col-12 text-center py-5">
+            <i class="bi bi-star fs-1 text-muted d-block mb-2"></i>
+            <h5 class="text-muted fw-bold">No se encontraron talleres extracurriculares</h5>
+            <p class="text-muted small">Crea tu primer taller extraprogramático para inscribir alumnos de distintos cursos y pasar lista.</p>
+          </div>
+        {% endfor %}
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- MODAL NUEVO TALLER -->
+<div class="modal fade" id="modalNuevoTaller" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 shadow-lg" style="border-radius:16px;">
+      <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+        <h5 class="modal-title fw-extrabold text-dark"><i class="bi bi-star-fill text-warning me-2"></i>Crear Nuevo Taller Extracurricular</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="POST" action="{% url 'crear_taller' %}">
+        {% csrf_token %}
+        <div class="modal-body p-4">
+          
+          <div class="row g-3 mb-3">
+            <div class="col-md-8">
+              <label class="form-label fw-bold text-dark small">Nombre del Taller</label>
+              <input type="text" name="nombre" class="form-control fw-bold" placeholder="Ej: Taller de Robótica, Selección de Fútbol, Teatro..." required style="border-radius:10px;">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-bold text-dark small">Categoría / Área</label>
+              <select name="categoria" class="form-select fw-bold" style="border-radius:10px;">
+                {% for val, label in categorias_choices %}
+                  <option value="{{ val }}">{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">Docente / Monitor del Colegio</label>
+              <select name="docente_encargado" class="form-select" style="border-radius:10px;">
+                <option value="">-- Sin docente asignado --</option>
+                {% for doc in docentes_disponibles %}
+                  <option value="{{ doc.id }}">{{ doc.first_name }} {{ doc.last_name }} ({{ doc.username }})</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">O Monitor / Entrenador Externo</label>
+              <input type="text" name="monitor_externo" class="form-control" placeholder="Ej: Prof. Gabriel Retamal (DT Deportivo)" style="border-radius:10px;">
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">Días y Horarios</label>
+              <input type="text" name="dias_horario" class="form-control" placeholder="Ej: Martes y Jueves 15:30 - 17:00" required style="border-radius:10px;">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-bold text-dark small">Lugar / Dependencia</label>
+              <input type="text" name="lugar" class="form-control" placeholder="Ej: Gimnasio, Lab. Computación, Auditorio" value="Gimnasio Principal" required style="border-radius:10px;">
+            </div>
+            <div class="col-md-2">
+              <label class="form-label fw-bold text-dark small">Cupo Máx.</label>
+              <input type="number" name="cupo_maximo" class="form-control fw-bold" value="30" min="1" style="border-radius:10px;">
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">Icono Visual</label>
+              <select name="icono" class="form-select" style="border-radius:10px;">
+                <option value="bi-trophy-fill">🏆 Trofeo / Deporte</option>
+                <option value="bi-robot">🤖 Robótica / Tecnología</option>
+                <option value="bi-palette-fill">🎨 Arte / Teatro</option>
+                <option value="bi-music-note-beamed">🎵 Música / Danza</option>
+                <option value="bi-grid-3x3-gap-fill">♟️ Ajedrez / Mente</option>
+                <option value="bi-book-fill">📖 Lectura / Debate</option>
+                <option value="bi-tree-fill">🌱 Ecología / Scout</option>
+                <option value="bi-star-fill">⭐ Estrella General</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">Color Distintivo</label>
+              <select name="color" class="form-select" style="border-radius:10px;">
+                <option value="#7C5CFC">Púrpura Eduteka</option>
+                <option value="#3B82F6">Azul Tecnológico</option>
+                <option value="#10B981">Verde Deportivo</option>
+                <option value="#EC4899">Rosado Artístico</option>
+                <option value="#F59E0B">Ámbar / Naranja</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold text-dark small">Descripción / Objetivos del Taller</label>
+            <textarea name="descripcion" class="form-control" rows="2" placeholder="Objetivos formativos, requisitos, competencias a participar..." style="border-radius:10px;"></textarea>
+          </div>
+
+        </div>
+        <div class="modal-footer border-top-0 p-4 pt-0">
+          <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary fw-extrabold px-4" style="border-radius:10px; background:linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%); border:none;">Crear Taller</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll('.bar-pct[data-pct]').forEach(function(el) {
+      el.style.width = (parseFloat(el.getAttribute('data-pct')) || 0) + '%';
+    });
+    document.querySelectorAll('.taller-icon-box[data-color]').forEach(function(el) {
+      el.style.color = el.getAttribute('data-color') || '#7C5CFC';
+    });
+  });
+</script>
+</body>
+</html>
+
+

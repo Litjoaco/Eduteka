@@ -9,66 +9,8 @@ from django.utils import timezone
 
 @login_required
 def dashboard_view(request):
-    # Obtenemos el colegio que administra el usuario logueado o del cual es miembro con permiso
-    colegio = request.user.colegios_administrados.order_by('-fecha_creacion').first()
-    
-    # Si no administra ninguno, buscamos si es miembro
-    if not colegio:
-        miembro = MiembroColegio.objects.filter(usuario=request.user, activo=True).order_by('-fecha_ingreso').first()
-        if miembro:
-            colegio = miembro.colegio
+    return redirect('dashboard_usuario')
 
-    if colegio:
-        solicitudes_pendientes = SolicitudAcceso.objects.filter(colegio=colegio, estado='pendiente')
-        modulos_activos_count = ColegioModulo.objects.filter(colegio=colegio, activo=True).count()
-        usuarios_colegio_count = MiembroColegio.objects.filter(colegio=colegio, activo=True).count()
-        ultimas_solicitudes = SolicitudAcceso.objects.filter(colegio=colegio).order_by('-fecha_solicitud')[:5]
-        
-        # Suscripción actual
-        suscripcion = getattr(colegio, 'suscripcion', None)
-        
-        # Alumnos en riesgo
-        from asistencia.utils import calcular_alumnos_en_riesgo
-        alumnos_en_riesgo = calcular_alumnos_en_riesgo(colegio)
-        alumnos_en_riesgo_count = len(alumnos_en_riesgo)
-        # Total Estudiantes y Cursos
-        total_estudiantes_count = Estudiante.objects.filter(colegio=colegio, activo=True).count()
-        total_cursos_count = CursoColegio.objects.filter(colegio=colegio, activo=True).count()
-    else:
-        # Si no tiene colegio, redirigir a solicitar acceso o registro
-        return redirect('solicitar_acceso')
-
-    from colegios.models import ConfiguracionAcademica
-
-    # Obtener miembro actual (puede ser None si es el administrador directo del colegio)
-    miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
-    periodo = ConfiguracionAcademica.objects.filter(colegio=colegio).first()
-
-    # is_admin: True para administradores del colegio y roles directivos
-    is_admin = (
-        request.user.colegios_administrados.filter(id=colegio.id).exists()
-        or (miembro and miembro.rol and miembro.rol.nombre in ['Administrador', 'Director'])
-    )
-
-    context = {
-        'colegio': colegio,
-        'miembro': miembro,
-        'periodo': periodo,
-        'is_admin': is_admin,
-        'active_page': 'inicio',
-        'suscripcion': suscripcion,
-        'solicitudes_pendientes_count': solicitudes_pendientes.count(),
-        'modulos_activos_count': modulos_activos_count,
-        'usuarios_colegio_count': usuarios_colegio_count,
-        'total_estudiantes_count': total_estudiantes_count,
-        'total_cursos_count': total_cursos_count,
-        'solicitudes_pendientes': solicitudes_pendientes,
-        'ultimas_solicitudes': ultimas_solicitudes,
-        'alumnos_en_riesgo': alumnos_en_riesgo,
-        'alumnos_en_riesgo_count': alumnos_en_riesgo_count,
-        'hoy': timezone.now(),
-    }
-    return render(request, 'dashboard_profesor.html', context)
 
 
 

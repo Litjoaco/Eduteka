@@ -4,1185 +4,649 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configura tu colegio - Paso 3 - Eduteka</title>
+    <title>Configura tu colegio - Paso 3: Estructura Académica — Eduteka</title>
     
-    <!-- Google Fonts: Inter -->
+    <!-- Google Fonts: Inter & Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- Bootstrap Icons -->
+    <!-- Bootstrap CSS & Icons -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{% static 'css/configuracion_colegio_paso3.css' %}">
-    <style>
-        /* Unificar el diseño del Stepper para que sea igual en todos los pasos */
-        .stepper .step {
-            background: transparent !important;
-            border-radius: 0 !important;
-            padding: 0 !important;
-        }
-        .stepper .step-icon {
-            width: 32px !important;
-            height: 32px !important;
-            border-radius: 50% !important; /* Siempre circulares, elimina efecto pastilla */
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            font-weight: 700 !important;
-            background-image: none !important; /* Elimina íconos de fondo */
-            text-indent: 0 !important; /* Mantiene el número visible */
-        }
-        .stepper .step.completed .step-icon {
-            background-color: #7b52d9 !important; /* Color morado */
-            border-color: #7b52d9 !important;
-            color: #ffffff !important;
-        }
-        /* Ocultar checkmarks (ticket positivo) inyectados mediante seudo-elementos */
-        .stepper .step.completed .step-icon::before,
-        .stepper .step.completed .step-icon::after {
-            display: none !important;
-            content: none !important;
-        }
-        /* Mejoras en los botones de acción de la tabla */
-        .btn-action-sm {
-            padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600;
-            border: 1px solid #e2e8f0; background: #fff; color: #475569; cursor: pointer;
-            transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.4rem;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-        }
-        .btn-action-sm:hover { background: #f8fafc; color: #0f172a; border-color: #cbd5e1; }
-        .btn-action-primary { background: linear-gradient(135deg, #7b52d9 0%, #6a44c2 100%); color: #fff; border: none; }
-        .btn-action-primary:hover { background: linear-gradient(135deg, #6a44c2 0%, #5a38a8 100%); color: #fff; box-shadow: 0 4px 12px rgba(123, 82, 217, 0.2); }
-        
-        .btn-action-danger { background: #fff1f2; color: #e11d48; border: 1px solid #fecdd3; }
-        .btn-action-danger:hover { background: #fecdd3; color: #be123c; }
-
-        /* Botones fantasmas sutiles para acciones secundarias */
-        .btn-ghost-sm {
-            padding: 0.4rem 0.6rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600;
-            background: transparent; color: #64748b; border: 1px solid transparent; cursor: pointer;
-            transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.3rem;
-        }
-        .btn-ghost-sm:hover { background: #f1f5f9; color: #0f172a; }
-
-        /* Efecto para celdas editables */
-        td[contenteditable="true"] { outline: none; border-radius: 4px; transition: all 0.2s ease; border: 1px border transparent; }
-        td[contenteditable="true"]:hover, td[contenteditable="true"]:focus { background: #f8fafc; box-shadow: inset 0 0 0 1px #cbd5e1; padding-left: 0.5rem; }
-
-        /* Estilos del panel interactivo (Modal) */
-        .custom-modal-overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(4px);
-            z-index: 1000; display: none; align-items: center; justify-content: center;
-            opacity: 0; transition: opacity 0.3s ease;
-        }
-        .custom-modal-overlay.active { display: flex; opacity: 1; }
-        .custom-modal-content {
-            background: #fff; border-radius: 16px; width: 95%; max-width: 680px;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); overflow: hidden;
-            transform: translateY(20px); transition: transform 0.3s ease;
-            display: flex; flex-direction: column; max-height: 88vh;
-        }
-        .custom-modal-overlay.active .custom-modal-content { transform: translateY(0); }
-        .custom-modal-header {
-            padding: 1.25rem 1.5rem; border-bottom: 1px solid #e2e8f0; 
-            display: flex; justify-content: space-between; align-items: center;
-            background: #f8fafc;
-        }
-        .custom-modal-header h5 { margin: 0; font-weight: 700; color: #0f172a; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; }
-        .custom-modal-body { padding: 1.5rem; overflow-y: auto; }
-        .custom-modal-footer {
-            padding: 1rem 1.5rem; border-top: 1px solid #e2e8f0; 
-            background: #f8fafc; display: flex; justify-content: flex-end; gap: 0.75rem;
-        }
-        
-        /* Lista de Checkboxes en el modal */
-        .course-level-title {
-            font-size: 0.8rem; text-transform: uppercase; font-weight: 800; 
-            color: #334155; letter-spacing: 0.5px; margin: 1.5rem 0 0.8rem 0;
-            display: flex; align-items: center; gap: 0.4rem;
-            border-bottom: 2px solid #f1f5f9; padding-bottom: 0.5rem;
-        }
-        .course-level-title i { color: #7b52d9; font-size: 1.1rem; }
-        .course-level-title:first-child { margin-top: 0; }
-        .courses-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.6rem; margin-bottom: 1rem;
-        }
-        .course-checkbox-item {
-            display: flex; align-items: center; padding: 0.6rem 0.8rem;
-            border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 0;
-            cursor: pointer; transition: all 0.2s; background: #fff;
-            gap: 0.8rem;
-        }
-        .course-checkbox-item:hover { border-color: #cbd5e1; background: #f8fafc; transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        .course-checkbox-item input[type="checkbox"] { margin: 0; flex-shrink: 0; }
-        .course-checkbox-item span { font-weight: 600; color: #475569; font-size: 0.85rem; line-height: 1.2; }
-
-        /* Scrollbar modal */
-        .custom-modal-body::-webkit-scrollbar { width: 6px; }
-        .custom-modal-body::-webkit-scrollbar-track { background: #f1f5f9; }
-        .custom-modal-body::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-
-        /* Estado Vacío de Cursos */
-        .empty-state-container {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 3rem 2rem; text-align: center; background: #f8fafc;
-            border: 2px dashed #cbd5e1; border-radius: 16px; margin-top: 1rem;
-            transition: all 0.3s ease;
-        }
-        .empty-state-container .empty-icon { font-size: 3.5rem; color: #94a3b8; margin-bottom: 1rem; }
-        .empty-state-container h4 { font-size: 1.35rem; font-weight: 700; color: #1e293b; margin-bottom: 0.5rem; }
-        .empty-state-container p { color: #64748b; max-width: 600px; font-size: 1rem; margin-bottom: 2rem; line-height: 1.5; }
-        
-        .important-alert {
-            background: #fffbeb; border: 1px solid #fde68a; border-radius: 12px;
-            padding: 1.2rem 1.5rem; display: flex; align-items: flex-start; gap: 1rem;
-            text-align: left; max-width: 650px; color: #92400e; box-shadow: 0 4px 6px rgba(253, 230, 138, 0.15);
-        }
-        .important-alert i { font-size: 1.5rem; color: #f59e0b; line-height: 1; }
-        .important-alert strong { display: block; font-size: 1.05rem; margin-bottom: 0.25rem; color: #b45309; }
-        .important-alert span { font-size: 0.95rem; line-height: 1.4; display: block; }
-
-        /* Ajustes Tabla Cursos Scroll */
-        .courses-table-wrapper {
-            max-height: 450px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 12px;
-        }
-        .courses-table-wrapper::-webkit-scrollbar { width: 8px; }
-        .courses-table-wrapper::-webkit-scrollbar-track { background: #f8fafc; border-radius: 0 12px 12px 0; }
-        .courses-table-wrapper::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .courses-table thead th { position: sticky; top: 0; background: #f8fafc; z-index: 10; box-shadow: 0 1px 0 #e2e8f0; }
-
-        /* --- Mejoras visuales para Checkboxes --- */
-        .course-checkbox-item input[type="checkbox"],
-        .courses-table input[type="checkbox"] {
-            appearance: none;
-            -webkit-appearance: none;
-            width: 1.3rem;
-            height: 1.3rem;
-            border: 2px solid #cbd5e1;
-            border-radius: 6px;
-            background-color: #fff;
-            cursor: pointer;
-            position: relative;
-            transition: all 0.2s ease-in-out;
-            vertical-align: middle;
-            margin: 0;
-        }
-        .course-checkbox-item input[type="checkbox"]:checked,
-        .courses-table input[type="checkbox"]:checked {
-            background-color: #7b52d9;
-            border-color: #7b52d9;
-        }
-        .course-checkbox-item input[type="checkbox"]:checked::after,
-        .courses-table input[type="checkbox"]:checked::after {
-            content: '';
-            position: absolute;
-            left: 32%;
-            top: 10%;
-            width: 30%;
-            height: 55%;
-            border: solid white;
-            border-width: 0 2px 2px 0;
-            transform: rotate(45deg);
-        }
-        .course-checkbox-item input[type="checkbox"]:hover,
-        .courses-table input[type="checkbox"]:hover {
-            border-color: #7b52d9;
-            box-shadow: 0 0 0 4px rgba(123, 82, 217, 0.1);
-        }
-
-        /* Mejoras a la Tabla de Cursos */
-        .courses-table { width: 100%; border-collapse: separate; border-spacing: 0; }
-        .courses-table th { font-size: 0.85rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; padding: 1rem; border-bottom: 2px solid #e2e8f0; }
-        .courses-table td { padding: 1rem; vertical-align: middle; border-bottom: 1px solid #f8fafc; color: #334155; font-size: 0.95rem; }
-        .courses-table tbody tr { transition: background-color 0.2s ease; }
-        .courses-table tbody tr:hover { background-color: #f1f5f9; }
-
-        /* Selects de Letras (Desde - Hasta) */
-        .letter-select {
-            appearance: none;
-            background-color: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 0.4rem 1.8rem 0.4rem 0.8rem;
-            font-weight: 600;
-            color: #334155;
-            cursor: pointer;
-            transition: all 0.2s;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 0.6rem center;
-            background-size: 10px;
-        }
-        .letter-select:hover, .letter-select:focus {
-            background-color: #fff;
-            border-color: #7b52d9;
-            box-shadow: 0 0 0 3px rgba(123, 82, 217, 0.1);
-            outline: none;
-        }
-
-        /* Tags de Secciones generadas */
-        .sections-flex { display: flex; flex-wrap: wrap; gap: 0.4rem; }
-        .section-tag {
-            background: #e0e7ff; color: #4338ca; padding: 0.25rem 0.6rem;
-            border-radius: 6px; font-size: 0.8rem; font-weight: 700;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-        }
-        .section-tag.more { background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; box-shadow: none; }
-        
-        /* Indicador de Estado (Ej: Nuevo) */
-        .status-indicator {
-            display: inline-flex; align-items: center; gap: 0.3rem;
-            background: #dcfce7; color: #15803d; padding: 0.25rem 0.75rem;
-            border-radius: 20px; font-size: 0.8rem; font-weight: 700;
-        }
-
-        /* Ajuste definitivo para el resumen: comportamiento normal sin fijar (sticky) ni scroll interno */
-        .summary-area, .summary-card {
-            position: relative !important;
-            top: 0 !important;
-            height: auto !important;
-            max-height: none !important;
-            align-self: flex-start !important;
-            overflow: visible !important;
-            margin-bottom: 2rem;
-        }
-        .summary-value {
-            word-break: break-word;
-            white-space: normal !important;
-        }
-
-        /* Eliminar cuadro de focus predeterminado en inputs y selects sin bordes */
-        .form-control.border-0:focus, .form-select.border-0:focus {
-            box-shadow: none !important;
-        }
-    </style>
+    <link rel="stylesheet" href="{% static 'css/configuracion_colegio_paso3.css' %}?v=6">
+    <link rel="stylesheet" href="{% static 'css/backbutton.css' %}">
 </head>
 <body>
 
-<div class="config-container">
-    
-    <!-- ==========================================
-         LEFT COLUMN 
-         ========================================== -->
-    <div class="left-column">
-        <div class="logo-container">
-            <img src="/static/img/logo.png" alt="Eduteka Logo" style="height: 100px; width: auto;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzdiNTJkOSIgcng9IjIwIi8+PHRleHQgeD0iNTAiIHk9IjY0IiBmb250LWZhbWlseT0iSW50ZXIiIGZvbnQtd2VpZ2h0PSI4MDAiIGZvbnQtc2l6ZT0iNDgiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5FPC90ZXh0Pjwvc3ZnPg=='">
-        </div>
+    <!-- Botón Volver al paso 2 -->
+    <a href="{% url 'configuracion_colegio_paso2' colegio.id %}" class="back-button">
+        <i class="bi bi-arrow-left"></i> Volver al Paso 2
+    </a>
+
+    <div class="config-container">
         
-        <div class="header-text-group">
-            <div class="step-pill">
-                <i class="bi bi-mortarboard-fill"></i> Paso 3 de 5
+        <!-- ==========================================
+             LEFT COLUMN (Branding & Guidance)
+             ========================================== -->
+        <div class="left-column">
+            <div class="logo-container">
+                <img src="{% static 'img/logo.png' %}" alt="Eduteka Logo" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzdiNTJkOSIgcng9IjIwIi8+PHRleHQgeD0iNTAiIHk9IjY0IiBmb250LWZhbWlseT0iSW50ZXIiIGZvbnQtd2VpZ2h0PSI4MDAiIGZvbnQtc2l6ZT0iNDgiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5FPC90ZXh0Pjwvc3ZnPg=='">
             </div>
-            <h1>Configura tu colegio</h1>
-            <p class="desc-text">Define el año escolar, niveles educativos, jornadas, cursos y secciones que tendrá tu institución.</p>
-        </div>
-        
-        <div class="illustration-wrapper">
-            <div class="deco-blob blob-1"></div>
-            <div class="deco-blob blob-2"></div>
-            <div class="deco-blob blob-3"></div>
-            <img src="{% static 'img/personaliza colegio 1.png' %}" alt="Ilustración Colegio" height: 100px; width: auto>
-        </div>
-        
-        <div class="plan-includes-card">
-            <h3>Tu configuración incluirá</h3>
-            <ul class="plan-includes-list">
-                <li><i class="bi bi-calendar-check"></i> Año académico activo</li>
-                <li><i class="bi bi-layers"></i> Niveles educativos</li>
-                <li><i class="bi bi-clock-history"></i> Jornadas y períodos</li>
-                <li><i class="bi bi-grid-3x3-gap"></i> Cursos y secciones</li>
-            </ul>
-        </div>
-    </div>
-    
-    <!-- ==========================================
-        MAIN CARD (RIGHT) 
-        ========================================== -->
-    <div class="main-card">
-        
-        <!-- Compact Stepper -->
-        <div class="stepper">
-            <div class="step completed">
-                <div class="step-icon">1</div>
-                <div class="step-text">Identidad</div>
-            </div>
-            <div class="step completed">
-                <div class="step-icon">2</div>
-                <div class="step-text">Contacto</div>
-            </div>
-            <div class="step active">
-                <div class="step-icon">3</div>
-                <div class="step-text">Académica</div>
-            </div>
-            <div class="step">
-                <div class="step-icon">4</div>
-                <div class="step-text">Roles</div>
-            </div>
-            <div class="step">
-                <div class="step-icon">5</div>
-                <div class="step-text">Módulos</div>
-            </div>
-        </div>
-        
-        <!-- Form Header -->
-        <div class="form-section-header">
-            <div class="section-icon-wrapper">
-                <i class="bi bi-book"></i>
-            </div>
-            <div class="section-titles">
-                <h2>3. Configuración académica</h2>
-                <p>Define cómo se organizará el año escolar, los niveles, jornadas, cursos y secciones de tu institución.</p>
-            </div>
-        </div>
-        
-        <!-- Content Grid (Form + Summary) -->
-        <div class="content-grid">
             
-            <!-- Fields Area -->
-            <div class="form-area">
-                <form id="config-form-paso3" method="post" action="{% url 'configuracion_colegio_paso3' colegio.id %}" onsubmit="updateSummary()">
-                    {% csrf_token %}
-                    
-                    <!-- Bloque: Año académico -->
-                    <div class="form-block">
-                        <div class="form-block-title">
-                            <i class="bi bi-calendar3"></i> Año académico
-                        </div>
-                        <div class="basic-fields-grid">
-                            <div class="form-group">
-                                <label class="form-label">Año actual</label>
-                                <input type="number" name="anio_academico" id="input-anio" class="form-control" value="{{ periodo.anio|default:'2026' }}" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Inicio</label>
-                                <input type="date" name="fecha_inicio" class="form-control" value="{{ periodo.fecha_inicio|date:'Y-m-d'|default:'' }}" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Término</label>
-                                <input type="date" name="fecha_termino" class="form-control" value="{{ periodo.fecha_termino|date:'Y-m-d'|default:'' }}" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Períodos</label>
-                                <select name="tipo_periodo" id="input-periodo" class="form-select">
-                                    <option value="Semestres" {% if periodo.tipo_periodo == 'Semestres' %}selected{% endif %}>Semestres</option>
-                                    <option value="Trimestres" {% if periodo.tipo_periodo == 'Trimestres' %}selected{% endif %}>Trimestres</option>
-                                    <option value="Anual" {% if periodo.tipo_periodo == 'Anual' %}selected{% endif %}>Anual</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
+            <div class="step-pill">
+                <i class="bi bi-mortarboard-fill"></i> Paso 3 de 5: Estructura Académica
+            </div>
 
-                    <!-- Bloque: Niveles educativos -->
-                    <div class="form-block">
-                        <div class="form-block-title">
-                            <i class="bi bi-layers"></i> Niveles educativos
+            <h1>Configura la malla escolar</h1>
+            <p class="desc-text">Define el período lectivo, los niveles y las salas/secciones de tu establecimiento. Esta configuración habilitará todos los módulos operativos de Eduteka.</p>
+
+            <!-- Ilustración con Aura Luminosa -->
+            <div class="left-illustration-frame">
+                <div class="left-illustration-aura"></div>
+                <img src="{% static 'img/personaliza colegio 1.png' %}" alt="Estructura Académica" class="img-fluid left-illustration-img">
+            </div>
+            
+            <div class="plan-includes-card">
+                <h3><i class="bi bi-diagram-3-fill text-primary"></i> Módulos que se alimentan de aquí</h3>
+                <ul class="plan-includes-list">
+                    <li><i class="bi bi-journal-bookmark-fill"></i> <strong>Libro de Clases:</strong> Genera las planillas de notas por sección.</li>
+                    <li><i class="bi bi-calendar-check-fill"></i> <strong>Asistencia Diaria:</strong> Listas de alumnos por curso y letra.</li>
+                    <li><i class="bi bi-person-plus-fill"></i> <strong>Matrícula:</strong> Asignación directa a cursos creados.</li>
+                    <li><i class="bi bi-award-fill"></i> <strong>SIMCE & DIA:</strong> Diagnósticos agrupados por nivel.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- ==========================================
+             MAIN CARD (Right: Stepper + Form + Live Summary)
+             ========================================== -->
+        <div class="main-card">
+            
+            <!-- Stepper Moderno de 5 Pasos -->
+            <div class="stepper-pro">
+                <div class="stepper-pro-line"></div>
+
+                <!-- Paso 1: Completado -->
+                <div class="stepper-pro-step completed">
+                    <div class="step-node-pro"><i class="bi bi-check2"></i></div>
+                    <span class="step-label-pro">1. Identidad ✓</span>
+                </div>
+
+                <!-- Paso 2: Completado -->
+                <div class="stepper-pro-step completed">
+                    <div class="step-node-pro"><i class="bi bi-check2"></i></div>
+                    <span class="step-label-pro">2. Contacto ✓</span>
+                </div>
+
+                <!-- Paso 3: Activo -->
+                <div class="stepper-pro-step active">
+                    <div class="step-node-pro"><i class="bi bi-mortarboard"></i></div>
+                    <span class="step-label-pro">3. Académica</span>
+                </div>
+
+                <!-- Paso 4 -->
+                <div class="stepper-pro-step">
+                    <div class="step-node-pro"><i class="bi bi-people"></i></div>
+                    <span class="step-label-pro">4. Roles</span>
+                </div>
+
+                <!-- Paso 5 -->
+                <div class="stepper-pro-step">
+                    <div class="step-node-pro"><i class="bi bi-grid"></i></div>
+                    <span class="step-label-pro">5. Módulos</span>
+                </div>
+            </div>
+            
+            <!-- Form Header -->
+            <div class="form-section-header">
+                <div class="section-icon-wrapper">
+                    <i class="bi bi-mortarboard-fill"></i>
+                </div>
+                <div class="section-titles">
+                    <h2>3. Configuración Académica Institucional</h2>
+                    <p>Organiza el año escolar, los niveles y las secciones de <strong>{{ colegio.nombre }}</strong>.</p>
+                </div>
+            </div>
+            
+            <!-- Content Grid (Form + Sticky Summary Card) -->
+            <div class="content-grid">
+                
+                <!-- Columna Izquierda: Formulario -->
+                <div class="form-area">
+                    {% if messages %}
+                        <div class="messages-container mb-3">
+                            {% for message in messages %}
+                                <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}" style="border-radius: 12px; font-size: 0.9rem; padding: 0.85rem 1rem;">
+                                    <i class="bi bi-exclamation-circle-fill me-1"></i> {{ message }}
+                                </div>
+                            {% endfor %}
                         </div>
+                    {% endif %}
+
+                    <form id="config-form-paso3" method="post" action="{% url 'configuracion_colegio_paso3' colegio.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="datos_cursos" id="datos_cursos" value="">
                         <input type="hidden" name="niveles_educativos" id="niveles_educativos" value="">
-                        <div class="selectable-cards-grid">
-                            <div class="selectable-card {% if periodo %}{% if periodo.nivel_parvularia %}active{% endif %}{% else %}active{% endif %}" onclick="toggleCard(this)">
-                                Educación parvularia <i class="bi bi-check-circle-fill check-icon"></i>
-                            </div>
-                            <div class="selectable-card {% if periodo %}{% if periodo.nivel_basica %}active{% endif %}{% else %}active{% endif %}" onclick="toggleCard(this)">
-                                Educación básica <i class="bi bi-check-circle-fill check-icon"></i>
-                            </div>
-                            <div class="selectable-card {% if periodo %}{% if periodo.nivel_media %}active{% endif %}{% else %}active{% endif %}" onclick="toggleCard(this)">
-                                Educación media <i class="bi bi-check-circle-fill check-icon"></i>
-                            </div>
-                            <div class="selectable-card {% if periodo and periodo.nivel_tecnico_profesional %}active{% endif %}" onclick="toggleCard(this)">
-                                Técnico profesional <i class="bi bi-check-circle-fill check-icon"></i>
-                            </div>
-                            <div class="selectable-card {% if periodo and periodo.nivel_especial %}active{% endif %}" onclick="toggleCard(this)">
-                                Educación especial <i class="bi bi-check-circle-fill check-icon"></i>
-                            </div>
-                            <div class="selectable-card {% if periodo and periodo.nivel_otro %}active{% endif %}" onclick="toggleCard(this)">
-                                Otro <i class="bi bi-check-circle-fill check-icon"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Bloque: Jornadas -->
-                    <div class="form-block">
-                        <div class="form-block-title">
-                            <i class="bi bi-clock"></i> Jornadas
-                        </div>
                         <input type="hidden" name="jornadas" id="jornadas" value="">
                         <input type="hidden" name="horario_referencia" id="horario_referencia_hidden" value="{{ periodo.horario_referencial|default:'' }}">
                         
-                        <div class="chips-flex mb-3">
-                            <div class="chip {% if periodo and periodo.jornada_manana %}active{% endif %}" onclick="toggleChip(this)" data-jornada="Mañana">Mañana</div>
-                            <div class="chip {% if periodo and periodo.jornada_tarde %}active{% endif %}" onclick="toggleChip(this)" data-jornada="Tarde">Tarde</div>
-                            <div class="chip {% if periodo %}{% if periodo.jornada_completa %}active{% endif %}{% else %}active{% endif %}" onclick="toggleChip(this)" data-jornada="Completa">Completa</div>
-                            <div class="chip {% if periodo and periodo.jornada_vespertina %}active{% endif %}" onclick="toggleChip(this)" data-jornada="Vespertina">Vespertina</div>
-                            <div class="chip {% if periodo and periodo.jornada_flexible %}active{% endif %}" onclick="toggleChip(this)" data-jornada="Flexible">Flexible</div>
-                        </div>
-
-                        <!-- Contenedor para los horarios por jornada -->
-                        <div id="horarios-container" class="mt-4 pt-3 border-top" style="display: none;"></div>
-                    </div>
-
-                    <!-- Bloque Principal: Cursos y Secciones -->
-                    <div class="form-block" style="margin-bottom: 0;">
-                        <div class="courses-block-header">
-                            <div>
-                                <div class="form-block-title" style="margin-bottom: 0.2rem; border-bottom: none;">
-                                    <i class="bi bi-diagram-3"></i> Cursos y secciones
+                        <!-- BLOQUE 1: PERÍODO Y AÑO ESCOLAR -->
+                        <div class="form-group-block">
+                            <div class="form-block-title">
+                                <i class="bi bi-calendar-range-fill text-primary"></i> 1. Año y Régimen Académico
+                            </div>
+                            
+                            <div class="basic-fields-grid">
+                                <div class="form-group">
+                                    <label class="form-label" for="input-anio">Año Escolar *</label>
+                                    <input type="number" name="anio_academico" id="input-anio" class="form-control-enhanced" value="{{ periodo.anio_academico|default:'2026' }}" required min="2020" max="2035">
                                 </div>
-                                <p class="courses-desc">Define qué cursos tendrá tu colegio y hasta qué letra o sección llega cada uno.</p>
-                            </div>
-                        <div class="courses-actions d-flex gap-3 align-items-center flex-wrap justify-content-end">
-                            <div class="btn-secondary-action gap-2 align-items-center" style="display:none;">
-                                <button type="button" class="btn-ghost-sm" id="btnSelectAll" onclick="selectAllCourses()" title="Seleccionar todos"><i class="bi bi-check2-square"></i> Todos</button>
-                                <button type="button" class="btn-ghost-sm" id="btnClear" onclick="clearSelection()" title="Limpiar selección"><i class="bi bi-x-square"></i> Ninguno</button>
-                                <div style="width: 1px; height: 20px; background-color: #cbd5e1; margin: 0 0.5rem;"></div>
-                                <button type="button" class="btn-action-sm" id="btnApply" onclick="openApplyModal()"><i class="bi bi-layers-half"></i> Aplicar a seleccionados</button>
-                            </div>
-                            <button type="button" class="btn-action-sm btn-action-primary" onclick="openAddCourseModal()"><i class="bi bi-plus-lg"></i> Agregar cursos</button>
+                                <div class="form-group">
+                                    <label class="form-label" for="input-periodo">Régimen *</label>
+                                    <select name="tipo_periodo" id="input-periodo" class="form-select-enhanced">
+                                        <option value="Semestres" {% if periodo.periodo_academico == 'semestres' or not periodo %}selected{% endif %}>Semestral (2 Semestres)</option>
+                                        <option value="Trimestres" {% if periodo.periodo_academico == 'trimestres' %}selected{% endif %}>Trimestral (3 Trimestres)</option>
+                                        <option value="Anual" {% if periodo.periodo_academico == 'anual' %}selected{% endif %}>Anual</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="input-fecha-inicio">Inicio de Clases *</label>
+                                    <input type="date" name="fecha_inicio" id="input-fecha-inicio" class="form-control-enhanced" value="{{ periodo.fecha_inicio|date:'Y-m-d'|default:'2026-03-02' }}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="input-fecha-termino">Término de Clases *</label>
+                                    <input type="date" name="fecha_termino" id="input-fecha-termino" class="form-control-enhanced" value="{{ periodo.fecha_termino|date:'Y-m-d'|default:'2026-12-15' }}" required>
+                                </div>
                             </div>
                         </div>
-                        <input type="hidden" name="datos_cursos" id="datos_cursos" value="">
 
-                        <!-- Estado Vacío -->
-                        <div id="empty-courses-state" class="empty-state-container">
-                            <div class="empty-icon"><i class="bi bi-mortarboard"></i></div>
-                            <h4>Aún no has agregado cursos</h4>
-                            <p>Este es un paso fundamental para configurar tu colegio. Selecciona los cursos que impartirá tu institución y define hasta qué letra llega cada uno (Ej: 1° Básico A, 1° Básico B).</p>
-                            <div class="important-alert">
-                                <i class="bi bi-exclamation-triangle-fill"></i>
+                        <!-- BLOQUE 2: NIVELES Y JORNADAS -->
+                        <div class="form-group-block">
+                            <div class="form-block-title">
+                                <i class="bi bi-layers-fill text-info"></i> 2. Niveles Educativos Impartidos
+                            </div>
+                            
+                            <div class="selectable-cards-grid mb-3">
+                                <div class="selectable-card {% if periodo.nivel_parvularia or not periodo %}active{% endif %}" data-nivel="parvularia" onclick="toggleLevel(this)">
+                                    <span>Educación Parvularia</span>
+                                    <i class="bi bi-check-circle-fill check-icon"></i>
+                                </div>
+                                <div class="selectable-card {% if periodo.nivel_basica or not periodo %}active{% endif %}" data-nivel="básica" onclick="toggleLevel(this)">
+                                    <span>Educación Básica</span>
+                                    <i class="bi bi-check-circle-fill check-icon"></i>
+                                </div>
+                                <div class="selectable-card {% if periodo.nivel_media or not periodo %}active{% endif %}" data-nivel="media" onclick="toggleLevel(this)">
+                                    <span>Educación Media</span>
+                                    <i class="bi bi-check-circle-fill check-icon"></i>
+                                </div>
+                                <div class="selectable-card {% if periodo.nivel_tecnico_profesional %}active{% endif %}" data-nivel="técnico" onclick="toggleLevel(this)">
+                                    <span>Técnico Profesional (TP)</span>
+                                    <i class="bi bi-check-circle-fill check-icon"></i>
+                                </div>
+                                <div class="selectable-card {% if periodo.nivel_especial %}active{% endif %}" data-nivel="especial" onclick="toggleLevel(this)">
+                                    <span>Educación Especial</span>
+                                    <i class="bi bi-check-circle-fill check-icon"></i>
+                                </div>
+                                <div class="selectable-card {% if periodo.nivel_otro %}active{% endif %}" data-nivel="otro" onclick="toggleLevel(this)">
+                                    <span>Adultos / Vespertina</span>
+                                    <i class="bi bi-check-circle-fill check-icon"></i>
+                                </div>
+                            </div>
+
+                            <div class="form-block-title mt-3 mb-2 pt-2 border-top">
+                                <i class="bi bi-clock-fill text-warning"></i> Jornadas de Funcionamiento
+                            </div>
+
+                            <div class="chips-flex">
+                                <div class="chip {% if periodo.jornada_manana or not periodo %}active{% endif %}" data-jornada="Mañana" onclick="toggleChip(this)">Mañana</div>
+                                <div class="chip {% if periodo.jornada_tarde %}active{% endif %}" data-jornada="Tarde" onclick="toggleChip(this)">Tarde</div>
+                                <div class="chip {% if periodo.jornada_completa or not periodo %}active{% endif %}" data-jornada="Completa" onclick="toggleChip(this)">Jornada Completa (JEC)</div>
+                                <div class="chip {% if periodo.jornada_vespertina %}active{% endif %}" data-jornada="Vespertina" onclick="toggleChip(this)">Vespertina</div>
+                                <div class="chip {% if periodo.jornada_flexible %}active{% endif %}" data-jornada="Flexible" onclick="toggleChip(this)">Flexible</div>
+                            </div>
+                        </div>
+
+                        <!-- BLOQUE 3: CURSOS Y SECCIONES (MATRIZ) -->
+                        <div class="form-group-block">
+                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
                                 <div>
-                                    <strong>Punto importante:</strong>
-                                    <span>Esta configuración será la base obligatoria para matricular alumnos, crear asignaturas, registrar asistencia y organizar el libro de clases.</span>
+                                    <div class="form-block-title mb-0 border-0 p-0 fs-6">
+                                        <i class="bi bi-diagram-3-fill text-primary"></i> 3. Malla de Cursos y Letras / Secciones
+                                    </div>
+                                    <span class="small text-muted d-block mt-0.5">Cada curso generará automáticamente sus libros de clases y listas de asistencia.</span>
+                                </div>
+                                
+                                <div class="d-flex gap-2 align-items-center">
+                                    <button type="button" class="btn btn-sm btn-outline-primary fw-bold px-3 py-1.5" onclick="loadStandardChileanCourses()" style="border-radius: 10px; font-size: 0.82rem; background:#F0EDFF; border-color:#D8CEFF; color:#7C5CFC;">
+                                        <i class="bi bi-magic me-1"></i> ✨ Precargar Estándar Chile
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-primary fw-bold px-3 py-1.5" onclick="openAddCourseModal()" style="border-radius: 10px; font-size: 0.82rem; background: linear-gradient(135deg, #7C5CFA 0%, #5B38E8 100%); border:none;">
+                                        <i class="bi bi-plus-lg me-1"></i> Agregar Cursos
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Estado Vacío -->
+                            <div id="empty-courses-state" class="text-center py-4 px-3 border rounded-3 bg-white" style="border-style: dashed !important; border-color: #CBD5E1 !important;">
+                                <div class="mb-2 text-muted fs-1"><i class="bi bi-mortarboard"></i></div>
+                                <h6 class="fw-bold text-dark mb-1">Aún no has configurado los cursos del colegio</h6>
+                                <p class="small text-muted mb-3" style="max-width: 480px; margin: 0 auto;">Puedes precargar la estructura típica chilena (1° Básico a 4° Medio) en un solo clic o elegir los cursos específicos de tu institución.</p>
+                                <button type="button" class="btn btn-primary fw-bold px-4 py-2" style="border-radius: 12px; background: linear-gradient(135deg, #7C5CFA 0%, #5B38E8 100%); border:none; font-size: 0.88rem;" onclick="loadStandardChileanCourses()">
+                                    <i class="bi bi-magic me-1"></i> Precargar 1° Básico a 4° Medio (A y B)
+                                </button>
+                            </div>
+
+                            <!-- Tabla de Cursos Activos -->
+                            <div id="courses-table-container" style="display: none;">
+                                <div class="courses-table-wrapper">
+                                    <table class="courses-table">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 25%;">Curso</th>
+                                                <th style="width: 15%;">Nivel</th>
+                                                <th style="width: 18%;">Jornada</th>
+                                                <th style="width: 18%;">Letras</th>
+                                                <th style="width: 18%;">Secciones</th>
+                                                <th style="width: 6%; text-align: center;"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="coursesTableBody">
+                                            <!-- Filas generadas dinámicamente -->
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Scrollable Table -->
-                        <div class="table-container mt-3" id="courses-table-container" style="display: none;">
-                            <div class="courses-table-wrapper">
-                                <table class="courses-table">
-                                    <thead>
-                                        <tr>
-                                            <th style="width: 5%; text-align: center;"><input type="checkbox" id="selectAllCheckbox" onclick="toggleAllCourses(this)"></th>
-                                            <th style="width: 12%;">Curso</th>
-                                            <th style="width: 12%;">Nivel</th>
-                                            <th style="width: 15%;">Jornada</th>
-                                            <th style="width: 10%;">Desde</th>
-                                            <th style="width: 10%;">Hasta</th>
-                                            <th style="width: 20%;">Secciones generadas</th>
-                                            <th style="width: 15%;">Estado</th>
-                                            <th style="width: 5%;"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <!-- Inicialmente Vacío -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="micro-help">
-                            <i class="bi bi-info-circle"></i> Ejemplo: si 1° Básico llega hasta la letra F, se crearán automáticamente 1A, 1B, 1C, 1D, 1E y 1F.
-                        </div>
-                    </div>
-                </form>
-            </div>
-            
-            <!-- Summary Card Area -->
-            <div class="summary-area">
-                <div class="summary-card">
-                    <div class="summary-header">
-                        <i class="bi bi-clipboard-data"></i> Resumen académico
-                    </div>
-                    
-                    <div class="summary-list">
-                        <div class="summary-item">
-                            <span class="summary-label">Año académico</span>
-                            <span class="summary-value" id="summary-anio">{{ periodo.anio|default:"2026" }}</span>
-                        </div>
-                        <div class="summary-item">
-                            <span class="summary-label">Período</span>
-                            <span class="summary-value" id="summary-periodo">{{ periodo.tipo_periodo|default:"Semestres" }}</span>
-                        </div>
-                        <div class="summary-item">
-                            <span class="summary-label">Niveles activos</span>
-                            <span class="summary-value" id="summary-niveles">{{ periodo.niveles_educativos|default:"Básica y Media" }}</span>
-                        </div>
-                        <div class="summary-item">
-                            <span class="summary-label">Jornada</span>
-                            <span class="summary-value" id="summary-jornadas">{{ periodo.jornadas|default:"Completa" }}</span>
-                        </div>
-                        <div class="summary-item">
-                            <span class="summary-label">Cursos config.</span>
-                            <span class="summary-value highlight" id="summary-cursos">0 cursos</span>
-                        </div>
-                        <div class="summary-item">
-                            <span class="summary-label">Secciones creadas</span>
-                            <span class="summary-value highlight" id="summary-secciones">0 secciones</span>
-                        </div>
-                        <div class="summary-item">
-                            <span class="summary-label">Letras usadas</span>
-                            <span class="summary-value" id="summary-letras">-</span>
-                        </div>
-                    </div>
-                    
-                    <div class="summary-status">
-                        <i class="bi bi-exclamation-circle-fill"></i> Configuración pendiente de guardar
-                    </div>
-                </div>
-            </div>
-            
-        </div> <!-- End Content Grid -->
-        
-        <!-- Bottom Actions & Tip -->
-        <div class="bottom-area">
-            <div class="tip-card">
-                <div class="tip-icon-bg">
-                    <i class="bi bi-lightbulb-fill"></i>
-                </div>
-                <p><strong>Consejo:</strong> Puedes modificar las letras y secciones por curso en cualquier momento desde la configuración académica.</p>
-            </div>
-            
-            <div class="action-bar">
-                <div class="help-block">
-                    <span>¿Necesitas ayuda?</span>
-                    <a href="#" class="help-link">Ver guía de configuración académica <i class="bi bi-arrow-up-right"></i></a>
+                    </form>
                 </div>
                 
-                <div class="buttons-group">
-                    <a href="{% url 'configuracion_colegio_paso2' colegio.id %}" class="btn-secondary">Volver al paso 2</a>
-                    <button type="submit" form="config-form-paso3" class="btn-primary-gradient">
-                        Guardar y continuar <i class="bi bi-arrow-right"></i>
+                <!-- Columna Derecha: Resumen de Estructura Académica (Sticky Summary Card) -->
+                <div class="summary-area">
+                    <div class="summary-card">
+                        
+                        <div class="summary-header">
+                            <div class="summary-icon">
+                                <i class="bi bi-mortarboard-fill"></i>
+                            </div>
+                            <div>
+                                <h5 class="summary-title">{{ colegio.nombre|default:"Colegio San Bernardo" }}</h5>
+                                <span class="badge bg-light text-primary border" style="font-size: 0.72rem; font-weight: 800;" id="summary-periodo-badge">Régimen Semestral 2026</span>
+                            </div>
+                        </div>
+
+                        <!-- Métricas en vivo -->
+                        <div class="summary-metric-box">
+                            <div>
+                                <div class="metric-val" id="summary-total-courses">0</div>
+                                <div class="metric-lbl">Cursos</div>
+                            </div>
+                            <div>
+                                <div class="metric-val" id="summary-total-sections" style="color:#0D9488;">0</div>
+                                <div class="metric-lbl">Secciones</div>
+                            </div>
+                        </div>
+
+                        <!-- Niveles Activos Resumen -->
+                        <div>
+                            <span class="small fw-bold text-muted text-uppercase d-block mb-1.5" style="font-size: 0.72rem; letter-spacing: 0.5px;">Niveles Impartidos</span>
+                            <div class="d-flex flex-wrap gap-1.5" id="summary-levels-container">
+                                <span class="badge bg-light text-dark border">Básica</span>
+                                <span class="badge bg-light text-dark border">Media</span>
+                            </div>
+                        </div>
+
+                        <!-- Módulos Vinculados -->
+                        <div class="modules-linked-box">
+                            <div class="modules-linked-title">
+                                <i class="bi bi-check-circle-fill"></i> Conexión con Módulos
+                            </div>
+                            <ul class="modules-linked-list">
+                                <li><i class="bi bi-check2"></i> Libro de clases y calificaciones</li>
+                                <li><i class="bi bi-check2"></i> Asistencia diaria y por bloque</li>
+                                <li><i class="bi bi-check2"></i> Matrícula y ficha del estudiante</li>
+                                <li><i class="bi bi-check2"></i> Asignación de profesores jefes</li>
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
+                
+            </div> <!-- End Content Grid -->
+            
+            <!-- Bottom Actions & Tip -->
+            <div class="bottom-area">
+                <div class="action-bar">
+                    <a href="{% url 'configuracion_colegio_paso2' colegio.id %}" class="btn-secondary-outline">
+                        <i class="bi bi-arrow-left"></i> Volver al Paso 2
+                    </a>
+                    
+                    <button type="button" class="btn-primary-gradient" id="btnSubmitPaso3" onclick="submitPaso3Form()">
+                        <span id="btnSubmitPaso3Text">Guardar y Continuar al Paso 4</span>
+                        <i class="bi bi-arrow-right-short fs-3" id="btnSubmitPaso3Icon"></i>
+                        <span class="spinner-border spinner-border-sm d-none" id="btnSubmitPaso3Spinner" role="status"></span>
                     </button>
                 </div>
             </div>
-        </div>
-        
-    </div>
-</div>
-
-<!-- Modal: Agregar Cursos -->
-<div id="addCourseModal" class="custom-modal-overlay">
-    <div class="custom-modal-content">
-        <div class="custom-modal-header">
-            <h5><i class="bi bi-plus-circle text-primary"></i> Agregar cursos</h5>
-            <button type="button" class="btn-close" onclick="closeAddCourseModal()" aria-label="Close"></button>
-        </div>
-        <div class="custom-modal-body">
-            <p class="text-muted mb-3" style="font-size: 0.95rem;">Selecciona los cursos que tendrá tu colegio durante este periodo académico.</p>
             
-            <div class="mb-4 p-3 rounded" style="background-color: #f3f0ff; border: none;">
-                <label class="form-label fw-bold mb-2" style="font-size: 0.95rem; color: #4c1d95;"><i class="bi bi-clock-history"></i> Jornada para estos cursos:</label>
-                <select id="modal-jornada-select" class="form-select border-0 shadow-none" onchange="refreshModalCheckboxes()" style="background-color: #ffffff; font-weight: 600; color: #4c1d95; cursor: pointer; outline: none;">
-                    <!-- Opciones de jornada generadas dinámicamente -->
-                </select>
-                <small class="text-muted mt-2 d-block" style="font-size: 0.8rem; color: #6b21a8 !important;"><i class="bi bi-info-circle"></i> Puedes agregar un mismo curso en diferentes jornadas abriendo este panel nuevamente.</small>
-            </div>
-            
-            <div class="course-level-title"><i class="bi bi-balloon"></i> Educación Parvularia</div>
-            <div class="courses-grid">
-                <label class="course-checkbox-item"><input type="checkbox" value="Medio Menor" data-nivel="Parvularia"><span>Medio Menor</span></label>
-                <label class="course-checkbox-item"><input type="checkbox" value="Medio Mayor" data-nivel="Parvularia"><span>Medio Mayor</span></label>
-                <label class="course-checkbox-item" title="Pre-kínder o Primer Nivel de Transición"><input type="checkbox" value="Pre-kínder o Primer Nivel de Transición" data-nivel="Parvularia"><span>Pre-kínder (NT1)</span></label>
-                <label class="course-checkbox-item" title="Kínder o Segundo Nivel de Transición"><input type="checkbox" value="Kínder o Segundo Nivel de Transición" data-nivel="Parvularia"><span>Kínder (NT2)</span></label>
-            </div>
-            
-            <div class="course-level-title"><i class="bi bi-backpack"></i> Educación Básica</div>
-            <div class="courses-grid">
-                <label class="course-checkbox-item"><input type="checkbox" value="1° Básico" data-nivel="Básica"><span>1° Básico</span></label>
-                <label class="course-checkbox-item"><input type="checkbox" value="2° Básico" data-nivel="Básica"><span>2° Básico</span></label>
-                <label class="course-checkbox-item"><input type="checkbox" value="3° Básico" data-nivel="Básica"><span>3° Básico</span></label>
-                <label class="course-checkbox-item"><input type="checkbox" value="4° Básico" data-nivel="Básica"><span>4° Básico</span></label>
-                <label class="course-checkbox-item"><input type="checkbox" value="5° Básico" data-nivel="Básica"><span>5° Básico</span></label>
-                <label class="course-checkbox-item"><input type="checkbox" value="6° Básico" data-nivel="Básica"><span>6° Básico</span></label>
-                <label class="course-checkbox-item"><input type="checkbox" value="7° Básico" data-nivel="Básica"><span>7° Básico</span></label>
-                <label class="course-checkbox-item"><input type="checkbox" value="8° Básico" data-nivel="Básica"><span>8° Básico</span></label>
-            </div>
-            
-            <div class="course-level-title"><i class="bi bi-book"></i> Educación Media</div>
-            <div class="courses-grid">
-                <label class="course-checkbox-item"><input type="checkbox" value="1° Medio" data-nivel="Media"><span>1° Medio</span></label>
-                <label class="course-checkbox-item"><input type="checkbox" value="2° Medio" data-nivel="Media"><span>2° Medio</span></label>
-                <label class="course-checkbox-item"><input type="checkbox" value="3° Medio" data-nivel="Media"><span>3° Medio</span></label>
-                <label class="course-checkbox-item"><input type="checkbox" value="4° Medio" data-nivel="Media"><span>4° Medio</span></label>
-            </div>
-
-            <div class="course-level-title"><i class="bi bi-tools"></i> Técnico Profesional / Especialidades</div>
-            <div class="courses-grid">
-                <label class="course-checkbox-item"><input type="checkbox" value="3° Medio TP" data-nivel="TP"><span>3° Medio TP</span></label>
-                <label class="course-checkbox-item"><input type="checkbox" value="4° Medio TP" data-nivel="TP"><span>4° Medio TP</span></label>
-            </div>
-        </div>
-        <div class="custom-modal-footer">
-            <button type="button" class="btn-action-sm" onclick="closeAddCourseModal()">Cancelar</button>
-            <button type="button" class="btn-action-sm btn-action-primary" onclick="confirmAddCourses()">Agregar seleccionados</button>
         </div>
     </div>
-</div>
 
-<!-- Modal: Aplicar a varios -->
-<div id="applyModal" class="custom-modal-overlay">
-    <div class="custom-modal-content" style="max-width: 450px;">
-        <div class="custom-modal-header">
-            <h5><i class="bi bi-layers-half text-primary"></i> Aplicar letras a varios cursos</h5>
-            <button type="button" class="btn-close" onclick="closeApplyModal()" aria-label="Close"></button>
-        </div>
-        <div class="custom-modal-body">
-            <p class="text-muted mb-4" style="font-size: 0.95rem;">Se ajustarán las letras de inicio y fin para los cursos que hayas marcado en la tabla.</p>
-            
-            <div class="row g-3">
-                <div class="col-6">
-                    <label class="form-label" style="font-size: 0.9rem; font-weight: 600;">Desde la letra:</label>
-                    <select id="applyLetraDesde" class="form-select">
-                        <option value="A" selected>A</option>
-                        <option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option>
-                    </select>
+    <!-- Modal para Agregar Cursos -->
+    <div class="modal fade" id="addCourseModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+                <div class="modal-header border-0 pb-0 px-4 pt-4">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-plus-circle text-primary me-2"></i> Seleccionar Cursos a Impartir</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="col-6">
-                    <label class="form-label" style="font-size: 0.9rem; font-weight: 600;">Hasta la letra:</label>
-                    <select id="applyLetraHasta" class="form-select">
-                        <option value="A">A</option><option value="B">B</option>
-                        <option value="C" selected>C</option>
-                        <option value="D">D</option><option value="E">E</option><option value="F">F</option>
-                        <option value="G">G</option><option value="H">H</option><option value="I">I</option><option value="J">J</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-        <div class="custom-modal-footer">
-            <button type="button" class="btn-action-sm" onclick="closeApplyModal()">Cancelar</button>
-            <button type="button" class="btn-action-sm btn-action-primary" onclick="confirmApply()">Aplicar cambios</button>
-        </div>
-    </div>
-</div>
-
-<!-- Modal: Confirmar Eliminar -->
-<div id="deleteCourseModal" class="custom-modal-overlay">
-    <div class="custom-modal-content" style="max-width: 420px; text-align: center;">
-        <div class="custom-modal-body" style="padding: 2.5rem 1.5rem 1.5rem 1.5rem;">
-            <div style="font-size: 3rem; color: #ef4444; margin-bottom: 1rem;"><i class="bi bi-trash3"></i></div>
-            <h5 style="font-weight: 700; color: #0f172a; margin-bottom: 0.75rem; font-size: 1.25rem;">Eliminar curso</h5>
-            <p style="color: #475569; margin-bottom: 0.5rem;">¿Seguro que deseas eliminar este curso y sus secciones generadas?</p>
-            <p style="color: #64748b; font-size: 0.85rem; line-height: 1.4;">Esta acción solo quitará el curso de esta configuración inicial. Podrás volver a agregarlo si lo necesitas.</p>
-        </div>
-        <div class="custom-modal-footer" style="justify-content: center; gap: 1rem; border-top: none; padding-bottom: 2rem; background: #fff;">
-            <button type="button" class="btn-action-sm" onclick="closeDeleteModal()">Cancelar</button>
-            <button type="button" class="btn-action-sm btn-action-danger" onclick="confirmDeleteCourse()">Eliminar curso</button>
-        </div>
-    </div>
-</div>
-
-<!-- Modal: Alerta de Validación -->
-<div id="validationAlertModal" class="custom-modal-overlay">
-    <div class="custom-modal-content" style="max-width: 400px; text-align: center;">
-        <div class="custom-modal-body" style="padding: 2.5rem 1.5rem 1.5rem 1.5rem;">
-            <div style="font-size: 3.5rem; color: #f59e0b; margin-bottom: 1rem; line-height: 1;"><i class="bi bi-exclamation-triangle-fill"></i></div>
-            <h5 style="font-weight: 700; color: #0f172a; margin-bottom: 0.75rem; font-size: 1.25rem;">Faltan datos obligatorios</h5>
-            <p style="color: #475569; margin-bottom: 0; font-size: 0.95rem;">Por favor, completa el <strong style="color:#0f172a;">Año académico</strong>, la <strong style="color:#0f172a;">Fecha de inicio</strong> y la <strong style="color:#0f172a;">Fecha de término</strong> en la parte superior antes de continuar.</p>
-        </div>
-        <div class="custom-modal-footer" style="justify-content: center; border-top: none; padding-bottom: 2rem; background: #fff;">
-            <button type="button" class="btn-action-sm btn-action-primary" onclick="closeValidationAlert()" style="padding: 0.6rem 2rem; border-radius: 20px;">Entendido</button>
-        </div>
-    </div>
-</div>
-
-<!-- Contenedor seguro para los datos de Django (Evita el texto rojo en el IDE) -->
-{{ cursos_data|json_script:"saved-courses-data" }}
-
-<script>
-    let rowToDelete = null;
-    let savedSchedules = {};
-
-    function parseSavedSchedules() {
-        const hiddenInput = document.getElementById('horario_referencia_hidden').value;
-        if (hiddenInput && hiddenInput.includes(':')) {
-            const parts = hiddenInput.split('|');
-            parts.forEach(p => {
-                const [jor, time] = p.split(':');
-                if (jor && time) savedSchedules[jor.trim()] = time.trim();
-            });
-        } else if (hiddenInput) {
-            savedSchedules['Completa'] = hiddenInput.trim();
-        }
-    }
-
-    function updateJornadasActivas() {
-        const activeChips = Array.from(document.querySelectorAll('.chips-flex .chip.active')).map(el => el.innerText.trim());
-        
-        const horariosContainer = document.getElementById('horarios-container');
-        const currentInputs = horariosContainer.querySelectorAll('input');
-        currentInputs.forEach(input => {
-            savedSchedules[input.dataset.jornada] = input.value;
-        });
-
-        if (activeChips.length > 0) {
-            horariosContainer.style.display = 'block';
-            horariosContainer.innerHTML = '<div class="mb-3" style="font-size: 0.85rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;"><i class="bi bi-clock-history me-1"></i> Especifica el horario de cada jornada</div>';
-            
-            const grid = document.createElement('div');
-            grid.style.display = 'grid';
-            grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(260px, 1fr))';
-            grid.style.gap = '1rem';
-            
-            activeChips.forEach(jornada => {
-                const val = savedSchedules[jornada] || '';
-                
-                // Icono dinámico según la jornada
-                let icon = 'bi-clock';
-                if (jornada === 'Mañana') icon = 'bi-sunrise';
-                else if (jornada === 'Tarde') icon = 'bi-sun';
-                else if (jornada === 'Vespertina') icon = 'bi-moon';
-                else if (jornada === 'Completa') icon = 'bi-brightness-high';
-                else if (jornada === 'Flexible') icon = 'bi-calendar2-range';
-
-                grid.innerHTML += `
-                    <div class="horario-item p-3 rounded-4" style="background: #f8fafc; border: none; transition: all 0.2s ease;">
-                        <div class="d-flex align-items-center mb-2">
-                            <i class="bi ${icon} fs-5 me-2" style="color: #7b52d9;"></i>
-                            <span style="font-weight: 700; color: #1e293b; font-size: 0.95rem;">${jornada}</span>
-                        </div>
-                        <div class="input-group input-group-sm" style="background: #ffffff; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); overflow: hidden;">
-                            <span class="input-group-text bg-transparent border-0" style="color: #94a3b8; transition: all 0.2s;"><i class="bi bi-calendar-event"></i></span>
-                            <input type="text" class="form-control border-0 bg-transparent jornada-horario-input shadow-none" data-jornada="${jornada}" placeholder="Ej: 08:00 a 13:00 hrs" value="${val}" style="color: #334155; font-weight: 500; font-size: 0.9rem; padding-left: 0; outline: none; transition: all 0.2s;">
-                        </div>
-                    </div>
-                `;
-            });
-            horariosContainer.appendChild(grid);
-        } else {
-            horariosContainer.style.display = 'none';
-            horariosContainer.innerHTML = '';
-        }
-
-        horariosContainer.querySelectorAll('input').forEach(input => {
-            input.addEventListener('input', updateSummary);
-            
-            // Efectos visuales de focus para que se vea premium e interactivo
-            input.addEventListener('focus', function() {
-                const item = this.closest('.horario-item');
-                item.style.borderColor = '#7b52d9';
-                item.style.backgroundColor = '#ffffff';
-                item.style.boxShadow = '0 4px 12px rgba(123, 82, 217, 0.08)';
-                this.style.borderColor = '#7b52d9';
-                this.previousElementSibling.style.borderColor = '#7b52d9';
-                this.previousElementSibling.style.color = '#7b52d9';
-            });
-            
-            input.addEventListener('blur', function() {
-                const item = this.closest('.horario-item');
-                item.style.borderColor = '#e2e8f0';
-                item.style.backgroundColor = '#f8fafc';
-                item.style.boxShadow = 'none';
-                this.style.borderColor = '#cbd5e1';
-                this.previousElementSibling.style.borderColor = '#cbd5e1';
-                this.previousElementSibling.style.color = '#94a3b8';
-            });
-        });
-
-        const modalSelect = document.getElementById('modal-jornada-select');
-        if (modalSelect) {
-            const currentModalVal = modalSelect.value;
-            modalSelect.innerHTML = '';
-            activeChips.forEach(jornada => {
-                modalSelect.innerHTML += `<option value="${jornada}">${jornada}</option>`;
-            });
-            if (activeChips.includes(currentModalVal)) {
-                modalSelect.value = currentModalVal;
-            } else if (activeChips.length > 0) {
-                modalSelect.value = activeChips[0];
-            }
-        }
-    }
-
-    function toggleCard(element) {
-        element.classList.toggle('active');
-        updateSummary();
-    }
-    
-    function toggleChip(element) {
-        element.classList.toggle('active');
-        updateJornadasActivas();
-        updateSummary();
-    }
-
-    function checkTableVisibility() {
-        const tbody = document.querySelector('.courses-table tbody');
-        const emptyState = document.getElementById('empty-courses-state');
-        const tableContainer = document.getElementById('courses-table-container');
-        const secondaryBtns = document.querySelectorAll('.btn-secondary-action');
-
-        if (tbody.children.length === 0) {
-            emptyState.style.display = 'flex';
-            tableContainer.style.display = 'none';
-            secondaryBtns.forEach(btn => btn.style.display = 'none');
-        } else {
-            emptyState.style.display = 'none';
-            tableContainer.style.display = 'block';
-            secondaryBtns.forEach(btn => btn.style.display = 'inline-flex');
-        }
-    }
-    
-    function updateCourseSummary() {
-        const rows = document.querySelectorAll('.courses-table tbody tr');
-        let totalSections = 0;
-        
-        rows.forEach(row => {
-            const selects = row.querySelectorAll('.letter-select');
-            if (selects.length === 2) {
-                const start = selects[0].value.charCodeAt(0);
-                const end = selects[1].value.charCodeAt(0);
-                const count = Math.max(1, end - start + 1);
-                totalSections += count;
-                
-                const tagsContainer = row.querySelector('.sections-flex');
-                if (tagsContainer) {
-                    tagsContainer.innerHTML = '';
-                    const prefix = row.querySelector('.col-curso').innerText.trim().split('°')[0].trim();
-                    const suffix = row.querySelector('.col-nivel').innerText.trim().toLowerCase() === 'media' ? 'M' : '';
+                <div class="modal-body px-4 py-3">
+                    <p class="small text-muted mb-3">Marca los cursos que impartirá tu colegio para agregarlos a la matriz.</p>
                     
-                    for (let i = 0; i < Math.min(count, 4); i++) {
-                        const letter = String.fromCharCode(start + i);
-                        tagsContainer.innerHTML += `<span class="section-tag">${prefix}${suffix}${letter}</span>`;
-                    }
-                    if (count > 4) {
-                        tagsContainer.innerHTML += `<span class="section-tag more">+${count - 4} más</span>`;
-                    }
-                }
-            }
-        });
-        
-        document.getElementById('summary-cursos').innerText = rows.length + ' cursos';
-        document.getElementById('summary-secciones').innerText = totalSections + ' secciones';
-        
-        // Detectar letras usadas para resumen
-        let startLetter = 'Z';
-        let endLetter = 'A';
-        if (rows.length > 0) {
-            rows.forEach(row => {
-                const selects = row.querySelectorAll('.letter-select');
-                if (selects.length === 2) {
-                    if(selects[0].value < startLetter) startLetter = selects[0].value;
-                    if(selects[1].value > endLetter) endLetter = selects[1].value;
-                }
-            });
-            document.getElementById('summary-letras').innerText = `Desde ${startLetter} hasta ${endLetter}`;
-        } else {
-            document.getElementById('summary-letras').innerText = '-';
-        }
-        
-        checkTableVisibility();
-    }
+                    <!-- Pestañas de Niveles -->
+                    <div class="d-flex flex-column gap-3">
+                        
+                        <!-- Parvularia -->
+                        <div>
+                            <span class="small fw-bold text-uppercase text-muted d-block mb-1">Educación Parvularia</span>
+                            <div class="d-flex flex-wrap gap-2">
+                                <label class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1.5"><input type="checkbox" value="Sala Cuna Menor" data-nivel="Parvularia" class="modal-course-cb"> Sala Cuna Menor</label>
+                                <label class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1.5"><input type="checkbox" value="Sala Cuna Mayor" data-nivel="Parvularia" class="modal-course-cb"> Sala Cuna Mayor</label>
+                                <label class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1.5"><input type="checkbox" value="Medio Menor" data-nivel="Parvularia" class="modal-course-cb"> Medio Menor</label>
+                                <label class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1.5"><input type="checkbox" value="Medio Mayor" data-nivel="Parvularia" class="modal-course-cb"> Medio Mayor</label>
+                                <label class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1.5"><input type="checkbox" value="Pre-Kínder" data-nivel="Parvularia" class="modal-course-cb"> Pre-Kínder</label>
+                                <label class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1.5"><input type="checkbox" value="Kínder" data-nivel="Parvularia" class="modal-course-cb"> Kínder</label>
+                            </div>
+                        </div>
 
-    function updateSummary() {
-        const levels = Array.from(document.querySelectorAll('.selectable-card.active')).map(el => el.innerText.trim());
-        document.getElementById('niveles_educativos').value = levels.join(', ');
-        document.getElementById('summary-niveles').innerText = levels.length ? levels.join(', ') : 'Ninguno';
-        
-        const jornadas = Array.from(document.querySelectorAll('.chip.active')).map(el => el.innerText.trim());
-        document.getElementById('jornadas').value = jornadas.join(', ');
-        document.getElementById('summary-jornadas').innerText = jornadas.length ? jornadas.join(', ') : 'Ninguna';
+                        <!-- Básica -->
+                        <div>
+                            <span class="small fw-bold text-uppercase text-muted d-block mb-1">Educación Básica</span>
+                            <div class="d-flex flex-wrap gap-2">
+                                <label class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1.5"><input type="checkbox" value="1° Básico" data-nivel="Básica" class="modal-course-cb"> 1° Básico</label>
+                                <label class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1.5"><input type="checkbox" value="2° Básico" data-nivel="Básica" class="modal-course-cb"> 2° Básico</label>
+                                <label class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1.5"><input type="checkbox" value="3° Básico" data-nivel="Básica" class="modal-course-cb"> 3° Básico</label>
+                                <label class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1.5"><input type="checkbox" value="4° Básico" data-nivel="Básica" class="modal-course-cb"> 4° Básico</label>
+                                <label class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1.5"><input type="checkbox" value="5° Básico" data-nivel="Básica" class="modal-course-cb"> 5° Básico</label>
+                                <label class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1.5"><input type="checkbox" value="6° Básico" data-nivel="Básica" class="modal-course-cb"> 6° Básico</label>
+                                <label class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1.5"><input type="checkbox" value="7° Básico" data-nivel="Básica" class="modal-course-cb"> 7° Básico</label>
+                                <label class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1.5"><input type="checkbox" value="8° Básico" data-nivel="Básica" class="modal-course-cb"> 8° Básico</label>
+                            </div>
+                        </div>
 
-        const horarioInputs = document.querySelectorAll('.jornada-horario-input');
-        let combinedSchedules = [];
-        horarioInputs.forEach(input => {
-            if (input.value.trim()) {
-                combinedSchedules.push(`${input.dataset.jornada}: ${input.value.trim()}`);
-            }
-        });
-        document.getElementById('horario_referencia_hidden').value = combinedSchedules.join(' | ');
+                        <!-- Media -->
+                        <div>
+                            <span class="small fw-bold text-uppercase text-muted d-block mb-1">Educación Media</span>
+                            <div class="d-flex flex-wrap gap-2">
+                                <label class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1.5"><input type="checkbox" value="1° Medio" data-nivel="Media" class="modal-course-cb"> 1° Medio</label>
+                                <label class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1.5"><input type="checkbox" value="2° Medio" data-nivel="Media" class="modal-course-cb"> 2° Medio</label>
+                                <label class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1.5"><input type="checkbox" value="3° Medio" data-nivel="Media" class="modal-course-cb"> 3° Medio</label>
+                                <label class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1.5"><input type="checkbox" value="4° Medio" data-nivel="Media" class="modal-course-cb"> 4° Medio</label>
+                            </div>
+                        </div>
 
-        // Recolectar datos de los cursos configurados
-        const rows = document.querySelectorAll('.courses-table tbody tr');
-        let cursos = [];
-        rows.forEach(row => {
-            const selects = row.querySelectorAll('.letter-select');
-            const jornadaSelect = row.querySelector('.col-jornada select');
-            if (selects.length === 2 && jornadaSelect) {
-                cursos.push({
-                    curso: row.querySelector('.col-curso').innerText.trim(),
-                    nivel: row.querySelector('.col-nivel').innerText.trim(),
-                    jornada: jornadaSelect.value,
-                    letra_desde: selects[0].value,
-                    letra_hasta: selects[1].value
-                });
-            }
-        });
-        document.getElementById('datos_cursos').value = JSON.stringify(cursos);
-    }
+                    </div>
+                </div>
+                <div class="modal-footer border-0 px-4 pb-4">
+                    <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary fw-bold px-4" onclick="addSelectedCoursesFromModal()">Agregar Seleccionados</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    function toggleAllCourses(source) {
-        const checkboxes = document.querySelectorAll('.course-checkbox');
-        checkboxes.forEach(cb => cb.checked = source.checked);
-    }
+    <!-- Bootstrap JS Bundle -->
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 
-    function selectAllCourses() {
-        const selectAllCheckbox = document.getElementById('selectAllCheckbox');
-        if (selectAllCheckbox) {
-            selectAllCheckbox.checked = !selectAllCheckbox.checked;
-            toggleAllCourses(selectAllCheckbox);
-        }
-    }
+    <!-- Script de Gestión Dinámica de Cursos y Malla Académica -->
+    <script>
+        // Cursos existentes cargados desde Django
+        let courses = {{ cursos_data|safe|default:"[]" }};
 
-    function clearSelection() {
-        const checkboxes = document.querySelectorAll('.course-checkbox');
-        checkboxes.forEach(cb => cb.checked = false);
-        const selectAllCheckbox = document.getElementById('selectAllCheckbox');
-        if (selectAllCheckbox) selectAllCheckbox.checked = false;
-    }
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCoursesTable();
+            updateSummary();
 
-    function openApplyModal() {
-        const selected = document.querySelectorAll('.course-checkbox:checked');
-        if (selected.length === 0) {
-            alert("Por favor, selecciona al menos un curso marcando su casilla.");
-            return;
-        }
-        document.getElementById('applyModal').classList.add('active');
-    }
-    function confirmApply() {
-        const selected = document.querySelectorAll('.course-checkbox:checked');
-        const desde = document.getElementById('applyLetraDesde').value;
-        const hasta = document.getElementById('applyLetraHasta').value;
-        
-        selected.forEach(cb => {
-            const row = cb.closest('tr');
-            const selects = row.querySelectorAll('.letter-select');
-            if (selects.length === 2) {
-                let valDesde = desde.toUpperCase();
-                let valHasta = hasta.toUpperCase();
-                
-                if (!Array.from(selects[0].options).some(opt => opt.value === valDesde)) {
-                    selects[0].add(new Option(valDesde, valDesde));
-                }
-                if (!Array.from(selects[1].options).some(opt => opt.value === valHasta)) {
-                    selects[1].add(new Option(valHasta, valHasta));
-                }
-
-                selects[0].value = valDesde;
-                selects[1].value = valHasta;
-                
-                updateCourseSummary();
-            }
-        });
-        updateSummary();
-        closeApplyModal();
-    }
-    function closeApplyModal() { document.getElementById('applyModal').classList.remove('active'); }
-
-    function getExistingCourses() {
-        const rows = document.querySelectorAll('.courses-table tbody tr');
-        let existing = [];
-        rows.forEach(row => {
-            const jornadaSelect = row.querySelector('.col-jornada select');
-            existing.push({
-                curso: row.querySelector('.col-curso').innerText.trim(),
-                jornada: jornadaSelect ? jornadaSelect.value : ''
-            });
-        });
-        return existing;
-    }
-
-    function refreshModalCheckboxes() {
-        const selectedJornada = document.getElementById('modal-jornada-select').value;
-        const existing = getExistingCourses();
-        const checkboxes = document.querySelectorAll('#addCourseModal .course-checkbox-item input[type="checkbox"]');
-        
-        checkboxes.forEach(cb => {
-            const courseName = cb.value;
-            const isDuplicate = existing.some(c => c.curso === courseName && c.jornada === selectedJornada);
-            
-            if (isDuplicate) {
-                cb.checked = false;
-                cb.disabled = true;
-                cb.closest('.course-checkbox-item').style.opacity = '0.5';
-                cb.closest('.course-checkbox-item').style.cursor = 'not-allowed';
-            } else {
-                cb.disabled = false;
-                cb.closest('.course-checkbox-item').style.opacity = '1';
-                cb.closest('.course-checkbox-item').style.cursor = 'pointer';
-            }
-        });
-    }
-
-    function openAddCourseModal() {
-        const activeChips = document.querySelectorAll('.chips-flex .chip.active');
-        if (activeChips.length === 0) {
-            alert("Debes seleccionar al menos una jornada en la sección superior antes de agregar cursos.");
-            return;
-        }
-        document.querySelectorAll('#addCourseModal input[type="checkbox"]').forEach(cb => cb.checked = false);
-        refreshModalCheckboxes();
-        document.getElementById('addCourseModal').classList.add('active');
-    }
-    function closeAddCourseModal() { document.getElementById('addCourseModal').classList.remove('active'); }
-    
-    function confirmAddCourses() {
-        const selectedBoxes = document.querySelectorAll('#addCourseModal .course-checkbox-item input:checked:not(:disabled)');
-        if (selectedBoxes.length === 0) {
-            alert("Selecciona al menos un curso para agregar.");
-            return;
-        }
-        
-        const selectedJornada = document.getElementById('modal-jornada-select').value;
-        const tbody = document.querySelector('.courses-table tbody');
-        let options = '';
-        for(let i = 65; i <= 74; i++) {
-            options += `<option>${String.fromCharCode(i)}</option>`;
-        }
-        
-        const activeChips = Array.from(document.querySelectorAll('.chips-flex .chip.active')).map(el => el.innerText.trim());
-        let jornadaOptions = '';
-        activeChips.forEach(j => {
-            jornadaOptions += `<option value="${j}" ${selectedJornada === j ? 'selected' : ''}>${j}</option>`;
+            // Sincronizar cambios de período
+            document.getElementById('input-periodo').addEventListener('change', updateSummary);
+            document.getElementById('input-anio').addEventListener('input', updateSummary);
         });
 
-        selectedBoxes.forEach(box => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td style="text-align: center;"><input type="checkbox" class="course-checkbox"></td>
-                <td class="col-curso" contenteditable="true">${box.value}</td>
-                <td class="col-nivel" contenteditable="true">${box.dataset.nivel}</td>
-                <td class="col-jornada">
-                    <select class="form-select form-select-sm border-0 bg-transparent" onchange="validateRowJornadaChange(this)" style="font-weight: 600; color: #475569; box-shadow: none; cursor: pointer;">
-                        ${jornadaOptions}
-                    </select>
-                </td>
-                <td><select class="letter-select">${options}</select></td>
-                <td><select class="letter-select">${options}</select></td>
-                <td><div class="sections-flex"></div></td>
-                <td><span class="status-indicator">Nuevo</span></td>
-                <td style="text-align: center;"><i class="bi bi-trash text-danger" style="cursor: pointer;" onclick="removeCourse(this)"></i></td>
-            `;
-            tbody.appendChild(tr);
-            tr.querySelectorAll('select').forEach(sel => sel.addEventListener('change', updateCourseSummary));
-        });
-        
-        updateCourseSummary();
-        updateSummary();
-        closeAddCourseModal();
-    }
-    
-    function validateRowJornadaChange(selectElement) {
-        const row = selectElement.closest('tr');
-        const courseName = row.querySelector('.col-curso').innerText.trim();
-        const selectedJornada = selectElement.value;
-        
-        const rows = document.querySelectorAll('.courses-table tbody tr');
-        let count = 0;
-        rows.forEach(r => {
-            if (r.querySelector('.col-curso').innerText.trim() === courseName &&
-                r.querySelector('.col-jornada select').value === selectedJornada) {
-                count++;
-            }
-        });
-        
-        if (count > 1) {
-            alert(`Atención: El curso ${courseName} ya se encuentra agregado en la jornada ${selectedJornada}.`);
-        }
-        updateCourseSummary();
-        updateSummary();
-    }
-
-    function removeCourse(btn) {
-        rowToDelete = btn.closest('tr');
-        document.getElementById('deleteCourseModal').classList.add('active');
-    }
-    function closeDeleteModal() {
-        document.getElementById('deleteCourseModal').classList.remove('active');
-        rowToDelete = null;
-    }
-    function confirmDeleteCourse() {
-        if(rowToDelete) {
-            rowToDelete.remove();
-            updateCourseSummary();
+        function toggleLevel(card) {
+            card.classList.toggle('active');
             updateSummary();
         }
-        closeDeleteModal();
-    }
 
-    function closeValidationAlert() {
-        document.getElementById('validationAlertModal').classList.remove('active');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        setTimeout(() => document.getElementById('config-form-paso3').reportValidity(), 600);
-    }
+        function toggleChip(chip) {
+            chip.classList.toggle('active');
+            updateSummary();
+        }
 
-    // Leemos los datos de manera segura sin alterar el parser de JS
-    const savedCoursesData = document.getElementById('saved-courses-data');
-    const savedCourses = savedCoursesData ? JSON.parse(savedCoursesData.textContent) : [];
+        function getActiveLevels() {
+            const activeCards = document.querySelectorAll('.selectable-card.active');
+            const levels = [];
+            activeCards.forEach(c => levels.push(c.dataset.nivel));
+            return levels;
+        }
 
-    function loadExistingCourses(coursesData) {
-        const tbody = document.querySelector('.courses-table tbody');
-        const activeChips = Array.from(document.querySelectorAll('.chips-flex .chip.active')).map(el => el.innerText.trim());
-        coursesData.forEach(c => {
-            let optionsDesde = '';
-            let optionsHasta = '';
-            for(let i = 65; i <= 74; i++) {
-                let letter = String.fromCharCode(i);
-                optionsDesde += `<option value="${letter}" ${letter === c.desde_letra ? 'selected' : ''}>${letter}</option>`;
-                optionsHasta += `<option value="${letter}" ${letter === c.hasta_letra ? 'selected' : ''}>${letter}</option>`;
+        function getActiveJornadas() {
+            const activeChips = document.querySelectorAll('.chip.active');
+            const jornadas = [];
+            activeChips.forEach(c => jornadas.push(c.dataset.jornada));
+            return jornadas;
+        }
+
+        function renderCoursesTable() {
+            const tableBody = document.getElementById('coursesTableBody');
+            const emptyState = document.getElementById('empty-courses-state');
+            const tableContainer = document.getElementById('courses-table-container');
+
+            if (courses.length === 0) {
+                emptyState.style.display = 'block';
+                tableContainer.style.display = 'none';
+                updateSummary();
+                return;
             }
 
-            let optionsToUse = activeChips.includes(c.jornada) ? activeChips : [...new Set([...activeChips, c.jornada])];
-            if (optionsToUse.length === 0) optionsToUse = [c.jornada || ''];
-            let jornadaOptions = '';
-            optionsToUse.forEach(j => {
-                jornadaOptions += `<option value="${j}" ${c.jornada === j ? 'selected' : ''}>${j}</option>`;
+            emptyState.style.display = 'none';
+            tableContainer.style.display = 'block';
+            tableBody.innerHTML = '';
+
+            const alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+
+            courses.forEach((c, index) => {
+                const tr = document.createElement('tr');
+                
+                // Generar opciones de letra_desde y letra_hasta
+                let optionsDesde = '';
+                let optionsHasta = '';
+                alphabet.forEach(letter => {
+                    optionsDesde += `<option value="${letter}" ${c.letra_desde === letter ? 'selected' : ''}>${letter}</option>`;
+                    optionsHasta += `<option value="${letter}" ${c.letra_hasta === letter ? 'selected' : ''}>${letter}</option>`;
+                });
+
+                // Generar tags de secciones
+                const startCode = c.letra_desde.charCodeAt(0);
+                const endCode = c.letra_hasta.charCodeAt(0);
+                let sectionTags = '';
+                if (startCode <= endCode) {
+                    for (let i = startCode; i <= endCode; i++) {
+                        sectionTags += `<span class="section-tag">${c.curso} ${String.fromCharCode(i)}</span>`;
+                    }
+                }
+
+                tr.innerHTML = `
+                    <td class="fw-bold text-dark">${c.curso}</td>
+                    <td><span class="badge bg-light text-primary border">${c.nivel}</span></td>
+                    <td>
+                        <select class="letter-select w-100" onchange="updateCourseJornada(${index}, this.value)">
+                            <option value="Mañana" ${c.jornada === 'Mañana' ? 'selected' : ''}>Mañana</option>
+                            <option value="Tarde" ${c.jornada === 'Tarde' ? 'selected' : ''}>Tarde</option>
+                            <option value="Completa" ${c.jornada === 'Completa' ? 'selected' : ''}>Completa</option>
+                        </select>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center gap-1.5">
+                            <select class="letter-select" onchange="updateCourseFrom(${index}, this.value)">${optionsDesde}</select>
+                            <span class="text-muted small">a</span>
+                            <select class="letter-select" onchange="updateCourseTo(${index}, this.value)">${optionsHasta}</select>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="sections-flex">${sectionTags}</div>
+                    </td>
+                    <td style="text-align: center;">
+                        <button type="button" class="btn btn-sm btn-link text-danger p-0" onclick="removeCourse(${index})" title="Eliminar curso">
+                            <i class="bi bi-trash3-fill"></i>
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
             });
 
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td style="text-align: center;"><input type="checkbox" class="course-checkbox"></td>
-                <td class="col-curso" contenteditable="true">${c.curso}</td>
-                <td class="col-nivel" contenteditable="true">${c.nivel}</td>
-                <td class="col-jornada">
-                    <select class="form-select form-select-sm border-0 bg-transparent" onchange="validateRowJornadaChange(this)" style="font-weight: 600; color: #475569; box-shadow: none; cursor: pointer;">
-                        ${jornadaOptions}
-                    </select>
-                </td>
-                <td><select class="letter-select">${optionsDesde}</select></td>
-                <td><select class="letter-select">${optionsHasta}</select></td>
-                <td><div class="sections-flex"></div></td>
-                <td><span class="status-indicator" style="background: #e2e8f0; color: #475569;">Guardado</span></td>
-                <td style="text-align: center;"><i class="bi bi-trash text-danger" style="cursor: pointer;" onclick="removeCourse(this)"></i></td>
-            `;
-            tbody.appendChild(tr);
-            tr.querySelectorAll('select').forEach(sel => sel.addEventListener('change', updateCourseSummary));
-        });
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        parseSavedSchedules();
-
-        if (savedCourses && savedCourses.length > 0) {
-            loadExistingCourses(savedCourses);
+            updateSummary();
         }
-        
-        updateJornadasActivas();
-        updateSummary();
-        updateCourseSummary();
-        
-        document.getElementById('input-anio').addEventListener('input', function(e) {
-            document.getElementById('summary-anio').innerText = e.target.value;
-        });
-        document.getElementById('input-periodo').addEventListener('change', function(e) {
-            document.getElementById('summary-periodo').innerText = e.target.options[e.target.selectedIndex].text;
-        });
-        
-        document.querySelectorAll('.letter-select').forEach(select => {
-            select.addEventListener('change', updateCourseSummary);
-        });
 
-        // Validación visible de campos obligatorios al intentar guardar
-        const submitBtn = document.querySelector('button[type="submit"].btn-primary-gradient');
-        if (submitBtn) {
-            submitBtn.addEventListener('click', function(e) {
-                const form = document.getElementById('config-form-paso3');
-                if (!form.checkValidity()) {
-                    e.preventDefault();
-                    document.getElementById('validationAlertModal').classList.add('active');
+        function updateCourseFrom(index, val) {
+            courses[index].letra_desde = val;
+            if (courses[index].letra_hasta < val) {
+                courses[index].letra_hasta = val;
+            }
+            renderCoursesTable();
+        }
+
+        function updateCourseTo(index, val) {
+            courses[index].letra_hasta = val;
+            if (courses[index].letra_desde > val) {
+                courses[index].letra_desde = val;
+            }
+            renderCoursesTable();
+        }
+
+        function updateCourseJornada(index, val) {
+            courses[index].jornada = val;
+            updateSummary();
+        }
+
+        function removeCourse(index) {
+            courses.splice(index, 1);
+            renderCoursesTable();
+        }
+
+        function loadStandardChileanCourses() {
+            courses = [
+                { curso: "1° Básico", nivel: "Básica", jornada: "Mañana", letra_desde: "A", letra_hasta: "B" },
+                { curso: "2° Básico", nivel: "Básica", jornada: "Mañana", letra_desde: "A", letra_hasta: "B" },
+                { curso: "3° Básico", nivel: "Básica", jornada: "Mañana", letra_desde: "A", letra_hasta: "B" },
+                { curso: "4° Básico", nivel: "Básica", jornada: "Mañana", letra_desde: "A", letra_hasta: "B" },
+                { curso: "5° Básico", nivel: "Básica", jornada: "Mañana", letra_desde: "A", letra_hasta: "B" },
+                { curso: "6° Básico", nivel: "Básica", jornada: "Mañana", letra_desde: "A", letra_hasta: "B" },
+                { curso: "7° Básico", nivel: "Básica", jornada: "Mañana", letra_desde: "A", letra_hasta: "B" },
+                { curso: "8° Básico", nivel: "Básica", jornada: "Mañana", letra_desde: "A", letra_hasta: "B" },
+                { curso: "1° Medio", nivel: "Media", jornada: "Mañana", letra_desde: "A", letra_hasta: "B" },
+                { curso: "2° Medio", nivel: "Media", jornada: "Mañana", letra_desde: "A", letra_hasta: "B" },
+                { curso: "3° Medio", nivel: "Media", jornada: "Mañana", letra_desde: "A", letra_hasta: "B" },
+                { curso: "4° Medio", nivel: "Media", jornada: "Mañana", letra_desde: "A", letra_hasta: "B" }
+            ];
+            renderCoursesTable();
+        }
+
+        let addCourseModalInstance = null;
+        function openAddCourseModal() {
+            if (!addCourseModalInstance) {
+                addCourseModalInstance = new bootstrap.Modal(document.getElementById('addCourseModal'));
+            }
+            // Desmarcar checkboxes previos
+            document.querySelectorAll('.modal-course-cb').forEach(cb => {
+                const alreadyExists = courses.some(c => c.curso === cb.value);
+                cb.checked = alreadyExists;
+                cb.disabled = alreadyExists;
+            });
+            addCourseModalInstance.show();
+        }
+
+        function addSelectedCoursesFromModal() {
+            const checkedBoxes = document.querySelectorAll('.modal-course-cb:checked:not(:disabled)');
+            checkedBoxes.forEach(cb => {
+                courses.push({
+                    curso: cb.value,
+                    nivel: cb.dataset.nivel || "Básica",
+                    jornada: "Mañana",
+                    letra_desde: "A",
+                    letra_hasta: "B"
+                });
+            });
+            if (addCourseModalInstance) addCourseModalInstance.hide();
+            renderCoursesTable();
+        }
+
+        function updateSummary() {
+            const totalCoursesEl = document.getElementById('summary-total-courses');
+            const totalSectionsEl = document.getElementById('summary-total-sections');
+            const anioVal = document.getElementById('input-anio').value || '2026';
+            const periodoVal = document.getElementById('input-periodo').value || 'Semestral';
+            const periodoBadge = document.getElementById('summary-periodo-badge');
+            const levelsContainer = document.getElementById('summary-levels-container');
+
+            if (totalCoursesEl) totalCoursesEl.textContent = courses.length;
+
+            // Calcular total de secciones
+            let totalSections = 0;
+            courses.forEach(c => {
+                const startCode = c.letra_desde.charCodeAt(0);
+                const endCode = c.letra_hasta.charCodeAt(0);
+                if (startCode <= endCode) {
+                    totalSections += (endCode - startCode + 1);
                 }
             });
+            if (totalSectionsEl) totalSectionsEl.textContent = totalSections;
+
+            if (periodoBadge) {
+                periodoBadge.textContent = `Régimen ${periodoVal} ${anioVal}`;
+            }
+
+            // Niveles activos
+            const activeLevels = getActiveLevels();
+            if (levelsContainer) {
+                levelsContainer.innerHTML = '';
+                if (activeLevels.length === 0) {
+                    levelsContainer.innerHTML = '<span class="text-muted small">Sin niveles seleccionados</span>';
+                } else {
+                    activeLevels.forEach(lvl => {
+                        const span = document.createElement('span');
+                        span.className = 'badge bg-light text-dark border';
+                        span.textContent = lvl.charAt(0).toUpperCase() + lvl.slice(1);
+                        levelsContainer.appendChild(span);
+                    });
+                }
+            }
         }
-    });
-</script>
+
+        function submitPaso3Form() {
+            const form = document.getElementById('config-form-paso3');
+            if (form.checkValidity()) {
+                const btn = document.getElementById('btnSubmitPaso3');
+                const txt = document.getElementById('btnSubmitPaso3Text');
+                const icon = document.getElementById('btnSubmitPaso3Icon');
+                const spinner = document.getElementById('btnSubmitPaso3Spinner');
+
+                // Sincronizar hidden inputs
+                document.getElementById('datos_cursos').value = JSON.stringify(courses);
+                document.getElementById('niveles_educativos').value = getActiveLevels().join(',');
+                document.getElementById('jornadas').value = getActiveJornadas().join(',');
+
+                btn.disabled = true;
+                txt.textContent = 'Guardando estructura académica...';
+                icon.classList.add('d-none');
+                spinner.classList.remove('d-none');
+                form.submit();
+            } else {
+                form.reportValidity();
+            }
+        }
+    </script>
 </body>
 </html>

@@ -2,234 +2,188 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Historial de Asistencia - Eduteka</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Historial de Asistencia - Eduteka</title>
 
-    <!-- Bootstrap CSS -->
-    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <!-- Bootstrap CSS & Icons -->
+  <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
-<style>
-  :root {
-    --primary: #7C5CFC;
-    --primary-soft: #F0EDFF;
-    --secondary: #65CDBF;
-    --accent: #F76F7A;
-    --warning: #F6C85F;
-    --dark: #151A35;
-    --gray-text: #687089;
-    --bg-color: #F8F9FC;
-    --border-color: #BCC0CF;
-    --white: #FFFFFF;
-    --sidebar-width: 240px;
-  }
-  
-  html {
-    font-size: 14px;
-  }
-
-  body { 
-    background: var(--bg-color); 
-    color: var(--dark); 
-    font-family: 'Inter', sans-serif; 
-    overflow-x: hidden; 
-  }
-
-  .app-container { display: flex; min-height: 100vh; width: 100vw; overflow-x: hidden; }
-    /* Main Wrapper & Topbar */
-  .main-content { margin-left: 248px; flex: 1; display: flex; flex-direction: column; min-width: 0; transition: margin 0.3s ease; width: calc(100% - 248px); }
-  .topbar { height: 64px; background: var(--white); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; position: sticky; top: 0; z-index: 1030; }
-
-  .topbar-right { display: flex; align-items: center; gap: 1.5rem; }
-  .user-profile { display: flex; align-items: center; gap: 0.75rem; cursor: pointer; }
-  .user-profile img { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; }
-  .user-info { display: flex; flex-direction: column; }
-  .user-name { font-weight: 600; font-size: 0.9rem; color: var(--dark); }
-  .user-role { font-size: 0.8rem; color: var(--gray-text); }
-
-  .content-area { padding: 1.5rem 2rem; max-width: 1440px; margin: 0 auto; width: 100%; box-sizing: border-box; }
-  
-  .seccion-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.25rem; margin-top: 1rem; }
-  .seccion-card { 
-    background: var(--white); 
-    border: 1px solid var(--border-color); 
-    border-radius: 12px; 
-    padding: 1.25rem; 
-    cursor: pointer; 
-    transition: all 0.2s ease; 
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    min-height: 120px;
-    position: relative;
-    overflow: hidden;
-  }
-  .seccion-card:hover {
-    border-color: var(--primary);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(124, 92, 252, 0.1);
-  }
-  .seccion-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; width: 4px; height: 100%;
-    background: var(--secondary);
-  }
-  .seccion-card-title { font-size: 1.1rem; font-weight: 700; color: var(--dark); margin-bottom: 0.25rem; }
-  .seccion-card-subtitle { font-size: 0.85rem; color: var(--gray-text); }
-  .seccion-card-badge { align-self: flex-start; font-size: 0.75rem; font-weight: 600; background: var(--primary-soft); color: var(--primary); padding: 0.25rem 0.5rem; border-radius: 6px; margin-top: 0.75rem; }
-
-  @media (max-width: 992px) {
-    .sidebar { transform: translateX(-100%); }
-    .main-content { margin-left: 0; width: 100%; }
-  }
-
-  /* ── ELEVATED PREMIUM STYLES ── */
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(18px);
+  <style>
+    :root {
+      --primary: #7C5CFC;
+      --primary-soft: rgba(124, 92, 252, 0.08);
+      --primary-hover: #6747E3;
+      --secondary: #65CDBF;
+      --bg: #F8F9FD;
+      --white: #FFFFFF;
+      --dark: #151A35;
+      --gray-text: #687089;
+      --border: #BCC0CF;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
     }
-    to {
-      opacity: 1;
-      transform: translateY(0);
+
+    * { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      margin: 0;
     }
-  }
 
-  /* Fade-in staggered animations on load */
-  .dashboard-panel, .seccion-card {
-    animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
+    .wrapper { display: flex; flex: 1; position: relative; }
 
-  /* Body background glowing gradients */
-  body {
-    position: relative;
-  }
-  body::before {
-    content: '';
-    position: fixed;
-    top: -15%; left: 65%;
-    width: 50vw; height: 50vw;
-    background: radial-gradient(circle, rgba(124, 92, 252, 0.07) 0%, rgba(255,255,255,0) 70%);
-    z-index: -2;
-    pointer-events: none;
-  }
-  body::after {
-    content: '';
-    position: fixed;
-    top: 45%; left: -15%;
-    width: 40vw; height: 40vw;
-    background: radial-gradient(circle, rgba(101, 205, 191, 0.06) 0%, rgba(255,255,255,0) 70%);
-    z-index: -2;
-    pointer-events: none;
-  }
+    .topbar {
+      height: 70px;
+      background: rgba(255, 255, 255, 0.85) !important;
+      backdrop-filter: blur(12px) !important;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; position: sticky; top: 0; z-index: 98;
+    }
+    .content-body { padding: 2rem; flex-grow: 1; max-width: 1350px; margin: 0 auto; width: 100%; }
 
-  /* Smooth dynamic transitions */
-  .nav-item, .menu-item, .user-profile, .seccion-card, .btn {
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
-  }
+    /* Course Card */
+    .course-history-card {
+      background: var(--white);
+      border: 1px solid #E2E8F0;
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      transition: all 0.2s ease;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .course-history-card:hover {
+      border-color: #C5B6FF;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(124, 92, 252, 0.08);
+    }
 
-</style>
+    .btn-section-chip {
+      background: #F0EDFF;
+      color: #7C5CFC;
+      border: 1px solid #D8CEFF;
+      border-radius: 10px;
+      padding: 0.45rem 0.9rem;
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: all 0.2s ease;
+    }
+    .btn-section-chip:hover {
+      background: #7C5CFC;
+      color: #FFFFFF;
+      border-color: #7C5CFC;
+      transform: translateY(-1px);
+    }
+  </style>
 </head>
 <body>
 
-<div class="app-container">
-  {% include 'colegios/_sidebar.html' with active_page='reportes' %}
+<div class="wrapper">
+  {% include 'colegios/_sidebar.html' with active_page='asistencia' %}
 
-    <!-- MAIN CONTENT -->
-    <div class="main-content">
-        <header class="topbar">
-            <div class="d-flex align-items-center gap-3">
-                <button class="btn btn-light d-lg-none" id="mobileMenuBtn">
-                    <i class="bi bi-list fs-5"></i>
-                </button>
-                <h4 class="mb-0 fw-semibold text-dark">Reportes de Asistencia</h4>
-            </div>
-            
-            <div class="topbar-right">
-                <div class="user-profile dropdown-toggle" data-bs-toggle="dropdown">
-                    <img src="https://ui-avatars.com/api/?name={{ request.user.first_name|default:request.user.username }}+{{ request.user.last_name|default:'' }}&background=7C5CFC&color=fff" alt="Perfil">
-                    <div class="user-info d-none d-sm-flex">
-                        <span class="user-name">{{ request.user.first_name|default:request.user.username }}</span>
-                        <span class="user-role">{{ miembro.rol.nombre|default:'Profesor' }}</span>
-                    </div>
-                </div>
-            </div>
-        </header>
+  <div class="main-content">
+    <header class="topbar">
+      <div>
+        <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn" style="border:none; background:var(--primary-soft); color:var(--primary);">
+          <i class="bi bi-list fs-5"></i>
+        </button>
+        <span class="fw-bold text-dark fs-5"><i class="bi bi-clock-history text-primary me-2"></i>Historial & Reportes de Asistencia</span>
+      </div>
 
-        <main class="content-area">
-            <div class="d-flex justify-content-between align-items-center mb-4">
+      <div class="topbar-right d-flex align-items-center gap-4">
+        <div class="topbar-date d-none d-sm-block text-muted small fw-semibold">
+          <i class="bi bi-calendar3 me-1"></i> {{ hoy|date:"l, d \d\e F \d\e Y"|title }}
+        </div>
+      </div>
+    </header>
+
+    <main class="content-body">
+      <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <div>
+          <h2 class="fw-extrabold text-dark mb-1" style="font-size: 1.6rem;">Historial y Estadísticas de Asistencia</h2>
+          <p class="text-muted small mb-0">Selecciona el curso y sección para consultar los registros históricos y métricas de presentismo.</p>
+        </div>
+        <a href="{% url 'registrar_asistencia' %}" class="btn btn-primary fw-extrabold px-4 py-2 shadow-sm" style="border-radius: 12px; background: linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%); border:none;">
+          <i class="bi bi-calendar-check-fill me-1.5"></i> Tomar Asistencia Hoy
+        </a>
+      </div>
+
+      <!-- SECCIONES DISPONIBLES -->
+      <div class="row g-4">
+        {% if cursos %}
+          {% for curso in cursos %}
+            <div class="col-lg-4 col-md-6">
+              <div class="course-history-card">
                 <div>
-                    <h2 class="fw-bold text-dark">Historial de Asistencia</h2>
-                    <p class="text-muted mb-0">Selecciona el curso para consultar las estadísticas e historial de registros.</p>
-                </div>
-                <a href="{% url 'registrar_asistencia' %}" class="btn btn-primary d-flex align-items-center gap-2">
-                    <i class="bi bi-calendar-check"></i> Registrar Nueva Asistencia
-                </a>
-            </div>
+                  <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                      <div class="rounded-3 d-flex align-items-center justify-content-center" style="width:38px; height:38px; background:#F0EDFF; color:#7C5CFC;">
+                        <i class="bi bi-mortarboard-fill fs-5"></i>
+                      </div>
+                      <div>
+                        <h4 class="fw-extrabold text-dark mb-0 fs-5">{{ curso.nombre }}</h4>
+                        <span class="text-muted extra-small fw-semibold">Jornada: {{ curso.get_jornada_display|default:curso.jornada }}</span>
+                      </div>
+                    </div>
+                    <span class="badge bg-light text-primary border px-2 py-1 fw-bold" style="font-size:0.75rem; border-radius:6px;">
+                      {{ curso.get_nivel_display|default:curso.nivel }}
+                    </span>
+                  </div>
 
-            <!-- Sections List -->
-            <div class="mt-4">
-                <h4 class="fw-semibold mb-3 text-dark">Selecciona un Curso</h4>
-                {% if cursos %}
-                    <div class="row g-4">
-                        {% for curso in cursos %}
-                            <div class="col-md-6 col-lg-4">
-                                <div class="dashboard-panel h-100 d-flex flex-column justify-content-between" style="border-left: 4px solid var(--secondary); padding: 1.25rem;">
-                                    <div>
-                                        <div class="d-flex justify-content-between align-items-start mb-2">
-                                            <h5 class="fw-bold text-dark mb-0" style="font-size: 1.15rem;">{{ curso.nombre }}</h5>
-                                            <span class="badge bg-light text-primary font-weight-600 px-2 py-1" style="font-size: 0.75rem; text-transform: capitalize;">
-                                                {{ curso.get_nivel_display|default:curso.nivel }}
-                                            </span>
-                                        </div>
-                                        <p class="text-secondary small mb-3"><i class="bi bi-clock me-1"></i> Jornada: {{ curso.get_jornada_display|default:curso.jornada }}</p>
-                                    </div>
-                                    
-                                    <div>
-                                        <div class="text-muted small mb-2 fw-semibold">Consultar historial:</div>
-                                        <div class="d-flex flex-wrap gap-2">
-                                            {% for sec in curso.secciones.all %}
-                                                <button type="button" class="btn btn-outline-secondary btn-sm fw-semibold rounded-pill px-3 py-2 d-flex align-items-center gap-1 transition-all" onclick="location.href='/asistencia/historial/{{ sec.id }}/'" style="min-width: 55px; justify-content: center;">
-                                                    Sección {{ sec.letra }}
-                                                </button>
-                                            {% empty %}
-                                                <span class="text-muted small italic">Sin secciones activas</span>
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endfor %}
+                  <div class="mb-2">
+                    <span class="text-muted extra-small text-uppercase fw-bold d-block mb-2">Selecciona la Sección:</span>
+                    <div class="d-flex flex-wrap gap-2">
+                      {% for sec in curso.secciones.all %}
+                        <a href="{% url 'historial_seccion' sec.id %}" class="btn-section-chip">
+                          <i class="bi bi-calendar3-range text-primary"></i> Sección {{ sec.letra }}
+                        </a>
+                      {% empty %}
+                        <span class="text-muted small">Sin secciones registradas</span>
+                      {% endfor %}
                     </div>
-                {% else %}
-                    <div class="text-center p-5 bg-white rounded-3 border border-dashed">
-                        <i class="bi bi-journal-x fs-1 text-muted"></i>
-                        <h5 class="mt-3 fw-semibold">No se encontraron cursos activos</h5>
-                        <p class="text-muted">Por favor, asegúrate de configurar los cursos de tu establecimiento en la sección de administración.</p>
-                    </div>
-                {% endif %}
+                  </div>
+                </div>
+              </div>
             </div>
-        </main>
-    </div>
+          {% endfor %}
+        {% else %}
+          <div class="col-12">
+            <div class="card p-5 text-center bg-white border rounded-4 shadow-sm">
+              <i class="bi bi-journal-x fs-1 text-muted d-block mb-3"></i>
+              <h4 class="fw-bold text-dark">No hay cursos configurados</h4>
+              <p class="text-muted small mb-0">Configura los cursos y secciones desde el módulo de administración académica.</p>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+
+    </main>
+  </div>
 </div>
 
-<!-- Scripts -->
 <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const mobileBtn = document.getElementById('mobileMenuBtn');
-        const sidebar = document.getElementById('sidebar');
-        
-        if(mobileBtn) {
-            mobileBtn.addEventListener('click', () => {
-                sidebar.style.transform = sidebar.style.transform === 'translateX(0px)' ? 'translateX(-100%)' : 'translateX(0px)';
-            });
-        }
-    });
+  document.addEventListener("DOMContentLoaded", function() {
+    const mobileBtn = document.getElementById('mobileMenuBtn');
+    const sidebar = document.getElementById('sidebar');
+    if (mobileBtn) {
+      mobileBtn.addEventListener('click', () => sidebar.classList.toggle('active'));
+    }
+  });
 </script>
 </body>
 </html>

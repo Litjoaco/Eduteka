@@ -124,8 +124,8 @@ body.login-body {
     min-height: 100vh;
     display: flex;
     align-items: center;
-    padding-top: 2rem;
-    padding-bottom: 2rem;
+    padding-top: 5.5rem;
+    padding-bottom: 3rem;
 }
 
 /* Left Column - Welcome & Illustration */

@@ -1,0 +1,849 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estadísticas Institucionales - Eduteka</title>
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --primary: #7C5CFC;
+      --primary-soft: rgba(124, 92, 252, 0.08);
+      --primary-hover: #6747E3;
+      --secondary: #65CDBF;
+      --bg: #F8F9FD;
+      --white: #FFFFFF;
+      --dark: #151A35;
+      --gray-text: #687089;
+      --border: #BCC0CF;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+    }
+
+    * { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+    }
+
+    .wrapper { display: flex; flex: 1; position: relative; }
+
+    .topbar {
+      height: 70px;
+      background: rgba(255, 255, 255, 0.85) !important;
+      backdrop-filter: blur(12px) !important;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; position: sticky; top: 0; z-index: 98;
+    }
+    .content-body { padding: 2rem; flex-grow: 1; max-width: 1440px; margin: 0 auto; width: 100%; }
+
+    /* Hero Banner Estadísticas (Armonizado con estética Eduteka) */
+    .hero-banner-stats {
+      background: linear-gradient(135deg, #7C5CFC 0%, #6D4BF5 50%, #5835E5 100%);
+      border-radius: var(--radius-lg);
+      padding: 2rem 2.2rem;
+      color: var(--white);
+      margin-bottom: 2rem;
+      box-shadow: 0 10px 25px rgba(124, 92, 252, 0.22);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-banner-stats::before {
+      content: '';
+      position: absolute;
+      width: 320px; height: 320px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0) 70%);
+      top: -80px; right: -60px;
+      border-radius: 50%;
+    }
+
+
+    .hero-badge-pill {
+      background: rgba(255, 255, 255, 0.2);
+      color: #FFFFFF !important;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 20px;
+      padding: 0.35rem 0.85rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      backdrop-filter: blur(8px);
+    }
+
+    .hero-school-pill {
+      background: rgba(0, 0, 0, 0.2);
+      color: #FFFFFF !important;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 20px;
+      padding: 0.35rem 0.85rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      backdrop-filter: blur(8px);
+    }
+
+    /* KPI Grid */
+    .kpi-grid-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+
+
+    .kpi-card-stat {
+      background: var(--white);
+      border: 1px solid #E2E8F0;
+      border-radius: var(--radius-lg);
+      padding: 1.4rem 1.5rem;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.02);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.25s ease;
+    }
+    .kpi-card-stat:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(124, 92, 252, 0.08);
+    }
+    .kpi-card-stat::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3.5px;
+      background: var(--stat-color, var(--primary));
+    }
+    .kpi-card-stat.blue { --stat-color: #3B82F6; }
+    .kpi-card-stat.green { --stat-color: #10B981; }
+    .kpi-card-stat.purple { --stat-color: #8B5CF6; }
+    .kpi-card-stat.amber { --stat-color: #F59E0B; }
+
+    /* Chart Cards */
+    .chart-card {
+      background: var(--white);
+      border: 1px solid #E2E8F0;
+      border-radius: var(--radius-lg);
+      padding: 1.6rem 1.75rem;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.02);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .chart-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid #F1F5F9;
+    }
+
+    /* Nav Tabs */
+    .nav-pills-custom .nav-link {
+      color: #64748B;
+      font-weight: 700;
+      font-size: 0.88rem;
+      padding: 0.6rem 1.25rem;
+      border-radius: 12px;
+      transition: all 0.2s ease;
+    }
+    .nav-pills-custom .nav-link.active {
+      background: var(--primary);
+      color: var(--white);
+      box-shadow: 0 4px 14px rgba(124, 92, 252, 0.25);
+    }
+
+    .btn-export-excel {
+      background: #107C41;
+      color: #FFFFFF;
+      font-weight: 800;
+      font-size: 0.88rem;
+      padding: 0.65rem 1.4rem;
+      border-radius: 12px;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 4px 14px rgba(16, 124, 65, 0.25);
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    .btn-export-excel:hover {
+      background: #0E6B37;
+      color: #FFFFFF;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(16, 124, 65, 0.35);
+    }
+  </style>
+</head>
+<body>
+
+<div class="wrapper">
+  {% include 'colegios/_sidebar.html' with active_page='estadisticas' %}
+
+  <div class="main-content">
+    <header class="topbar">
+      <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn" style="border:none; background:var(--primary-soft); color:var(--primary);">
+          <i class="bi bi-list fs-5"></i>
+        </button>
+        <span class="fw-bold text-dark fs-5"><i class="bi bi-pie-chart-fill text-primary me-2"></i>Centro de Estadísticas & Business Intelligence</span>
+      </div>
+
+      <div class="topbar-right d-flex align-items-center gap-4">
+        <div class="topbar-date d-none d-sm-block text-muted small fw-semibold">
+          <i class="bi bi-calendar3 me-1"></i> {{ hoy|date:"l, d \d\e F \d\e Y"|title }}
+        </div>
+      </div>
+    </header>
+
+    <main class="content-body">
+      
+      <!-- HERO BANNER -->
+      <div class="hero-banner-stats">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-4 position-relative" style="z-index:1;">
+          <div>
+            <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+              <span class="hero-badge-pill">
+                <i class="bi bi-graph-up-arrow"></i> Panel Directivo
+              </span>
+              <span class="hero-school-pill">
+                <i class="bi bi-building"></i> {{ colegio.nombre }} • Período {{ periodo.anio_lectivo|default:2026 }}
+              </span>
+            </div>
+            <h2 class="fw-extrabold text-white mb-1 fs-3">Métricas & Estadísticas Globales</h2>
+            <p class="text-white text-opacity-85 small mb-0">
+              Analítica integral de matrícula, género, rangos etarios, rendimiento académico, asistencia y convivencia escolar.
+            </p>
+          </div>
+
+          <div>
+            <a href="{% url 'exportar_estadisticas_excel' %}" class="btn-export-excel">
+              <i class="bi bi-file-earmark-excel-fill fs-5"></i> Descargar Reporte Excel (.xlsx)
+            </a>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- 4 TOP KPIS -->
+      <div class="kpi-grid-stats">
+        <div class="kpi-card-stat purple">
+          <span class="text-muted extra-small text-uppercase fw-bold d-block">Matrícula Activa</span>
+          <div class="d-flex align-items-baseline gap-2 mt-1">
+            <span class="fs-3 fw-extrabold text-dark">{{ total_estudiantes }}</span>
+            <span class="badge bg-purple-subtle text-primary small fw-bold">100% escolar</span>
+          </div>
+          <span class="text-muted extra-small mt-1 d-block">Edad promedio: <strong>{{ edad_promedio }} años</strong></span>
+        </div>
+
+        <div class="kpi-card-stat blue">
+          <span class="text-muted extra-small text-uppercase fw-bold d-block">Promedio General</span>
+          <div class="d-flex align-items-baseline gap-2 mt-1">
+            <span class="fs-3 fw-extrabold text-primary">{{ promedio_global|default:"-" }}</span>
+            <span class="badge bg-primary-subtle text-primary small fw-bold">Escala 1.0 - 7.0</span>
+          </div>
+          <span class="text-muted extra-small mt-1 d-block">{{ total_notas }} notas registradas</span>
+        </div>
+
+        <div class="kpi-card-stat green">
+          <span class="text-muted extra-small text-uppercase fw-bold d-block">Asistencia Institucional</span>
+          <div class="d-flex align-items-baseline gap-2 mt-1">
+            <span class="fs-3 fw-extrabold text-success">{{ pct_asistencia_global }}%</span>
+            <span class="badge bg-success-subtle text-success small fw-bold">Presentismo</span>
+          </div>
+          <span class="text-muted extra-small mt-1 d-block">{{ total_asistencias }} registros tomados</span>
+        </div>
+
+        <div class="kpi-card-stat amber">
+          <span class="text-muted extra-small text-uppercase fw-bold d-block">Tasa Aprobación</span>
+          <div class="d-flex align-items-baseline gap-2 mt-1">
+            <span class="fs-3 fw-extrabold text-warning">{{ tasa_aprobacion_global }}%</span>
+            <span class="badge bg-warning-subtle text-warning small fw-bold">≥ 4.0</span>
+          </div>
+          <span class="text-muted extra-small mt-1 d-block">Alumnos PIE: <strong>{{ pie_count }} ({{ pct_pie }}%)</strong></span>
+        </div>
+      </div>
+
+      <!-- TABS NAVEGACIÓN -->
+      <ul class="nav nav-pills nav-pills-custom mb-4 gap-2" id="statsTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="tab-demo-btn" data-bs-toggle="pill" data-bs-target="#tab-demo" type="button" role="tab">
+            <i class="bi bi-people-fill me-1.5"></i> Demografía, Género & Edades
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="tab-acad-btn" data-bs-toggle="pill" data-bs-target="#tab-acad" type="button" role="tab">
+            <i class="bi bi-journal-bookmark-fill me-1.5"></i> Rendimiento & Rangos de Notas
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="tab-asist-btn" data-bs-toggle="pill" data-bs-target="#tab-asist" type="button" role="tab">
+            <i class="bi bi-calendar-check-fill me-1.5"></i> Asistencia & Convivencia
+          </button>
+        </li>
+      </ul>
+
+      <div class="tab-content" id="statsTabsContent">
+        
+        <!-- PESTAÑA 1: DEMOGRAFÍA & EDADES -->
+        <div class="tab-pane fade show active" id="tab-demo" role="tabpanel">
+          <div class="row g-4 mb-4">
+            
+            <!-- GRAFICO 1: GÉNERO -->
+            <div class="col-lg-5">
+              <div class="chart-card">
+                <div>
+                  <div class="chart-header">
+                    <div>
+                      <h5 class="fw-extrabold text-dark mb-0">Distribución de Género</h5>
+                      <span class="text-muted small">Hombres, Mujeres y No Binario</span>
+                    </div>
+                    <span class="badge bg-light text-dark border px-2.5 py-1 fw-bold">Demografía</span>
+                  </div>
+                  <div style="height: 250px; position: relative;">
+                    <canvas id="generoChart"></canvas>
+                  </div>
+                </div>
+                <div class="row g-2 text-center mt-3 pt-3 border-top">
+                  <div class="col-4">
+                    <span class="text-muted extra-small text-uppercase fw-bold d-block">Hombres</span>
+                    <span class="fw-extrabold text-primary fs-6">{{ hombres_count }} ({{ pct_hombres }}%)</span>
+                  </div>
+                  <div class="col-4">
+                    <span class="text-muted extra-small text-uppercase fw-bold d-block">Mujeres</span>
+                    <span class="fw-extrabold text-danger fs-6">{{ mujeres_count }} ({{ pct_mujeres }}%)</span>
+                  </div>
+                  <div class="col-4">
+                    <span class="text-muted extra-small text-uppercase fw-bold d-block">Otro / S/I</span>
+                    <span class="fw-extrabold text-muted fs-6">{{ otros_count }} ({{ pct_otros }}%)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- GRAFICO 2: RANGOS ETARIOS -->
+            <div class="col-lg-7">
+              <div class="chart-card">
+                <div>
+                  <div class="chart-header">
+                    <div>
+                      <h5 class="fw-extrabold text-dark mb-0">Rangos Etarios (Pirámide de Edades)</h5>
+                      <span class="text-muted small">Distribución de estudiantes por tramo de edad</span>
+                    </div>
+                    <span class="badge bg-light text-dark border px-2.5 py-1 fw-bold">Edad Promedio: {{ edad_promedio }}</span>
+                  </div>
+                  <div style="height: 250px; position: relative;">
+                    <canvas id="edadesChart"></canvas>
+                  </div>
+                </div>
+                <div class="row g-2 text-center mt-3 pt-3 border-top">
+                  <div class="col-2">
+                    <span class="text-muted extra-small fw-bold d-block">&lt; 6</span>
+                    <span class="fw-bold text-dark">{{ edad_menor_6 }}</span>
+                  </div>
+                  <div class="col-3">
+                    <span class="text-muted extra-small fw-bold d-block">6 a 9</span>
+                    <span class="fw-bold text-dark">{{ edad_6_9 }}</span>
+                  </div>
+                  <div class="col-3">
+                    <span class="text-muted extra-small fw-bold d-block">10 a 13</span>
+                    <span class="fw-bold text-dark">{{ edad_10_13 }}</span>
+                  </div>
+                  <div class="col-2">
+                    <span class="text-muted extra-small fw-bold d-block">14 a 17</span>
+                    <span class="fw-bold text-dark">{{ edad_14_17 }}</span>
+                  </div>
+                  <div class="col-2">
+                    <span class="text-muted extra-small fw-bold d-block">18+</span>
+                    <span class="fw-bold text-dark">{{ edad_18_mas }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- GRAFICO 3: INCLUSIÓN PIE -->
+            <div class="col-lg-6">
+              <div class="chart-card">
+                <div>
+                  <div class="chart-header">
+                    <div>
+                      <h5 class="fw-extrabold text-dark mb-0">Programa de Integración Escolar (PIE)</h5>
+                      <span class="text-muted small">Alumnos regulares vs Necesidades Educativas Especiales</span>
+                    </div>
+                    <span class="badge bg-purple-subtle text-primary border border-primary-subtle px-2.5 py-1 fw-bold">Inclusión</span>
+                  </div>
+                  <div style="height: 240px; position: relative;">
+                    <canvas id="pieChart"></canvas>
+                  </div>
+                </div>
+                <div class="row g-2 text-center mt-3 pt-3 border-top">
+                  <div class="col-4">
+                    <span class="text-muted extra-small text-uppercase fw-bold d-block">NEEP (Perm.)</span>
+                    <span class="fw-extrabold text-primary">{{ pie_neep }}</span>
+                  </div>
+                  <div class="col-4">
+                    <span class="text-muted extra-small text-uppercase fw-bold d-block">NEET (Trans.)</span>
+                    <span class="fw-extrabold text-info">{{ pie_neet }}</span>
+                  </div>
+                  <div class="col-4">
+                    <span class="text-muted extra-small text-uppercase fw-bold d-block">Regular</span>
+                    <span class="fw-extrabold text-success">{{ regular_count }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- GRAFICO 4: DISTRIBUCION POR NIVELES -->
+            <div class="col-lg-6">
+              <div class="chart-card">
+                <div>
+                  <div class="chart-header">
+                    <div>
+                      <h5 class="fw-extrabold text-dark mb-0">Matrícula por Nivel Educativo</h5>
+                      <span class="text-muted small">Cantidad de estudiantes por nivel escolar</span>
+                    </div>
+                    <span class="badge bg-light text-dark border px-2.5 py-1 fw-bold">Niveles</span>
+                  </div>
+                  <div style="height: 240px; position: relative;">
+                    <canvas id="nivelesChart"></canvas>
+                  </div>
+                </div>
+                <div class="p-2 text-center mt-3 pt-3 border-top text-muted small">
+                  Total de niveles activos: <strong>{{ niveles_labels|length }}</strong>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- PESTAÑA 2: RENDIMIENTO & CALIFICACIONES -->
+        <div class="tab-pane fade" id="tab-acad" role="tabpanel">
+          <div class="row g-4 mb-4">
+            
+            <!-- GRAFICO 5: RANGOS DE CALIFICACIONES -->
+            <div class="col-lg-5">
+              <div class="chart-card">
+                <div>
+                  <div class="chart-header">
+                    <div>
+                      <h5 class="fw-extrabold text-dark mb-0">Distribución de Calificaciones</h5>
+                      <span class="text-muted small">Clasificación por tramo de notas oficiales</span>
+                    </div>
+                    <span class="badge bg-light text-dark border px-2.5 py-1 fw-bold">Notas</span>
+                  </div>
+                  <div style="height: 260px; position: relative;">
+                    <canvas id="notasRangosChart"></canvas>
+                  </div>
+                </div>
+                <div class="row g-2 text-center mt-3 pt-3 border-top">
+                  <div class="col-3">
+                    <span class="text-muted extra-small text-uppercase fw-bold d-block">6.0 - 7.0</span>
+                    <span class="fw-extrabold text-success">{{ notas_sobresaliente }}</span>
+                  </div>
+                  <div class="col-3">
+                    <span class="text-muted extra-small text-uppercase fw-bold d-block">5.0 - 5.9</span>
+                    <span class="fw-extrabold text-primary">{{ notas_bueno }}</span>
+                  </div>
+                  <div class="col-3">
+                    <span class="text-muted extra-small text-uppercase fw-bold d-block">4.0 - 4.9</span>
+                    <span class="fw-extrabold text-warning">{{ notas_suficiente }}</span>
+                  </div>
+                  <div class="col-3">
+                    <span class="text-muted extra-small text-uppercase fw-bold d-block">&lt; 4.0</span>
+                    <span class="fw-extrabold text-danger">{{ notas_insuficiente }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- GRAFICO 6: PROMEDIOS POR CURSO -->
+            <div class="col-lg-7">
+              <div class="chart-card">
+                <div>
+                  <div class="chart-header">
+                    <div>
+                      <h5 class="fw-extrabold text-dark mb-0">Rendimiento Promedio por Nivel</h5>
+                      <span class="text-muted small">Promedio de calificaciones por cada curso activo</span>
+                    </div>
+                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1 fw-bold">Aprobación {{ tasa_aprobacion_global }}%</span>
+                  </div>
+                  <div style="height: 260px; position: relative;">
+                    <canvas id="cursosPromedioChart"></canvas>
+                  </div>
+                </div>
+                <div class="p-2 text-center mt-3 pt-3 border-top text-muted small">
+                  Promedio Global Institucional: <strong class="text-primary fs-6">{{ promedio_global }}</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- TABLA RESUMEN ACADÉMICO -->
+            <div class="col-12">
+              <div class="card bg-white border rounded-4 shadow-sm p-4">
+                <h5 class="fw-extrabold text-dark mb-3"><i class="bi bi-table text-primary me-2"></i>Detalle de Rendimiento por Curso</h5>
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle mb-0" style="font-size:0.9rem;">
+                    <thead class="table-light">
+                      <tr>
+                        <th class="fw-bold">Curso</th>
+                        <th class="fw-bold">Nivel</th>
+                        <th class="text-center fw-bold">Total Notas</th>
+                        <th class="text-center fw-bold">Promedio</th>
+                        <th class="text-center fw-bold">% Aprobación</th>
+                        <th class="text-center fw-bold">Estado</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for r in rendimiento_cursos %}
+                        <tr>
+                          <td class="fw-bold text-dark">{{ r.nombre }}</td>
+                          <td class="text-muted">{{ r.nivel }}</td>
+                          <td class="text-center fw-bold">{{ r.total_notas }}</td>
+                          <td class="text-center">
+                            <span class="badge px-2.5 py-1 fw-bold {% if r.promedio >= 5.5 %}bg-success-subtle text-success border border-success-subtle{% elif r.promedio >= 4.0 %}bg-primary-subtle text-primary border border-primary-subtle{% else %}bg-danger-subtle text-danger border border-danger-subtle{% endif %}" style="font-size:0.85rem;">
+                              {{ r.promedio }}
+                            </span>
+                          </td>
+                          <td class="text-center fw-bold">{{ r.aprobadas_pct }}%</td>
+                          <td class="text-center">
+                            {% if r.promedio >= 5.5 %}
+                              <span class="badge bg-success-subtle text-success">Óptimo</span>
+                            {% elif r.promedio >= 4.0 %}
+                              <span class="badge bg-primary-subtle text-primary">Normal</span>
+                            {% else %}
+                              <span class="badge bg-danger-subtle text-danger">En Refuerzo</span>
+                            {% endif %}
+                          </td>
+                        </tr>
+                      {% empty %}
+                        <tr>
+                          <td colspan="6" class="text-center py-4 text-muted">No hay calificaciones registradas aún.</td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- PESTAÑA 3: ASISTENCIA & CONVIVENCIA -->
+        <div class="tab-pane fade" id="tab-asist" role="tabpanel">
+          <div class="row g-4 mb-4">
+            
+            <!-- GRAFICO 7: ASISTENCIA -->
+            <div class="col-lg-6">
+              <div class="chart-card">
+                <div>
+                  <div class="chart-header">
+                    <div>
+                      <h5 class="fw-extrabold text-dark mb-0">Desglose de Asistencia</h5>
+                      <span class="text-muted small">Proporción de presentes, atrasos y ausencias</span>
+                    </div>
+                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1 fw-bold">{{ pct_asistencia_global }}% Global</span>
+                  </div>
+                  <div style="height: 250px; position: relative;">
+                    <canvas id="asistenciaChart"></canvas>
+                  </div>
+                </div>
+                <div class="row g-2 text-center mt-3 pt-3 border-top">
+                  <div class="col-3">
+                    <span class="text-muted extra-small text-uppercase fw-bold d-block">Presentes</span>
+                    <span class="fw-extrabold text-success">{{ presentes }}</span>
+                  </div>
+                  <div class="col-3">
+                    <span class="text-muted extra-small text-uppercase fw-bold d-block">Atrasados</span>
+                    <span class="fw-extrabold text-warning">{{ atrasados }}</span>
+                  </div>
+                  <div class="col-3">
+                    <span class="text-muted extra-small text-uppercase fw-bold d-block">Justificados</span>
+                    <span class="fw-extrabold text-info">{{ justificados }}</span>
+                  </div>
+                  <div class="col-3">
+                    <span class="text-muted extra-small text-uppercase fw-bold d-block">Ausentes</span>
+                    <span class="fw-extrabold text-danger">{{ ausentes }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- GRAFICO 8: CONVIVENCIA ESCOLAR -->
+            <div class="col-lg-6">
+              <div class="chart-card">
+                <div>
+                  <div class="chart-header">
+                    <div>
+                      <h5 class="fw-extrabold text-dark mb-0">Clima & Convivencia Escolar</h5>
+                      <span class="text-muted small">Anotaciones positivas vs negativas en hoja de vida</span>
+                    </div>
+                    <span class="badge bg-light text-dark border px-2.5 py-1 fw-bold">{{ total_anotaciones }} Registros</span>
+                  </div>
+                  <div style="height: 250px; position: relative;">
+                    <canvas id="convivenciaChart"></canvas>
+                  </div>
+                </div>
+                <div class="row g-2 text-center mt-3 pt-3 border-top">
+                  <div class="col-4">
+                    <span class="text-muted extra-small text-uppercase fw-bold d-block">Positivas</span>
+                    <span class="fw-extrabold text-success">{{ anotaciones_pos }}</span>
+                  </div>
+                  <div class="col-4">
+                    <span class="text-muted extra-small text-uppercase fw-bold d-block">Destacadas</span>
+                    <span class="fw-extrabold text-primary">{{ anotaciones_dest }}</span>
+                  </div>
+                  <div class="col-4">
+                    <span class="text-muted extra-small text-uppercase fw-bold d-block">Faltas / Negat.</span>
+                    <span class="fw-extrabold text-danger">{{ anotaciones_neg }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- DATOS JSON PARA GRÁFICOS -->
+<script id="stats-data" type="application/json">
+{
+  "genero": [{{ hombres_count|default:0 }}, {{ mujeres_count|default:0 }}, {{ otros_count|default:0 }}],
+  "edades": [{{ edad_menor_6|default:0 }}, {{ edad_6_9|default:0 }}, {{ edad_10_13|default:0 }}, {{ edad_14_17|default:0 }}, {{ edad_18_mas|default:0 }}],
+  "pie": [{{ regular_count|default:0 }}, {{ pie_neep|default:0 }}, {{ pie_neet|default:0 }}],
+  "nivelesLabels": {{ niveles_labels|safe }},
+  "nivelesCounts": {{ niveles_counts|safe }},
+  "notas": [{{ notas_sobresaliente|default:0 }}, {{ notas_bueno|default:0 }}, {{ notas_suficiente|default:0 }}, {{ notas_insuficiente|default:0 }}],
+  "cursosLabels": [{% for r in rendimiento_cursos %}"{{ r.nombre|escapejs }}"{% if not forloop.last %},{% endif %}{% endfor %}],
+  "cursosData": [{% for r in rendimiento_cursos %}{% if r.promedio != '-' %}{{ r.promedio }}{% else %}0{% endif %}{% if not forloop.last %},{% endif %}{% endfor %}],
+  "asistencia": [{{ presentes|default:0 }}, {{ atrasados|default:0 }}, {{ justificados|default:0 }}, {{ ausentes|default:0 }}],
+  "convivencia": [{{ anotaciones_pos|default:0 }}, {{ anotaciones_dest|default:0 }}, {{ anotaciones_neg|default:0 }}]
+}
+</script>
+
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const mobileBtn = document.getElementById('mobileMenuBtn');
+    const sidebar = document.getElementById('sidebar');
+    if (mobileBtn) {
+      mobileBtn.addEventListener('click', () => sidebar.classList.toggle('active'));
+    }
+
+    const statsData = JSON.parse(document.getElementById('stats-data')?.textContent || '{}');
+
+    // 1. Gráfico de Género (Donut)
+    const ctxGenero = document.getElementById('generoChart');
+    if (ctxGenero && statsData.genero) {
+      new Chart(ctxGenero, {
+        type: 'doughnut',
+        data: {
+          labels: ['Hombres', 'Mujeres', 'Otro / No Informa'],
+          datasets: [{
+            data: statsData.genero,
+            backgroundColor: ['#3B82F6', '#EC4899', '#94A3B8'],
+            borderWidth: 2,
+            borderColor: '#FFFFFF'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'bottom' } },
+          cutout: '68%'
+        }
+      });
+    }
+
+    // 2. Gráfico de Edades (Bar)
+    const ctxEdades = document.getElementById('edadesChart');
+    if (ctxEdades && statsData.edades) {
+      new Chart(ctxEdades, {
+        type: 'bar',
+        data: {
+          labels: ['< 6 años', '6 a 9 años', '10 a 13 años', '14 a 17 años', '18+ años'],
+          datasets: [{
+            label: 'Estudiantes',
+            data: statsData.edades,
+            backgroundColor: '#7C5CFC',
+            borderRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true, grid: { color: '#F1F5F9' } } }
+        }
+      });
+    }
+
+    // 3. Gráfico PIE (Inclusión)
+    const ctxPie = document.getElementById('pieChart');
+    if (ctxPie && statsData.pie) {
+      new Chart(ctxPie, {
+        type: 'doughnut',
+        data: {
+          labels: ['Alumnos Regulares', 'PIE - NEEP (Perm.)', 'PIE - NEET (Trans.)'],
+          datasets: [{
+            data: statsData.pie,
+            backgroundColor: ['#10B981', '#7C5CFC', '#06B6D4'],
+            borderWidth: 2,
+            borderColor: '#FFFFFF'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'bottom' } },
+          cutout: '65%'
+        }
+      });
+    }
+
+    // 4. Gráfico Niveles
+    const ctxNiveles = document.getElementById('nivelesChart');
+    if (ctxNiveles && statsData.nivelesLabels) {
+      new Chart(ctxNiveles, {
+        type: 'bar',
+        data: {
+          labels: statsData.nivelesLabels,
+          datasets: [{
+            label: 'Matrícula',
+            data: statsData.nivelesCounts,
+            backgroundColor: ['#3B82F6', '#8B5CF6', '#10B981', '#F59E0B', '#6366F1'],
+            borderRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true, grid: { color: '#F1F5F9' } } }
+        }
+      });
+    }
+
+    // 5. Gráfico Rangos de Notas
+    const ctxNotas = document.getElementById('notasRangosChart');
+    if (ctxNotas && statsData.notas) {
+      new Chart(ctxNotas, {
+        type: 'doughnut',
+        data: {
+          labels: ['Sobresaliente (6.0-7.0)', 'Bueno (5.0-5.9)', 'Suficiente (4.0-4.9)', 'Insuficiente (<4.0)'],
+          datasets: [{
+            data: statsData.notas,
+            backgroundColor: ['#10B981', '#3B82F6', '#F59E0B', '#EF4444'],
+            borderWidth: 2,
+            borderColor: '#FFFFFF'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'bottom' } },
+          cutout: '65%'
+        }
+      });
+    }
+
+    // 6. Gráfico Cursos Promedio
+    const ctxCursos = document.getElementById('cursosPromedioChart');
+    if (ctxCursos && statsData.cursosLabels) {
+      new Chart(ctxCursos, {
+        type: 'bar',
+        data: {
+          labels: statsData.cursosLabels,
+          datasets: [{
+            label: 'Promedio General',
+            data: statsData.cursosData,
+            backgroundColor: '#6366F1',
+            borderRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { min: 1.0, max: 7.0, grid: { color: '#F1F5F9' } }
+          }
+        }
+      });
+    }
+
+    // 7. Gráfico Asistencia
+    const ctxAsist = document.getElementById('asistenciaChart');
+    if (ctxAsist && statsData.asistencia) {
+      new Chart(ctxAsist, {
+        type: 'doughnut',
+        data: {
+          labels: ['Presentes', 'Atrasados', 'Justificados', 'Ausentes'],
+          datasets: [{
+            data: statsData.asistencia,
+            backgroundColor: ['#10B981', '#F59E0B', '#06B6D4', '#EF4444'],
+            borderWidth: 2,
+            borderColor: '#FFFFFF'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'bottom' } },
+          cutout: '65%'
+        }
+      });
+    }
+
+    // 8. Gráfico Convivencia
+    const ctxConv = document.getElementById('convivenciaChart');
+    if (ctxConv && statsData.convivencia) {
+      new Chart(ctxConv, {
+        type: 'bar',
+        data: {
+          labels: ['Positivas', 'Destacadas', 'Faltas / Negativas'],
+          datasets: [{
+            label: 'Anotaciones',
+            data: statsData.convivencia,
+            backgroundColor: ['#10B981', '#3B82F6', '#EF4444'],
+            borderRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true, grid: { color: '#F1F5F9' } } }
+        }
+      });
+    }
+
+  });
+</script>
+</body>
+</html>
+

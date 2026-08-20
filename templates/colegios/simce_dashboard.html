@@ -1,0 +1,834 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Módulo SIMCE & Diagnóstico Integral - Eduteka</title>
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --primary: #7C5CFC;
+      --primary-soft: rgba(124, 92, 252, 0.08);
+      --primary-hover: #6747E3;
+      --secondary: #65CDBF;
+      --bg: #F8F9FD;
+      --white: #FFFFFF;
+      --dark: #151A35;
+      --gray-text: #687089;
+      --border: #BCC0CF;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+    }
+
+    * { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+    }
+
+    .wrapper { display: flex; flex: 1; position: relative; }
+
+    .topbar {
+      height: 70px;
+      background: rgba(255, 255, 255, 0.85) !important;
+      backdrop-filter: blur(12px) !important;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; position: sticky; top: 0; z-index: 98;
+    }
+    .content-body { padding: 2rem; flex-grow: 1; max-width: 1440px; margin: 0 auto; width: 100%; }
+
+    /* Hero Banner SIMCE */
+    .hero-banner-simce {
+      background: linear-gradient(135deg, #7C5CFC 0%, #6344CE 50%, #4F46E5 100%);
+      border-radius: var(--radius-lg);
+      padding: 2.2rem 2.5rem;
+      color: var(--white);
+      margin-bottom: 2rem;
+      box-shadow: 0 12px 30px rgba(124, 92, 252, 0.25);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-banner-simce::before {
+      content: '';
+      position: absolute;
+      width: 320px; height: 320px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 70%);
+      top: -80px; right: -60px;
+      border-radius: 50%;
+    }
+
+    .hero-badge-pill {
+      background: rgba(255, 255, 255, 0.2);
+      color: #FFFFFF !important;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 20px;
+      padding: 0.35rem 0.85rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      backdrop-filter: blur(8px);
+    }
+
+    .hero-school-pill {
+      background: rgba(0, 0, 0, 0.2);
+      color: #FFFFFF !important;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 20px;
+      padding: 0.35rem 0.85rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      backdrop-filter: blur(8px);
+    }
+
+    /* KPI Cards */
+    .kpi-card-simce {
+      background: var(--white);
+      border: 1px solid #E2E8F0;
+      border-radius: var(--radius-lg);
+      padding: 1.4rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.02);
+      height: 100%;
+    }
+    .kpi-card-simce:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(124, 92, 252, 0.08);
+      border-color: #CBD5E1;
+    }
+    .kpi-icon-simce {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    /* Panels */
+    .card-panel-simce {
+      background: var(--white);
+      border: 1px solid #E2E8F0;
+      border-radius: var(--radius-lg);
+      padding: 1.6rem 1.75rem;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.02);
+      margin-bottom: 1.5rem;
+    }
+
+    /* Tabs */
+    .nav-pills-simce .nav-link {
+      color: #64748B;
+      font-weight: 700;
+      font-size: 0.9rem;
+      padding: 0.65rem 1.4rem;
+      border-radius: 12px;
+      transition: all 0.2s ease;
+    }
+    .nav-pills-simce .nav-link.active {
+      background: var(--primary);
+      color: var(--white);
+      box-shadow: 0 4px 14px rgba(124, 92, 252, 0.25);
+    }
+
+    /* Card Ensayo */
+    .card-ensayo-item {
+      background: var(--white);
+      border: 1px solid #E2E8F0;
+      border-radius: var(--radius-md);
+      padding: 1.3rem 1.4rem;
+      transition: all 0.2s ease;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .card-ensayo-item:hover {
+      border-color: var(--primary);
+      box-shadow: 0 6px 20px rgba(124, 92, 252, 0.08);
+    }
+
+    /* Progress bar niveles */
+    .progress-niveles {
+      height: 9px;
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+      background: #E2E8F0;
+    }
+
+    .badge-insuf { background: #FEE2E2; color: #DC2626; border: 1px solid #FECACA; font-weight: 700; border-radius: 6px; padding: 0.25rem 0.55rem; font-size: 0.75rem; }
+    .badge-elem { background: #FEF3C7; color: #D97706; border: 1px solid #FDE68A; font-weight: 700; border-radius: 6px; padding: 0.25rem 0.55rem; font-size: 0.75rem; }
+    .badge-adec { background: #DCFCE7; color: #16A34A; border: 1px solid #BBF7D0; font-weight: 700; border-radius: 6px; padding: 0.25rem 0.55rem; font-size: 0.75rem; }
+  </style>
+</head>
+<body>
+
+<div class="wrapper">
+  {% include 'colegios/_sidebar.html' with active_page='simce' %}
+
+  <div class="main-content">
+    <header class="topbar">
+      <div class="d-flex align-items-center gap-3">
+        <span class="fw-bold text-dark fs-5"><i class="bi bi-award-fill text-warning me-2"></i>Evaluación SIMCE & DIA</span>
+        <span class="badge bg-light text-muted border px-2.5 py-1">Estándares MINEDUC / Agencia de Calidad</span>
+      </div>
+
+      <div class="topbar-right d-flex align-items-center gap-3">
+        <div class="topbar-date d-none d-sm-block text-muted small fw-semibold">
+          <i class="bi bi-calendar3 me-1"></i> {{ hoy|date:"l, d \d\e F \d\e Y"|title }}
+        </div>
+      </div>
+    </header>
+
+    <main class="content-body">
+      
+      <!-- HERO BANNER SIMCE -->
+      <div class="hero-banner-simce">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-4 position-relative" style="z-index:1;">
+          <div>
+            <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+              <span class="hero-badge-pill">
+                <i class="bi bi-mortarboard-fill"></i> Sistema de Medición de Calidad de la Educación
+              </span>
+              <span class="hero-school-pill">
+                <i class="bi bi-building"></i> {{ colegio.nombre }}
+              </span>
+            </div>
+            <h2 class="fw-extrabold text-white mb-1 fs-3">Panel de Rendimiento SIMCE & Simulacros UTP</h2>
+            <p class="text-white text-opacity-85 small mb-0">
+              Analiza los resultados históricos oficiales de la Agencia de la Calidad y gestiona ensayos internos con cálculo de estándares.
+            </p>
+          </div>
+
+          <div class="d-flex gap-2 flex-wrap">
+            <button type="button" class="btn btn-light fw-bold px-3 py-2 shadow-sm" style="border-radius:12px; color:#7C5CFC;" data-bs-toggle="modal" data-bs-target="#modalNuevoEnsayo">
+              <i class="bi bi-plus-circle-fill me-1.5"></i> Nuevo Ensayo SIMCE
+            </button>
+
+            <button type="button" class="btn btn-outline-light fw-bold px-3 py-2" style="border-radius:12px;" data-bs-toggle="modal" data-bs-target="#modalNuevoHistorico">
+              <i class="bi bi-journal-plus me-1.5"></i> Cargar Histórico Oficial
+            </button>
+
+            <a href="{% url 'exportar_simce_excel' %}" class="btn btn-outline-light fw-bold px-3 py-2" style="border-radius:12px;">
+              <i class="bi bi-file-earmark-excel me-1.5"></i> Exportar Todo (.xlsx)
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI METRICS ROW -->
+      <div class="row g-3 mb-4">
+        <div class="col-lg-3 col-sm-6">
+          <div class="kpi-card-simce">
+            <div class="kpi-icon-simce" style="background:#F0EDFF; color:#7C5CFC;">
+              <i class="bi bi-trophy-fill"></i>
+            </div>
+            <div>
+              <span class="text-muted extra-small text-uppercase fw-bold d-block">Promedio Ensayos</span>
+              <span class="fs-4 fw-extrabold text-dark">{{ promedio_general_simce }} <small class="fs-6 text-muted">pts</small></span>
+              <span class="text-muted extra-small d-block">{{ promedio_logro_general }}% de logro promedio</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-sm-6">
+          <div class="kpi-card-simce">
+            <div class="kpi-icon-simce" style="background:#ECFDF5; color:#10B981;">
+              <i class="bi bi-check2-circle"></i>
+            </div>
+            <div>
+              <span class="text-muted extra-small text-uppercase fw-bold d-block">Nivel Adecuado</span>
+              <span class="fs-4 fw-extrabold text-success">{{ pct_adecuado }}%</span>
+              <span class="text-muted extra-small d-block">{{ total_adecuados }} evaluaciones en rango alto</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-sm-6">
+          <div class="kpi-card-simce">
+            <div class="kpi-icon-simce" style="background:#FEF3C7; color:#D97706;">
+              <i class="bi bi-layers"></i>
+            </div>
+            <div>
+              <span class="text-muted extra-small text-uppercase fw-bold d-block">Nivel Elemental</span>
+              <span class="fs-4 fw-extrabold text-warning">{{ pct_elemental }}%</span>
+              <span class="text-muted extra-small d-block">{{ total_elementales }} evaluaciones intermedias</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-sm-6">
+          <div class="kpi-card-simce">
+            <div class="kpi-icon-simce" style="background:#FEE2E2; color:#EF4444;">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+            </div>
+            <div>
+              <span class="text-muted extra-small text-uppercase fw-bold d-block">Nivel Insuficiente</span>
+              <span class="fs-4 fw-extrabold text-danger">{{ pct_insuficiente }}%</span>
+              <span class="text-muted extra-small d-block">{{ total_insuficientes }} evaluaciones en riesgo</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GRAFICOS COMPARATIVOS -->
+      <div class="row g-4 mb-4">
+        <!-- Gráfico 1: Histórico Oficial Colegio vs GSE vs Nacional -->
+        <div class="col-lg-8">
+          <div class="card-panel-simce h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div>
+                <h5 class="fw-extrabold text-dark mb-0"><i class="bi bi-graph-up text-primary me-2"></i>Evolución Oficial SIMCE vs GSE y Nacional</h5>
+                <small class="text-muted">Resultados oficiales de la Agencia de la Calidad de la Educación</small>
+              </div>
+              <span class="badge bg-purple-subtle text-primary fw-bold">Escala 150 - 350 pts</span>
+            </div>
+            <div style="height: 280px; position: relative;">
+              <canvas id="chartHistoricoSimce"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gráfico 2: Distribución de Estándares -->
+        <div class="col-lg-4">
+          <div class="card-panel-simce h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="fw-extrabold text-dark mb-0"><i class="bi bi-pie-chart-fill text-primary me-2"></i>Estándares de Aprendizaje</h5>
+            </div>
+            <small class="text-muted d-block mb-3">Distribución global de los ensayos institucionales</small>
+            <div style="height: 220px; position: relative;" class="d-flex justify-content-center">
+              <canvas id="chartDistribucionNiveles"></canvas>
+            </div>
+            <div class="d-flex justify-content-around text-center mt-3 pt-2 border-top">
+              <div>
+                <span class="badge-insuf d-block mb-1">Insuficiente</span>
+                <strong class="text-danger small">{{ pct_insuficiente }}%</strong>
+              </div>
+              <div>
+                <span class="badge-elem d-block mb-1">Elemental</span>
+                <strong class="text-warning small">{{ pct_elemental }}%</strong>
+              </div>
+              <div>
+                <span class="badge-adec d-block mb-1">Adecuado</span>
+                <strong class="text-success small">{{ pct_adecuado }}%</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABS PRINCIPALES -->
+      <ul class="nav nav-pills nav-pills-simce gap-2 mb-4">
+        <li class="nav-item">
+          <button class="nav-link active" id="tab-ensayos" data-bs-toggle="pill" data-bs-target="#panel-ensayos">
+            <i class="bi bi-pencil-square me-1.5"></i> Ensayos & Simulacros Internos ({{ total_ensayos }})
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" id="tab-historico" data-bs-toggle="pill" data-bs-target="#panel-historico">
+            <i class="bi bi-clock-history me-1.5"></i> Historial Oficial Agencia de Calidad ({{ historicos|length }})
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" id="tab-riesgo" data-bs-toggle="pill" data-bs-target="#panel-riesgo">
+            <i class="bi bi-person-exclamation me-1.5 text-danger"></i> Foco Pedagógico & Alumnos en Riesgo ({{ total_insuficientes }})
+          </button>
+        </li>
+      </ul>
+
+      <div class="tab-content">
+        
+        <!-- PANEL 1: ENSAYOS INTERNOS -->
+        <div class="tab-pane fade show active" id="panel-ensayos">
+          <!-- Filtros de Ensayos -->
+          <div class="card-panel-simce p-3 mb-4">
+            <form method="GET" class="row g-2 align-items-center">
+              <div class="col-md-4">
+                <select name="curso" class="form-select form-select-sm" onchange="this.form.submit()">
+                  <option value="">-- Todos los Cursos --</option>
+                  {% for c in cursos_colegio %}
+                    <option value="{{ c.id }}" {% if curso_filtro == c.id|stringformat:"s" %}selected{% endif %}>{{ c.nombre }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-4">
+                <select name="asignatura" class="form-select form-select-sm" onchange="this.form.submit()">
+                  <option value="">-- Todas las Asignaturas --</option>
+                  {% for val, label in asignaturas_choices %}
+                    <option value="{{ val }}" {% if asignatura_filtro == val %}selected{% endif %}>{{ label }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-4 d-flex justify-content-end gap-2">
+                {% if curso_filtro or asignatura_filtro %}
+                  <a href="{% url 'simce_dashboard' %}" class="btn btn-sm btn-light border">Limpiar</a>
+                {% endif %}
+                <button type="button" class="btn btn-sm btn-primary fw-bold" data-bs-toggle="modal" data-bs-target="#modalNuevoEnsayo">
+                  <i class="bi bi-plus-lg me-1"></i> Crear Ensayo
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Cards de Ensayos -->
+          <div class="row g-3">
+            {% for ens in ensayos %}
+              <div class="col-lg-4 col-md-6">
+                <div class="card-ensayo-item">
+                  <div>
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                      <span class="badge px-2.5 py-1 fw-bold" style="background:#F0EDFF; color:#7C5CFC; border-radius:6px; font-size:0.78rem;">
+                        {{ ens.curso.nombre }}
+                      </span>
+                      <span class="text-muted extra-small">{{ ens.fecha|date:"d/m/Y" }}</span>
+                    </div>
+
+                    <h5 class="fw-bold text-dark mb-1 fs-6">{{ ens.titulo }}</h5>
+                    <span class="text-muted extra-small d-block mb-3">
+                      <i class="bi bi-book me-1 text-primary"></i>{{ ens.get_asignatura_display }} &nbsp;|&nbsp; 
+                      <i class="bi bi-question-circle me-1"></i>{{ ens.total_preguntas }} preguntas
+                    </span>
+
+                    <div class="d-flex align-items-baseline gap-2 mb-2">
+                      <span class="fs-4 fw-extrabold text-dark">{{ ens.promedio_puntaje }}</span>
+                      <span class="text-muted small">pts SIMCE prom. ({{ ens.promedio_logro }}%)</span>
+                    </div>
+
+                    <!-- Barra de Niveles -->
+                    {% with d=ens.desglose_niveles %}
+                      <div class="progress-niveles mb-2" title="Insuficiente: {{ d.pct_insuficiente }}% | Elemental: {{ d.pct_elemental }}% | Adecuado: {{ d.pct_adecuado }}%">
+                        <div class="bar-segment" data-pct="{{ d.pct_insuficiente }}" style="background:#EF4444;"></div>
+                        <div class="bar-segment" data-pct="{{ d.pct_elemental }}" style="background:#F59E0B;"></div>
+                        <div class="bar-segment" data-pct="{{ d.pct_adecuado }}" style="background:#10B981;"></div>
+                      </div>
+                      <div class="d-flex justify-content-between extra-small text-muted mb-3">
+                        <span class="text-danger fw-bold">🔴 {{ d.insuficiente }} Insuf.</span>
+                        <span class="text-warning fw-bold">🟡 {{ d.elemental }} Elem.</span>
+                        <span class="text-success fw-bold">🟢 {{ d.adecuado }} Adec.</span>
+                      </div>
+                    {% endwith %}
+                  </div>
+
+
+                  <div class="d-flex gap-2 pt-2 border-top">
+                    <a href="{% url 'detalle_ensayo_simce' ens.id %}" class="btn btn-sm btn-primary w-100 fw-bold" style="border-radius:8px;">
+                      <i class="bi bi-pencil-square me-1"></i> Ver Resultados & Editar
+                    </a>
+                    <a href="{% url 'exportar_ensayo_excel' ens.id %}" class="btn btn-sm btn-outline-success" title="Descargar Excel" style="border-radius:8px;">
+                      <i class="bi bi-file-earmark-excel"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            {% empty %}
+              <div class="col-12">
+                <div class="card-panel-simce text-center py-5">
+                  <i class="bi bi-journal-x fs-1 text-muted d-block mb-3"></i>
+                  <h5 class="fw-bold text-dark">No se encontraron ensayos registrados</h5>
+                  <p class="text-muted small mb-3">Crea tu primer simulacro SIMCE o diagnóstico para evaluar a los estudiantes.</p>
+                  <button type="button" class="btn btn-primary fw-bold" data-bs-toggle="modal" data-bs-target="#modalNuevoEnsayo">
+                    <i class="bi bi-plus-lg me-1"></i> Crear Primer Ensayo
+                  </button>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- PANEL 2: HISTORICO OFICIAL AGENCIA DE CALIDAD -->
+        <div class="tab-pane fade" id="panel-historico">
+          <div class="card-panel-simce p-0 overflow-hidden">
+            <div class="d-flex justify-content-between align-items-center p-3 border-bottom bg-light">
+              <div class="fw-bold text-dark">
+                <i class="bi bi-award me-1.5 text-warning"></i> Historial de Puntajes Oficiales SIMCE del Establecimiento
+              </div>
+              <button type="button" class="btn btn-sm btn-primary fw-bold" data-bs-toggle="modal" data-bs-target="#modalNuevoHistorico" style="border-radius:8px;">
+                <i class="bi bi-plus-lg me-1"></i> Agregar Año Histórico
+              </button>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table table-hover mb-0" style="vertical-align: middle;">
+                <thead class="table-light">
+                  <tr>
+                    <th class="ps-4">Año</th>
+                    <th>Nivel Escolar</th>
+                    <th>Asignatura</th>
+                    <th class="text-center">Puntaje Colegio</th>
+                    <th class="text-center">Promedio GSE</th>
+                    <th class="text-center">Promedio Nacional</th>
+                    <th class="text-center">Brecha vs GSE</th>
+                    <th class="text-center">Distribución de Estándares</th>
+                    <th class="text-center">Acción</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for h in historicos %}
+                    <tr>
+                      <td class="ps-4 fw-extrabold text-primary">{{ h.anio }}</td>
+                      <td class="fw-bold text-dark">{{ h.nivel_escolar }}</td>
+                      <td>{{ h.asignatura }}</td>
+                      <td class="text-center">
+                        <span class="fs-6 fw-extrabold text-dark">{{ h.puntaje_colegio }} pts</span>
+                      </td>
+                      <td class="text-center text-muted small fw-semibold">{{ h.puntaje_gse }} pts</td>
+                      <td class="text-center text-muted small">{{ h.puntaje_nacional }} pts</td>
+                      <td class="text-center">
+                        {% with diff=h.puntaje_colegio|add:h.puntaje_gse %}
+                          {% if h.puntaje_colegio >= h.puntaje_gse %}
+                            <span class="badge bg-success-subtle text-success border border-success-subtle fw-bold">
+                              +{{ h.puntaje_colegio|add:"-"|add:h.puntaje_gse|stringformat:"s"|slice:"1:"|default:"0" }} pts sobre GSE
+                            </span>
+                          {% else %}
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle fw-bold">
+                              Bajo GSE
+                            </span>
+                          {% endif %}
+                        {% endwith %}
+                      </td>
+                      <td class="text-center" style="min-width: 170px;">
+                        <div class="progress-niveles mb-1">
+                          <div class="bar-segment" data-pct="{{ h.nivel_insuficiente_pct }}" style="background:#EF4444;" title="Insuficiente: {{ h.nivel_insuficiente_pct }}%"></div>
+                          <div class="bar-segment" data-pct="{{ h.nivel_elemental_pct }}" style="background:#F59E0B;" title="Elemental: {{ h.nivel_elemental_pct }}%"></div>
+                          <div class="bar-segment" data-pct="{{ h.nivel_adecuado_pct }}" style="background:#10B981;" title="Adecuado: {{ h.nivel_adecuado_pct }}%"></div>
+                        </div>
+                        <div class="d-flex justify-content-between extra-small text-muted">
+                          <span class="text-danger">{{ h.nivel_insuficiente_pct }}%</span>
+                          <span class="text-warning">{{ h.nivel_elemental_pct }}%</span>
+                          <span class="text-success">{{ h.nivel_adecuado_pct }}%</span>
+                        </div>
+                      </td>
+
+                      <td class="text-center">
+                        <a href="{% url 'eliminar_historico_simce' h.id %}" class="btn btn-sm btn-outline-danger py-0.5 px-2" style="border-radius:6px; font-size:0.75rem;" onclick="return confirm('¿Eliminar este registro histórico?')">
+                          <i class="bi bi-trash"></i>
+                        </a>
+                      </td>
+                    </tr>
+                  {% empty %}
+                    <tr>
+                      <td colspan="9" class="text-center py-4 text-muted">No hay registros históricos ingresados.</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL 3: FOCO PEDAGOGICO & ALUMNOS EN RIESGO -->
+        <div class="tab-pane fade" id="panel-riesgo">
+          <div class="card-panel-simce p-0 overflow-hidden">
+            <div class="p-3 border-bottom bg-light">
+              <div class="fw-bold text-danger">
+                <i class="bi bi-exclamation-triangle-fill me-1.5"></i> Estudiantes en Nivel Insuficiente (Prioridad UTP)
+              </div>
+              <small class="text-muted">Alumnos con puntajes inferiores a 235 pts en ensayos que requieren plan de reforzamiento.</small>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table table-hover mb-0" style="vertical-align: middle;">
+                <thead class="table-light">
+                  <tr>
+                    <th class="ps-4">Estudiante</th>
+                    <th>Curso / Sección</th>
+                    <th>Ensayo Evaluado</th>
+                    <th class="text-center">Resp. Correctas</th>
+                    <th class="text-center">% Logro</th>
+                    <th class="text-center">Puntaje SIMCE</th>
+                    <th>Nivel</th>
+                    <th>Acción Sugerida</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for r in alumnos_riesgo %}
+                    <tr>
+                      <td class="ps-4">
+                        <div class="d-flex align-items-center gap-2.5">
+                          <img src="https://ui-avatars.com/api/?name={{ r.estudiante.nombre_completo|urlencode }}&background=FEE2E2&color=DC2626" style="width:32px; height:32px; border-radius:50%;">
+                          <span class="fw-bold text-dark">{{ r.estudiante.nombre_completo }}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <span class="badge px-2 py-1" style="background:#F0EDFF; color:#7C5CFC; border-radius:6px; font-size:0.75rem;">
+                          {{ r.estudiante.seccion.nombre|default:"Sin curso" }}
+                        </span>
+                      </td>
+                      <td>
+                        <span class="fw-semibold text-dark">{{ r.ensayo.titulo }}</span>
+                      </td>
+                      <td class="text-center fw-bold">{{ r.respuestas_correctas }} / {{ r.ensayo.total_preguntas }}</td>
+                      <td class="text-center text-danger fw-bold">{{ r.porcentaje_logro }}%</td>
+                      <td class="text-center">
+                        <span class="badge bg-danger text-white fw-extrabold px-2.5 py-1">{{ r.puntaje_simce }} pts</span>
+                      </td>
+                      <td>
+                        <span class="badge-insuf">Insuficiente</span>
+                      </td>
+                      <td>
+                        <a href="{% url 'detalle_ensayo_simce' r.ensayo.id %}" class="btn btn-sm btn-outline-primary py-0.5 px-2" style="border-radius:6px; font-size:0.75rem;">
+                          Ver Ficha Ensayo
+                        </a>
+                      </td>
+                    </tr>
+                  {% empty %}
+                    <tr>
+                      <td colspan="8" class="text-center py-4 text-success fw-bold">
+                        <i class="bi bi-check-circle fs-3 d-block mb-1"></i>
+                        ¡Excelente! No hay alumnos en nivel insuficiente registrados en los simulacros.
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- MODAL NUEVO ENSAYO SIMCE -->
+<div class="modal fade" id="modalNuevoEnsayo" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg" style="border-radius:16px;">
+      <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+        <h5 class="modal-title fw-extrabold text-dark"><i class="bi bi-pencil-square text-primary me-2"></i>Crear Nuevo Ensayo SIMCE</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="POST" action="{% url 'crear_ensayo_simce' %}">
+        {% csrf_token %}
+        <div class="modal-body p-4">
+          <div class="mb-3">
+            <label class="form-label fw-bold text-dark small">Título del Ensayo / Simulacro</label>
+            <input type="text" name="titulo" class="form-control fw-bold" placeholder="Ej: 1° Ensayo SIMCE Matemática 4° Básico" required style="border-radius:10px;">
+          </div>
+
+          <div class="row g-2 mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">Asignatura</label>
+              <select name="asignatura" class="form-select fw-bold" style="border-radius:10px;">
+                {% for val, label in asignaturas_choices %}
+                  <option value="{{ val }}">{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">Curso a Evaluar</label>
+              <select name="curso" class="form-select fw-bold" required style="border-radius:10px;">
+                {% for c in cursos_colegio %}
+                  <option value="{{ c.id }}">{{ c.nombre }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <div class="row g-2 mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">Fecha de Aplicación</label>
+              <input type="date" name="fecha" class="form-control" value="{{ hoy|date:'Y-m-d' }}" required style="border-radius:10px;">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">Total Preguntas</label>
+              <input type="number" name="total_preguntas" class="form-control fw-bold" value="35" min="5" max="100" required style="border-radius:10px;">
+            </div>
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label fw-bold text-dark small">Descripción / Objetivo Pedagógico (Opcional)</label>
+            <textarea name="descripcion" class="form-control" rows="2" placeholder="Diagnóstico de mitad de semestre..." style="border-radius:10px;"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer border-top-0 p-4 pt-0">
+          <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary fw-extrabold px-4" style="border-radius:10px; background:linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%); border:none;">Crear Ensayo</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NUEVO HISTORICO OFICIAL -->
+<div class="modal fade" id="modalNuevoHistorico" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg" style="border-radius:16px;">
+      <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+        <h5 class="modal-title fw-extrabold text-dark"><i class="bi bi-journal-plus text-primary me-2"></i>Registrar Puntaje Histórico Oficial</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="POST" action="{% url 'crear_historico_simce' %}">
+        {% csrf_token %}
+        <div class="modal-body p-4">
+          <div class="row g-2 mb-3">
+            <div class="col-md-4">
+              <label class="form-label fw-bold text-dark small">Año</label>
+              <input type="number" name="anio" class="form-control fw-bold" value="2024" required style="border-radius:10px;">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-bold text-dark small">Nivel</label>
+              <input type="text" name="nivel_escolar" class="form-control" value="4° Básico" placeholder="4° Básico / II° Medio" required style="border-radius:10px;">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-bold text-dark small">Asignatura</label>
+              <input type="text" name="asignatura" class="form-control" value="Lectura" placeholder="Lectura / Matemática" required style="border-radius:10px;">
+            </div>
+          </div>
+
+          <div class="row g-2 mb-3">
+            <div class="col-md-4">
+              <label class="form-label fw-bold text-dark small">Puntaje Colegio</label>
+              <input type="number" name="puntaje_colegio" class="form-control fw-bold text-primary" placeholder="270" required style="border-radius:10px;">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-bold text-dark small">Promedio GSE</label>
+              <input type="number" name="puntaje_gse" class="form-control" value="255" required style="border-radius:10px;">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-bold text-dark small">Promedio Nacional</label>
+              <input type="number" name="puntaje_nacional" class="form-control" value="250" required style="border-radius:10px;">
+            </div>
+          </div>
+
+          <div class="row g-2">
+            <div class="col-4">
+              <label class="form-label extra-small text-danger fw-bold">% Insuficiente</label>
+              <input type="number" step="0.1" name="nivel_insuficiente_pct" class="form-control form-control-sm" value="20.0" style="border-radius:8px;">
+            </div>
+            <div class="col-4">
+              <label class="form-label extra-small text-warning fw-bold">% Elemental</label>
+              <input type="number" step="0.1" name="nivel_elemental_pct" class="form-control form-control-sm" value="45.0" style="border-radius:8px;">
+            </div>
+            <div class="col-4">
+              <label class="form-label extra-small text-success fw-bold">% Adecuado</label>
+              <input type="number" step="0.1" name="nivel_adecuado_pct" class="form-control form-control-sm" value="35.0" style="border-radius:8px;">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer border-top-0 p-4 pt-0">
+          <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary fw-extrabold px-4" style="border-radius:10px; background:linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%); border:none;">Guardar Registro</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- DATOS JSON PARA GRÁFICOS SIMCE -->
+{{ chart_labels|json_script:"simce-chart-labels" }}
+{{ chart_colegio|json_script:"simce-chart-colegio" }}
+{{ chart_gse|json_script:"simce-chart-gse" }}
+{{ chart_nacional|json_script:"simce-chart-nacional" }}
+<script id="simce-donut-data" type="application/json">
+[{{ total_insuficientes|default:0 }}, {{ total_elementales|default:0 }}, {{ total_adecuados|default:0 }}]
+</script>
+
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll('.bar-segment[data-pct]').forEach(function(el) {
+      el.style.width = (parseFloat(el.getAttribute('data-pct')) || 0) + '%';
+    });
+
+    // 1. Gráfico Histórico SIMCE (Colegio vs GSE vs Nacional)
+    const ctxHistEl = document.getElementById('chartHistoricoSimce');
+    if (ctxHistEl) {
+      const simceLabels = JSON.parse(document.getElementById('simce-chart-labels')?.textContent || '[]');
+      const simceColegio = JSON.parse(document.getElementById('simce-chart-colegio')?.textContent || '[]');
+      const simceGse = JSON.parse(document.getElementById('simce-chart-gse')?.textContent || '[]');
+      const simceNacional = JSON.parse(document.getElementById('simce-chart-nacional')?.textContent || '[]');
+
+      new Chart(ctxHistEl.getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: simceLabels,
+          datasets: [
+            {
+              label: 'Nuestro Colegio',
+              data: simceColegio,
+              backgroundColor: '#7C5CFC',
+              borderRadius: 6,
+            },
+            {
+              label: 'Mismo GSE',
+              data: simceGse,
+              backgroundColor: '#94A3B8',
+              borderRadius: 6,
+            },
+            {
+              label: 'Promedio Nacional',
+              data: simceNacional,
+              backgroundColor: '#CBD5E1',
+              borderRadius: 6,
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              min: 150,
+              max: 350,
+              ticks: { stepSize: 50 }
+            }
+          },
+          plugins: {
+            legend: { position: 'top', labels: { boxWidth: 12, font: { family: 'Plus Jakarta Sans', weight: 'bold' } } }
+          }
+        }
+      });
+    }
+
+    // 2. Gráfico Distribución Niveles (Donut)
+    const ctxDistEl = document.getElementById('chartDistribucionNiveles');
+    if (ctxDistEl) {
+      const simceDonut = JSON.parse(document.getElementById('simce-donut-data')?.textContent || '[0,0,0]');
+
+      new Chart(ctxDistEl.getContext('2d'), {
+        type: 'doughnut',
+        data: {
+          labels: ['Insuficiente', 'Elemental', 'Adecuado'],
+          datasets: [{
+            data: simceDonut,
+            backgroundColor: ['#EF4444', '#F59E0B', '#10B981'],
+            borderWidth: 2,
+            borderColor: '#ffffff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '70%',
+          plugins: {
+            legend: { display: false }
+          }
+        }
+      });
+    }
+  });
+</script>
+</body>
+</html>
+

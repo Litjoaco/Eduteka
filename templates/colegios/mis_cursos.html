@@ -1,0 +1,339 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mis Cursos y Materias - Eduteka</title>
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #7C5CFC;
+      --primary-soft: rgba(124, 92, 252, 0.08);
+      --primary-hover: #6747E3;
+      --secondary: #65CDBF;
+      --bg: #F8F9FD;
+      --white: #FFFFFF;
+      --dark: #151A35;
+      --gray-text: #687089;
+      --border: #BCC0CF;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+    }
+
+    * { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+    }
+
+    .wrapper { display: flex; flex: 1; position: relative; }
+
+    .topbar {
+      height: 70px;
+      background: rgba(255, 255, 255, 0.85) !important;
+      backdrop-filter: blur(12px) !important;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; position: sticky; top: 0; z-index: 98;
+    }
+    .content-body { padding: 2rem; flex-grow: 1; max-width: 1440px; margin: 0 auto; width: 100%; }
+
+    /* Teacher Hero Banner */
+    .teacher-hero {
+      background: linear-gradient(135deg, #4F46E5 0%, #7C5CFC 50%, #2563EB 100%);
+      border-radius: var(--radius-lg);
+      padding: 2.2rem 2.5rem;
+      color: var(--white);
+      margin-bottom: 2rem;
+      box-shadow: 0 10px 30px rgba(124, 92, 252, 0.18);
+      position: relative;
+      overflow: hidden;
+    }
+    .teacher-hero::after {
+      content: '';
+      position: absolute;
+      right: -40px;
+      bottom: -40px;
+      width: 220px;
+      height: 220px;
+      background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%);
+      border-radius: 50%;
+    }
+
+    /* Cards */
+    .card-jefatura {
+      background: var(--white);
+      border: 1.5px solid #D8CEFF;
+      border-radius: var(--radius-lg);
+      padding: 1.6rem 1.75rem;
+      box-shadow: 0 4px 20px rgba(124, 92, 252, 0.06);
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .card-jefatura::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #F59E0B, #7C5CFC);
+    }
+    .card-jefatura:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 28px rgba(124, 92, 252, 0.14);
+    }
+
+    .card-materia {
+      background: var(--white);
+      border: 1px solid #E2E8F0;
+      border-radius: var(--radius-lg);
+      padding: 1.5rem 1.6rem;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.02);
+      transition: all 0.25s ease;
+    }
+    .card-materia:hover {
+      transform: translateY(-3px);
+      border-color: var(--primary);
+      box-shadow: 0 8px 24px rgba(124, 92, 252, 0.08);
+    }
+
+    .kpi-icon-box {
+      width: 52px; height: 52px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; flex-shrink: 0;
+    }
+
+    .badge-jefatura {
+      background: #FEF3C7;
+      color: #92400E;
+      border: 1px solid #FDE68A;
+      font-weight: 800;
+      font-size: 0.75rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .btn-action-pill {
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 0.5rem 1rem;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+  </style>
+</head>
+<body>
+
+<div class="wrapper">
+  {% include 'colegios/_sidebar.html' with active_page='mis_cursos' %}
+
+  <div class="main-content">
+    <header class="topbar">
+      <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn" style="border:none; background:var(--primary-soft); color:var(--primary);">
+          <i class="bi bi-list fs-5"></i>
+        </button>
+        <span class="fw-bold text-dark fs-5"><i class="bi bi-person-video3 text-primary me-2"></i>Mi Aula & Cursos Dictados</span>
+      </div>
+
+      <div class="topbar-right d-flex align-items-center gap-4">
+        <div class="topbar-date d-none d-sm-block text-muted small fw-semibold">
+          <i class="bi bi-calendar3 me-1"></i> {{ hoy|date:"l, d \d\e F \d\e Y"|title }}
+        </div>
+      </div>
+    </header>
+
+    <main class="content-body">
+      
+      <!-- HERO DEL DOCENTE -->
+      <div class="teacher-hero">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-4 position-relative" style="z-index:1;">
+          <div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <span class="badge bg-white text-primary fw-extrabold px-3 py-1.5" style="border-radius:20px; font-size:0.8rem;">
+                <i class="bi bi-mortarboard-fill me-1"></i> Perfil Docente
+              </span>
+              <span class="badge bg-white text-white bg-opacity-25 px-2.5 py-1" style="border-radius:20px; font-size:0.78rem;">
+                Período {{ periodo.anio_lectivo|default:2026 }}
+              </span>
+            </div>
+            <h2 class="fw-extrabold text-white mb-1">Mis Cursos y Materias Asignadas</h2>
+            <p class="text-white text-opacity-75 small mb-0">
+              Accede directamente a tus cursos jefatura con libro de clases completo y a tus materias dictadas.
+            </p>
+          </div>
+
+          <div class="d-flex gap-3">
+            <div class="text-center bg-white bg-opacity-10 px-3.5 py-2 rounded-3 border border-white border-opacity-25">
+              <span class="fs-4 fw-extrabold text-white d-block">{{ jefaturas_count }}</span>
+              <span class="text-white text-opacity-75 extra-small fw-bold text-uppercase">Jefaturas</span>
+            </div>
+            <div class="text-center bg-white bg-opacity-10 px-3.5 py-2 rounded-3 border border-white border-opacity-25">
+              <span class="fs-4 fw-extrabold text-white d-block">{{ asignaturas_count }}</span>
+              <span class="text-white text-opacity-75 extra-small fw-bold text-uppercase">Materias</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECCIÓN 1: MIS JEFATURAS (PROFESOR JEFE) -->
+      <div class="mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <h4 class="fw-extrabold text-dark mb-0">
+              <i class="bi bi-star-fill text-warning me-2"></i>Mis Jefaturas de Curso (Profesor Jefe)
+            </h4>
+            <p class="text-muted small mb-0">Tienes acceso al <strong>libro de clases completo (todas las materias)</strong> y a la gestión integral de estos cursos.</p>
+          </div>
+        </div>
+
+        {% if jefaturas %}
+          <div class="row g-4">
+            {% for item in jefaturas %}
+              <div class="col-lg-6">
+                <div class="card-jefatura h-100">
+                  <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                      <span class="badge-jefatura mb-2">
+                        <i class="bi bi-award-fill"></i> Profesor(a) Jefe Titular
+                      </span>
+                      <h4 class="fw-extrabold text-dark mb-0">{{ item.seccion.curso.nombre }} - {{ item.seccion.nombre }}</h4>
+                      <span class="text-muted small">{{ item.seccion.curso.get_nivel_display }} • Jornada {{ item.seccion.curso.jornada }}</span>
+                    </div>
+                    <div class="kpi-icon-box" style="background:#F0EDFF; color:#7C5CFC;">
+                      <i class="bi bi-mortarboard"></i>
+                    </div>
+                  </div>
+
+                  <div class="row g-2 p-3 bg-light rounded-3 mb-3 border">
+                    <div class="col-6">
+                      <span class="text-muted extra-small text-uppercase fw-bold d-block">Estudiantes Matriculados</span>
+                      <span class="fs-5 fw-extrabold text-dark">{{ item.alumnos_count }} Alumnos</span>
+                    </div>
+                    <div class="col-6">
+                      <span class="text-muted extra-small text-uppercase fw-bold d-block">Malla Curricular</span>
+                      <span class="fs-5 fw-extrabold text-primary">{{ item.asignaturas_count }} Asignaturas</span>
+                    </div>
+                  </div>
+
+                  <div class="d-flex gap-2 flex-wrap">
+                    <a href="{% url 'libro_calificaciones' %}?seccion={{ item.seccion.id }}" class="btn btn-primary btn-action-pill" style="background:linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%); border:none;">
+                      <i class="bi bi-journal-bookmark-fill"></i> Libro de Clases Completo
+                    </a>
+                    <a href="{% url 'registrar_asistencia' %}?seccion={{ item.seccion.id }}" class="btn btn-outline-primary btn-action-pill">
+                      <i class="bi bi-calendar-check"></i> Tomar Asistencia
+                    </a>
+                    <a href="{% url 'convivencia_hub' %}" class="btn btn-light btn-action-pill text-muted">
+                      <i class="bi bi-shield-check"></i> Convivencia
+                    </a>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="card p-4 text-center bg-white border rounded-4 shadow-sm">
+            <i class="bi bi-star text-muted fs-2 d-block mb-2"></i>
+            <h6 class="fw-bold text-dark mb-1">No tienes cursos asignados como Profesor(a) Jefe</h6>
+            <p class="text-muted small mb-0">El Administrador o Director puede asignarte una jefatura de curso desde la administración de cursos.</p>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- SECCIÓN 2: MIS ASIGNATURAS Y CÁTEDRAS DICTADAS -->
+      <div>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <h4 class="fw-extrabold text-dark mb-0">
+              <i class="bi bi-book-fill text-primary me-2"></i>Mis Materias y Cátedras Dictadas
+            </h4>
+            <p class="text-muted small mb-0">Asignaturas donde estás registrado como docente titular.</p>
+          </div>
+        </div>
+
+        {% if asignaturas %}
+          <div class="row g-4">
+            {% for item in asignaturas %}
+              <div class="col-md-6 col-lg-4">
+                <div class="card-materia h-100 d-flex flex-column justify-content-between">
+                  <div>
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                      <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2.5 py-1 fw-bold" style="border-radius:8px; font-size:0.75rem;">
+                        <i class="bi bi-clock me-1"></i> {{ item.asignatura.horas_semanales }} hrs/sem
+                      </span>
+                      <div class="kpi-icon-box" style="width:42px; height:42px; background:#EFF6FF; color:#2563EB; font-size:1.2rem;">
+                        <i class="bi bi-book"></i>
+                      </div>
+                    </div>
+
+                    <h5 class="fw-extrabold text-dark mb-1">{{ item.asignatura.nombre }}</h5>
+                    <span class="text-muted small d-block mb-3">{{ item.asignatura.curso.nombre }} ({{ item.asignatura.curso.get_nivel_display }})</span>
+
+                    <div class="p-2.5 bg-light rounded-3 mb-3 border">
+                      <span class="text-muted extra-small text-uppercase fw-bold d-block mb-1">Secciones Habilitadas:</span>
+                      <div class="d-flex flex-wrap gap-1">
+                        {% for sec in item.secciones %}
+                          <span class="badge bg-white text-dark border px-2 py-1 small fw-semibold">
+                            Sección {{ sec.nombre }}
+                          </span>
+                        {% empty %}
+                          <span class="text-muted small">Sin secciones</span>
+                        {% endfor %}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="d-flex gap-2">
+                    <a href="{% url 'libro_calificaciones' %}?asignatura={{ item.asignatura.id }}" class="btn btn-primary btn-action-pill flex-grow-1 justify-content-center" style="background:linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%); border:none;">
+                      <i class="bi bi-journal-check"></i> Calificar
+                    </a>
+                    <a href="{% url 'registrar_asistencia' %}" class="btn btn-outline-secondary btn-action-pill">
+                      <i class="bi bi-calendar-check"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="card p-4 text-center bg-white border rounded-4 shadow-sm">
+            <i class="bi bi-journal-x text-muted fs-2 d-block mb-2"></i>
+            <h6 class="fw-bold text-dark mb-1">No tienes materias asignadas actualmente</h6>
+            <p class="text-muted small mb-0">El Director puede asignarte materias desde la pestaña de Académico o Gestión de Personal.</p>
+          </div>
+        {% endif %}
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const mobileBtn = document.getElementById('mobileMenuBtn');
+    const sidebar = document.getElementById('sidebar');
+    if (mobileBtn) {
+      mobileBtn.addEventListener('click', () => sidebar.classList.toggle('active'));
+    }
+  });
+</script>
+</body>
+</html>

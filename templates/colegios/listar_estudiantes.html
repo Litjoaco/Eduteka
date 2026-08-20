@@ -4,9 +4,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gestión de Estudiantes - Eduteka</title>
+  <title>Nómina de Estudiantes y Matrícula - Eduteka</title>
   <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <style>
@@ -15,402 +15,123 @@
       --primary-soft: rgba(124, 92, 252, 0.08);
       --primary-hover: #6747E3;
       --secondary: #65CDBF;
-      --secondary-soft: rgba(101, 205, 191, 0.08);
       --bg: #F8F9FD;
       --white: #FFFFFF;
       --dark: #151A35;
       --gray-text: #687089;
       --border: #BCC0CF;
       --radius-lg: 16px;
-      --radius-md: 10px;
+      --radius-md: 12px;
       --radius-sm: 8px;
     }
 
-    * {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-    }
+    * { font-family: 'Plus Jakarta Sans', sans-serif; }
 
     body {
       background-color: var(--bg);
       color: var(--dark);
       min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    /* Floating modern blobs */
-    body::before {
-      content: '';
-      position: fixed;
-      top: -15%; left: 65%;
-      width: 50vw; height: 50vw;
-      background: radial-gradient(circle, rgba(124, 92, 252, 0.07) 0%, rgba(255,255,255,0) 70%);
-      z-index: -2;
-      pointer-events: none;
-    }
-    body::after {
-      content: '';
-      position: fixed;
-      top: 45%; left: -15%;
-      width: 40vw; height: 40vw;
-      background: radial-gradient(circle, rgba(101, 205, 191, 0.06) 0%, rgba(255,255,255,0) 70%);
-      z-index: -2;
-      pointer-events: none;
-    }
-
-    .wrapper {
-      display: flex;
-      width: 100%;
-      align-items: stretch;
-    }
-
-    /* SIDEBAR */
-    .sidebar {
-      width: 248px;
-      min-width: 248px;
-      flex-shrink: 0;
-      background: var(--white);
-      border-right: 1px solid var(--border);
-      position: fixed;
-      top: 0; bottom: 0; left: 0;
       display: flex;
       flex-direction: column;
-      z-index: 1040;
-      transition: transform .3s ease;
+      margin: 0;
     }
 
-    @media (max-width: 991.98px) {
-      .sidebar {
-        position: absolute;
-        left: -248px;
-        top: 0;
-        bottom: 0;
-        z-index: 1050;
-      }
-      .sidebar.active {
-        left: 0;
-      }
-    }
+    .wrapper { display: flex; flex: 1; position: relative; }
 
-    .sidebar-logo {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 1.4rem 1.5rem 1rem;
-    }
-    .sidebar-logo img { max-height: 100px; width: auto; }
-
-    .sidebar-school {
-      margin: 0 1rem .75rem;
-      background: linear-gradient(135deg, var(--primary-soft) 0%, #E8E2FF 100%);
-      border-radius: var(--radius-lg);
-      padding: .9rem 1rem;
-    }
-    .sidebar-school-name {
-      font-weight: 700;
-      font-size: .85rem;
-      color: var(--primary);
-      margin-bottom: 2px;
-    }
-    .sidebar-school-sub {
-      font-size: .75rem;
-      color: var(--primary-hover);
-      font-weight: 500;
-    }
-
-    .sidebar-nav {
-      flex: 1;
-      overflow-y: auto;
-      padding: .75rem .75rem 0;
-      scrollbar-width: none;
-    }
-    .sidebar-nav::-webkit-scrollbar { display: none; }
-
-    .nav-section-label {
-      font-size: .67rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      color: var(--gray-text);
-      padding: .5rem .75rem .3rem;
-      margin-top: .25rem;
-    }
-
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: .75rem;
-      padding: .6rem .85rem;
-      color: var(--gray-text);
-      font-weight: 500;
-      font-size: .88rem;
-      border-radius: var(--radius-md);
-      text-decoration: none;
-      transition: background .15s, color .15s;
-      margin-bottom: 2px;
-    }
-    .nav-item i { font-size: 1.05rem; flex-shrink: 0; }
-    .nav-item:hover { background: var(--bg); color: var(--dark); }
-    .nav-item.active {
-      background: var(--primary);
-      color: #fff;
-      font-weight: 600;
-      box-shadow: 0 4px 14px rgba(108,79,240,.3);
-    }
-    .nav-item.active i { color: #fff; }
-
-    .sidebar-footer {
-      padding: .75rem;
-      border-top: 1px solid var(--border);
-      margin-top: auto;
-    }
-
-    /* MAIN CONTENT */
-    .main-content {
-      margin-left: 248px;
-      width: calc(100% - 248px);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      transition: all 0.3s;
-    }
-
-    @media (max-width: 991.98px) {
-      .main-content {
-        margin-left: 0;
-        width: 100%;
-      }
-    }
-
-    /* TOPBAR */
     .topbar {
       height: 70px;
-      background: rgba(255, 255, 255, 0.8) !important;
+      background: rgba(255, 255, 255, 0.85) !important;
       backdrop-filter: blur(12px) !important;
-      -webkit-backdrop-filter: blur(12px) !important;
       border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 2rem;
-      position: sticky;
-      top: 0;
-      z-index: 98;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; position: sticky; top: 0; z-index: 98;
     }
+    .content-body { padding: 2rem; flex-grow: 1; max-width: 1320px; margin: 0 auto; width: 100%; }
 
-    .topbar-date {
-      font-size: 0.85rem;
-      color: var(--gray-text);
-      font-weight: 600;
-    }
-
-    .user-chip {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      cursor: pointer;
-    }
-
-    .user-chip img {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid var(--primary);
-    }
-
-    .user-chip-name {
-      font-weight: 700;
-      font-size: 0.85rem;
-      color: var(--dark);
-    }
-
-    .user-chip-role {
-      font-size: 0.7rem;
-      color: var(--gray-text);
-      font-weight: 600;
-    }
-
-    .content-body {
-      padding: 2rem;
-      flex-grow: 1;
-      animation: fadeInUp 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
-    }
-
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* KPI CARDS */
-    .kpi-grid {
+    /* KPI Cards */
+    .kpi-grid-students {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 1.5rem;
+      gap: 1.25rem;
       margin-bottom: 2rem;
     }
 
-    .kpi-card {
-      background: var(--white);
-      border: 1px solid var(--border);
+    .kpi-card-student {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
       border-radius: var(--radius-lg);
-      padding: 1.25rem;
+      padding: 1.25rem 1.5rem;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.02);
       display: flex;
       align-items: center;
-      gap: 1rem;
-      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+      gap: 1.2rem;
+      transition: all 0.2s ease;
+    }
+    .kpi-card-student:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.05); }
+
+    .kpi-icon-student {
+      width: 48px; height: 48px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.35rem; flex-shrink: 0;
     }
 
-    .kpi-card:hover {
-      transform: translateY(-5px) scale(1.02) !important;
-      box-shadow: 0 12px 30px rgba(124, 92, 252, 0.12) !important;
-    }
-
-    .kpi-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: var(--radius-md);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-    }
-
-    .kpi-icon.blue { background-color: rgba(124, 92, 252, 0.08); color: var(--primary); }
-    .kpi-icon.green { background-color: rgba(101, 205, 191, 0.08); color: var(--secondary); }
-    .kpi-icon.red { background-color: #FFF1F2; color: #EF4444; }
-
-    .kpi-title {
-      font-size: 0.75rem;
-      color: var(--gray-text);
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .kpi-value {
-      font-size: 1.5rem;
-      font-weight: 800;
-      color: var(--dark);
-      margin: 0;
-    }
-
-    /* PANELS */
-    .dashboard-panel {
-      background: var(--white);
-      border: 1px solid var(--border);
+    /* Main Table Panel */
+    .card-panel-students {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
       border-radius: var(--radius-lg);
       padding: 1.5rem;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.01);
+      box-shadow: 0 4px 18px rgba(0,0,0,0.02);
+      margin-bottom: 2rem;
     }
 
-    .panel-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 1.5rem;
-    }
-
-    .panel-title {
-      font-size: 1.1rem;
-      font-weight: 800;
-      color: var(--dark);
-      margin: 0;
-    }
-
-    /* TABLES */
-    .table-students {
+    .table-students-custom {
       width: 100%;
       border-collapse: separate;
-      border-spacing: 0 8px;
+      border-spacing: 0;
     }
-
-    .table-students th {
-      border: none;
-      background: none;
-      color: var(--gray-text);
-      font-weight: 700;
-      font-size: 0.8rem;
+    .table-students-custom th {
+      background: #F8FAFC;
+      padding: 0.85rem 1rem;
+      font-weight: 800;
+      font-size: 0.75rem;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      padding: 0.5rem 1rem;
+      letter-spacing: 0.05em;
+      color: #64748B;
+      border-bottom: 1px solid #E2E8F0;
     }
-
-    .table-students td {
-      background: var(--white);
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
+    .table-students-custom td {
       padding: 1rem;
       font-size: 0.9rem;
+      border-bottom: 1px solid #F1F5F9;
+      vertical-align: middle;
+    }
+    .table-students-custom tr:hover td {
+      background-color: #FAFAFE;
     }
 
-    .table-students td:first-child {
-      border-left: 1px solid var(--border);
-      border-top-left-radius: var(--radius-md);
-      border-bottom-left-radius: var(--radius-md);
+    .student-avatar {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 0.9rem;
+      background: #F0EDFF; color: #7C5CFC; flex-shrink: 0;
     }
 
-    .table-students td:last-child {
-      border-right: 1px solid var(--border);
-      border-top-right-radius: var(--radius-md);
-      border-bottom-right-radius: var(--radius-md);
-    }
-
-    .table-students tr {
-      transition: all 0.2s;
-    }
-
-    .table-students tbody tr:hover td {
-      background-color: #FAF9FF !important;
-      border-color: #D6CFFE;
-    }
-
-    /* Search bar wrapper */
-    .search-group {
-      display: flex;
+    .btn-action-student {
+      display: inline-flex;
       align-items: center;
-      gap: 0.75rem;
-      flex-wrap: wrap;
+      justify-content: center;
+      padding: 0.4rem 0.65rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      text-decoration: none;
     }
-
-    .search-box {
-      position: relative;
-      max-width: 280px;
-      width: 100%;
-    }
-
-    .search-box i {
-      position: absolute;
-      left: 0.75rem;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--gray-text);
-    }
-
-    .search-box input {
-      width: 100%;
-      padding: 0.45rem 1rem 0.45rem 2.2rem;
-      font-size: 0.85rem;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    .search-box input:focus {
-      border-color: var(--primary);
-    }
-
-    /* RESPONSIVE */
-    @media (max-width: 992px) {
-      .sidebar { transform: translateX(-100%); }
-      .main-content { margin-left: 0; width: 100%; }
-      .sidebar.active { transform: translateX(0); }
+    .btn-action-student:hover {
+      transform: translateY(-1px);
     }
   </style>
 </head>
@@ -418,7 +139,6 @@
 
 <div class="wrapper">
   {% include 'colegios/_sidebar.html' with active_page='estudiantes' %}
-
 
   <!-- MAIN CONTENT -->
   <div class="main-content">
@@ -428,70 +148,72 @@
         <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn" style="border:none; background:var(--primary-soft); color:var(--primary);">
           <i class="bi bi-list fs-5"></i>
         </button>
+        <span class="fw-bold text-dark fs-5"><i class="bi bi-person-vcard text-primary me-2"></i>Nómina y Fichas de Estudiantes</span>
       </div>
 
       <div class="topbar-right d-flex align-items-center gap-4">
-        <div class="topbar-date d-none d-sm-block">
+        <div class="topbar-date d-none d-sm-block text-muted small fw-semibold">
           <i class="bi bi-calendar3 me-1"></i> {{ hoy|date:"l, d \d\e F \d\e Y"|title }}
-        </div>
-        <div class="user-chip">
-          <img src="https://ui-avatars.com/api/?name={{ request.user.first_name|default:'Admin' }}&background=7C5CFC&color=fff" alt="Avatar">
-          <div class="d-none d-sm-block">
-            <div class="user-chip-name">{{ request.user.first_name|default:'Administrador' }}</div>
-            <div class="user-chip-role">Gestor de Colegio</div>
-          </div>
         </div>
       </div>
     </header>
 
     <!-- CONTENT BODY -->
     <main class="content-body">
-
-
-      <!-- Header & Action -->
+      
+      <!-- HERO & ACTIONS -->
       <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
         <div>
-          <h2 class="fw-bold text-dark mb-0">Matrícula y Estudiantes</h2>
-          <p class="text-muted mb-0">Gestiona las fichas académicas y matrículas del colegio.</p>
+          <h2 class="fw-extrabold text-dark mb-1" style="font-size: 1.6rem;">Matrícula y Fichas de Estudiantes</h2>
+          <p class="text-muted small mb-0">Gestiona expedientes académicos, datos clínicos, apoderados y adecuaciones del Programa PIE.</p>
         </div>
-        <a href="{% url 'matricular_estudiante' %}" class="btn btn-primary d-flex align-items-center gap-2 px-4 py-2" style="border-radius: var(--radius-md); font-weight:700;">
-          <i class="bi bi-person-plus-fill"></i> Matricular Estudiante
+        <a href="{% url 'matricular_estudiante' %}" class="btn btn-primary fw-extrabold px-4 py-2 shadow-sm" style="border-radius: 12px; background: linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%); border:none;">
+          <i class="bi bi-person-plus-fill me-1.5"></i> Matricular Estudiante
         </a>
       </div>
 
-      <!-- KPI Row -->
-      <div class="kpi-grid">
-        <div class="kpi-card">
-          <div class="kpi-icon blue"><i class="bi bi-people-fill"></i></div>
+      <!-- KPI METRICS ROW -->
+      <div class="kpi-grid-students">
+        <div class="kpi-card-student">
+          <div class="kpi-icon-student" style="background:#F0EDFF; color:#7C5CFC;"><i class="bi bi-people-fill"></i></div>
           <div>
-            <div class="kpi-title">Total Matriculados</div>
-            <h4 class="kpi-value">{{ estudiantes|length }}</h4>
+            <span class="text-muted extra-small text-uppercase fw-bold d-block">Total Matriculados</span>
+            <span class="fs-4 fw-extrabold text-dark">{{ total_matriculados|default:estudiantes.paginator.count|default:0 }}</span>
           </div>
         </div>
-        <div class="kpi-card">
-          <div class="kpi-icon green"><i class="bi bi-person-check-fill"></i></div>
+
+        <div class="kpi-card-student">
+          <div class="kpi-icon-student" style="background:#ECFDF5; color:#10B981;"><i class="bi bi-person-check-fill"></i></div>
           <div>
-            <div class="kpi-title">Alumnos Activos</div>
-            <h4 class="kpi-value" id="activosVal">-</h4>
+            <span class="text-muted extra-small text-uppercase fw-bold d-block">Alumnos Activos</span>
+            <span class="fs-4 fw-extrabold text-success">{{ total_activos|default:0 }}</span>
           </div>
         </div>
-        <div class="kpi-card">
-          <div class="kpi-icon red"><i class="bi bi-person-x-fill"></i></div>
+
+        <div class="kpi-card-student">
+          <div class="kpi-icon-student" style="background:#FEF3C7; color:#D97706;"><i class="bi bi-puzzle-fill"></i></div>
           <div>
-            <div class="kpi-title">Alumnos de Baja</div>
-            <h4 class="kpi-value" id="inactivosVal">-</h4>
+            <span class="text-muted extra-small text-uppercase fw-bold d-block">Programa PIE</span>
+            <span class="fs-4 fw-extrabold text-warning">{{ total_pie|default:0 }}</span>
+          </div>
+        </div>
+
+        <div class="kpi-card-student">
+          <div class="kpi-icon-student" style="background:#FFF1F2; color:#E11D48;"><i class="bi bi-person-x-fill"></i></div>
+          <div>
+            <span class="text-muted extra-small text-uppercase fw-bold d-block">Alumnos de Baja</span>
+            <span class="fs-4 fw-extrabold text-danger">{{ total_baja|default:0 }}</span>
           </div>
         </div>
       </div>
 
-      <!-- Main Panel -->
-      <div class="dashboard-panel">
-        <div class="panel-header flex-wrap gap-3 mb-4">
-          <h3 class="panel-title">Listado de Alumnos</h3>
-          
-          <form method="GET" class="search-group">
-            <!-- Selector de Sección -->
-            <select name="seccion" class="form-select form-select-sm" style="width: 170px; border-radius: var(--radius-md);" onchange="this.form.submit()">
+      <!-- MAIN TABLE CONTAINER -->
+      <div class="card-panel-students">
+        
+        <!-- SEARCH & FILTER BAR -->
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+          <form method="GET" class="d-flex align-items-center gap-2 flex-wrap">
+            <select name="seccion" class="form-select form-select-sm fw-bold" style="width: 200px; border-radius: 10px; padding: 0.5rem 0.8rem;" onchange="this.form.submit()">
               <option value="">Todos los Cursos</option>
               {% for sec in secciones %}
                 <option value="{{ sec.id }}" {% if seccion_seleccionada == sec.id %}selected{% endif %}>
@@ -500,161 +222,259 @@
               {% endfor %}
             </select>
 
-            <!-- Campo de búsqueda -->
-            <div class="search-box">
-              <i class="bi bi-search"></i>
-              <input type="text" name="q" value="{{ busqueda }}" placeholder="Buscar por nombre o RUT...">
+            <div class="input-group" style="width: 280px;">
+              <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+              <input type="text" name="q" value="{{ busqueda }}" class="form-control border-start-0 ps-0 shadow-none" placeholder="Buscar por nombre o RUT...">
             </div>
-            
+
+            <button type="submit" class="btn btn-sm btn-primary fw-bold px-3 py-1.5" style="border-radius: 10px;">Buscar</button>
+
             {% if busqueda or seccion_seleccionada %}
-              <a href="{% url 'listar_estudiantes' %}" class="btn btn-sm btn-outline-secondary" style="border-radius: var(--radius-md);">Limpiar</a>
+              <a href="{% url 'listar_estudiantes' %}" class="btn btn-sm btn-outline-secondary fw-bold px-3 py-1.5" style="border-radius: 10px;">Limpiar</a>
             {% endif %}
           </form>
+
+          <div class="text-muted small">
+            <i class="bi bi-info-circle me-1"></i> Haz clic en la insignia <span class="badge px-1.5 py-0.5" style="background:#F0EDFF; color:#7C5CFC;">🧩 PIE</span> para ver adecuaciones pedagógicas.
+          </div>
         </div>
 
+        <!-- TABLE -->
         <div class="table-responsive">
-          <table class="table table-students">
+          <table class="table-students-custom">
             <thead>
               <tr>
                 <th>Estudiante</th>
                 <th>RUT</th>
-                <th>Curso / Sección</th>
-                <th style="width: 15%; text-align: center;">Estado</th>
-                <th style="width: 20%; text-align: center;">Acciones</th>
+                <th>Curso y Sección</th>
+                <th>Contacto Apoderado</th>
+                <th>Estado</th>
+                <th class="text-end">Acciones</th>
               </tr>
             </thead>
             <tbody>
               {% if estudiantes %}
                 {% for est in estudiantes %}
-                  <tr class="student-row-data" data-active="{% if est.activo %}true{% else %}false{% endif %}">
+                  <tr class="student-row-item">
                     <td>
-                      <div class="fw-semibold text-dark">{{ est.nombre_completo }}</div>
-                    </td>
-                    <td class="text-secondary">{{ est.rut|default:"-" }}</td>
-                    <td>
-                      <span class="badge bg-light text-dark border px-2.5 py-1.5 fw-semibold" style="border-radius:6px;">
-                        {{ est.seccion.curso.nombre }} - {{ est.seccion.nombre }}
-                      </span>
-                    </td>
-                    <td class="text-center">
-                      {% if est.activo %}
-                        <span class="badge bg-success-light text-success px-2.5 py-1 fw-semibold small" style="background-color: #ECFDF5; border: 1px solid #A7F3D0; border-radius: 6px;">Activo</span>
-                      {% else %}
-                        <span class="badge bg-danger-light text-danger px-2.5 py-1 fw-semibold small" style="background-color: #FFF1F2; border: 1px solid #FECDD3; border-radius: 6px;">Baja</span>
+                      <div class="d-flex align-items-center gap-2.5">
+                        <div class="student-avatar">
+                          {{ est.nombre_completo|first|upper }}
+                        </div>
+                        <div>
+                          <div class="d-flex align-items-center gap-2">
+                            <span class="fw-extrabold text-dark">{{ est.nombre_completo }}</span>
+                            {% if est.es_pie %}
+                              <span class="badge px-2 py-0.5 fw-bold shadow-sm" 
+                                    style="cursor: pointer; border-radius: 6px; font-size: 0.7rem; background: #F0EDFF; color: #7C5CFC; border: 1px solid #D8CEFF;"
+                                    data-bs-toggle="modal" data-bs-target="#modalPieInfo{{ est.id }}"
+                                    title="Ver Ficha PIE y Adecuaciones Pedagógicas">
+                                <i class="bi bi-puzzle-fill me-0.5"></i>PIE
+                              </span>
+                            {% endif %}
+                          </div>
+                          <span class="text-muted extra-small">{{ est.email_apoderado|default:"Sin correo apoderado" }}</span>
+                        </div>
+                      </div>
+
+                      {% if est.es_pie %}
+                        <!-- MODAL FICHA PIE Y ADECUACIONES -->
+                        <div class="modal fade text-start" id="modalPieInfo{{ est.id }}" tabindex="-1" aria-hidden="true">
+                          <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+                              <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+                                <div class="d-flex align-items-center gap-2">
+                                  <div class="rounded-3 d-flex align-items-center justify-content-center" style="width:36px; height:36px; background:#F0EDFF; color:#7C5CFC;">
+                                    <i class="bi bi-puzzle-fill fs-5"></i>
+                                  </div>
+                                  <div>
+                                    <h5 class="modal-title fw-extrabold text-dark mb-0">Programa PIE — {{ est.nombre_completo }}</h5>
+                                    <span class="text-muted small">{{ est.seccion.curso.nombre }} - {{ est.seccion.nombre }}</span>
+                                  </div>
+                                </div>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                              </div>
+                              <div class="modal-body p-4 text-start">
+                                <div class="p-3 rounded-3 mb-3" style="background:#F8FAFC; border: 1px solid #E2E8F0;">
+                                  <div class="row g-2">
+                                    <div class="col-6">
+                                      <span class="text-muted small d-block">Clasificación NEE</span>
+                                      <span class="fw-bold text-dark">{{ est.get_tipo_pie_display|default:"Sin Clasificar" }}</span>
+                                    </div>
+                                    <div class="col-6">
+                                      <span class="text-muted small d-block">Diagnóstico</span>
+                                      <span class="fw-bold text-primary">{{ est.diagnostico_pie|default:"No especificado" }}</span>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div class="p-3 rounded-3" style="background:#FFF9F2; border: 1px solid #FFE4C4;">
+                                  <h6 class="fw-bold text-dark mb-2"><i class="bi bi-chat-heart-fill me-1.5 text-danger"></i>Recomendaciones y Adecuaciones para Docentes</h6>
+                                  <p class="text-dark mb-0" style="font-size:0.9rem; line-height:1.5;">
+                                    {{ est.observaciones_pie|default:"No se han registrado observaciones pedagógicas específicas aún." }}
+                                  </p>
+                                </div>
+                              </div>
+                              <div class="modal-footer border-top-0 p-4 pt-0">
+                                <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Cerrar</button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       {% endif %}
                     </td>
-                    <td class="text-center">
-                      <div class="d-flex justify-content-center gap-2">
-                        <a href="{% url 'hoja_vida_estudiante' est.id %}" class="btn btn-outline-warning btn-sm px-2.5 text-dark fw-semibold" style="border-radius: var(--radius-sm);" title="Ver Hoja de Vida Conductual">
-                          <i class="bi bi-shield-check me-1 text-warning"></i> Hoja de Vida
+
+                    <td class="text-muted fw-semibold">{{ est.rut|default:"-" }}</td>
+
+                    <td>
+                      {% if est.seccion %}
+                        <span class="badge bg-light text-dark border px-2.5 py-1.5 fw-bold" style="border-radius:6px; font-size:0.8rem;">
+                          {{ est.seccion.curso.nombre }} - {{ est.seccion.nombre }}
+                        </span>
+                      {% else %}
+                        <span class="badge bg-light text-danger border px-2 py-1 small">Sin Sección</span>
+                      {% endif %}
+                    </td>
+
+                    <td>
+                      <div class="small fw-semibold text-dark">
+                        {{ est.nombre_apoderado|default:"No registrado" }}
+                      </div>
+                      <span class="text-muted extra-small">
+                        <i class="bi bi-telephone me-1"></i>{{ est.telefono_apoderado|default:est.contacto_emergencia_telefono|default:"-" }}
+                      </span>
+                    </td>
+
+                    <td>
+                      {% if est.activo %}
+                        <span class="badge px-2.5 py-1 fw-bold" style="background:#ECFDF5; color:#059669; border:1px solid #A7F3D0; border-radius:6px; font-size:0.75rem;">
+                          <i class="bi bi-check-circle-fill me-1"></i> Activo
+                        </span>
+                      {% else %}
+                        <span class="badge px-2.5 py-1 fw-bold" style="background:#FFF1F2; color:#E11D48; border:1px solid #FDA4AF; border-radius:6px; font-size:0.75rem;">
+                          <i class="bi bi-slash-circle-fill me-1"></i> Baja
+                        </span>
+                      {% endif %}
+                    </td>
+
+                    <td class="text-end">
+                      <div class="btn-group gap-1">
+                        <a href="{% url 'hoja_vida_estudiante' est.id %}" 
+                           class="btn btn-sm btn-light border fw-bold text-dark px-2.5 py-1" 
+                           style="border-radius:8px; font-size:0.8rem;" 
+                           data-bs-toggle="tooltip" 
+                           data-bs-placement="top" 
+                           title="Ver Hoja de Vida y Anotaciones">
+                          <i class="bi bi-shield-check text-warning me-1"></i> Hoja Vida
                         </a>
-                        <a href="{% url 'boletin_estudiante' est.id %}" target="_blank" class="btn btn-outline-info btn-sm px-2.5" style="border-radius: var(--radius-sm);" title="Ver Boletín de Notas">
-                          <i class="bi bi-file-earmark-text me-1"></i> Boletín
+                        <a href="{% url 'boletin_estudiante' est.id %}" 
+                           target="_blank" 
+                           class="btn btn-sm btn-light border fw-bold text-dark px-2 py-1" 
+                           style="border-radius:8px; font-size:0.8rem;" 
+                           data-bs-toggle="tooltip" 
+                           data-bs-placement="top" 
+                           title="Ver Boletín Oficial de Calificaciones">
+                          <i class="bi bi-file-earmark-text text-info"></i>
                         </a>
-                        <a href="{% url 'editar_estudiante' est.id %}" class="btn btn-outline-primary btn-sm px-2.5" style="border-radius: var(--radius-sm);" title="Editar ficha">
-                          <i class="bi bi-pencil-square"></i> Editar
+                        <a href="{% url 'editar_estudiante' est.id %}" 
+                           class="btn btn-sm btn-outline-primary fw-bold px-2 py-1" 
+                           style="border-radius:8px; font-size:0.8rem;" 
+                           data-bs-toggle="tooltip" 
+                           data-bs-placement="top" 
+                           title="Editar Ficha del Estudiante">
+                          <i class="bi bi-pencil-square"></i>
                         </a>
                         {% if est.activo %}
                           <a href="{% url 'baja_estudiante' est.id %}" 
-                             class="btn btn-outline-danger btn-sm px-2.5 js-confirm-delete" 
-                             data-confirm-title="¿Dar de baja a {{ est.nombre_completo }}?"
-                             data-confirm-text="El alumno pasará a estado inactivo."
-                             data-confirm-btn="Sí, dar de baja"
-                             style="border-radius: var(--radius-sm);" title="Dar de baja">
-                            <i class="bi bi-person-x"></i> Baja
+                             class="btn btn-sm btn-outline-danger px-2 py-1" 
+                             style="border-radius:8px; font-size:0.8rem;" 
+                             data-bs-toggle="tooltip" 
+                             data-bs-placement="top" 
+                             title="Dar de Baja a este Alumno"
+                             onclick="return confirm('¿Dar de baja a {{ est.nombre_completo|escapejs }}?');">
+                            <i class="bi bi-person-x"></i>
                           </a>
                         {% else %}
                           <a href="{% url 'baja_estudiante' est.id %}" 
-                             class="btn btn-outline-success btn-sm px-2.5 js-confirm-delete" 
-                             data-confirm-title="¿Re-activar a {{ est.nombre_completo }}?"
-                             data-confirm-text="El alumno volverá a estar activo en la nómina."
-                             data-confirm-btn="Sí, activar"
-                             style="border-radius: var(--radius-sm);" title="Re-activar estudiante">
-                            <i class="bi bi-person-check"></i> Activar
+                             class="btn btn-sm btn-outline-success px-2 py-1" 
+                             style="border-radius:8px; font-size:0.8rem;" 
+                             data-bs-toggle="tooltip" 
+                             data-bs-placement="top" 
+                             title="Re-activar Matrícula"
+                             onclick="return confirm('¿Re-activar a {{ est.nombre_completo|escapejs }}?');">
+                            <i class="bi bi-person-check"></i>
                           </a>
                         {% endif %}
-
                       </div>
-
-
                     </td>
                   </tr>
                 {% endfor %}
               {% else %}
                 <tr>
-                  <td colspan="5" class="text-center p-5">
+                  <td colspan="6" class="text-center py-5 text-muted">
                     <i class="bi bi-people fs-1 text-muted d-block mb-3"></i>
-                    <h6 class="fw-semibold text-secondary">No se encontraron estudiantes.</h6>
-                    <p class="text-muted small">Haz clic en "Matricular Estudiante" para matricular tu primer alumno.</p>
+                    <h5 class="fw-bold text-dark">No se encontraron estudiantes</h5>
+                    <p class="small text-muted mb-0">Haz clic en "Matricular Estudiante" para agregar alumnos al sistema.</p>
                   </td>
                 </tr>
               {% endif %}
             </tbody>
           </table>
-
-          {% if estudiantes.has_other_pages %}
-            <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
-              <div class="text-muted small">
-                Mostrando estudiantes <strong>{{ estudiantes.start_index }} - {{ estudiantes.end_index }}</strong> de <strong>{{ estudiantes.paginator.count }}</strong>
-              </div>
-              <nav>
-                <ul class="pagination pagination-sm mb-0">
-                  {% if estudiantes.has_previous %}
-                    <li class="page-item"><a class="page-link text-primary fw-bold" href="?page={{ estudiantes.previous_page_number }}{% if seccion_seleccionada %}&seccion={{ seccion_seleccionada }}{% endif %}{% if busqueda %}&q={{ busqueda }}{% endif %}">‹ Anterior</a></li>
-                  {% else %}
-                    <li class="page-item disabled"><span class="page-link">‹ Anterior</span></li>
-                  {% endif %}
-
-                  {% for i in estudiantes.paginator.page_range %}
-                    {% if estudiantes.number == i %}
-                      <li class="page-item active"><span class="page-link bg-primary border-primary">{{ i }}</span></li>
-                    {% else %}
-                      <li class="page-item"><a class="page-link" href="?page={{ i }}{% if seccion_seleccionada %}&seccion={{ seccion_seleccionada }}{% endif %}{% if busqueda %}&q={{ busqueda }}{% endif %}">{{ i }}</a></li>
-                    {% endif %}
-                  {% endfor %}
-
-                  {% if estudiantes.has_next %}
-                    <li class="page-item"><a class="page-link text-primary fw-bold" href="?page={{ estudiantes.next_page_number }}{% if seccion_seleccionada %}&seccion={{ seccion_seleccionada }}{% endif %}{% if busqueda %}&q={{ busqueda }}{% endif %}">Siguiente ›</a></li>
-                  {% else %}
-                    <li class="page-item disabled"><span class="page-link">Siguiente ›</span></li>
-                  {% endif %}
-                </ul>
-              </nav>
-            </div>
-          {% endif %}
         </div>
-      </div>
-    </main>
 
+        <!-- PAGINACION -->
+        {% if estudiantes.has_other_pages %}
+          <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top flex-wrap gap-2">
+            <div class="text-muted small">
+              Mostrando registros <strong>{{ estudiantes.start_index }} - {{ estudiantes.end_index }}</strong> de <strong>{{ estudiantes.paginator.count }}</strong>
+            </div>
+            <nav>
+              <ul class="pagination pagination-sm mb-0">
+                {% if estudiantes.has_previous %}
+                  <li class="page-item">
+                    <a class="page-link text-primary fw-bold" href="?page={{ estudiantes.previous_page_number }}{% if busqueda %}&q={{ busqueda }}{% endif %}{% if seccion_seleccionada %}&seccion={{ seccion_seleccionada }}{% endif %}">‹ Anterior</a>
+                  </li>
+                {% else %}
+                  <li class="page-item disabled"><span class="page-link">‹ Anterior</span></li>
+                {% endif %}
+
+                {% for i in estudiantes.paginator.page_range %}
+                  <li class="page-item {% if estudiantes.number == i %}active{% endif %}">
+                    <a class="page-link {% if estudiantes.number == i %}bg-primary border-primary{% endif %}" href="?page={{ i }}{% if busqueda %}&q={{ busqueda }}{% endif %}{% if seccion_seleccionada %}&seccion={{ seccion_seleccionada }}{% endif %}">{{ i }}</a>
+                  </li>
+                {% endfor %}
+
+                {% if estudiantes.has_next %}
+                  <li class="page-item">
+                    <a class="page-link text-primary fw-bold" href="?page={{ estudiantes.next_page_number }}{% if busqueda %}&q={{ busqueda }}{% endif %}{% if seccion_seleccionada %}&seccion={{ seccion_seleccionada }}{% endif %}">Siguiente ›</a>
+                  </li>
+                {% else %}
+                  <li class="page-item disabled"><span class="page-link">Siguiente ›</span></li>
+                {% endif %}
+              </ul>
+            </nav>
+          </div>
+        {% endif %}
+
+      </div>
+
+    </main>
   </div>
 </div>
 
 <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 <script>
   document.addEventListener("DOMContentLoaded", function() {
-    // Menu mobile drawer
+    // Inicializar tooltips de Bootstrap
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+
+    // Menú lateral móvil
     const mobileBtn = document.getElementById('mobileMenuBtn');
     const sidebar = document.getElementById('sidebar');
-    
-    if(mobileBtn) {
-      mobileBtn.addEventListener('click', () => {
-        sidebar.classList.toggle('active');
-      });
+    if (mobileBtn) {
+      mobileBtn.addEventListener('click', () => sidebar.classList.toggle('active'));
     }
-
-    // Calcular contadores dinámicos de activos y de baja en el cliente
-    const studentRows = document.querySelectorAll('.student-row-data');
-    let activos = 0;
-    let inactivos = 0;
-    
-    studentRows.forEach(row => {
-      const isActive = row.getAttribute('data-active') === 'true';
-      if (isActive) activos++;
-      else inactivos++;
-    });
-
-    document.getElementById('activosVal').innerText = activos;
-    document.getElementById('inactivosVal').innerText = inactivos;
   });
 </script>
 </body>

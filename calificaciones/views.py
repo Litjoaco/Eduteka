@@ -48,10 +48,15 @@ def libro_calificaciones_view(request):
     if is_admin:
         secciones = SeccionCurso.objects.filter(curso__colegio=colegio, activo=True).order_by('curso__nivel', 'curso__nombre', 'letra')
     else:
-        # Filtrar solo asignaturas y secciones asignadas a este docente
+        # Docente: Secciones donde es Profesor Jefe + Secciones donde dicta alguna Asignatura
+        from django.db.models import Q
         asignaturas_docente = Asignatura.objects.filter(colegio=colegio, docente=request.user, activo=True)
         cursos_ids = asignaturas_docente.values_list('curso_id', flat=True).distinct()
-        secciones = SeccionCurso.objects.filter(curso_id__in=cursos_ids, activo=True).order_by('curso__nivel', 'curso__nombre', 'letra')
+        
+        secciones = SeccionCurso.objects.filter(
+            Q(curso__colegio=colegio, activo=True) &
+            (Q(profesor_jefe=request.user) | Q(curso_id__in=cursos_ids))
+        ).distinct().order_by('curso__nivel', 'curso__nombre', 'letra')
 
     seccion_id = request.GET.get('seccion')
     asignatura_id = request.GET.get('asignatura')
@@ -65,16 +70,22 @@ def libro_calificaciones_view(request):
     # Asignaturas del curso de la sección seleccionada
     asignaturas = []
     asignatura_seleccionada = None
+    is_profesor_jefe = False
+
     if seccion_seleccionada:
-        if is_admin:
+        is_profesor_jefe = (seccion_seleccionada.profesor_jefe == request.user)
+        # Si es Admin o es el Profesor Jefe de este curso -> puede ver TODAS las asignaturas del curso
+        if is_admin or is_profesor_jefe:
             asignaturas = Asignatura.objects.filter(curso=seccion_seleccionada.curso, activo=True).order_by('nombre')
         else:
+            # Si solo es docente de asignatura -> SOLO ve su propia materia
             asignaturas = Asignatura.objects.filter(curso=seccion_seleccionada.curso, docente=request.user, activo=True).order_by('nombre')
 
         if asignatura_id and asignatura_id.isdigit():
             asignatura_seleccionada = asignaturas.filter(id=int(asignatura_id)).first()
         if not asignatura_seleccionada and asignaturas.exists():
             asignatura_seleccionada = asignaturas.first()
+
 
 
     # Cargar datos de la matriz si hay sección y asignatura seleccionadas
@@ -175,9 +186,11 @@ def libro_calificaciones_view(request):
         'tasa_aprobacion': tasa_aprobacion,
         'alumnos_riesgo_count': alumnos_riesgo_count,
         'evaluaciones_count': evaluaciones_count,
+        'is_profesor_jefe': is_profesor_jefe,
         'hoy': timezone.now(),
     }
     return render(request, 'calificaciones/libro_clases.html', context)
+
 
 
 @login_required
@@ -235,13 +248,50 @@ def eliminar_evaluacion_view(request, evaluacion_id):
 
 
 @login_required
+@login_required
 def guardar_notas_view(request):
     colegio, miembro, periodo, is_admin = obtener_datos_base_calificaciones(request)
     if request.method == 'POST':
+        CONCEPTUAL_MAP = {
+            'MB': 6.5, 'B': 5.5, 'S': 4.0, 'I': 3.0,
+            'PL': 7.0, 'L': 5.5, 'EP': 4.0, 'NL': 3.0, 'NT': 2.0
+        }
+
+        # Caso 1: Envío individual por AJAX
+        estudiante_id_single = request.POST.get('estudiante_id')
+        evaluacion_id_single = request.POST.get('evaluacion_id')
+        valor_single = request.POST.get('valor')
+
+        if estudiante_id_single and evaluacion_id_single:
+            val_clean = valor_single.strip().upper().replace(',', '.') if valor_single else ''
+            if val_clean in CONCEPTUAL_MAP:
+                val_clean = str(CONCEPTUAL_MAP[val_clean])
+            
+            if val_clean:
+                try:
+                    val_float = float(val_clean)
+                    if 1.0 <= val_float <= 7.0:
+                        val_dec = Decimal(f"{val_float:.1f}")
+                        ev_obj = Evaluacion.objects.filter(id=evaluacion_id_single, colegio=colegio).first()
+                        est_obj = Estudiante.objects.filter(id=estudiante_id_single, colegio=colegio).first()
+                        if ev_obj and est_obj:
+                            Nota.objects.update_or_create(
+                                evaluacion=ev_obj,
+                                estudiante=est_obj,
+                                defaults={'valor': val_dec}
+                            )
+                            return JsonResponse({'status': 'success', 'valor': str(val_dec)})
+                except ValueError:
+                    pass
+            else:
+                Nota.objects.filter(evaluacion_id=evaluacion_id_single, estudiante_id=estudiante_id_single).delete()
+                return JsonResponse({'status': 'deleted'})
+            return JsonResponse({'status': 'invalid'}, status=400)
+
+        # Caso 2: Envío masivo por formulario (Botón Guardar Calificaciones)
         seccion_id = request.POST.get('seccion_id')
         asignatura_id = request.POST.get('asignatura_id')
 
-        # El formulario envía inputs con nombre "nota_{evaluacion_id}_{estudiante_id}"
         count_guardadas = 0
         for key, val_str in request.POST.items():
             if key.startswith('nota_'):
@@ -249,12 +299,14 @@ def guardar_notas_view(request):
                 if len(parts) == 3:
                     evaluacion_id = parts[1]
                     estudiante_id = parts[2]
-                    val_clean = val_str.strip().replace(',', '.')
+                    val_clean = val_str.strip().upper().replace(',', '.')
                     
+                    if val_clean in CONCEPTUAL_MAP:
+                        val_clean = str(CONCEPTUAL_MAP[val_clean])
+
                     if val_clean:
                         try:
                             val_float = float(val_clean)
-                            # Validar rango escolar de notas (1.0 a 7.0)
                             if 1.0 <= val_float <= 7.0:
                                 val_dec = Decimal(f"{val_float:.1f}")
                                 ev_obj = Evaluacion.objects.filter(id=evaluacion_id, colegio=colegio).first()
@@ -270,13 +322,13 @@ def guardar_notas_view(request):
                         except ValueError:
                             pass
                     else:
-                        # Si envió vacío, eliminar la nota previa si existía
                         Nota.objects.filter(evaluacion_id=evaluacion_id, estudiante_id=estudiante_id).delete()
 
-        messages.success(request, f"¡Notas actualizadas con éxito ({count_guardadas} registradas/modificadas)!")
+        messages.success(request, f"¡Calificaciones guardadas exitosamente ({count_guardadas} notas actualizadas)!")
         return redirect(f"/calificaciones/?seccion={seccion_id}&asignatura={asignatura_id}")
 
     return redirect('libro_calificaciones')
+
 
 
 @login_required

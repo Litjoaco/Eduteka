@@ -4,9 +4,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Equipo Escolar | Eduteka</title>
+  <title>Equipo Escolar y Gestión de Roles - Eduteka</title>
   <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <style>
@@ -21,13 +21,11 @@
       --gray-text: #687089;
       --border: #BCC0CF;
       --radius-lg: 16px;
-      --radius-md: 10px;
+      --radius-md: 12px;
       --radius-sm: 8px;
     }
 
-    * {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-    }
+    * { font-family: 'Plus Jakarta Sans', sans-serif; }
 
     body {
       background-color: var(--bg);
@@ -38,75 +36,137 @@
       margin: 0;
     }
 
-
-    /* WRAPPER */
     .wrapper { display: flex; flex: 1; position: relative; }
 
-    /* MAIN CONTENT */
     .topbar {
-      height: 70px; background: var(--white);
+      height: 70px;
+      background: rgba(255, 255, 255, 0.85) !important;
+      backdrop-filter: blur(12px) !important;
       border-bottom: 1px solid var(--border);
       display: flex; align-items: center; justify-content: space-between;
       padding: 0 2rem; position: sticky; top: 0; z-index: 98;
     }
-    .content-body { padding: 2rem; flex-grow: 1; }
+    .content-body { padding: 2rem; flex-grow: 1; max-width: 1320px; margin: 0 auto; width: 100%; }
 
-    /* DASHBOARD PANEL */
-    .dashboard-panel {
-      background: var(--white);
-      border: 1px solid var(--border);
+    /* Modern Tabs Navigation */
+    .nav-tabs-custom {
+      border-bottom: 2px solid #E2E8F0;
+      gap: 1rem;
+      margin-bottom: 1.75rem;
+    }
+    .nav-tabs-custom .nav-link {
+      border: none;
+      background: transparent;
+      color: #64748B;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 0.75rem 1.25rem;
+      border-radius: 10px 10px 0 0;
+      position: relative;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .nav-tabs-custom .nav-link:hover {
+      color: var(--primary);
+    }
+    .nav-tabs-custom .nav-link.active {
+      color: var(--primary);
+      background: #FFFFFF;
+      border-bottom: 3px solid var(--primary);
+    }
+
+    /* Cards */
+    .card-panel-custom {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
       border-radius: var(--radius-lg);
       padding: 1.5rem;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+      box-shadow: 0 4px 18px rgba(0,0,0,0.02);
       margin-bottom: 2rem;
     }
 
-    /* TABLE STYLING */
-    .table-container {
-      overflow-x: auto;
-    }
-
-    .table-premium {
+    /* Table */
+    .table-custom-staff {
       width: 100%;
       border-collapse: separate;
       border-spacing: 0;
     }
-
-    .table-premium th {
-      background: var(--bg);
-      padding: 1rem;
-      font-weight: 700;
-      font-size: 0.8rem;
+    .table-custom-staff th {
+      background: #F8FAFC;
+      padding: 0.85rem 1rem;
+      font-weight: 800;
+      font-size: 0.75rem;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      color: var(--gray-text);
-      border-bottom: 2px solid var(--border);
-      text-align: left;
+      color: #64748B;
+      border-bottom: 1px solid #E2E8F0;
     }
-
-    .table-premium td {
+    .table-custom-staff td {
       padding: 1rem;
       font-size: 0.9rem;
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1px solid #F1F5F9;
       vertical-align: middle;
     }
-
-    .table-premium tr:last-child td {
-      border-bottom: none;
+    .table-custom-staff tr:hover td {
+      background-color: #FAFAFE;
     }
 
-    .member-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: var(--primary-soft);
-      color: var(--primary);
+    .staff-avatar-circle {
+      width: 42px; height: 42px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 1rem;
+      color: #FFFFFF; flex-shrink: 0;
+    }
+    .avatar-admin { background: linear-gradient(135deg, #7C5CFC, #6344CE); }
+    .avatar-teacher { background: linear-gradient(135deg, #10B981, #059669); }
+    .avatar-staff { background: linear-gradient(135deg, #3B82F6, #2563EB); }
+
+    .badge-role-admin { background: #F0EDFF; color: #7C5CFC; border: 1px solid #D8CEFF; border-radius: 20px; font-size: 0.8rem; }
+    .badge-role-teacher { background: #ECFDF5; color: #059669; border: 1px solid #A7F3D0; border-radius: 20px; font-size: 0.8rem; }
+    .badge-role-staff { background: #EFF6FF; color: #2563EB; border: 1px solid #BFDBFE; border-radius: 20px; font-size: 0.8rem; }
+
+
+    /* Role Cards */
+    .role-grid-card {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      transition: all 0.2s ease;
       display: flex;
-      align-items: center;
-      justify-content: center;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+    }
+    .role-grid-card:hover {
+      border-color: #C5B6FF;
+      box-shadow: 0 8px 24px rgba(124, 92, 252, 0.08);
+      transform: translateY(-2px);
+    }
+
+    .perm-badge-pill {
+      background: #F1F5F9;
+      color: #475569;
+      font-size: 0.72rem;
       font-weight: 700;
-      font-size: 1rem;
-      border: 1px solid var(--border);
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+    }
+
+    .matrix-module-row {
+      background: #F8FAFC;
+      border-radius: 10px;
+      padding: 0.85rem 1rem;
+      margin-bottom: 0.6rem;
+      border: 1px solid #E2E8F0;
+    }
+
+    .toggle-perm-btn {
+      cursor: pointer;
+      user-select: none;
     }
   </style>
 </head>
@@ -114,267 +174,734 @@
 
 <div class="wrapper">
   {% include 'colegios/_sidebar.html' with active_page='personal' %}
+
   <!-- MAIN CONTENT -->
   <div class="main-content">
+    <!-- TOPBAR -->
     <header class="topbar">
       <div>
         <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn" style="border:none; background:var(--primary-soft); color:var(--primary);">
           <i class="bi bi-list fs-5"></i>
         </button>
-        <span class="fw-bold text-dark"><i class="bi bi-person-badge text-primary me-2"></i>Equipo y Colaboradores</span>
+        <span class="fw-bold text-dark fs-5"><i class="bi bi-people-fill text-primary me-2"></i>Equipo Escolar y Roles</span>
       </div>
-      <div class="topbar-right">
-        <div class="text-muted small fw-semibold">
+
+      <div class="topbar-right d-flex align-items-center gap-4">
+        <div class="topbar-date d-none d-sm-block">
           <i class="bi bi-calendar3 me-1"></i> {{ hoy|date:"l, d \d\e F \d\e Y"|title }}
         </div>
       </div>
     </header>
 
+    <!-- CONTENT BODY -->
     <main class="content-body">
-
-
-      <!-- Header -->
+      
+      <!-- HERO HEADER -->
       <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
         <div>
-          <h2 class="fw-bold text-dark mb-0">Gestión de Personal Escolar</h2>
-          <p class="text-muted mb-0">Controla los accesos de docentes y administrativos y asigna sus cargos oficiales.</p>
+          <h2 class="fw-extrabold text-dark mb-1" style="font-size: 1.6rem;">Gestión de Personal, Asignaciones y Permisos</h2>
+          <p class="text-muted small mb-0">Administra los accesos de tu equipo escolar, configura roles institucionales y ajusta permisos personalizados por funcionario.</p>
         </div>
-        {% if is_admin %}
-          <div>
-            <button class="btn btn-outline-primary fw-bold px-3 py-2" data-bs-toggle="modal" data-bs-target="#crearRolModal" style="border-radius: var(--radius-md);">
-              <i class="bi bi-shield-plus me-1.5"></i> + Crear Nuevo Rol
-            </button>
-          </div>
-        {% endif %}
+        <div class="d-flex align-items-center gap-2">
+          <button class="btn btn-primary fw-extrabold px-3.5 py-2 shadow-sm" style="border-radius: 12px; background: linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%); border:none;" onclick="openRoleModal(null)">
+            <i class="bi bi-shield-plus me-1.5"></i> Crear Nuevo Rol
+          </button>
+
+        </div>
       </div>
 
+      <!-- TABS NAVIGATION -->
+      <ul class="nav nav-tabs nav-tabs-custom" id="personalTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="staff-tab" data-bs-toggle="tab" data-bs-target="#staff-tab-pane" type="button" role="tab">
+            <i class="bi bi-person-lines-fill"></i> Nómina del Personal ({{ total_personal }})
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="roles-tab" data-bs-toggle="tab" data-bs-target="#roles-tab-pane" type="button" role="tab">
+            <i class="bi bi-shield-lock-fill"></i> Roles y Matriz de Permisos ({{ total_roles }})
+          </button>
+        </li>
+      </ul>
 
-      <!-- Tabla del Personal -->
-      <div class="dashboard-panel">
-        <div class="table-container">
-          <table class="table-premium">
-            <thead>
-              <tr>
-                <th>Usuario</th>
-                <th>Email</th>
-                <th>Rol Actual</th>
-                <th>Estado de Acceso</th>
-                {% if is_admin %}
-                  <th style="text-align: right;">Acciones</th>
-                {% endif %}
-              </tr>
-            </thead>
-            <tbody>
-              {% if personal %}
-                {% for miembro in personal %}
-                  <tr>
-                    <td>
-                      <div class="d-flex align-items-center gap-3">
-                        <div class="member-avatar">
-                          {{ miembro.usuario.username|slice:":2"|upper }}
-                        </div>
-                        <div>
-                          <div class="fw-bold text-dark">{{ miembro.usuario.first_name|default:miembro.usuario.username }}</div>
-                          <div class="text-muted small">Registrado: {{ miembro.usuario.date_joined|date:"d M Y" }}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td>{{ miembro.usuario.email }}</td>
-                    <td>
-                      <span class="badge bg-light text-dark border px-2.5 py-1.5 fw-semibold" style="border-radius:6px; font-size:0.8rem; border-color: var(--border) !important;">
-                        {{ miembro.rol.nombre }}
-                      </span>
-                    </td>
-                    <td>
-                      <span class="badge {% if miembro.activo %}bg-success-light text-success{% else %}bg-danger-light text-danger{% endif %} px-2 py-1 fw-bold" style="background-color: {% if miembro.activo %}#ECFDF5{% else %}#FFF1F2{% endif %}; border: 1px solid {% if miembro.activo %}#A7F3D0{% else %}#FECDD3{% endif %}; font-size: 0.75rem;">
-                        {% if miembro.activo %}Acceso Permitido{% else %}Acceso Suspendido{% endif %}
-                      </span>
-                    </td>
-                    {% if is_admin %}
-                      <td style="text-align: right;">
-                        <div class="d-flex justify-content-end gap-2">
-                          <button class="btn btn-sm btn-outline-success fw-semibold" data-bs-toggle="modal" data-bs-target="#modalAsignarMaterias{{ miembro.id }}">
-                            <i class="bi bi-book me-1"></i> Asignaturas
-                          </button>
-                          <button class="btn btn-sm btn-outline-primary fw-semibold" data-bs-toggle="modal" data-bs-target="#modalEditarRol{{ miembro.id }}">
-                            <i class="bi bi-shield-lock me-1"></i> Rol
-                          </button>
-                          
-                          {% if miembro.usuario != request.user %}
-                            <a class="btn btn-sm {% if miembro.activo %}btn-outline-danger{% else %}btn-outline-success{% endif %} fw-semibold js-confirm-delete" 
-                               data-confirm-title="¿{% if miembro.activo %}Suspender{% else %}Re-activar{% endif %} acceso de {{ miembro.usuario.username }}?"
-                               data-confirm-text="Se actualizará el estado de acceso de este funcionario."
-                               data-confirm-btn="Sí, proceder"
-                               href="{% url 'baja_personal' miembro.id %}">
-                              <i class="bi {% if miembro.activo %}bi-slash-circle{% else %}bi-check-circle{% endif %} me-1"></i>
-                              {% if miembro.activo %}Suspender{% else %}Re-activar{% endif %}
-                            </a>
-                          {% endif %}
-
-                        </div>
-                      </td>
-                    {% endif %}
-                  </tr>
-
-                  <!-- MODAL EDITAR ROL -->
-                  <div class="modal fade" id="modalEditarRol{{ miembro.id }}" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                      <div class="modal-content" style="border-radius: var(--radius-md); border:none;">
-                        <div class="modal-header border-bottom-0">
-                          <h5 class="fw-bold">Modificar Cargo de Personal</h5>
-                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <form method="POST" action="{% url 'editar_personal' miembro.id %}">
-                          {% csrf_token %}
-                          <div class="modal-body pt-0">
-                            <p class="text-muted small mb-3">Cambiar el cargo para: <strong>{{ miembro.usuario.username }}</strong>. Esto modificará sus accesos y privilegios en el sistema.</p>
-                            <div class="mb-3">
-                              <label class="form-label small fw-bold">Seleccionar Rol</label>
-                              <select name="rol" class="form-select" required style="border-color: var(--border);">
-                                {% for r in roles %}
-                                  <option value="{{ r.id }}" {% if miembro.rol.id == r.id %}selected{% endif %}>{{ r.nombre }}</option>
-                                {% endfor %}
-                              </select>
-                            </div>
-                          </div>
-                          <div class="modal-footer border-top-0">
-                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-primary fw-bold">Cambiar Cargo</button>
-                          </div>
-                        </form>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- MODAL ASIGNAR ASIGNATURAS -->
-                  <div class="modal fade" id="modalAsignarMaterias{{ miembro.id }}" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                      <div class="modal-content" style="border-radius: var(--radius-md); border:none;">
-                        <div class="modal-header border-bottom-0">
-                          <h5 class="fw-bold"><i class="bi bi-book text-primary me-2"></i>Asignar Cursos y Asignaturas</h5>
-                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <form method="POST" action="{% url 'asignar_asignaturas_docente' miembro.id %}">
-                          {% csrf_token %}
-                          <div class="modal-body pt-0">
-                            <p class="text-muted small mb-3">Selecciona las materias que imparte el docente <strong>{{ miembro.usuario.get_full_name|default:miembro.usuario.username }}</strong>. Esto limitará su acceso solo a estas materias.</p>
-                            
-                            <div class="d-flex flex-column gap-2" style="max-height: 280px; overflow-y: auto; text-align: left;">
-                              {% for asig in asignaturas_colegio %}
-                                <div class="form-check p-2.5 border rounded bg-light d-flex align-items-center gap-2">
-                                  <input class="form-check-input ms-1" type="checkbox" name="asignaturas" value="{{ asig.id }}" id="asig_{{ miembro.id }}_{{ asig.id }}" {% if asig.docente == miembro.usuario %}checked{% endif %}>
-                                  <label class="form-check-label fw-semibold text-dark mb-0" for="asig_{{ miembro.id }}_{{ asig.id }}">
-                                    {{ asig.nombre }} <span class="text-muted small fw-normal">({{ asig.curso.nombre }} {{ asig.curso.nivel }})</span>
-                                  </label>
-                                </div>
-                              {% empty %}
-                                <div class="alert alert-warning mb-0 small">
-                                  No hay asignaturas registradas en el colegio. Crea asignaturas en el módulo Académico primero.
-                                </div>
-                              {% endfor %}
-                            </div>
-                          </div>
-                          <div class="modal-footer border-top-0">
-                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-success fw-bold px-4">
-                              <i class="bi bi-check2-circle me-1"></i>Guardar Asignaciones
-                            </button>
-                          </div>
-                        </form>
-                      </div>
-                    </div>
-                  </div>
-
-
-                {% endfor %}
-              {% else %}
-                <tr>
-                  <td colspan="5" class="text-center text-muted py-4">No se registran otros colaboradores en el establecimiento.</td>
-                </tr>
-              {% endif %}
-            </tbody>
-          </table>
-
-          {% if personal.has_other_pages %}
-            <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
-              <div class="text-muted small">
-                Mostrando registros <strong>{{ personal.start_index }} - {{ personal.end_index }}</strong> de <strong>{{ personal.paginator.count }}</strong>
+      <div class="tab-content" id="personalTabsContent">
+        
+        <!-- ==========================================
+             TAB 1: NOMINA DE PERSONAL
+             ========================================== -->
+        <div class="tab-pane fade show active" id="staff-tab-pane" role="tabpanel">
+          <div class="card-panel-custom">
+            
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+              <div class="input-group" style="max-width: 420px;">
+                <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                <input type="text" id="staffSearchInput" class="form-control border-start-0 ps-0 shadow-none" placeholder="Buscar por nombre, usuario o cargo..." onkeyup="filterStaffTable()">
               </div>
-              <nav>
-                <ul class="pagination pagination-sm mb-0">
-                  {% if personal.has_previous %}
-                    <li class="page-item"><a class="page-link text-primary fw-bold" href="?page={{ personal.previous_page_number }}">‹ Anterior</a></li>
-                  {% else %}
-                    <li class="page-item disabled"><span class="page-link">‹ Anterior</span></li>
-                  {% endif %}
-
-                  {% for i in personal.paginator.page_range %}
-                    {% if personal.number == i %}
-                      <li class="page-item active"><span class="page-link bg-primary border-primary">{{ i }}</span></li>
-                    {% else %}
-                      <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
-                    {% endif %}
-                  {% endfor %}
-
-                  {% if personal.has_next %}
-                    <li class="page-item"><a class="page-link text-primary fw-bold" href="?page={{ personal.next_page_number }}">Siguiente ›</a></li>
-                  {% else %}
-                    <li class="page-item disabled"><span class="page-link">Siguiente ›</span></li>
-                  {% endif %}
-                </ul>
-              </nav>
+              <div class="text-muted small">
+                <i class="bi bi-info-circle me-1"></i> Haz clic en <strong>Permisos</strong> para personalizar módulos individuales a un funcionario.
+              </div>
             </div>
-          {% endif %}
+
+            <div class="table-responsive">
+              <table class="table-custom-staff" id="staffTable">
+                <thead>
+                  <tr>
+                    <th>Funcionario</th>
+                    <th>Rol / Cargo</th>
+                    <th>Asignaturas Dictadas</th>
+                    <th>Permisos Especiales</th>
+                    <th>Estado</th>
+                    <th class="text-end">Acciones de Gestión</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% if personal %}
+                    {% for m in personal %}
+                      <tr class="staff-row" data-name="{{ m.usuario.get_full_name|default:m.usuario.username|lower }}" data-role="{{ m.rol.nombre|default:'sin rol'|lower }}" data-username="{{ m.usuario.username|lower }}">
+                        <td>
+                          <div class="d-flex align-items-center gap-3">
+                            <div class="staff-avatar-circle {% if m.rol.nombre == 'Director' or m.rol.nombre == 'Administrador' %}avatar-admin{% elif m.rol.nombre == 'Profesor' %}avatar-teacher{% else %}avatar-staff{% endif %}">
+                              {{ m.usuario.first_name|first|default:m.usuario.username|first|upper }}
+                            </div>
+                            <div>
+                              <div class="fw-extrabold text-dark">{{ m.usuario.get_full_name|default:m.usuario.username }}</div>
+                              <span class="text-muted small">{{ m.usuario.email|default:m.usuario.username }}</span>
+                            </div>
+                          </div>
+                        </td>
+
+                        <td>
+                          {% if m.rol %}
+                            <span class="badge px-3 py-1.5 fw-bold {% if m.rol.nombre == 'Administrador' or m.rol.nombre == 'Director' %}badge-role-admin{% elif m.rol.nombre == 'Profesor' %}badge-role-teacher{% else %}badge-role-staff{% endif %}">
+                              {{ m.rol.nombre }}
+                            </span>
+                          {% else %}
+                            <span class="badge bg-secondary text-white px-2.5 py-1">Sin Rol</span>
+                          {% endif %}
+                        </td>
+
+
+                        <td>
+                          <button type="button" class="btn btn-sm btn-light border fw-bold text-dark px-2.5 py-1" style="border-radius:8px; font-size:0.8rem;" 
+                                  data-member-id="{{ m.id }}" 
+                                  data-staff-name="{{ m.usuario.get_full_name|default:m.usuario.username }}" 
+                                  onclick="openAssignSubjectsModalFromBtn(this)">
+                            <i class="bi bi-book me-1 text-primary"></i> Asignar Materias
+                          </button>
+                        </td>
+
+                        <td>
+                          {% if m.permisos_individuales.exists %}
+                            <span class="badge px-2.5 py-1 fw-bold" style="background:#FEF3C7; color:#B45309; border:1px solid #FDE68A; border-radius:6px; font-size:0.75rem;">
+                              <i class="bi bi-sliders me-1"></i> {{ m.permisos_individuales.count }} Módulo(s) Ajustados
+                            </span>
+                          {% else %}
+                            <span class="text-muted small"><i class="bi bi-check2 text-success me-1"></i>Heredados del rol</span>
+                          {% endif %}
+                        </td>
+
+                        <td>
+                          {% if m.activo %}
+                            <span class="badge bg-success-light text-success fw-bold px-2.5 py-1" style="background:#ECFDF5; border:1px solid #A7F3D0; border-radius:6px; font-size:0.75rem;">
+                              <i class="bi bi-check-circle-fill me-1"></i> Activo
+                            </span>
+                          {% else %}
+                            <span class="badge bg-danger-light text-danger fw-bold px-2.5 py-1" style="background:#FFF1F2; border:1px solid #FDA4AF; border-radius:6px; font-size:0.75rem;">
+                              <i class="bi bi-slash-circle-fill me-1"></i> Suspendido
+                            </span>
+                          {% endif %}
+                        </td>
+
+                        <td class="text-end">
+                          <div class="btn-group gap-1">
+                            <!-- BOTON PERMISOS INDIVIDUALES -->
+                            <button type="button" class="btn btn-sm btn-outline-primary fw-bold px-2.5 py-1" style="border-radius:8px; font-size:0.8rem;" 
+                                    data-member-id="{{ m.id }}" 
+                                    data-staff-name="{{ m.usuario.get_full_name|default:m.usuario.username }}" 
+                                    data-role-name="{% if m.rol %}{{ m.rol.nombre }}{% else %}Sin Rol{% endif %}" 
+                                    onclick="openIndividualPermsModalFromBtn(this)">
+                              <i class="bi bi-sliders me-1"></i> Permisos
+                            </button>
+
+
+                            <!-- BOTON EDITAR ROL -->
+                            <button type="button" class="btn btn-sm btn-light border fw-bold text-dark px-2.5 py-1" style="border-radius:8px; font-size:0.8rem;" data-bs-toggle="modal" data-bs-target="#modalEditarRol{{ m.id }}">
+                              <i class="bi bi-shield-lock me-1"></i> Rol
+                            </button>
+
+                            <!-- BOTON SUSPENDER/ACTIVAR -->
+                            {% if m.usuario != request.user %}
+                              <a href="{% url 'baja_personal' m.id %}" class="btn btn-sm {% if m.activo %}btn-outline-danger{% else %}btn-outline-success{% endif %} fw-bold px-2 py-1" style="border-radius:8px; font-size:0.8rem;" onclick="return confirm('¿Confirmas cambiar el estado de acceso de este funcionario?');">
+                                <i class="bi {% if m.activo %}bi-slash-circle{% else %}bi-check-circle{% endif %}"></i>
+                              </a>
+                            {% endif %}
+                          </div>
+
+                          <!-- MODAL EDITAR ROL DE USUARIO -->
+                          <div class="modal fade text-start" id="modalEditarRol{{ m.id }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                              <div class="modal-content border-0 shadow-lg" style="border-radius:16px;">
+                                <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+                                  <h5 class="modal-title fw-extrabold text-dark">Modificar Cargo de Personal</h5>
+                                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <form method="POST" action="{% url 'editar_personal' m.id %}">
+                                  {% csrf_token %}
+                                  <div class="modal-body p-4">
+                                    <p class="text-muted small mb-3">Cambiar el cargo institucional para: <strong>{{ m.usuario.get_full_name|default:m.usuario.username }}</strong>.</p>
+                                    <div class="mb-3">
+                                      <label class="form-label fw-bold text-dark small">Seleccionar Rol</label>
+                                      <select name="rol" class="form-select form-select-lg fw-semibold" style="border-radius:10px; font-size:0.95rem;">
+                                        {% for r in roles %}
+                                          <option value="{{ r.id }}" {% if m.rol.id == r.id %}selected{% endif %}>{{ r.nombre }}</option>
+                                        {% endfor %}
+                                      </select>
+                                    </div>
+                                  </div>
+                                  <div class="modal-footer border-top-0 p-4 pt-0">
+                                    <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-primary fw-extrabold px-4" style="border-radius:10px; background:linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%); border:none;">Guardar Cambio</button>
+                                  </div>
+                                </form>
+                              </div>
+                            </div>
+                          </div>
+
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  {% else %}
+                    <tr>
+                      <td colspan="6" class="text-center text-muted py-4">No hay funcionarios registrados en el colegio.</td>
+                    </tr>
+                  {% endif %}
+                </tbody>
+              </table>
+            </div>
+
+            <!-- PAGINACION -->
+            {% if personal.has_other_pages %}
+              <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                <div class="text-muted small">
+                  Mostrando registros <strong>{{ personal.start_index }} - {{ personal.end_index }}</strong> de <strong>{{ personal.paginator.count }}</strong>
+                </div>
+                <nav>
+                  <ul class="pagination pagination-sm mb-0">
+                    {% if personal.has_previous %}
+                      <li class="page-item"><a class="page-link text-primary fw-bold" href="?page={{ personal.previous_page_number }}">‹ Anterior</a></li>
+                    {% endif %}
+                    {% for i in personal.paginator.page_range %}
+                      <li class="page-item {% if personal.number == i %}active{% endif %}">
+                        <a class="page-link {% if personal.number == i %}bg-primary border-primary{% endif %}" href="?page={{ i }}">{{ i }}</a>
+                      </li>
+                    {% endfor %}
+                    {% if personal.has_next %}
+                      <li class="page-item"><a class="page-link text-primary fw-bold" href="?page={{ personal.next_page_number }}">Siguiente ›</a></li>
+                    {% endif %}
+                  </ul>
+                </nav>
+              </div>
+            {% endif %}
+
+          </div>
         </div>
+
+        <!-- ==========================================
+             TAB 2: GESTION DE ROLES Y MATRIZ DE PERMISOS
+             ========================================== -->
+        <div class="tab-pane fade" id="roles-tab-pane" role="tabpanel">
+          <div class="row g-3 mb-4">
+            {% for r in roles %}
+              <div class="col-lg-4 col-md-6">
+                <div class="role-grid-card">
+                  <div>
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                      <div class="d-flex align-items-center gap-2">
+                        <div class="rounded-3 d-flex align-items-center justify-content-center" style="width:36px; height:36px; background:#F0EDFF; color:#7C5CFC;">
+                          <i class="bi bi-shield-check fs-5"></i>
+                        </div>
+                        <h4 class="fw-extrabold text-dark mb-0 fs-5">{{ r.nombre }}</h4>
+                      </div>
+                      {% if r.es_base or r.nombre in 'Administrador,Director,Profesor' %}
+                        <span class="badge bg-light text-muted border px-2 py-1 fw-bold small" style="font-size:0.7rem;">Sistema</span>
+                      {% else %}
+                        <span class="badge px-2 py-1 fw-bold" style="background:#ECFDF5; color:#059669; border:1px solid #A7F3D0; font-size:0.7rem;">Personalizado</span>
+                      {% endif %}
+                    </div>
+
+                    <p class="text-muted small mb-3" style="min-height: 40px;">
+                      {{ r.descripcion|default:"Rol con privilegios asignados para la operación de la institución." }}
+                    </p>
+
+                    <!-- RESUMEN PERMISOS -->
+                    <div class="mb-3">
+                      <span class="text-muted extra-small text-uppercase fw-bold d-block mb-1.5">Módulos con Acceso:</span>
+                      <div class="d-flex flex-wrap gap-1">
+                        {% for rp in r.permisos.all %}
+                          {% if rp.puede_ver %}
+                            <span class="perm-badge-pill"><i class="bi bi-check2 text-primary me-0.5"></i>{{ rp.modulo.nombre }}</span>
+                          {% endif %}
+                        {% empty %}
+                          <span class="text-muted small">Sin permisos configurados</span>
+                        {% endfor %}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="border-top pt-3 mt-2 d-flex justify-content-between align-items-center gap-2">
+                    <button type="button" class="btn btn-sm btn-outline-primary fw-extrabold flex-grow-1 py-1.5" style="border-radius:10px;" onclick="openRoleModal('{{ r.id }}')">
+                      <i class="bi bi-ui-checks-grid me-1"></i> Configurar Permisos
+                    </button>
+                    {% if not r.es_base and r.nombre not in 'Administrador,Director,Profesor' %}
+                      <a href="{% url 'eliminar_rol_personalizado' r.id %}" class="btn btn-sm btn-outline-danger px-2.5 py-1.5" style="border-radius:10px;" onclick="return confirm('¿Estás seguro de eliminar este rol personalizado?');" title="Eliminar Rol">
+                        <i class="bi bi-trash"></i>
+                      </a>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
       </div>
 
     </main>
   </div>
 </div>
 
-<!-- MODAL CREAR NUEVO ROL -->
-<div class="modal fade" id="crearRolModal" tabindex="-1" aria-labelledby="crearRolModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content" style="border-radius: var(--radius-lg); border: none; overflow: hidden;">
-      <div class="modal-header bg-light">
-        <h5 class="modal-title fw-bold" id="crearRolModalLabel"><i class="bi bi-shield-plus text-primary me-2"></i>Crear Nuevo Rol Personalizado</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-
-      <form method="POST" action="{% url 'crear_rol_personalizado' %}">
-        {% csrf_token %}
-        <div class="modal-body">
-          <div class="mb-3">
-            <label class="form-label fw-semibold text-dark small">Nombre del Rol</label>
-            <input type="text" name="nombre_rol" class="form-control" placeholder="Ej: Jefe de UTP, Coordinador, Orientador..." required style="border-radius: var(--radius-md);">
+<!-- ==========================================
+     MODAL MATRIZ DE PERMISOS DE ROL
+     ========================================== -->
+<div class="modal fade" id="modalRolePerms" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+      <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+        <div class="d-flex align-items-center gap-2">
+          <div class="rounded-3 d-flex align-items-center justify-content-center" style="width:40px; height:40px; background:#F0EDFF; color:#7C5CFC;">
+            <i class="bi bi-shield-lock-fill fs-5"></i>
           </div>
-          <div class="mb-3">
-            <label class="form-label fw-semibold text-dark small">Descripción del Rol / Funciones</label>
-            <textarea name="descripcion" class="form-control" rows="3" placeholder="Describe brevemente las responsabilidades de este cargo..." style="border-radius: var(--radius-md);"></textarea>
+          <div>
+            <h5 class="modal-title fw-extrabold text-dark mb-0" id="roleModalTitle">Configurar Permisos de Rol</h5>
+            <span class="text-muted small">Define exactamente qué acciones puede realizar este cargo en cada módulo</span>
           </div>
         </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
 
-        <div class="modal-footer bg-light">
-          <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal" style="border-radius: var(--radius-md);">Cancelar</button>
-          <button type="submit" class="btn btn-primary fw-bold px-4" style="border-radius: var(--radius-md);"><i class="bi bi-check2-circle me-1"></i> Crear Rol</button>
+      <form method="POST" action="{% url 'guardar_rol_permisos' %}">
+        {% csrf_token %}
+        <input type="hidden" name="rol_id" id="roleModalId" value="">
+        
+        <div class="modal-body p-4">
+          <!-- DATOS BASICOS DEL ROL -->
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">Nombre del Rol *</label>
+              <input type="text" class="form-control fw-bold" name="nombre_rol" id="roleModalNombre" placeholder="Ej: Jefe de UTP, Coordinador PIE..." required style="border-radius:10px;">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">Descripción / Responsabilidades</label>
+              <input type="text" class="form-control" name="descripcion" id="roleModalDesc" placeholder="Breve descripción del cargo..." style="border-radius:10px;">
+            </div>
+          </div>
+
+          <!-- BOTONES DE ACCION RAPIDA -->
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="fw-extrabold text-dark small text-uppercase"><i class="bi bi-grid-3x3-gap-fill text-primary me-1.5"></i>Matriz de Permisos por Módulo</span>
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-xs btn-light border fw-bold" style="font-size:0.75rem; border-radius:6px;" onclick="setAllRolePerms(true)">Marcar Todos</button>
+              <button type="button" class="btn btn-xs btn-light border fw-bold" style="font-size:0.75rem; border-radius:6px;" onclick="setOnlyViewRolePerms()">Solo Lectura</button>
+              <button type="button" class="btn btn-xs btn-light border fw-bold" style="font-size:0.75rem; border-radius:6px;" onclick="setAllRolePerms(false)">Desmarcar</button>
+            </div>
+          </div>
+
+          <!-- LISTA DE MODULOS Y ACCIONES -->
+          <div class="modules-matrix-container">
+            {% for mc in modulos_colegio %}
+              <div class="matrix-module-row">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                  <div class="fw-extrabold text-dark" style="min-width: 170px;">
+                    <i class="bi bi-app-indicator text-primary me-1.5"></i>{{ mc.modulo.nombre }}
+                  </div>
+                  
+                  <div class="d-flex align-items-center gap-3 flex-wrap">
+                    <div class="form-check form-switch mb-0">
+                      <input class="form-check-input role-perm-check" type="checkbox" name="perm_view_{{ mc.modulo.id }}" id="role_perm_view_{{ mc.modulo.id }}" data-modid="{{ mc.modulo.id }}" data-type="view">
+                      <label class="form-check-label small fw-semibold" for="role_perm_view_{{ mc.modulo.id }}">Ver</label>
+                    </div>
+                    <div class="form-check form-switch mb-0">
+                      <input class="form-check-input role-perm-check" type="checkbox" name="perm_create_{{ mc.modulo.id }}" id="role_perm_create_{{ mc.modulo.id }}" data-modid="{{ mc.modulo.id }}" data-type="create">
+                      <label class="form-check-label small fw-semibold" for="role_perm_create_{{ mc.modulo.id }}">Crear</label>
+                    </div>
+                    <div class="form-check form-switch mb-0">
+                      <input class="form-check-input role-perm-check" type="checkbox" name="perm_edit_{{ mc.modulo.id }}" id="role_perm_edit_{{ mc.modulo.id }}" data-modid="{{ mc.modulo.id }}" data-type="edit">
+                      <label class="form-check-label small fw-semibold" for="role_perm_edit_{{ mc.modulo.id }}">Editar</label>
+                    </div>
+                    <div class="form-check form-switch mb-0">
+                      <input class="form-check-input role-perm-check" type="checkbox" name="perm_delete_{{ mc.modulo.id }}" id="role_perm_delete_{{ mc.modulo.id }}" data-modid="{{ mc.modulo.id }}" data-type="delete">
+                      <label class="form-check-label small fw-semibold" for="role_perm_delete_{{ mc.modulo.id }}">Eliminar</label>
+                    </div>
+                    <div class="form-check form-switch mb-0">
+                      <input class="form-check-input role-perm-check" type="checkbox" name="perm_export_{{ mc.modulo.id }}" id="role_perm_export_{{ mc.modulo.id }}" data-modid="{{ mc.modulo.id }}" data-type="export">
+                      <label class="form-check-label small fw-semibold" for="role_perm_export_{{ mc.modulo.id }}">Exportar</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+
+        </div>
+
+        <div class="modal-footer border-top-0 p-4 pt-0">
+          <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary fw-extrabold px-4" style="border-radius:10px; background:linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%); border:none;">
+            <i class="bi bi-shield-check me-1"></i> Guardar Configuración de Rol
+          </button>
         </div>
       </form>
     </div>
   </div>
 </div>
 
+<!-- ==========================================
+     MODAL PERMISOS INDIVIDUALES DE FUNCIONARIO
+     ========================================== -->
+<div class="modal fade" id="modalIndividualPerms" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+      <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+        <div class="d-flex align-items-center gap-2">
+          <div class="rounded-3 d-flex align-items-center justify-content-center" style="width:40px; height:40px; background:#FEF3C7; color:#D97706;">
+            <i class="bi bi-sliders fs-5"></i>
+          </div>
+          <div>
+            <h5 class="modal-title fw-extrabold text-dark mb-0">Permisos Individuales del Funcionario</h5>
+            <span class="text-muted small" id="indStaffSubtitle">-</span>
+          </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <form id="individualPermsForm" method="POST" action="">
+        {% csrf_token %}
+        <input type="hidden" name="limpiar_individuales" id="limpiarIndividualesInput" value="false">
+
+        <div class="modal-body p-4">
+          <div class="alert alert-info border-0 rounded-3 p-3 mb-3 d-flex align-items-center gap-2 small">
+            <i class="bi bi-info-circle-fill fs-5 text-primary"></i>
+            <div>
+              Por defecto, el funcionario tiene los permisos de su rol. Activa <strong>Personalizar</strong> en cualquier módulo para darle o quitarle permisos específicos a este usuario.
+            </div>
+          </div>
+
+          <div class="modules-matrix-container">
+            {% for mc in modulos_colegio %}
+              <div class="matrix-module-row">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                  <div class="fw-extrabold text-dark">
+                    <i class="bi bi-box text-primary me-1.5"></i>{{ mc.modulo.nombre }}
+                  </div>
+                  
+                  <div class="form-check form-switch mb-0">
+                    <input class="form-check-input" type="checkbox" name="override_{{ mc.modulo.id }}" id="ind_override_{{ mc.modulo.id }}" onchange="toggleIndRowDisabled('{{ mc.modulo.id }}')">
+                    <label class="form-check-label small fw-bold text-primary" for="ind_override_{{ mc.modulo.id }}">Personalizar este módulo</label>
+                  </div>
+                </div>
+
+                <div class="d-flex align-items-center gap-3 flex-wrap pt-2 border-top" id="ind_controls_{{ mc.modulo.id }}" style="opacity: 0.5; pointer-events: none;">
+                  <div class="form-check form-switch mb-0">
+                    <input class="form-check-input ind-perm-input" type="checkbox" name="ind_view_{{ mc.modulo.id }}" id="ind_view_{{ mc.modulo.id }}">
+                    <label class="form-check-label small fw-semibold" for="ind_view_{{ mc.modulo.id }}">Ver</label>
+                  </div>
+                  <div class="form-check form-switch mb-0">
+                    <input class="form-check-input ind-perm-input" type="checkbox" name="ind_create_{{ mc.modulo.id }}" id="ind_create_{{ mc.modulo.id }}">
+                    <label class="form-check-label small fw-semibold" for="ind_create_{{ mc.modulo.id }}">Crear</label>
+                  </div>
+                  <div class="form-check form-switch mb-0">
+                    <input class="form-check-input ind-perm-input" type="checkbox" name="ind_edit_{{ mc.modulo.id }}" id="ind_edit_{{ mc.modulo.id }}">
+                    <label class="form-check-label small fw-semibold" for="ind_edit_{{ mc.modulo.id }}">Editar</label>
+                  </div>
+                  <div class="form-check form-switch mb-0">
+                    <input class="form-check-input ind-perm-input" type="checkbox" name="ind_delete_{{ mc.modulo.id }}" id="ind_delete_{{ mc.modulo.id }}">
+                    <label class="form-check-label small fw-semibold" for="ind_delete_{{ mc.modulo.id }}">Eliminar</label>
+                  </div>
+                  <div class="form-check form-switch mb-0">
+                    <input class="form-check-input ind-perm-input" type="checkbox" name="ind_export_{{ mc.modulo.id }}" id="ind_export_{{ mc.modulo.id }}">
+                    <label class="form-check-label small fw-semibold" for="ind_export_{{ mc.modulo.id }}">Exportar</label>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="modal-footer border-top-0 p-4 pt-0 d-flex justify-content-between">
+          <button type="button" class="btn btn-outline-danger fw-bold" onclick="restaurarPermisosRolBase()">
+            <i class="bi bi-arrow-counterclockwise me-1"></i> Restaurar al Rol Base
+          </button>
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary fw-extrabold px-4" style="border-radius:10px; background:linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%); border:none;">
+              Guardar Permisos
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================
+     MODAL ASIGNAR ASIGNATURAS A DOCENTE
+     ========================================== -->
+<div class="modal fade" id="modalAssignSubjects" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+      <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+        <div class="d-flex align-items-center gap-2">
+          <div class="rounded-3 d-flex align-items-center justify-content-center" style="width:40px; height:40px; background:#ECFDF5; color:#059669;">
+            <i class="bi bi-book-half fs-5"></i>
+          </div>
+          <div>
+            <h5 class="modal-title fw-extrabold text-dark mb-0">Asignar Materias y Cursos</h5>
+            <span class="text-muted small" id="assignSubjectsSubtitle">-</span>
+          </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <form id="assignSubjectsForm" method="POST" action="">
+        {% csrf_token %}
+        <div class="modal-body p-4">
+          <p class="text-muted small mb-3">Marca las materias que imparte este profesor en cada nivel para habilitar su acceso en el libro de clases y notas.</p>
+          
+          <div class="accordion" id="accordionCursosAsig">
+            {% for item in cursos_con_asignaturas %}
+              <div class="accordion-item mb-2 border rounded-3 overflow-hidden">
+                <h2 class="accordion-header" id="headingCurso{{ item.curso.id }}">
+                  <button class="accordion-button collapsed fw-bold py-2.5 bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCurso{{ item.curso.id }}">
+                    <i class="bi bi-layers-fill text-primary me-2"></i> {{ item.curso.nombre }}
+                  </button>
+                </h2>
+                <div id="collapseCurso{{ item.curso.id }}" class="accordion-collapse collapse show">
+                  <div class="accordion-body p-3">
+                    <div class="row g-2">
+                      {% for asig in item.asignaturas %}
+                        <div class="col-md-6">
+                          <div class="form-check p-2 rounded border bg-white d-flex align-items-center gap-2">
+                            <input class="form-check-input ms-1 asig-check-item" type="checkbox" name="asignaturas" value="{{ asig.id }}" id="asig_chk_{{ asig.id }}">
+                            <label class="form-check-label small fw-bold text-dark mb-0" for="asig_chk_{{ asig.id }}">
+                              {{ asig.nombre }}
+                              {% if asig.docente %}
+                                <span class="badge bg-light text-muted border extra-small fw-normal ms-1">{{ asig.docente.get_full_name|default:asig.docente.username }}</span>
+                              {% endif %}
+                            </label>
+                          </div>
+                        </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% empty %}
+              <div class="alert alert-warning small mb-0">No hay asignaturas creadas en el plan de estudios.</div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="modal-footer border-top-0 p-4 pt-0">
+          <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-success fw-extrabold px-4" style="border-radius:10px;">
+            <i class="bi bi-check2-circle me-1"></i> Guardar Asignaciones
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script id="roles-data-json" type="application/json">{{ roles_permisos_json|safe }}</script>
+<script id="personal-data-json" type="application/json">{{ personal_permisos_json|safe }}</script>
+<script id="asig-docente-data-json" type="application/json">{{ asignaturas_por_docente_json|safe }}</script>
+
 <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 <script>
+  // Serialized matrices
+  const ROLES_DATA = JSON.parse(document.getElementById('roles-data-json')?.textContent || '{}');
+  const PERSONAL_DATA = JSON.parse(document.getElementById('personal-data-json')?.textContent || '{}');
+  const ASIGNATURAS_DOCENTE_DATA = JSON.parse(document.getElementById('asig-docente-data-json')?.textContent || '{}');
+
+  function openAssignSubjectsModalFromBtn(btn) {
+    const memberId = btn.getAttribute('data-member-id');
+    const staffName = btn.getAttribute('data-staff-name');
+    openAssignSubjectsModal(memberId, staffName);
+  }
+
+  function openIndividualPermsModalFromBtn(btn) {
+    const memberId = btn.getAttribute('data-member-id');
+    const staffName = btn.getAttribute('data-staff-name');
+    const roleName = btn.getAttribute('data-role-name');
+    openIndividualPermsModal(memberId, staffName, roleName);
+  }
+
+  // Open Role Edit or Create Modal
+  function openRoleModal(roleId) {
+
+    const title = document.getElementById('roleModalTitle');
+    const roleIdInput = document.getElementById('roleModalId');
+    const roleNombreInput = document.getElementById('roleModalNombre');
+    const roleDescInput = document.getElementById('roleModalDesc');
+
+    // Clear all checkboxes
+    document.querySelectorAll('.role-perm-check').forEach(cb => cb.checked = false);
+
+    if (roleId && ROLES_DATA[roleId]) {
+      const data = ROLES_DATA[roleId];
+      title.innerText = `Editar Rol: ${data.nombre}`;
+      roleIdInput.value = roleId;
+      roleNombreInput.value = data.nombre;
+      roleDescInput.value = data.descripcion || '';
+
+      // Load permissions
+      const perms = data.permisos;
+      for (const [modId, actions] of Object.entries(perms)) {
+        if (document.getElementById(`role_perm_view_${modId}`)) document.getElementById(`role_perm_view_${modId}`).checked = !!actions.view;
+        if (document.getElementById(`role_perm_create_${modId}`)) document.getElementById(`role_perm_create_${modId}`).checked = !!actions.create;
+        if (document.getElementById(`role_perm_edit_${modId}`)) document.getElementById(`role_perm_edit_${modId}`).checked = !!actions.edit;
+        if (document.getElementById(`role_perm_delete_${modId}`)) document.getElementById(`role_perm_delete_${modId}`).checked = !!actions.delete;
+        if (document.getElementById(`role_perm_export_${modId}`)) document.getElementById(`role_perm_export_${modId}`).checked = !!actions.export;
+      }
+    } else {
+      title.innerText = 'Crear Nuevo Rol Personalizado';
+      roleIdInput.value = '';
+      roleNombreInput.value = '';
+      roleDescInput.value = '';
+    }
+
+    const modal = new bootstrap.Modal(document.getElementById('modalRolePerms'));
+    modal.show();
+  }
+
+  function setAllRolePerms(state) {
+    document.querySelectorAll('.role-perm-check').forEach(cb => cb.checked = state);
+  }
+
+  function setOnlyViewRolePerms() {
+    document.querySelectorAll('.role-perm-check').forEach(cb => {
+      cb.checked = (cb.getAttribute('data-type') === 'view');
+    });
+  }
+
+  // Open Individual Permissions Modal
+  function openIndividualPermsModal(memberId, staffName, roleName) {
+    const form = document.getElementById('individualPermsForm');
+    form.action = `/colegios/personal/permisos-individuales/${memberId}/`;
+    document.getElementById('limpiarIndividualesInput').value = 'false';
+    document.getElementById('indStaffSubtitle').innerText = `${staffName} — Rol Base: ${roleName}`;
+
+    const memberData = PERSONAL_DATA[memberId] || {};
+    const indPerms = memberData.permisos_individuales || {};
+    const roleId = memberData.rol_id;
+    const basePerms = (roleId && ROLES_DATA[roleId]) ? ROLES_DATA[roleId].permisos : {};
+
+    // Reset all using pure DOM traversal
+    document.querySelectorAll('[id^="ind_override_"]').forEach(overrideCheck => {
+      const modId = overrideCheck.id.replace('ind_override_', '');
+      const controlsDiv = document.getElementById(`ind_controls_${modId}`);
+      if (!controlsDiv) return;
+
+      if (indPerms[modId]) {
+        overrideCheck.checked = true;
+        controlsDiv.style.opacity = '1';
+        controlsDiv.style.pointerEvents = 'auto';
+
+        const v = document.getElementById(`ind_view_${modId}`); if (v) v.checked = !!indPerms[modId].view;
+        const c = document.getElementById(`ind_create_${modId}`); if (c) c.checked = !!indPerms[modId].create;
+        const e = document.getElementById(`ind_edit_${modId}`); if (e) e.checked = !!indPerms[modId].edit;
+        const d = document.getElementById(`ind_delete_${modId}`); if (d) d.checked = !!indPerms[modId].delete;
+        const ex = document.getElementById(`ind_export_${modId}`); if (ex) ex.checked = !!indPerms[modId].export;
+      } else {
+        overrideCheck.checked = false;
+        controlsDiv.style.opacity = '0.5';
+        controlsDiv.style.pointerEvents = 'none';
+
+        const base = basePerms[modId] || {};
+        const v = document.getElementById(`ind_view_${modId}`); if (v) v.checked = !!base.view;
+        const c = document.getElementById(`ind_create_${modId}`); if (c) c.checked = !!base.create;
+        const e = document.getElementById(`ind_edit_${modId}`); if (e) e.checked = !!base.edit;
+        const d = document.getElementById(`ind_delete_${modId}`); if (d) d.checked = !!base.delete;
+        const ex = document.getElementById(`ind_export_${modId}`); if (ex) ex.checked = !!base.export;
+      }
+    });
+
+    const modal = new bootstrap.Modal(document.getElementById('modalIndividualPerms'));
+    modal.show();
+  }
+
+
+  function toggleIndRowDisabled(modId) {
+    const isChecked = document.getElementById(`ind_override_${modId}`).checked;
+    const controls = document.getElementById(`ind_controls_${modId}`);
+    if (isChecked) {
+      controls.style.opacity = '1';
+      controls.style.pointerEvents = 'auto';
+    } else {
+      controls.style.opacity = '0.5';
+      controls.style.pointerEvents = 'none';
+    }
+  }
+
+  function restaurarPermisosRolBase() {
+    if (confirm('¿Deseas eliminar todas las personalizaciones y volver a los permisos estándar del rol base?')) {
+      document.getElementById('limpiarIndividualesInput').value = 'true';
+      document.getElementById('individualPermsForm').submit();
+    }
+  }
+
+  // Open Assign Subjects Modal
+  function openAssignSubjectsModal(memberId, staffName) {
+    const form = document.getElementById('assignSubjectsForm');
+    form.action = `/colegios/personal/asignar-materias/${memberId}/`;
+    document.getElementById('assignSubjectsSubtitle').innerText = `Docente: ${staffName}`;
+
+    // Clear all
+    document.querySelectorAll('.asig-check-item').forEach(cb => cb.checked = false);
+
+    // Check assigned
+    const assignedList = ASIGNATURAS_DOCENTE_DATA[memberId] || [];
+    assignedList.forEach(asigId => {
+      const cb = document.getElementById(`asig_chk_${asigId}`);
+      if (cb) cb.checked = true;
+    });
+
+    const modal = new bootstrap.Modal(document.getElementById('modalAssignSubjects'));
+    modal.show();
+  }
+
+  // Filter Staff Table
+  function filterStaffTable() {
+    const q = document.getElementById('staffSearchInput').value.toLowerCase().trim();
+    document.querySelectorAll('.staff-row').forEach(row => {
+      const name = row.getAttribute('data-name') || '';
+      const role = row.getAttribute('data-role') || '';
+      const username = row.getAttribute('data-username') || '';
+      if (!q || name.includes(q) || role.includes(q) || username.includes(q)) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function() {
     const mobileBtn = document.getElementById('mobileMenuBtn');
     const sidebar = document.getElementById('sidebar');
-    if(mobileBtn) {
-      mobileBtn.addEventListener('click', () => {
-        sidebar.classList.toggle('active');
-      });
+    if (mobileBtn) {
+      mobileBtn.addEventListener('click', () => sidebar.classList.toggle('active'));
     }
   });
 </script>
 </body>
 </html>
-

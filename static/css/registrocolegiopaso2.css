@@ -1,136 +1,265 @@
-/* Grilla de Planes */
-.plans-grid {
-    display: grid;
+/* ==========================================================================
+   EDUTEKA - REGISTRO DE COLEGIO PASO 2 (AMPLIO, ESPACIOSO & PANORÁMICO)
+   ========================================================================== */
+
+:root {
+  --plan-primary: #7C5CFC;
+  --plan-primary-hover: #6344CE;
+  --plan-primary-soft: #F0EDFF;
+  --plan-secondary: #0D9488;
+  --plan-dark: #151A35;
+  --plan-muted: #687089;
+  --plan-border: #E2E8F0;
+}
+
+/* Grilla de Planes Panorámica (4 Columnas en Desktop) */
+.plans-grid-modern {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.1rem;
+  margin-bottom: 2rem;
+}
+
+.plan-card-pro {
+  border: 2px solid var(--plan-border);
+  border-radius: 20px;
+  padding: 1.4rem 1.15rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  margin: 0;
+  min-height: 250px;
+}
+
+.plan-card-pro:hover {
+  border-color: rgba(124, 92, 252, 0.5);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(21, 26, 53, 0.08);
+}
+
+.plan-card-pro input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.plan-card-pro:has(input:checked) {
+  border-color: var(--plan-primary);
+  background-color: #FAF8FF;
+  box-shadow: 0 10px 35px rgba(124, 92, 252, 0.18);
+  transform: translateY(-2px);
+}
+
+.plan-card-pro:has(input:checked) .plan-name-pro {
+  color: var(--plan-primary);
+}
+
+.plan-card-pro.featured {
+  border-color: rgba(124, 92, 252, 0.7);
+}
+
+.plan-ribbon-featured {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: linear-gradient(135deg, #7C5CFC 0%, #5B38E8 100%);
+  color: #ffffff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 0.25rem 0.85rem;
+  border-bottom-left-radius: 14px;
+}
+
+.plan-name-pro {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--plan-dark);
+  margin-bottom: 0.2rem;
+}
+
+.plan-price-pro {
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: var(--plan-dark);
+  line-height: 1.1;
+}
+
+.plan-price-pro small {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--plan-muted);
+}
+
+/* Billing Toggle Switch */
+.billing-pill-box {
+  background: #F1F5F9;
+  border: 1px solid var(--plan-border);
+  border-radius: 100px;
+  padding: 0.3rem;
+  display: inline-flex;
+  gap: 0.35rem;
+}
+
+.billing-pill-option {
+  cursor: pointer;
+  margin: 0;
+}
+
+.billing-pill-option input[type="radio"] {
+  display: none;
+}
+
+.billing-pill-label {
+  padding: 0.5rem 1.25rem;
+  border-radius: 100px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--plan-muted);
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.billing-pill-option input[type="radio"]:checked + .billing-pill-label {
+  background: #ffffff;
+  color: var(--plan-primary);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+}
+
+/* Grilla de Módulos Espaciosa */
+.modules-grid-pro {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.module-item-pro {
+  border: 1.5px solid var(--plan-border);
+  border-radius: 16px;
+  padding: 1.1rem 0.85rem;
+  text-align: center;
+  cursor: pointer;
+  background: #ffffff;
+  transition: all 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 0;
+  position: relative;
+  min-height: 105px;
+}
+
+.module-item-pro input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.module-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #F8FAFC;
+  color: #94A3B8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  transition: all 0.25s ease;
+}
+
+.module-item-pro span {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #334155;
+  line-height: 1.2;
+}
+
+.module-item-pro:hover {
+  border-color: rgba(124, 92, 252, 0.4);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+}
+
+.module-item-pro:has(input:checked) {
+  border-color: var(--plan-primary);
+  background-color: #FAF8FF;
+  box-shadow: 0 6px 20px rgba(124, 92, 252, 0.1);
+}
+
+.module-item-pro:has(input:checked) .module-icon-wrap {
+  background: var(--plan-primary-soft);
+  color: var(--plan-primary);
+}
+
+.module-item-pro:has(input:checked) span {
+  color: var(--plan-primary);
+}
+
+/* Tarjeta Checkout Resumen Espaciosa */
+.checkout-summary-box {
+  background: linear-gradient(135deg, #111827 0%, #1E1B4B 100%);
+  border-radius: 24px;
+  padding: 1.75rem 2.25rem;
+  color: #ffffff;
+  margin-bottom: 2rem;
+  box-shadow: 0 20px 45px rgba(17, 24, 39, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.summary-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.summary-col-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 0.6px;
+  margin-bottom: 0.2rem;
+}
+
+.summary-col-val {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.summary-total-price {
+  font-size: 1.9rem;
+  font-weight: 900;
+  color: #A98CF5;
+  line-height: 1;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .plans-grid-modern {
     grid-template-columns: repeat(2, 1fr);
-    gap: 0.8rem;
-}
-.plan-card-compact {
-    border: 2px solid #EAEAF2;
-    border-radius: 12px;
-    padding: 0.8rem 1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    background: #ffffff;
-    display: block;
-    position: relative;
-    overflow: hidden;
-    margin: 0;
-}
-.plan-card-compact:hover {
-    border-color: #d1c7f5;
-}
-.plan-card-compact input[type="radio"] {
-    position: absolute;
-    opacity: 0;
-}
-.plan-card-compact:has(input:checked) {
-    border-color: #8B6FE8;
-    background-color: #f0ebff;
-    box-shadow: 0 4px 15px rgba(139, 111, 232, 0.1);
-}
-.plan-card-compact:has(input:checked) .plan-name {
-    color: #8B6FE8;
-}
-.plan-badge {
-    background: #8B6FE8;
-    color: white;
-    font-size: 0.6rem;
-    font-weight: 700;
-    padding: 0.15rem 0.5rem;
-    border-radius: 5px;
-}
-
-/* Toggle de Facturación */
-.billing-toggle {
-    background-color: #F0F1F7;
-    border: 1px solid #EAEAF2;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.04);
-}
-.billing-btn {
-    color: #687089;
-    transition: all 0.3s ease;
-}
-input[name="billing"]:checked ~ .billing-btn {
-    background-color: #ffffff;
-    color: #8B6FE8;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.05);
-    transform: translateY(-1px);
-}
-
-/* Grilla de Módulos */
-.modules-grid-compact {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0.6rem;
-}
-.module-item {
-    border: 2px solid #EAEAF2;
-    border-radius: 10px;
-    padding: 0.5rem 0.3rem;
-    text-align: center;
-    cursor: pointer;
-    background: #ffffff;
-    transition: all 0.2s ease;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.2rem;
-    margin: 0;
-}
-.module-item i {
-    font-size: 1.3rem;
-    color: #a0aab5;
-    transition: all 0.2s ease;
-}
-.module-item span {
-    font-size: 0.65rem;
-    font-weight: 600;
-    color: #687089;
-    line-height: 1.1;
-}
-.module-item:hover {
-    border-color: #d1c7f5;
-}
-.module-item input[type="checkbox"] {
-    position: absolute;
-    opacity: 0;
-}
-.module-item:has(input:checked) {
-    border-color: #8B6FE8;
-    background-color: #f0ebff;
-}
-.module-item:has(input:checked) i {
-    color: #8B6FE8;
-}
-.module-item:has(input:checked) span {
-    color: #151A35;
-}
-.module-item:has(input:disabled) {
-    cursor: not-allowed;
-    opacity: 0.6;
-}
-
-/* Resumen */
-.summary-horizontal {
-    border: 1px solid #EAEAF2;
-    background: #F8F9FC;
+  }
 }
 
 @media (max-width: 768px) {
-    .plans-grid, .modules-grid-compact {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    .summary-horizontal {
-        flex-direction: column;
-        align-items: flex-start !important;
-    }
-    .summary-horizontal .text-end {
-        text-align: left !important;
-        border-left: none !important;
-        padding-left: 0 !important;
-        margin-top: 1rem;
-        padding-top: 1rem;
-        border-top: 2px dashed #EAEAF2;
-        width: 100%;
-    }
+  .plans-grid-modern {
+    grid-template-columns: 1fr;
+  }
+  .modules-grid-pro {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .checkout-summary-box {
+    padding: 1.25rem 1.25rem;
+  }
 }

@@ -146,12 +146,13 @@
             
             <div class="topbar-right">
                 <div class="user-profile dropdown-toggle" data-bs-toggle="dropdown">
-                    <img src="https://ui-avatars.com/api/?name={{ request.user.first_name|default:request.user.username }}+{{ request.user.last_name|default:'' }}&background=7C5CFC&color=fff" alt="Perfil">
+                    <img src="https://ui-avatars.com/api/?name={{ user.first_name|default:user.username }}+{{ user.last_name|default:'' }}&background=7C5CFC&color=fff" alt="Perfil">
                     <div class="user-info d-none d-sm-flex">
-                        <span class="user-name">{{ request.user.first_name|default:request.user.username }}</span>
+                        <span class="user-name">{{ user.first_name|default:user.username }}</span>
                         <span class="user-role">{{ miembro.rol.nombre|default:'Profesor' }}</span>
                     </div>
                 </div>
+
             </div>
         </header>
 
@@ -216,34 +217,50 @@
                                         <tr>
                                             <td>{{ forloop.counter }}</td>
                                             <td>
-                                                <div class="fw-semibold text-dark">{{ est.nombre_completo }}</div>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <div class="fw-semibold text-dark">{{ est.nombre_completo }}</div>
+                                                    {% if est.es_pie %}
+                                                        <span class="badge px-2 py-0.5 fw-bold" style="font-size:0.7rem; background:#F0EDFF; color:#7C5CFC; border:1px solid #D8CEFF;" title="Programa PIE: {{ est.diagnostico_pie|default:'Acompañamiento pedagógico' }}">
+                                                            <i class="bi bi-puzzle-fill me-1"></i>PIE
+                                                        </span>
+                                                    {% endif %}
+                                                </div>
                                             </td>
                                             <td class="text-secondary small">{{ est.rut|default:"-" }}</td>
                                             <td>
-                                                <div class="btn-check-group justify-content-center">
-                                                    <!-- Presente -->
-                                                    <input type="radio" class="btn-check" name="estado_{{ est.id }}" id="presente_{{ est.id }}" value="presente" {% if est.estado_actual == 'presente' %}checked{% endif %}>
-                                                    <label class="btn btn-outline-secondary btn-sm btn-state-presente px-2 py-1 fw-semibold text-capitalize d-flex align-items-center gap-1" for="presente_{{ est.id }}">
-                                                        <i class="bi bi-check-circle"></i> Presente
-                                                    </label>
+                                                <div class="d-flex flex-column align-items-center">
+                                                    <!-- Estado Principal: Presente / Atrasado / Ausente -->
+                                                    <input type="hidden" name="estado_{{ est.id }}" id="final_estado_{{ est.id }}" value="{% if est.estado_actual %}{{ est.estado_actual }}{% else %}presente{% endif %}">
+                                                    
+                                                    <div class="btn-check-group justify-content-center">
+                                                        <!-- Presente -->
+                                                        <input type="radio" class="btn-check radio-estado-main" name="main_estado_{{ est.id }}" id="presente_{{ est.id }}" value="presente" {% if est.estado_actual == 'presente' or not est.estado_actual %}checked{% endif %} onchange="onCambioEstadoPrincipal('{{ est.id }}', 'presente')">
+                                                        <label class="btn btn-outline-secondary btn-sm btn-state-presente px-2 py-1 fw-semibold text-capitalize d-flex align-items-center gap-1" for="presente_{{ est.id }}">
+                                                            <i class="bi bi-check-circle"></i> Presente
+                                                        </label>
 
-                                                    <!-- Atrasado -->
-                                                    <input type="radio" class="btn-check" name="estado_{{ est.id }}" id="tarde_{{ est.id }}" value="tarde" {% if est.estado_actual == 'tarde' %}checked{% endif %}>
-                                                    <label class="btn btn-outline-secondary btn-sm btn-state-tarde px-2 py-1 fw-semibold text-capitalize d-flex align-items-center gap-1" for="tarde_{{ est.id }}">
-                                                        <i class="bi bi-clock"></i> Atrasado
-                                                    </label>
+                                                        <!-- Atrasado -->
+                                                        <input type="radio" class="btn-check radio-estado-main" name="main_estado_{{ est.id }}" id="tarde_{{ est.id }}" value="tarde" {% if est.estado_actual == 'tarde' %}checked{% endif %} onchange="onCambioEstadoPrincipal('{{ est.id }}', 'tarde')">
+                                                        <label class="btn btn-outline-secondary btn-sm btn-state-tarde px-2 py-1 fw-semibold text-capitalize d-flex align-items-center gap-1" for="tarde_{{ est.id }}">
+                                                            <i class="bi bi-clock"></i> Atrasado
+                                                        </label>
 
-                                                    <!-- Ausente -->
-                                                    <input type="radio" class="btn-check" name="estado_{{ est.id }}" id="ausente_{{ est.id }}" value="ausente" {% if est.estado_actual == 'ausente' %}checked{% endif %}>
-                                                    <label class="btn btn-outline-secondary btn-sm btn-state-ausente px-2 py-1 fw-semibold text-capitalize d-flex align-items-center gap-1" for="ausente_{{ est.id }}">
-                                                        <i class="bi bi-x-circle"></i> Ausente
-                                                    </label>
+                                                        <!-- Ausente -->
+                                                        <input type="radio" class="btn-check radio-estado-main" name="main_estado_{{ est.id }}" id="ausente_{{ est.id }}" value="ausente" {% if est.estado_actual == 'ausente' or est.estado_actual == 'justificado' %}checked{% endif %} onchange="onCambioEstadoPrincipal('{{ est.id }}', 'ausente')">
+                                                        <label class="btn btn-outline-secondary btn-sm btn-state-ausente px-2 py-1 fw-semibold text-capitalize d-flex align-items-center gap-1" for="ausente_{{ est.id }}">
+                                                            <i class="bi bi-x-circle"></i> Ausente
+                                                        </label>
+                                                    </div>
 
-                                                    <!-- Justificado -->
-                                                    <input type="radio" class="btn-check" name="estado_{{ est.id }}" id="justificado_{{ est.id }}" value="justificado" {% if est.estado_actual == 'justificado' %}checked{% endif %}>
-                                                    <label class="btn btn-outline-secondary btn-sm btn-state-justificado px-2 py-1 fw-semibold text-capitalize d-flex align-items-center gap-1" for="justificado_{{ est.id }}">
-                                                        <i class="bi bi-file-earmark-text"></i> Justificado
-                                                    </label>
+                                                    <!-- Sub-opción condicional: Solo visible cuando está Ausente -->
+                                                    <div class="sub-justificado-container mt-1.5 p-1 px-2 rounded-2 border {% if est.estado_actual != 'ausente' and est.estado_actual != 'justificado' %}d-none{% endif %}" id="sub_just_{{ est.id }}" style="background: #EFF6FF; border-color: #BFDBFE !important;">
+                                                        <div class="form-check form-switch d-flex align-items-center gap-1.5 m-0 p-0">
+                                                            <input class="form-check-input m-0 cursor-pointer" type="checkbox" role="switch" id="check_just_{{ est.id }}" {% if est.estado_actual == 'justificado' %}checked{% endif %} onchange="onToggleJustificado('{{ est.id }}')">
+                                                            <label class="form-check-label extra-small fw-bold text-primary cursor-pointer mb-0" for="check_just_{{ est.id }}">
+                                                                <i class="bi bi-file-earmark-medical me-1"></i>¿Inasistencia Justificada?
+                                                            </label>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </td>
                                             <td>
@@ -293,12 +310,45 @@
         }
     });
 
+    function onCambioEstadoPrincipal(estId, estado) {
+        const subJust = document.getElementById('sub_just_' + estId);
+        const checkJust = document.getElementById('check_just_' + estId);
+        const finalInput = document.getElementById('final_estado_' + estId);
+
+        if (estado === 'ausente') {
+            if (subJust) subJust.classList.remove('d-none');
+            if (checkJust && checkJust.checked) {
+                finalInput.value = 'justificado';
+            } else {
+                finalInput.value = 'ausente';
+            }
+        } else {
+            if (subJust) subJust.classList.add('d-none');
+            if (checkJust) checkJust.checked = false;
+            finalInput.value = estado;
+        }
+    }
+
+    function onToggleJustificado(estId) {
+        const checkJust = document.getElementById('check_just_' + estId);
+        const finalInput = document.getElementById('final_estado_' + estId);
+        if (checkJust && checkJust.checked) {
+            finalInput.value = 'justificado';
+        } else {
+            finalInput.value = 'ausente';
+        }
+    }
+
     function marcarTodosPresente() {
-        const checkButtons = document.querySelectorAll('input[type="radio"][value="presente"]');
-        checkButtons.forEach(btn => {
-            btn.checked = true;
+        const presentesRadios = document.querySelectorAll('input[type="radio"][value="presente"]');
+        presentesRadios.forEach(radio => {
+            radio.checked = true;
+            const estId = radio.id.replace('presente_', '');
+            onCambioEstadoPrincipal(estId, 'presente');
         });
     }
 </script>
+
+
 </body>
 </html>

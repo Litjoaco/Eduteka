@@ -31,7 +31,11 @@ def calcular_alumnos_en_riesgo(colegio):
                 alumnos_en_riesgo.append({
                     'estudiante': est,
                     'tasa': round(tasa, 1),
-                    'faltas': est.faltas
+                    'porcentaje_asistencia': round(tasa, 1),
+                    'faltas': est.faltas,
+                    'total_inasistencias': est.faltas,
+                    'negativas_count': est.faltas,
                 })
     return alumnos_en_riesgo
+
 

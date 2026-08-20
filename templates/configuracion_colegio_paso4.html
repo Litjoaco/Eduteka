@@ -4,580 +4,557 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configura tu colegio - Paso 4 - Eduteka</title>
+    <title>Configura tu colegio - Paso 4: Roles & Permisos — Eduteka</title>
     
-    <!-- Google Fonts: Inter -->
+    <!-- Google Fonts: Inter & Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- Bootstrap Icons -->
+    <!-- Bootstrap CSS & Icons -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{% static 'css/configuracion_colegio_paso4.css' %}">
-    <style>
-        /* Unificar el diseño del Stepper para que sea igual en todos los pasos */
-        .stepper .step {
-            background: transparent !important;
-            border-radius: 0 !important;
-            padding: 0 !important;
-        }
-        .stepper .step-icon {
-            width: 32px !important;
-            height: 32px !important;
-            border-radius: 50% !important; /* Siempre circulares, elimina efecto pastilla */
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            font-weight: 700 !important;
-            background-image: none !important; /* Elimina íconos de fondo */
-            text-indent: 0 !important; /* Mantiene el número visible */
-        }
-        .stepper .step.completed .step-icon {
-            background-color: #7b52d9 !important; /* Color morado */
-            border-color: #7b52d9 !important;
-            color: #ffffff !important;
-        }
-        /* Ocultar checkmarks (ticket positivo) inyectados mediante seudo-elementos */
-        .stepper .step.completed .step-icon::before,
-        .stepper .step.completed .step-icon::after {
-            display: none !important;
-            content: none !important;
-        }
-        
-        /* Estilo para los interruptores de permisos bloqueados */
-        .toggle-switch.locked {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        .toggle-switch.locked input {
-            cursor: not-allowed;
-        }
-    </style>
+    <link rel="stylesheet" href="{% static 'css/configuracion_colegio_paso4.css' %}?v=6">
+    <link rel="stylesheet" href="{% static 'css/backbutton.css' %}">
 </head>
 <body>
 
-<div class="config-container">
-    
-    <!-- ==========================================
-         LEFT COLUMN 
-         ========================================== -->
-    <div class="left-column">
-        <div class="logo-container">
-            <img src="/static/img/logo.png" alt="Eduteka Logo" style="height: 100px; width: auto;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzdiNTJkOSIgcng9IjIwIi8+PHRleHQgeD0iNTAiIHk9IjY0IiBmb250LWZhbWlseT0iSW50ZXIiIGZvbnQtd2VpZ2h0PSI4MDAiIGZvbnQtc2l6ZT0iNDgiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5FPC90ZXh0Pjwvc3ZnPg=='">
-        </div>
+    <!-- Botón Volver al paso 3 -->
+    <a href="{% url 'configuracion_colegio_paso3' colegio.id %}" class="back-button">
+        <i class="bi bi-arrow-left"></i> Volver al Paso 3
+    </a>
+
+    <div class="config-container">
         
-        <div class="header-text-group">
+        <!-- ==========================================
+             LEFT COLUMN (Branding & Guidance)
+             ========================================== -->
+        <div class="left-column">
+            <div class="logo-container">
+                <img src="{% static 'img/logo.png' %}" alt="Eduteka Logo" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzdiNTJkOSIgcng9IjIwIi8+PHRleHQgeD0iNTAiIHk9IjY0IiBmb250LWZhbWlseT0iSW50ZXIiIGZvbnQtd2VpZ2h0PSI4MDAiIGZvbnQtc2l6ZT0iNDgiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5FPC90ZXh0Pjwvc3ZnPg=='">
+            </div>
+            
             <div class="step-pill">
-                <i class="bi bi-shield-lock-fill"></i> Paso 4 de 5
-            </div>
-            <h1>Configura roles y permisos</h1>
-            <p class="desc-text">El administrador define qué puede ver y hacer cada rol dentro de la plataforma para mantener el control y la seguridad del colegio.</p>
-        </div>
-        
-        <div class="illustration-wrapper">
-            <div class="deco-blob blob-1"></div>
-            <div class="deco-blob blob-2"></div>
-            <div class="deco-blob blob-3"></div>
-            <img src="{% static 'img/seguridad.png' %}" alt="Ilustración Seguridad y Roles" onerror="this.src='https://placehold.co/400x300/F4F0FF/7C5CFA?text=Roles+%26+Security+3D'">
-        </div>
-        
-        <div class="plan-includes-card">
-            <h3>Beneficios para tu colegio</h3>
-            <ul class="plan-includes-list">
-                <li><i class="bi bi-person-badge"></i> Roles personalizados</li>
-                <li><i class="bi bi-ui-checks-grid"></i> Permisos por módulo</li>
-                <li><i class="bi bi-eye"></i> Vista previa del acceso</li>
-                <li><i class="bi bi-shield-check"></i> Control seguro</li>
-            </ul>
-        </div>
-    </div>
-    
-    <!-- ==========================================
-         MAIN CARD (RIGHT) 
-         ========================================== -->
-    <div class="main-card">
-        
-        <!-- Compact Stepper -->
-        <div class="stepper">
-            <div class="step completed">
-                <div class="step-icon">1</div>
-                <div class="step-text">Identidad</div>
-            </div>
-            <div class="step completed">
-                <div class="step-icon">2</div>
-                <div class="step-text">Contacto</div>
-            </div>
-            <div class="step completed">
-                <div class="step-icon">3</div>
-                <div class="step-text">Académica</div>
-            </div>
-            <div class="step active">
-                <div class="step-icon">4</div>
-                <div class="step-text">Roles</div>
-            </div>
-            <div class="step">
-                <div class="step-icon">5</div>
-                <div class="step-text">Módulos</div>
-            </div>
-        </div>
-        
-        <!-- Form Header -->
-        <div class="form-section-header">
-            <div class="section-icon-wrapper">
-                <i class="bi bi-person-lines-fill"></i>
-            </div>
-            <div class="section-titles">
-                <h2>4. Roles y permisos</h2>
-                <p>Define qué puede ver y hacer cada rol dentro de tu colegio.</p>
-            </div>
-        </div>
-        
-        <form id="config-form-paso4" method="post" action="{% url 'configuracion_colegio_paso4' colegio.id %}">
-            {% csrf_token %}
-            <input type="hidden" name="permissions_data" id="permissions_data">
-            
-            <!-- BLOCK 1: Roles Grid -->
-            <div class="block-title">1. Selecciona un rol</div>
-            <div class="roles-grid">
-                {% for rol in roles %}
-                <div class="role-card {% if forloop.first %}active{% endif %}" data-role-id="{{ rol.id }}">
-                    {% if forloop.first %}<i class="bi bi-check-circle-fill role-check"></i>{% endif %}
-                    <div class="role-icon">
-                        <i class="bi {% if rol.nombre == 'Profesor' %}bi-person-video3{% elif rol.nombre == 'Director' %}bi-person-workspace{% elif rol.nombre == 'Administrador' %}bi-shield-lock{% else %}bi-person-vcard{% endif %}"></i>
-                    </div>
-                    <span class="role-name">{{ rol.nombre }}</span>
-                </div>
-                {% empty %}
-                <p>No se han encontrado roles configurados.</p>
-                {% endfor %}
+                <i class="bi bi-people-fill"></i> Paso 4 de 6: Roles & Permisos
             </div>
 
-            <!-- Layout for Block 2 (Table) & Block 3 (Preview) -->
-            <div class="permissions-container">
-                
-                <!-- BLOCK 2: Permissions Table -->
-                <div class="table-section">
-                    <div class="table-header-flex">
-                        <div class="block-title" style="margin: 0;">2. Permisos por módulo</div>
-                        <p>Puedes cambiar estos permisos cuando lo necesites. Los cambios se aplicarán al rol seleccionado.</p>
-                    </div>
-                    
-                    <div id="admin-alert" class="alert alert-info mb-3" style="display: none; background: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; border-radius: 8px; font-size: 0.9rem;">
-                        <i class="bi bi-shield-lock-fill me-2"></i> <strong>Rol de Administrador:</strong> Este rol tiene acceso total al sistema por motivos de seguridad. Sus permisos no pueden ser reducidos.
-                    </div>
+            <h1>Matriz de Roles y Seguridad</h1>
+            <p class="desc-text">Define qué puede ver y modificar cada perfil del colegio (Profesores, Directivos, Inspectores, Secretaría). La seguridad y trazabilidad institucional están garantizadas.</p>
 
-                    <div class="permissions-table-wrapper">
-                        <table class="permissions-table">
-                            <thead>
-                                <tr>
-                                    <th class="col-mod">Módulo</th>
-                                    <th>Ver</th>
-                                    <th>Crear</th>
-                                    <th>Editar</th>
-                                    <th>Exportar</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Generado mediante JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <div class="table-legend">
-                        <div class="legend-item"><div class="legend-dot dot-on"></div> Permitido</div>
-                        <div class="legend-item"><div class="legend-dot dot-off"></div> No permitido</div>
-                        <div class="legend-item"><i class="bi bi-lock-fill" style="color: #94a3b8; font-size: 1rem;"></i> Bloqueado / Por defecto</div>
-                    </div>
-                </div>
-
-                <!-- BLOCK 3: Preview -->
-                <div class="preview-card">
-                    <div class="block-title" style="margin-bottom: 1rem;">3. Vista previa del acceso</div>
-                    
-                    <div class="preview-header">
-                        <h4>Rol seleccionado:</h4>
-                        <h3><i class="bi bi-person-video3"></i> Profesor</h3>
-                    </div>
-                    
-                    <div class="preview-section">
-                        <h5>Menú visible</h5>
-                        <div class="chip-group">
-                            <span class="chip-sm chip-visible"><i class="bi bi-house-door"></i> Inicio</span>
-                            <span class="chip-sm chip-visible"><i class="bi bi-journal-text"></i> Mis cursos</span>
-                            <span class="chip-sm chip-visible"><i class="bi bi-book"></i> Libro de clases</span>
-                            <span class="chip-sm chip-visible"><i class="bi bi-calendar-check"></i> Asistencia</span>
-                            <span class="chip-sm chip-visible"><i class="bi bi-file-earmark-check"></i> Evaluaciones</span>
-                            <span class="chip-sm chip-visible"><i class="bi bi-chat-dots"></i> Comunicación</span>
-                            <span class="chip-sm chip-visible"><i class="bi bi-bar-chart"></i> Reportes</span>
-                        </div>
-                    </div>
-
-                    <div class="preview-section">
-                        <h5>Acciones permitidas</h5>
-                        <div class="chip-group">
-                            <span class="chip-sm chip-action"><i class="bi bi-eye"></i> Ver</span>
-                            <span class="chip-sm chip-action"><i class="bi bi-plus"></i> Crear</span>
-                            <span class="chip-sm chip-action"><i class="bi bi-pencil"></i> Editar</span>
-                            <span class="chip-sm chip-action"><i class="bi bi-download"></i> Exportar</span>
-                            <span class="chip-sm chip-action"><i class="bi bi-send"></i> Enviar mensajes</span>
-                        </div>
-                    </div>
-
-                    <div class="preview-section">
-                        <h5>No visible para este rol</h5>
-                        <div class="chip-group">
-                            <span class="chip-sm chip-blocked"><i class="bi bi-lock-fill"></i> Gestión de usuarios</span>
-                            <span class="chip-sm chip-blocked"><i class="bi bi-lock-fill"></i> Roles y permisos</span>
-                            <span class="chip-sm chip-blocked"><i class="bi bi-lock-fill"></i> Configuración general</span>
-                            <span class="chip-sm chip-blocked"><i class="bi bi-lock-fill"></i> Contabilidad</span>
-                        </div>
-                    </div>
-
-                    <div class="preview-section" style="margin-bottom: 0;">
-                        <h5>Alcance del acceso</h5>
-                        <div class="scope-box">
-                            Solo sus cursos y estudiantes asociados.
-                        </div>
-                    </div>
-                </div>
-
-            </div> <!-- End Permissions Container -->
-        </form>
-        
-        <!-- Bottom Actions & Tip -->
-        <div class="bottom-area">
-            <div class="tip-card">
-                <div class="tip-icon-bg">
-                    <i class="bi bi-lightbulb-fill"></i>
-                </div>
-                <p><strong>Consejo:</strong> Los permisos pueden ajustarse más adelante desde la configuración del colegio.</p>
+            <!-- Ilustración con Aura Luminosa -->
+            <div class="left-illustration-frame">
+                <div class="left-illustration-aura"></div>
+                <img src="{% static 'img/seguridad.png' %}" alt="Seguridad y Roles" class="img-fluid left-illustration-img">
             </div>
             
-            <div class="action-bar">
-                <div class="help-block">
-                    <span>¿Necesitas ayuda?</span>
-                    <a href="#" class="help-link">Ver guía de roles y permisos <i class="bi bi-arrow-up-right"></i></a>
+            <div class="plan-includes-card">
+                <h3><i class="bi bi-shield-check text-primary"></i> Control de Accesos Institucional</h3>
+                <ul class="plan-includes-list">
+                    <li><i class="bi bi-person-video3"></i> <strong>Profesor:</strong> Notas, asistencia y libro de clases.</li>
+                    <li><i class="bi bi-person-workspace"></i> <strong>Director / UTP:</strong> Aprobación de actas y métricas.</li>
+                    <li><i class="bi bi-clipboard-check"></i> <strong>Inspector:</strong> Asistencia diaria y convivencia escolar.</li>
+                    <li><i class="bi bi-folder2-open"></i> <strong>Secretaría:</strong> Matrícula y certificados de alumno regular.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- ==========================================
+             MAIN CARD (Right: Stepper + Matrix + Live Preview)
+             ========================================== -->
+        <div class="main-card">
+            
+            <!-- Stepper Moderno de 6 Pasos -->
+            <div class="stepper-pro-6">
+                <div class="stepper-pro-line-6"></div>
+
+                <!-- Paso 1 -->
+                <div class="stepper-step-node-6 completed">
+                    <div class="step-node-circle"><i class="bi bi-check2"></i></div>
+                    <span class="step-node-label">1. Identidad ✓</span>
+                </div>
+
+                <!-- Paso 2 -->
+                <div class="stepper-step-node-6 completed">
+                    <div class="step-node-circle"><i class="bi bi-check2"></i></div>
+                    <span class="step-node-label">2. Contacto ✓</span>
+                </div>
+
+                <!-- Paso 3 -->
+                <div class="stepper-step-node-6 completed">
+                    <div class="step-node-circle"><i class="bi bi-check2"></i></div>
+                    <span class="step-node-label">3. Académica ✓</span>
+                </div>
+
+                <!-- Paso 4: Activo -->
+                <div class="stepper-step-node-6 active">
+                    <div class="step-node-circle"><i class="bi bi-people"></i></div>
+                    <span class="step-node-label">4. Roles</span>
+                </div>
+
+                <!-- Paso 5 -->
+                <div class="stepper-step-node-6">
+                    <div class="step-node-circle"><i class="bi bi-grid"></i></div>
+                    <span class="step-node-label">5. Módulos</span>
+                </div>
+
+                <!-- Paso 6 -->
+                <div class="stepper-step-node-6">
+                    <div class="step-node-circle"><i class="bi bi-sliders2"></i></div>
+                    <span class="step-node-label">6. Políticas</span>
+                </div>
+            </div>
+            
+            <!-- Form Header -->
+            <div class="form-section-header">
+                <div class="section-icon-wrapper">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+                <div class="section-titles">
+                    <h2>4. Configuración de Roles y Permisos</h2>
+                    <p>Selecciona un rol institucional para ajustar qué módulos puede ver, crear, editar o exportar.</p>
+                </div>
+            </div>
+            
+            <!-- Content Grid (Matrix + Live Preview) -->
+            <div class="content-grid">
+                
+                <!-- Columna Izquierda: Formulario y Matriz -->
+                <div class="form-area">
+                    {% if messages %}
+                        <div class="messages-container mb-3">
+                            {% for message in messages %}
+                                <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}" style="border-radius: 12px; font-size: 0.9rem; padding: 0.85rem 1rem;">
+                                    <i class="bi bi-exclamation-circle-fill me-1"></i> {{ message }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <form id="config-form-paso4" method="post" action="{% url 'configuracion_colegio_paso4' colegio.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="permissions_data" id="permissions_data">
+                        
+                        <!-- SECCIÓN 1: TARJETAS VISUALES DE ROLES -->
+                        <div class="form-group-block">
+                            <div class="form-block-title">
+                                <i class="bi bi-person-badge-fill text-primary"></i> 1. Selecciona el Rol Institucional
+                            </div>
+
+                            <div class="role-cards-grid" id="roleCardsGrid">
+                                
+                                <!-- Administrador -->
+                                <div class="role-card-item active" data-role-name="Administrador" onclick="switchRole('Administrador')">
+                                    <div class="role-avatar-icon"><i class="bi bi-shield-lock-fill"></i></div>
+                                    <div class="role-card-info">
+                                        <span class="role-card-title">Administrador</span>
+                                        <span class="role-card-subtitle">Control total del sistema</span>
+                                    </div>
+                                </div>
+
+                                <!-- Director -->
+                                <div class="role-card-item" data-role-name="Director" onclick="switchRole('Director')">
+                                    <div class="role-avatar-icon"><i class="bi bi-person-workspace"></i></div>
+                                    <div class="role-card-info">
+                                        <span class="role-card-title">Director / UTP</span>
+                                        <span class="role-card-subtitle">Gestión académica y actas</span>
+                                    </div>
+                                </div>
+
+                                <!-- Profesor -->
+                                <div class="role-card-item" data-role-name="Profesor" onclick="switchRole('Profesor')">
+                                    <div class="role-avatar-icon"><i class="bi bi-person-video3"></i></div>
+                                    <div class="role-card-info">
+                                        <span class="role-card-title">Profesor Docente</span>
+                                        <span class="role-card-subtitle">Libro de clases y notas</span>
+                                    </div>
+                                </div>
+
+                                <!-- Inspector -->
+                                <div class="role-card-item" data-role-name="Inspector" onclick="switchRole('Inspector')">
+                                    <div class="role-avatar-icon"><i class="bi bi-clipboard-check"></i></div>
+                                    <div class="role-card-info">
+                                        <span class="role-card-title">Inspectoría</span>
+                                        <span class="role-card-subtitle">Asistencia y convivencia</span>
+                                    </div>
+                                </div>
+
+                                <!-- Secretario -->
+                                <div class="role-card-item" data-role-name="Secretario" onclick="switchRole('Secretario')">
+                                    <div class="role-avatar-icon"><i class="bi bi-folder2-open"></i></div>
+                                    <div class="role-card-info">
+                                        <span class="role-card-title">Secretaría</span>
+                                        <span class="role-card-subtitle">Matrículas y certificados</span>
+                                    </div>
+                                </div>
+
+                                <!-- Contabilidad -->
+                                <div class="role-card-item" data-role-name="Contabilidad" onclick="switchRole('Contabilidad')">
+                                    <div class="role-avatar-icon"><i class="bi bi-calculator-fill"></i></div>
+                                    <div class="role-card-info">
+                                        <span class="role-card-title">Contabilidad</span>
+                                        <span class="role-card-subtitle">Finanzas y mensualidades</span>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- SECCIÓN 2: MATRIZ DE PERMISOS -->
+                        <div class="form-group-block">
+                            <div class="presets-bar">
+                                <div class="form-block-title m-0 p-0 border-0">
+                                    <i class="bi bi-ui-checks-grid text-primary"></i> 2. Permisos para: <span id="currentRoleTitle" class="text-primary fw-extrabold ms-1">Administrador</span>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button type="button" class="preset-btn" onclick="applyPreset('recommended')">
+                                        <i class="bi bi-shield-check"></i> Recomendado MINEDUC
+                                    </button>
+                                    <button type="button" class="preset-btn" onclick="applyPreset('readonly')">
+                                        <i class="bi bi-eye"></i> Solo Lectura
+                                    </button>
+                                    <button type="button" class="preset-btn" onclick="applyPreset('full')">
+                                        <i class="bi bi-check2-all"></i> Acceso Total
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="matrix-table-wrapper">
+                                <table class="matrix-table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 40%;">Módulo del Sistema</th>
+                                            <th style="width: 15%;">Ver</th>
+                                            <th style="width: 15%;">Crear</th>
+                                            <th style="width: 15%;">Editar</th>
+                                            <th style="width: 15%;">Exportar</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="matrixTableBody">
+                                        <!-- Filas de módulos generadas dinámicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </form>
                 </div>
                 
-                <div class="buttons-group">
-                    <a href="{% url 'configuracion_colegio_paso3' colegio.id %}" class="btn-secondary">Volver al paso 3</a>
-                    <button type="button" class="btn-primary-gradient" onclick="submitPermissionsForm()">
-                        Guardar y continuar <i class="bi bi-arrow-right"></i>
+                <!-- Columna Derecha: Simulación de Barra Lateral en Vivo -->
+                <div class="summary-area">
+                    <div class="role-preview-card">
+                        
+                        <div class="preview-header">
+                            <div class="preview-avatar" id="previewAvatar">
+                                <i class="bi bi-shield-lock-fill"></i>
+                            </div>
+                            <div>
+                                <h5 class="preview-role-name" id="previewRoleName">Administrador</h5>
+                                <span class="badge bg-primary-subtle text-primary border" style="font-size: 0.72rem; font-weight: 800;" id="previewRoleBadge">Acceso Total Institucional</span>
+                            </div>
+                        </div>
+
+                        <!-- Mini Sidebar Simulada -->
+                        <div class="sim-sidebar-box">
+                            <div class="sim-sidebar-title">
+                                <i class="bi bi-layout-sidebar-inset"></i> Menú Lateral para este Perfil
+                            </div>
+                            <ul class="sim-sidebar-list" id="simSidebarList">
+                                <!-- Lista dinámica de accesos -->
+                            </ul>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center small text-muted pt-2 border-top">
+                            <span>Módulos visibles en su menú:</span>
+                            <strong class="text-dark fw-extrabold" id="statsVisibleModules">0 de 0</strong>
+                        </div>
+
+                    </div>
+                </div>
+                
+            </div> <!-- End Content Grid -->
+            
+            <!-- Bottom Actions & Continue -->
+            <div class="bottom-area">
+                <div class="action-bar">
+                    <a href="{% url 'configuracion_colegio_paso3' colegio.id %}" class="btn-secondary-outline">
+                        <i class="bi bi-arrow-left"></i> Volver al Paso 3
+                    </a>
+                    
+                    <button type="button" class="btn-primary-gradient" id="btnSubmitPaso4" onclick="submitPaso4Form()">
+                        <span id="btnSubmitPaso4Text">Guardar Permisos y Continuar al Paso 5</span>
+                        <i class="bi bi-arrow-right-short fs-3" id="btnSubmitPaso4Icon"></i>
+                        <span class="spinner-border spinner-border-sm d-none" id="btnSubmitPaso4Spinner" role="status"></span>
                     </button>
                 </div>
             </div>
+            
         </div>
-        
     </div>
-</div>
 
-<script id="saved-permissions-data" type="application/json">
-    {{ saved_permissions_json|safe }}
-</script>
-
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const rolePermissions = {
-            'Profesor': {
-                modules: {
-                    'Inicio': { view: true, create: false, edit: false, export: false, locked: ['create', 'edit', 'export'] },
-                    'Mis cursos': { view: true, create: false, edit: false, export: false, locked: ['export'] },
-                    'Libro de clases': { view: true, create: true, edit: true, export: false, locked: [] },
-                    'Asistencia': { view: true, create: false, edit: true, export: false, locked: [] },
-                    'Evaluaciones': { view: true, create: true, edit: true, export: false, locked: [] },
-                    'Comunicación': { view: true, create: true, edit: false, export: false, locked: ['export'] },
-                    'Reportes y analíticas': { view: true, create: false, edit: false, export: true, locked: ['create', 'edit'] },
-                    'Perfil del estudiante': { view: false, create: false, edit: false, export: false, locked: ['view', 'create', 'edit', 'export'], disabledModule: true },
-                    'Configuración avanzada': { view: false, create: false, edit: false, export: false, locked: ['view', 'create', 'edit', 'export'], disabledModule: true },
-                    'Finanzas': { view: false, create: false, edit: false, export: false, locked: ['view', 'create', 'edit', 'export'], disabledModule: true }
-                },
-                scope: "Solo sus cursos y estudiantes asociados."
-            },
-            'Inspector': {
-                modules: {
-                    'Inicio': { view: true, create: false, edit: false, export: false, locked: ['create', 'edit', 'export'] },
-                    'Mis cursos': { view: true, create: false, edit: false, export: false, locked: ['create', 'edit', 'export'] },
-                    'Libro de clases': { view: true, create: false, edit: false, export: false, locked: [] },
-                    'Asistencia': { view: true, create: true, edit: true, export: true, locked: [] },
-                    'Evaluaciones': { view: false, create: false, edit: false, export: false, locked: ['create', 'edit', 'export'] },
-                    'Comunicación': { view: true, create: true, edit: false, export: false, locked: ['export'] },
-                    'Reportes y analíticas': { view: true, create: false, edit: false, export: true, locked: ['create', 'edit'] },
-                    'Perfil del estudiante': { view: true, create: false, edit: false, export: false, locked: [] },
-                    'Configuración avanzada': { view: false, create: false, edit: false, export: false, locked: ['view', 'create', 'edit', 'export'], disabledModule: true },
-                    'Finanzas': { view: false, create: false, edit: false, export: false, locked: ['view', 'create', 'edit', 'export'], disabledModule: true }
-                },
-                scope: "Todos los cursos y estudiantes."
-            },
-            'Director': {
-                 modules: {
-                    'Inicio': { view: true, create: false, edit: false, export: false, locked: ['create', 'edit', 'export'] },
-                    'Mis cursos': { view: true, create: true, edit: true, export: true, locked: [] },
-                    'Libro de clases': { view: true, create: true, edit: true, export: true, locked: [] },
-                    'Asistencia': { view: true, create: true, edit: true, export: true, locked: [] },
-                    'Evaluaciones': { view: true, create: true, edit: true, export: true, locked: [] },
-                    'Comunicación': { view: true, create: true, edit: true, export: true, locked: [] },
-                    'Reportes y analíticas': { view: true, create: true, edit: true, export: true, locked: [] },
-                    'Perfil del estudiante': { view: true, create: true, edit: true, export: true, locked: [] },
-                    'Configuración avanzada': { view: true, create: true, edit: true, export: true, locked: [] },
-                    'Finanzas': { view: true, create: true, edit: true, export: true, locked: [] }
-                },
-                scope: "Acceso total a la institución."
-            },
-            'Administrativo': {
-                 modules: {
-                    'Inicio': { view: true, create: false, edit: false, export: false, locked: ['create', 'edit', 'export'] },
-                    'Mis cursos': { view: true, create: false, edit: false, export: false, locked: [] },
-                    'Libro de clases': { view: false, create: false, edit: false, export: false, locked: [] },
-                    'Asistencia': { view: true, create: false, edit: false, export: true, locked: [] },
-                    'Evaluaciones': { view: false, create: false, edit: false, export: false, locked: [] },
-                    'Comunicación': { view: true, create: true, edit: false, export: false, locked: ['export'] },
-                    'Reportes y analíticas': { view: true, create: false, edit: false, export: true, locked: ['create', 'edit'] },
-                    'Perfil del estudiante': { view: true, create: true, edit: true, export: true, locked: [] },
-                    'Configuración avanzada': { view: true, create: false, edit: false, export: false, locked: [] },
-                    'Finanzas': { view: false, create: false, edit: false, export: false, locked: ['view', 'create', 'edit', 'export'], disabledModule: true }
-                },
-                scope: "Gestión de usuarios y reportes."
-            },
-            'Contabilidad': {
-                modules: {
-                    'Inicio': { view: true, create: false, edit: false, export: false, locked: ['create', 'edit', 'export'] },
-                    'Mis cursos': { view: false, create: false, edit: false, export: false, locked: ['view', 'create', 'edit', 'export'], disabledModule: true },
-                    'Libro de clases': { view: false, create: false, edit: false, export: false, locked: ['view', 'create', 'edit', 'export'], disabledModule: true },
-                    'Asistencia': { view: false, create: false, edit: false, export: false, locked: ['view', 'create', 'edit', 'export'], disabledModule: true },
-                    'Evaluaciones': { view: false, create: false, edit: false, export: false, locked: ['view', 'create', 'edit', 'export'], disabledModule: true },
-                    'Comunicación': { view: true, create: true, edit: false, export: false, locked: ['export'] },
-                    'Reportes y analíticas': { view: true, create: false, edit: false, export: true, locked: ['create', 'edit'] },
-                    'Perfil del estudiante': { view: true, create: false, edit: false, export: false, locked: [] },
-                    'Configuración avanzada': { view: false, create: false, edit: false, export: false, locked: ['view', 'create', 'edit', 'export'], disabledModule: true },
-                    'Finanzas': { view: true, create: true, edit: true, export: true, locked: [] }
-                },
-                scope: "Acceso exclusivo a finanzas y pagos."
-            },
-            'Administrador': {
-                modules: {
-                    'Inicio': { view: true, create: false, edit: false, export: false, locked: ['create', 'edit', 'export'] },
-                    'Mis cursos': { view: true, create: true, edit: true, export: true, locked: ['view', 'create', 'edit', 'export'] },
-                    'Libro de clases': { view: true, create: true, edit: true, export: true, locked: ['view', 'create', 'edit', 'export'] },
-                    'Asistencia': { view: true, create: true, edit: true, export: true, locked: ['view', 'create', 'edit', 'export'] },
-                    'Evaluaciones': { view: true, create: true, edit: true, export: true, locked: ['view', 'create', 'edit', 'export'] },
-                    'Comunicación': { view: true, create: true, edit: true, export: true, locked: ['view', 'create', 'edit', 'export'] },
-                    'Reportes y analíticas': { view: true, create: true, edit: true, export: true, locked: ['view', 'create', 'edit', 'export'] },
-                    'Perfil del estudiante': { view: true, create: true, edit: true, export: true, locked: ['view', 'create', 'edit', 'export'] },
-                    'Configuración avanzada': { view: true, create: true, edit: true, export: true, locked: ['view', 'create', 'edit', 'export'] },
-                    'Finanzas': { view: true, create: true, edit: true, export: true, locked: ['view', 'create', 'edit', 'export'] }
-                },
-                scope: "Acceso total a la institución (No modificable)."
-            },
-            'Otro rol': {
-                modules: {
-                    'Inicio': { view: true, create: false, edit: false, export: false, locked: ['create', 'edit', 'export'] },
-                    'Mis cursos': { view: false, create: false, edit: false, export: false, locked: [] },
-                    'Libro de clases': { view: false, create: false, edit: false, export: false, locked: [] },
-                    'Asistencia': { view: false, create: false, edit: false, export: false, locked: [] },
-                    'Evaluaciones': { view: false, create: false, edit: false, export: false, locked: [] },
-                    'Comunicación': { view: false, create: false, edit: false, export: false, locked: [] },
-                    'Reportes y analíticas': { view: false, create: false, edit: false, export: false, locked: [] },
-                    'Perfil del estudiante': { view: false, create: false, edit: false, export: false, locked: [] },
-                    'Configuración avanzada': { view: false, create: false, edit: false, export: false, locked: [] },
-                    'Finanzas': { view: false, create: false, edit: false, export: false, locked: [] }
-                },
-                scope: "Personalizado."
-            }
-        };
-
+    <!-- Script de Gestión Reactiva de Permisos y Simulación -->
+    <script>
+        // Lista completa de módulos de Eduteka
         const modulesList = [
-            { name: 'Inicio', icon: 'bi-house-door' },
-            { name: 'Mis cursos', icon: 'bi-journal-text' },
-            { name: 'Libro de clases', icon: 'bi-book' },
-            { name: 'Asistencia', icon: 'bi-calendar-check' },
-            { name: 'Evaluaciones', icon: 'bi-file-earmark-check' },
-            { name: 'Comunicación', icon: 'bi-chat-dots' },
-            { name: 'Reportes y analíticas', icon: 'bi-bar-chart' },
-            { name: 'Perfil del estudiante', icon: 'bi-people' },
-            { name: 'Configuración avanzada', icon: 'bi-gear' },
-            { name: 'Finanzas', icon: 'bi-calculator' }
+            { nombre: "Libro de clases", icono: "bi-book", desc: "Planillas de notas y firmas" },
+            { nombre: "Asistencia", icono: "bi-calendar-check", desc: "Control diario y por bloque" },
+            { nombre: "Perfil del estudiante", icono: "bi-person-vcard", desc: "Matrículas y ficha del alumno" },
+            { nombre: "Reportes y analíticas", icono: "bi-bar-chart", desc: "Métricas y diagnósticos" },
+            { nombre: "Finanzas", icono: "bi-calculator", desc: "Cobros y mensualidades" },
+            { nombre: "Proveedores", icono: "bi-truck", desc: "Compras y compras públicas" },
+            { nombre: "SIMCE", icono: "bi-clipboard-data", desc: "Ensayos y diagnósticos DIA" }
         ];
 
-        let currentRole = 'Profesor';
+        // Matriz de permisos en memoria por rol
+        let currentRole = "Administrador";
+        let permissionsMatrix = {{ saved_permissions_json|safe|default:"{}" }};
 
-        // Cargar datos reales guardados en Django
-        const savedDataEl = document.getElementById('saved-permissions-data');
-        if (savedDataEl && savedDataEl.textContent.trim()) {
-            try {
-                const savedData = JSON.parse(savedDataEl.textContent);
-                for (const [rolName, modules] of Object.entries(savedData)) {
-                    if (!rolePermissions[rolName]) {
-                        rolePermissions[rolName] = { modules: {}, scope: "Personalizado" };
-                        modulesList.forEach(m => {
-                            rolePermissions[rolName].modules[m.name] = { view: false, create: false, edit: false, export: false, locked: [] };
-                        });
-                    }
-                    for (const [modName, perms] of Object.entries(modules)) {
-                        if (!rolePermissions[rolName].modules[modName]) {
-                            rolePermissions[rolName].modules[modName] = { view: false, create: false, edit: false, export: false, locked: [] };
-                        }
-                        rolePermissions[rolName].modules[modName].view = perms.view;
-                        rolePermissions[rolName].modules[modName].create = perms.create;
-                        rolePermissions[rolName].modules[modName].edit = perms.edit;
-                        rolePermissions[rolName].modules[modName].export = perms.export;
-                    }
-                }
-            } catch (e) { console.error('Error al cargar permisos', e); }
-        }
-
-        const roleCards = document.querySelectorAll('.role-card');
-        const tbody = document.querySelector('.permissions-table tbody');
-        const previewHeader = document.querySelector('.preview-header h3');
-        const previewScope = document.querySelector('.scope-box');
-        
-        const visibleSection = document.querySelectorAll('.preview-section')[0].querySelector('.chip-group');
-        const actionsSection = document.querySelectorAll('.preview-section')[1].querySelector('.chip-group');
-        const blockedSection = document.querySelectorAll('.preview-section')[2].querySelector('.chip-group');
-        const adminAlert = document.getElementById('admin-alert');
-
-        function renderTable() {
-            tbody.innerHTML = '';
-            
-            if (adminAlert) {
-                adminAlert.style.display = currentRole === 'Administrador' ? 'block' : 'none';
+        // Presets recomendados por normativa
+        const defaultRolePresets = {
+            'Administrador': { all: { view: true, create: true, edit: true, export: true }, badge: 'Acceso Total Institucional' },
+            'Director': { all: { view: true, create: true, edit: true, export: true }, badge: 'Gestión Directiva & UTP' },
+            'Profesor': {
+                'Libro de clases': { view: true, create: true, edit: true, export: true },
+                'Asistencia': { view: true, create: true, edit: true, export: false },
+                'Perfil del estudiante': { view: true, create: false, edit: false, export: false },
+                'Reportes y analíticas': { view: true, create: false, edit: false, export: false },
+                'Finanzas': { view: false, create: false, edit: false, export: false },
+                'Proveedores': { view: false, create: false, edit: false, export: false },
+                'SIMCE': { view: true, create: true, edit: false, export: true },
+                badge: 'Perfil Docente de Aula'
+            },
+            'Inspector': {
+                'Libro de clases': { view: true, create: false, edit: false, export: false },
+                'Asistencia': { view: true, create: true, edit: true, export: true },
+                'Perfil del estudiante': { view: true, create: true, edit: false, export: false },
+                'Reportes y analíticas': { view: true, create: false, edit: false, export: false },
+                'Finanzas': { view: false, create: false, edit: false, export: false },
+                'Proveedores': { view: false, create: false, edit: false, export: false },
+                'SIMCE': { view: false, create: false, edit: false, export: false },
+                badge: 'Control de Convivencia'
+            },
+            'Secretario': {
+                'Libro de clases': { view: true, create: false, edit: false, export: true },
+                'Asistencia': { view: true, create: false, edit: false, export: true },
+                'Perfil del estudiante': { view: true, create: true, edit: true, export: true },
+                'Reportes y analíticas': { view: true, create: false, edit: false, export: true },
+                'Finanzas': { view: true, create: true, edit: false, export: true },
+                'Proveedores': { view: false, create: false, edit: false, export: false },
+                'SIMCE': { view: false, create: false, edit: false, export: false },
+                badge: 'Gestión Administrativa'
+            },
+            'Contabilidad': {
+                'Libro de clases': { view: false, create: false, edit: false, export: false },
+                'Asistencia': { view: false, create: false, edit: false, export: false },
+                'Perfil del estudiante': { view: true, create: false, edit: false, export: false },
+                'Reportes y analíticas': { view: true, create: false, edit: false, export: true },
+                'Finanzas': { view: true, create: true, edit: true, export: true },
+                'Proveedores': { view: true, create: true, edit: true, export: true },
+                'SIMCE': { view: false, create: false, edit: false, export: false },
+                badge: 'Gestión Financiera'
             }
-
-            // Evitar errores si se crea un rol nuevo desconocido
-            if (!rolePermissions[currentRole]) {
-                rolePermissions[currentRole] = { modules: {}, scope: "Rol personalizado" };
-                modulesList.forEach(m => {
-                    rolePermissions[currentRole].modules[m.name] = { view: false, create: false, edit: false, export: false, locked: [] };
-                });
-            }
-            
-            const perms = rolePermissions[currentRole].modules;
-
-            modulesList.forEach(mod => {
-                if (!perms[mod.name]) perms[mod.name] = { view: false, create: false, edit: false, export: false, locked: [] };
-                const p = perms[mod.name];
-                
-                const tr = document.createElement('tr');
-                let modStyle = p.disabledModule ? 'style="color: var(--text-tertiary);"' : '';
-                let iconStyle = p.disabledModule ? 'style="background: #F1F5F9; color: #94A3B8;"' : '';
-                
-                let html = `<td class="col-mod" ${modStyle}><i class="bi ${mod.icon}" ${iconStyle}></i> ${mod.name}</td>`;
-                
-                ['view', 'create', 'edit', 'export'].forEach(action => {
-                    const checked = p[action] ? 'checked' : '';
-                    if (p.locked.includes(action)) {
-                        html += `<td>
-                                    <label class="toggle-switch locked" title="Permiso por defecto (No modificable)">
-                                        <input type="checkbox" data-module="${mod.name}" data-action="${action}" ${checked} disabled>
-                                        <span class="toggle-slider"></span>
-                                    </label>
-                                 </td>`;
-                    } else {
-                        const disabled = p.disabledModule ? 'disabled' : '';
-                        html += `<td>
-                                    <label class="toggle-switch">
-                                        <input type="checkbox" data-module="${mod.name}" data-action="${action}" ${checked} ${disabled}>
-                                        <span class="toggle-slider"></span>
-                                    </label>
-                                 </td>`;
-                    }
-                });
-                
-                tr.innerHTML = html;
-                tbody.appendChild(tr);
-            });
-
-            const checkboxes = tbody.querySelectorAll('input[type="checkbox"]');
-            checkboxes.forEach(cb => {
-                cb.addEventListener('change', (e) => {
-                    const moduleName = e.target.dataset.module;
-                    const action = e.target.dataset.action;
-                    rolePermissions[currentRole].modules[moduleName][action] = e.target.checked;
-                    updatePreview();
-                });
-            });
-        }
-
-        function updatePreview() {
-            const activeRoleCard = document.querySelector('.role-card.active');
-            const iconClass = activeRoleCard.querySelector('.role-icon i').className;
-            previewHeader.innerHTML = `<i class="${iconClass}"></i> ${currentRole}`;
-            
-            previewScope.textContent = rolePermissions[currentRole].scope;
-
-            const perms = rolePermissions[currentRole].modules;
-            
-            let visibleHtml = '';
-            let blockedHtml = '';
-            let actionsSet = new Set();
-
-            modulesList.forEach(mod => {
-                const p = perms[mod.name];
-                if (p.view) {
-                    visibleHtml += `<span class="chip-sm chip-visible"><i class="bi ${mod.icon}"></i> ${mod.name}</span>`;
-                    if (p.create) actionsSet.add('Crear');
-                    if (p.edit) actionsSet.add('Editar');
-                    if (p.export) actionsSet.add('Exportar');
-                    if (mod.name === 'Comunicación' && p.create) actionsSet.add('Enviar mensajes');
-                } else {
-                    blockedHtml += `<span class="chip-sm chip-blocked"><i class="bi bi-lock-fill"></i> ${mod.name}</span>`;
-                }
-            });
-
-            visibleSection.innerHTML = visibleHtml || '<span class="chip-sm" style="color:var(--text-sec);">Ninguno</span>';
-            blockedSection.innerHTML = blockedHtml || '<span class="chip-sm" style="color:var(--text-sec);">Ninguno</span>';
-
-            const actionIcons = {
-                'Ver': 'bi-eye',
-                'Crear': 'bi-plus',
-                'Editar': 'bi-pencil',
-                'Exportar': 'bi-download',
-                'Enviar mensajes': 'bi-send'
-            };
-
-            let actionsHtml = '';
-            if (visibleHtml !== '') {
-                actionsHtml = `<span class="chip-sm chip-action"><i class="bi bi-eye"></i> Ver</span>`;
-                Array.from(actionsSet).forEach(act => {
-                    actionsHtml += `<span class="chip-sm chip-action"><i class="bi ${actionIcons[act]}"></i> ${act}</span>`;
-                });
-            } else {
-                actionsHtml = '<span class="chip-sm" style="color:var(--text-sec);">Ninguna</span>';
-            }
-            
-            actionsSection.innerHTML = actionsHtml;
-        }
-
-        roleCards.forEach(card => {
-            card.addEventListener('click', () => {
-                roleCards.forEach(c => {
-                    c.classList.remove('active');
-                    const check = c.querySelector('.role-check');
-                    if(check) check.remove();
-                });
-                
-                card.classList.add('active');
-                card.insertAdjacentHTML('afterbegin', '<i class="bi bi-check-circle-fill role-check"></i>');
-                
-                currentRole = card.querySelector('.role-name').textContent.trim();
-                renderTable();
-                updatePreview();
-            });
-        });
-
-        if(!roleCards[0].querySelector('.role-check')) {
-            roleCards[0].insertAdjacentHTML('afterbegin', '<i class="bi bi-check-circle-fill role-check"></i>');
-        }
-
-        renderTable();
-        updatePreview();
-
-        window.submitPermissionsForm = function() {
-            document.getElementById('permissions_data').value = JSON.stringify(rolePermissions);
-            document.getElementById('config-form-paso4').submit();
         };
-    });
-</script>
+
+        const roleIcons = {
+            'Administrador': 'bi-shield-lock-fill',
+            'Director': 'bi-person-workspace',
+            'Profesor': 'bi-person-video3',
+            'Inspector': 'bi-clipboard-check',
+            'Secretario': 'bi-folder2-open',
+            'Contabilidad': 'bi-calculator-fill'
+        };
+
+        // Inicializar matriz si está vacía
+        function initMatrix() {
+            const roleCards = document.querySelectorAll('.role-card-item');
+            roleCards.forEach(card => {
+                const rName = card.dataset.roleName;
+                if (!permissionsMatrix[rName]) {
+                    permissionsMatrix[rName] = {};
+                    modulesList.forEach(m => {
+                        const preset = defaultRolePresets[rName];
+                        if (preset && preset.all) {
+                            permissionsMatrix[rName][m.nombre] = { ...preset.all };
+                        } else if (preset && preset[m.nombre]) {
+                            permissionsMatrix[rName][m.nombre] = { ...preset[m.nombre] };
+                        } else {
+                            permissionsMatrix[rName][m.nombre] = { view: false, create: false, edit: false, export: false };
+                        }
+                    });
+                }
+            });
+        }
+
+        function switchRole(roleName) {
+            currentRole = roleName;
+            document.querySelectorAll('.role-card-item').forEach(card => {
+                card.classList.toggle('active', card.dataset.roleName === roleName);
+            });
+
+            document.getElementById('currentRoleTitle').textContent = roleName;
+            document.getElementById('previewRoleName').textContent = roleName;
+            
+            const badgeText = defaultRolePresets[roleName]?.badge || 'Perfil Personalizado';
+            document.getElementById('previewRoleBadge').textContent = badgeText;
+
+            const iconClass = roleIcons[roleName] || 'bi-person-badge';
+            document.getElementById('previewAvatar').innerHTML = `<i class="bi ${iconClass}"></i>`;
+
+            renderMatrix();
+            updateLivePreview();
+        }
+
+        function renderMatrix() {
+            const tableBody = document.getElementById('matrixTableBody');
+            tableBody.innerHTML = '';
+
+            const rolePerms = permissionsMatrix[currentRole] || {};
+
+            modulesList.forEach(m => {
+                const p = rolePerms[m.nombre] || { view: false, create: false, edit: false, export: false };
+                const isLockedAdmin = (currentRole === 'Administrador');
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>
+                        <div class="d-flex align-items-center gap-2.5">
+                            <div class="module-tag-icon"><i class="bi ${m.icono}"></i></div>
+                            <div>
+                                <span class="fw-bold text-dark d-block">${m.nombre}</span>
+                                <span class="text-muted extra-small" style="font-size:0.75rem;">${m.desc}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-check form-switch d-flex justify-content-center m-0">
+                            <input class="form-check-input form-check-input-matrix" type="checkbox" ${p.view ? 'checked' : ''} ${isLockedAdmin ? 'disabled checked' : ''} onchange="updatePerm('${m.nombre}', 'view', this.checked)">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-check form-switch d-flex justify-content-center m-0">
+                            <input class="form-check-input form-check-input-matrix" type="checkbox" ${p.create ? 'checked' : ''} ${isLockedAdmin ? 'disabled checked' : ''} onchange="updatePerm('${m.nombre}', 'create', this.checked)">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-check form-switch d-flex justify-content-center m-0">
+                            <input class="form-check-input form-check-input-matrix" type="checkbox" ${p.edit ? 'checked' : ''} ${isLockedAdmin ? 'disabled checked' : ''} onchange="updatePerm('${m.nombre}', 'edit', this.checked)">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-check form-switch d-flex justify-content-center m-0">
+                            <input class="form-check-input form-check-input-matrix" type="checkbox" ${p.export ? 'checked' : ''} ${isLockedAdmin ? 'disabled checked' : ''} onchange="updatePerm('${m.nombre}', 'export', this.checked)">
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        function updatePerm(moduleName, permType, isChecked) {
+            if (!permissionsMatrix[currentRole]) permissionsMatrix[currentRole] = {};
+            if (!permissionsMatrix[currentRole][moduleName]) permissionsMatrix[currentRole][moduleName] = {};
+
+            permissionsMatrix[currentRole][moduleName][permType] = isChecked;
+
+            // Si activa crear o editar, automáticamente debe tener permiso de ver
+            if ((permType === 'create' || permType === 'edit' || permType === 'export') && isChecked) {
+                permissionsMatrix[currentRole][moduleName]['view'] = true;
+                renderMatrix();
+            }
+
+            // Si desactiva ver, automáticamente se quitan crear, editar y exportar
+            if (permType === 'view' && !isChecked) {
+                permissionsMatrix[currentRole][moduleName]['create'] = false;
+                permissionsMatrix[currentRole][moduleName]['edit'] = false;
+                permissionsMatrix[currentRole][moduleName]['export'] = false;
+                renderMatrix();
+            }
+
+            updateLivePreview();
+        }
+
+        function applyPreset(presetType) {
+            if (currentRole === 'Administrador') return;
+
+            modulesList.forEach(m => {
+                if (!permissionsMatrix[currentRole][m.nombre]) permissionsMatrix[currentRole][m.nombre] = {};
+                
+                if (presetType === 'full') {
+                    permissionsMatrix[currentRole][m.nombre] = { view: true, create: true, edit: true, export: true };
+                } else if (presetType === 'readonly') {
+                    permissionsMatrix[currentRole][m.nombre] = { view: true, create: false, edit: false, export: true };
+                } else if (presetType === 'recommended') {
+                    const preset = defaultRolePresets[currentRole];
+                    if (preset && preset[m.nombre]) {
+                        permissionsMatrix[currentRole][m.nombre] = { ...preset[m.nombre] };
+                    } else {
+                        permissionsMatrix[currentRole][m.nombre] = { view: false, create: false, edit: false, export: false };
+                    }
+                }
+            });
+
+            renderMatrix();
+            updateLivePreview();
+        }
+
+        function updateLivePreview() {
+            const sidebarList = document.getElementById('simSidebarList');
+            const statsEl = document.getElementById('statsVisibleModules');
+            const rolePerms = permissionsMatrix[currentRole] || {};
+
+            sidebarList.innerHTML = '';
+            let visibleCount = 0;
+
+            modulesList.forEach(m => {
+                const p = rolePerms[m.nombre] || {};
+                const isView = (currentRole === 'Administrador') ? true : (p.view === true);
+
+                if (isView) visibleCount++;
+
+                const li = document.createElement('li');
+                li.className = `sim-sidebar-item ${isView ? 'accessible' : 'blocked'}`;
+                li.innerHTML = `
+                    <i class="bi ${m.icono}"></i>
+                    <span>${m.nombre}</span>
+                    ${isView ? '<i class="bi bi-check2 text-success ms-auto" style="font-size:0.85rem;"></i>' : '<i class="bi bi-lock-fill text-muted ms-auto" style="font-size:0.75rem;"></i>'}
+                `;
+                sidebarList.appendChild(li);
+            });
+
+            if (statsEl) {
+                statsEl.textContent = `${visibleCount} de ${modulesList.length} módulos`;
+            }
+        }
+
+        function submitPaso4Form() {
+            const form = document.getElementById('config-form-paso4');
+            const btn = document.getElementById('btnSubmitPaso4');
+            const txt = document.getElementById('btnSubmitPaso4Text');
+            const icon = document.getElementById('btnSubmitPaso4Icon');
+            const spinner = document.getElementById('btnSubmitPaso4Spinner');
+
+            // Empaquetar matriz en formato JSON compatible con backend
+            const formattedData = {};
+            for (const rName in permissionsMatrix) {
+                formattedData[rName] = {
+                    modules: permissionsMatrix[rName]
+                };
+            }
+            document.getElementById('permissions_data').value = JSON.stringify(formattedData);
+
+            btn.disabled = true;
+            txt.textContent = 'Guardando matriz de permisos...';
+            icon.classList.add('d-none');
+            spinner.classList.remove('d-none');
+            form.submit();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initMatrix();
+            renderMatrix();
+            updateLivePreview();
+        });
+    </script>
 </body>
 </html>
