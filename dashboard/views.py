@@ -646,9 +646,14 @@ def dashboard_superadmin_estadisticas_view(request):
 @login_required
 def dashboard_superadmin_modulos_erp_view(request):
     from colegios.models import Colegio
+    from planes.models import Plan, Modulo
     total_colegios = Colegio.objects.filter(estado='activo').count()
+    total_planes = Plan.objects.filter(activo=True).count()
+    total_modulos_db = Modulo.objects.count()
     return render(request, 'dashboard_superadmin_modulos_erp.html', {
         'total_colegios': total_colegios,
+        'total_planes': total_planes,
+        'total_modulos_db': total_modulos_db,
     })
 
 
