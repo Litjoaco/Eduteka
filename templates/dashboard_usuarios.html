@@ -339,34 +339,34 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.03);
     }
 
-    /* ═══ ESTILOS TOPBAR & MODAL SOLICITUDES ═════════════════════════════ */
+    /* ═══ ESTILOS TOPBAR & MODAL SOLICITUDES (MORADO INSTITUCIONAL) ═════ */
     .btn-topbar-solicitudes {
       display: inline-flex;
       align-items: center;
-      gap: 0.55rem;
-      background: #FEF9C3;
-      border: 1.5px solid #FACC15;
+      gap: 0.6rem;
+      background: #F5F3FF;
+      border: 1.5px solid #DDD6FE;
       border-radius: 12px;
-      padding: 0.4rem 0.85rem;
-      color: #854D0E;
+      padding: 0.42rem 0.95rem;
+      color: #6D28D9;
       font-weight: 800;
       font-size: 0.82rem;
       cursor: pointer;
-      box-shadow: 0 2px 8px rgba(234, 179, 8, 0.15);
-      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(124, 92, 252, 0.12);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       text-decoration: none;
     }
     .btn-topbar-solicitudes:hover {
-      background: #FEF08A;
-      border-color: #EAB308;
-      color: #713F12;
+      background: #EDE9FE;
+      border-color: #7C5CFC;
+      color: #5B21B6;
       transform: translateY(-1px);
-      box-shadow: 0 4px 14px rgba(234, 179, 8, 0.25);
+      box-shadow: 0 4px 14px rgba(124, 92, 252, 0.22);
     }
     .bell-icon-wrapper {
       width: 26px;
       height: 26px;
-      background: #EAB308;
+      background: #7C5CFC;
       color: #FFFFFF;
       border-radius: 50%;
       display: flex;
@@ -375,12 +375,58 @@
       font-size: 0.8rem;
     }
     .sol-count-pill {
-      background: #854D0E;
+      background: #6D28D9;
       color: #FFFFFF;
       font-size: 0.72rem;
       font-weight: 800;
       padding: 0.12rem 0.5rem;
       border-radius: 20px;
+    }
+
+    .btn-topbar-custom {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      background: #FFFFFF;
+      border: 1.5px solid #E2E8F0;
+      color: #334155;
+      font-weight: 700;
+      font-size: 0.82rem;
+      border-radius: 12px;
+      padding: 0.42rem 0.95rem;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    .btn-topbar-custom:hover {
+      background: #F8FAFC;
+      border-color: #7C5CFC;
+      color: #7C5CFC;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(124, 92, 252, 0.12);
+    }
+
+    .btn-topbar-superadmin {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: linear-gradient(135deg, #1E1B4B 0%, #151A35 100%);
+      color: #FFFFFF !important;
+      border: 1.5px solid rgba(124, 92, 252, 0.35);
+      font-weight: 800;
+      font-size: 0.82rem;
+      border-radius: 12px;
+      padding: 0.42rem 0.95rem;
+      box-shadow: 0 2px 8px rgba(30, 27, 75, 0.2);
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    .btn-topbar-superadmin:hover {
+      background: linear-gradient(135deg, #2E1065 0%, #1E1B4B 100%);
+      border-color: #7C5CFC;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(124, 92, 252, 0.25);
     }
 
     /* Modal Container & Header */
@@ -391,42 +437,42 @@
       box-shadow: 0 25px 70px rgba(15, 23, 42, 0.28) !important;
       background: #F8FAFC;
     }
-    .modal-solicitudes-header-amber {
-      background: linear-gradient(135deg, #FEF9C3 0%, #FEF08A 100%);
-      color: #1E293B;
-      padding: 1.35rem 1.75rem;
-      border-bottom: 1.5px solid #FDE047;
+    .modal-solicitudes-header-purple {
+      background: linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #4338CA 100%);
+      color: #FFFFFF;
+      padding: 1.4rem 1.8rem;
+      border-bottom: 2px solid rgba(124, 92, 252, 0.3);
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
-    .pulse-glow-amber {
-      animation: pulseGlowAmber 2s infinite;
+    .pulse-glow-purple {
+      animation: pulseGlowPurple 2s infinite;
     }
-    @keyframes pulseGlowAmber {
-      0% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.7); }
-      70% { box-shadow: 0 0 0 10px rgba(234, 179, 8, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0); }
+    @keyframes pulseGlowPurple {
+      0% { box-shadow: 0 0 0 0 rgba(124, 92, 252, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(124, 92, 252, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(124, 92, 252, 0); }
     }
 
     /* Request Card Component */
     .solicitud-card-redesign {
       background: #FFFFFF;
-      border: 1.5px solid #E2E8F0;
+      border: 1.5px solid #E9D5FF;
       border-radius: 20px;
       overflow: hidden;
-      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+      box-shadow: 0 4px 20px rgba(124, 92, 252, 0.05);
       transition: all 0.25s ease;
       margin-bottom: 1.25rem;
     }
     .solicitud-card-redesign:hover {
-      border-color: #CBD5E1;
-      box-shadow: 0 10px 30px rgba(124, 92, 252, 0.1);
+      border-color: #C084FC;
+      box-shadow: 0 10px 30px rgba(124, 92, 252, 0.12);
       transform: translateY(-2px);
     }
     .card-user-header {
-      background: linear-gradient(135deg, #FFFDF0 0%, #FEF9C3 100%);
-      border-bottom: 1.5px solid #FEF08A;
+      background: linear-gradient(135deg, #FAF5FF 0%, #F3E8FF 100%);
+      border-bottom: 1.5px solid #E9D5FF;
       padding: 1.15rem 1.4rem;
       display: flex;
       align-items: center;
@@ -464,19 +510,19 @@
       color: #475569;
     }
     .badge-rol-highlight {
-      background: #EDE9FE;
-      color: #6D28D9;
-      border: 1.5px solid #DDD6FE;
+      background: #7C5CFC;
+      color: #FFFFFF;
+      border: none;
       font-size: 0.78rem;
       font-weight: 800;
-      padding: 0.4rem 0.85rem;
+      padding: 0.45rem 0.95rem;
       border-radius: 50px;
       display: inline-flex;
       align-items: center;
       gap: 0.35rem;
       text-transform: uppercase;
       letter-spacing: 0.03em;
-      box-shadow: 0 2px 6px rgba(109, 40, 217, 0.08);
+      box-shadow: 0 4px 12px rgba(124, 92, 252, 0.3);
     }
     .card-body-content {
       padding: 1.35rem 1.4rem;
@@ -583,7 +629,6 @@
       color: #94A3B8;
       font-size: 0.76rem;
       font-weight: 600;
-    }
   </style>
 </head>
 <body>
@@ -605,7 +650,7 @@
 
       <div class="topbar-right d-flex align-items-center gap-2.5">
         {% if request.user.is_superuser or request.user.is_staff %}
-        <a href="{% url 'dashboard_superadmin' %}" class="btn btn-sm fw-extrabold px-3 py-2 shadow-sm d-flex align-items-center gap-1.5" style="border-radius:10px; background:#151A35; color:#FFFFFF; text-decoration:none;">
+        <a href="{% url 'dashboard_superadmin' %}" class="btn-topbar-superadmin">
           <i class="bi bi-shield-shaded text-warning"></i>
           <span>Panel Super Admin</span>
         </a>
@@ -613,7 +658,7 @@
 
         {% if is_admin and solicitudes_pendientes_count > 0 %}
         <button type="button" class="btn-topbar-solicitudes" data-bs-toggle="modal" data-bs-target="#modalSolicitudesPendientes">
-          <span class="bell-icon-wrapper pulse-glow-amber">
+          <span class="bell-icon-wrapper pulse-glow-purple">
             <i class="bi bi-bell-fill"></i>
           </span>
           <span>Solicitudes</span>
@@ -621,12 +666,13 @@
         </button>
         {% endif %}
 
-        <button type="button" class="btn btn-outline-primary btn-sm fw-bold px-3 py-2" data-bs-toggle="modal" data-bs-target="#modalCustomizeShortcuts" style="border-radius:10px;">
-          <i class="bi bi-sliders2-vertical me-1.5"></i> Personalizar Accesos
+        <button type="button" class="btn-topbar-custom" data-bs-toggle="modal" data-bs-target="#modalCustomizeShortcuts">
+          <i class="bi bi-sliders2-vertical text-primary"></i>
+          <span>Personalizar Accesos</span>
         </button>
 
-        <div class="topbar-date d-none d-sm-block text-muted small fw-semibold">
-          <i class="bi bi-calendar3 me-1"></i> {{ hoy|date:"l, d \d\e F \d\e Y"|title }}
+        <div class="topbar-date d-none d-sm-block text-muted small fw-bold px-3 py-2 bg-light border rounded-3">
+          <i class="bi bi-calendar3 text-primary me-1"></i> {{ hoy|date:"l, d \d\e F \d\e Y"|title }}
         </div>
       </div>
     </header>
@@ -666,15 +712,15 @@
         </div>
 
         {% if is_admin and solicitudes_pendientes_count > 0 %}
-        <div class="mt-3.5 p-3 px-4 rounded-4 d-flex align-items-center justify-content-between flex-wrap gap-3 position-relative" style="background: rgba(254, 243, 199, 0.25); border: 1.5px solid rgba(254, 243, 199, 0.45); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); z-index: 1; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);">
+        <div class="mt-3.5 p-3 px-4 rounded-4 d-flex align-items-center justify-content-between flex-wrap gap-3 position-relative" style="background: rgba(255, 255, 255, 0.16); border: 1.5px solid rgba(255, 255, 255, 0.35); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); z-index: 1; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);">
           <div class="d-flex align-items-center gap-3 text-white small fw-bold">
-            <span class="rounded-circle d-flex align-items-center justify-content-center pulse-glow-amber shadow-sm flex-shrink-0" style="width:34px; height:34px; background:#F59E0B; color:#FFFFFF;">
-              <i class="bi bi-bell-fill fs-6"></i>
+            <span class="rounded-circle d-flex align-items-center justify-content-center pulse-glow-purple shadow-sm flex-shrink-0" style="width:34px; height:34px; background:#FFFFFF; color:#7C5CFC;">
+              <i class="bi bi-person-plus-fill fs-6"></i>
             </span>
-            <span>Hay <strong>{{ solicitudes_pendientes_count }} solicitud{{ solicitudes_pendientes_count|pluralize:"es" }} de acceso</strong> de docentes/personal esperando tu autorización en este establecimiento.</span>
+            <span>Hay <strong>{{ solicitudes_pendientes_count }} solicitud{{ solicitudes_pendientes_count|pluralize:"es" }} de acceso</strong> de docentes/personal esperando tu autorización en este colegio.</span>
           </div>
-          <button type="button" class="btn btn-sm fw-extrabold px-3.5 py-1.5 shadow-sm d-flex align-items-center gap-1.5" data-bs-toggle="modal" data-bs-target="#modalSolicitudesPendientes" style="border-radius:10px; font-size:0.82rem; background:#FFFFFF; color:#92400E; border:none; transition: all .2s ease;">
-            <i class="bi bi-eye-fill text-warning"></i> Revisar Solicitudes Ahora
+          <button type="button" class="btn btn-sm fw-extrabold px-3.5 py-1.5 shadow-sm d-flex align-items-center gap-1.5" data-bs-toggle="modal" data-bs-target="#modalSolicitudesPendientes" style="border-radius:10px; font-size:0.82rem; background:#FFFFFF; color:#6D28D9; border:none; transition: all .2s ease;">
+            <i class="bi bi-eye-fill text-primary"></i> Revisar Solicitudes Ahora
           </button>
         </div>
         {% endif %}
@@ -975,11 +1021,11 @@
 
           <!-- SOLICITUDES DE ACCESO PENDIENTES (ADMIN/DIRECTOR) -->
           {% if is_admin and solicitudes_pendientes %}
-            <div class="card-panel-dash" style="border: 1.5px solid #FDE68A; background: #FFFFFF; box-shadow: 0 4px 20px rgba(245, 158, 11, 0.08);">
-              <div class="panel-header-dash" style="background: linear-gradient(135deg, #FFFDF5 0%, #FEF9C3 100%); border-bottom: 1px solid #FEF08A; padding: 1.1rem 1.4rem; border-radius: 16px 16px 0 0;">
+            <div class="card-panel-dash" style="border: 1.5px solid #DDD6FE; background: #FFFFFF; box-shadow: 0 8px 30px rgba(124, 92, 252, 0.07); border-radius: 18px; overflow: hidden;">
+              <div class="panel-header-dash" style="background: linear-gradient(135deg, #FAF5FF 0%, #F5F3FF 100%); border-bottom: 1.5px solid #EDE9FE; padding: 1.2rem 1.5rem;">
                 <div>
                   <h3 class="fw-extrabold text-dark mb-0 fs-6 d-flex align-items-center gap-2">
-                    <span class="rounded-circle d-flex align-items-center justify-content-center pulse-glow-amber" style="width:32px; height:32px; background:#F59E0B; color:#FFFFFF;">
+                    <span class="rounded-circle d-flex align-items-center justify-content-center pulse-glow-purple" style="width:34px; height:34px; background:#7C5CFC; color:#FFFFFF;">
                       <i class="bi bi-person-plus-fill fs-6"></i>
                     </span>
                     Solicitudes de Acceso al Colegio
@@ -987,59 +1033,60 @@
                   <span class="text-muted extra-small">Docentes o funcionarios que esperan autorización para ingresar</span>
                 </div>
                 <div class="d-flex align-items-center gap-2">
-                  <span class="badge bg-warning text-dark fw-extrabold px-2.5 py-1.5" style="border-radius:20px; font-size: 0.76rem;">
+                  <span class="badge fw-extrabold px-3 py-1.5" style="background: #EDE9FE; color: #6D28D9; border: 1px solid #DDD6FE; border-radius:20px; font-size: 0.76rem;">
                     {{ solicitudes_pendientes_count }} Pendiente{{ solicitudes_pendientes_count|pluralize:"s" }}
                   </span>
-                  <button type="button" class="btn btn-sm btn-dark fw-bold" data-bs-toggle="modal" data-bs-target="#modalSolicitudesPendientes" style="border-radius:10px; font-size:0.8rem; background:#1E1B4B; border:none;">
-                    <i class="bi bi-window-fullscreen me-1.5 text-warning"></i> Gestionar en Ventana
+                  <button type="button" class="btn btn-sm fw-bold px-3 py-1.5 d-flex align-items-center gap-1.5 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalSolicitudesPendientes" style="border-radius:10px; font-size:0.8rem; background:#7C5CFC; color:#FFFFFF; border:none; transition: all 0.2s ease;">
+                    <i class="bi bi-window-fullscreen"></i>
+                    <span>Gestionar en Ventana</span>
                   </button>
                 </div>
               </div>
 
-              <div class="table-responsive p-2">
+              <div class="table-responsive p-3">
                 <table class="table align-middle mb-0" style="font-size: 0.88rem;">
-                  <thead style="font-size: 0.74rem; text-transform: uppercase; color: #64748B; background:#F8FAFC;">
+                  <thead style="font-size: 0.74rem; text-transform: uppercase; color: #64748B; background:#F8FAFC; border-bottom: 1px solid #E2E8F0;">
                     <tr>
                       <th style="padding: 0.85rem 1rem; border-radius: 8px 0 0 8px;">Docente / Solicitante</th>
                       <th>Rol Solicitado</th>
                       <th style="min-width: 180px;">Rol a Asignar</th>
-                      <th>Fecha</th>
-                      <th class="text-end" style="padding-right: 1rem; border-radius: 0 8px 8px 0;">Acción</th>
+                      <th>Fecha de Envío</th>
+                      <th class="text-end" style="padding-right: 1rem; border-radius: 0 8px 8px 0;">Decisión</th>
                     </tr>
                   </thead>
                   <tbody>
                     {% for sol in solicitudes_pendientes %}
                       <tr>
-                        <td style="padding: 0.9rem 1rem;">
+                        <td style="padding: 0.95rem 1rem;">
                           <div class="d-flex align-items-center gap-3">
-                            <div class="solicitud-avatar-circle" style="width:40px; height:40px; font-size:1rem;">
+                            <div class="user-portrait-circle" style="width:42px; height:42px; font-size:1.05rem; border-radius:12px;">
                               {{ sol.usuario.first_name|default:sol.usuario.username|slice:":1"|upper }}
                             </div>
                             <div>
-                              <div class="fw-extrabold text-dark">{{ sol.usuario.perfil.nombre_completo|default:sol.usuario.get_full_name|default:sol.usuario.username }}</div>
+                              <div class="fw-extrabold text-dark" style="font-size: 0.92rem;">{{ sol.usuario.perfil.nombre_completo|default:sol.usuario.get_full_name|default:sol.usuario.username }}</div>
                               <div class="text-muted extra-small d-flex align-items-center gap-2 mt-0.5">
-                                <span class="text-primary fw-bold"><i class="bi bi-envelope-fill me-0.5"></i> {{ sol.usuario.email }}</span>
+                                <span class="text-primary fw-bold"><i class="bi bi-envelope-at-fill me-0.5"></i> {{ sol.usuario.email }}</span>
                                 {% if sol.usuario.perfil.rut %}
                                   <span class="text-secondary fw-bold">• <i class="bi bi-person-vcard me-0.5"></i> {{ sol.usuario.perfil.rut }}</span>
                                 {% endif %}
                               </div>
                               {% if sol.mensaje %}
-                                <div class="mt-1.5 p-1.5 px-2.5 bg-light rounded-3 text-muted extra-small border" style="font-style: italic; max-width: 420px;">
-                                  <i class="bi bi-chat-left-quote me-1 text-primary"></i> "{{ sol.mensaje }}"
+                                <div class="mt-1.5 p-2 px-3 bg-light rounded-3 text-muted extra-small border" style="font-style: italic; max-width: 440px; border-left: 3px solid #7C5CFC !important;">
+                                  <i class="bi bi-chat-left-quote-fill me-1 text-primary"></i> "{{ sol.mensaje }}"
                                 </div>
                               {% endif %}
                             </div>
                           </div>
                         </td>
                         <td>
-                          <span class="badge-role-pill">
-                            <i class="bi bi-tag-fill"></i> {{ sol.rol_solicitado|title }}
+                          <span class="badge-rol-highlight" style="font-size: 0.72rem; padding: 0.35rem 0.75rem;">
+                            <i class="bi bi-award-fill"></i> {{ sol.rol_solicitado|title }}
                           </span>
                         </td>
                         <td>
                           <form id="formAprobar{{ sol.id }}" method="POST" action="{% url 'aprobar_solicitud' sol.id %}">
                             {% csrf_token %}
-                            <select name="rol_id" class="role-select-styled form-select form-select-sm" style="font-size:0.8rem; padding: 0.4rem 0.75rem;">
+                            <select name="rol_id" class="role-input-field form-select form-select-sm" style="font-size:0.82rem; padding: 0.45rem 0.85rem;">
                               {% for r in roles_colegio %}
                                 <option value="{{ r.id }}" {% if r.nombre|lower == sol.rol_solicitado|lower %}selected{% endif %}>
                                   {{ r.nombre }}
@@ -1054,19 +1101,20 @@
                           </form>
                         </td>
                         <td>
-                          <span class="text-muted extra-small d-flex align-items-center gap-1">
-                            <i class="bi bi-clock"></i> {{ sol.fecha_solicitud|date:"d/m/Y H:i" }}
+                          <span class="text-muted extra-small d-flex align-items-center gap-1 font-monospace">
+                            <i class="bi bi-clock-history text-primary"></i> {{ sol.fecha_solicitud|date:"d/m/Y H:i" }}
                           </span>
                         </td>
                         <td class="text-end" style="padding-right: 1rem;">
-                          <div class="d-flex align-items-center justify-content-end gap-1.5">
-                            <button type="submit" form="formAprobar{{ sol.id }}" class="btn btn-sm btn-success fw-bold px-3 py-1.5 shadow-sm d-flex align-items-center gap-1" style="border-radius:8px; font-size:0.82rem; background:linear-gradient(135deg, #10B981 0%, #059669 100%); border:none;" title="Aprobar con el rol seleccionado">
-                              <i class="bi bi-check-lg"></i> Aprobar
+                          <div class="d-flex align-items-center justify-content-end gap-2">
+                            <button type="submit" form="formAprobar{{ sol.id }}" class="btn btn-sm fw-bold px-3 py-2 shadow-sm d-flex align-items-center gap-1.5" style="border-radius:10px; font-size:0.82rem; background:linear-gradient(135deg, #10B981 0%, #059669 100%); color:#FFFFFF; border:none; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);" title="Aprobar con el rol seleccionado">
+                              <i class="bi bi-check-circle-fill"></i>
+                              <span>Aprobar</span>
                             </button>
                             <form method="POST" action="{% url 'rechazar_solicitud' sol.id %}" class="d-inline" onsubmit="return confirm('¿Seguro que deseas rechazar la solicitud de {{ sol.usuario.perfil.nombre_completo|default:sol.usuario.email }}?');">
                               {% csrf_token %}
-                              <button type="submit" class="btn btn-sm btn-outline-danger fw-bold px-2 py-1.5" style="border-radius:8px; font-size:0.82rem;" title="Rechazar solicitud">
-                                <i class="bi bi-x-lg"></i>
+                              <button type="submit" class="btn btn-sm fw-bold px-2.5 py-2 d-flex align-items-center gap-1" style="border-radius:10px; font-size:0.82rem; background:#FFF1F2; color:#E11D48; border:1.5px solid #FECDD3;" title="Rechazar solicitud">
+                                <i class="bi bi-x-circle-fill"></i>
                               </button>
                             </form>
                           </div>
@@ -1412,30 +1460,32 @@
 </script>
 
   <!-- ==========================================================================
-       MODAL POPUP DE SOLICITUDES PENDIENTES (REDDISEÑO MODERNO PASO A PASO)
+       MODAL POPUP DE SOLICITUDES PENDIENTES (REDDISEÑO MODERNO MORADO PASO A PASO)
        ========================================================================== -->
   {% if is_admin and solicitudes_pendientes %}
   <div class="modal fade" id="modalSolicitudesPendientes" tabindex="-1" aria-labelledby="modalSolLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content modal-solicitudes-premium">
         
-        <!-- Header con fondo ámbar suave -->
-        <div class="modal-solicitudes-header-amber">
+        <!-- Header con gradiente morado profundo -->
+        <div class="modal-solicitudes-header-purple">
           <div class="d-flex align-items-center gap-3">
-            <div class="rounded-circle d-flex align-items-center justify-content-center pulse-glow-amber shadow-sm flex-shrink-0" style="width:44px; height:44px; background:#EAB308; color:#FFFFFF;">
+            <div class="rounded-circle d-flex align-items-center justify-content-center pulse-glow-purple shadow-sm flex-shrink-0" style="width:46px; height:46px; background:#7C5CFC; color:#FFFFFF;">
               <i class="bi bi-person-plus-fill fs-5"></i>
             </div>
             <div>
               <div class="d-flex align-items-center gap-2">
-                <h5 class="modal-title fw-extrabold mb-0 fs-5 text-dark" id="modalSolLabel">Solicitudes de Incorporación Docente</h5>
-                <span class="sol-count-pill">{{ solicitudes_pendientes_count }} Pendiente{{ solicitudes_pendientes_count|pluralize:"s" }}</span>
+                <h5 class="modal-title fw-extrabold mb-0 fs-5 text-white" id="modalSolLabel">Solicitudes de Incorporación Docente</h5>
+                <span class="badge fw-extrabold px-2.5 py-1" style="background: rgba(255,255,255,0.2); color:#FFFFFF; border:1px solid rgba(255,255,255,0.3); border-radius:20px; font-size:0.75rem;">
+                  {{ solicitudes_pendientes_count }} Pendiente{{ solicitudes_pendientes_count|pluralize:"s" }}
+                </span>
               </div>
-              <p class="mb-0 text-muted extra-small mt-0.5">
+              <p class="mb-0 text-white-50 extra-small mt-0.5">
                 {{ colegio.nombre }} • Revisa y valida los permisos de acceso antes de autorizar.
               </p>
             </div>
           </div>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
 
         <!-- Body con tarjetas paso a paso -->
