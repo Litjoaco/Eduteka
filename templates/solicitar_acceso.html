@@ -5,23 +5,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Solicitar Acceso - Eduteka</title>
+    
+    <!-- Google Fonts: Inter & Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap CSS -->
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="{% static 'css/login.css' %}">
     <link rel="stylesheet" href="{% static 'css/backbutton.css' %}">
-    <link rel="stylesheet" href="{% static 'css/solicitar_acceso.css' %}">
+    <link rel="stylesheet" href="{% static 'css/solicitar_acceso.css' %}?v=8">
 </head>
 <body class="login-body">
 
-    <!-- Botón volver -->
+    <!-- Botón volver flotante -->
     <a href="{% url 'landing_page' %}" class="back-button">
-        <i class="bi bi-arrow-left"></i> Volver
+        <i class="bi bi-arrow-left"></i> Volver al Inicio
     </a>
 
-    <!-- Fondos orgánicos (heredados de login.css) -->
+    <!-- Fondos orgánicos -->
     <div class="bg-shapes">
         <div class="shape shape-1"></div>
         <div class="shape shape-2"></div>
@@ -31,129 +38,205 @@
         <div class="pattern-dots dots-2"></div>
     </div>
 
-    <div class="container solicitud-container">
-        <div class="row w-100 m-0 align-items-center justify-content-center">
+    <div class="solicitud-container">
+        <div class="row w-100 align-items-center justify-content-center g-4 g-lg-5">
 
-            <!-- ── Columna Izquierda ── -->
-            <div class="col-lg-6 d-none d-lg-flex flex-column justify-content-center welcome-section">
+            <!-- ── Columna Izquierda: Branding & Beneficios ── -->
+            <div class="col-lg-5 d-none d-lg-flex flex-column justify-content-center welcome-section">
+                
                 <div class="mb-3">
-                    <img src="{% static 'img/logo.png' %}" alt="Eduteka Logo" class="logo-blend" style="height: 140px;">
+                    <img src="{% static 'img/logo.png' %}" alt="Eduteka Logo" class="brand-logo-large logo-blend" style="max-height: 100px; width: auto; max-width: 220px; object-fit: contain;">
                 </div>
 
-                <h1 class="welcome-title">Solicita acceso a tu colegio</h1>
+                <div class="brand-status-pill">
+                    <i class="bi bi-building-check"></i> Vinculación Institucional
+                </div>
+
+                <h1 class="welcome-title">
+                    Solicita acceso a tu <span style="color:#7C5CFC;">colegio</span>
+                </h1>
                 <p class="welcome-desc">
-                    Una vez que encuentres tu institución, selecciona tu rol y envía la solicitud.
-                    El administrador del colegio la revisará para darte acceso.
+                    Encuentra tu establecimiento educacional, selecciona el rol docente o administrativo que desempeñas y envía tu solicitud al administrador.
                 </p>
 
-                <ul class="benefits-list">
-                    <li><span class="benefit-chip"><i class="bi bi-shield-fill-check"></i> Proceso seguro</span></li>
-                    <li><span class="benefit-chip"><i class="bi bi-clock-fill"></i> Respuesta rápida</span></li>
-                    <li><span class="benefit-chip"><i class="bi bi-people-fill"></i> Roles personalizados</span></li>
-                </ul>
+                <!-- Stack de Beneficios -->
+                <div class="left-feature-stack">
+                    <div class="left-feature-card">
+                        <div class="feature-card-icon" style="background:#ECFDF5; color:#10B981;">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <div>
+                            <div class="feature-card-title">Validación Segura</div>
+                            <div class="feature-card-desc">El equipo directivo revisa y autoriza cada perfil.</div>
+                        </div>
+                    </div>
 
-                <div class="illustration-wrapper mt-2">
-                    <img src="{% static 'img/colegio.png' %}" alt="Plataforma Eduteka"
-                         class="img-fluid floating-illustration" style="max-height: 420px; object-fit: contain;">
+                    <div class="left-feature-card">
+                        <div class="feature-card-icon" style="background:#F0EDFF; color:#7C5CFC;">
+                            <i class="bi bi-lightning-charge"></i>
+                        </div>
+                        <div>
+                            <div class="feature-card-title">Acceso Instantáneo</div>
+                            <div class="feature-card-desc">Tus cursos y asignaturas asignadas al instante.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ilustración -->
+                <div class="illustration-hero-frame">
+                    <div class="illustration-aura-glow"></div>
+                    <img src="{% static 'img/colegio.png' %}" alt="Colegio Eduteka" class="img-fluid floating-illustration" style="max-height: 280px; object-fit: contain; position: relative; z-index: 2;">
                 </div>
             </div>
 
-            <!-- ── Columna Derecha ── -->
-            <div class="col-12 col-md-10 col-lg-6">
+            <!-- ── Columna Derecha: Tarjeta de Solicitud ── -->
+            <div class="col-12 col-lg-7 col-xl-7">
                 <div class="solicitud-card">
 
                     <!-- Header -->
-                    <div class="text-center mb-4">
-                        <img src="{% static 'img/logo.png' %}" alt="Eduteka Logo" class="logo-blend" style="height: 80px; margin-bottom: 1.5rem;">
-                        <h2 class="card-title">Solicita acceso a tu colegio</h2>
-                        <p class="card-subtitle">Ingresa los datos para enviar tu solicitud de acceso.</p>
+                    <div class="solicitud-header">
+                        <div class="solicitud-badge">
+                            <i class="bi bi-person-plus-fill"></i> Solicitud de Ingreso
+                        </div>
+                        <h2 class="card-title">Vincularme a un Colegio</h2>
+                        <p class="card-subtitle">Busca tu colegio por nombre para enviar tu solicitud de acceso.</p>
                     </div>
 
+                    <!-- Mensajes de Django -->
                     {% if messages %}
                         {% for message in messages %}
-                            <div class="alert alert-{{ message.tags }} mb-3" role="alert" style="border-radius: 12px;">
-                                {{ message }}
+                            <div class="alert alert-{{ message.tags|default:'info' }} rounded-4 shadow-sm border-0 d-flex align-items-center gap-2 mb-4 p-3" role="alert" style="font-size:0.88rem;">
+                                <i class="bi bi-info-circle-fill fs-5"></i>
+                                <div>{{ message }}</div>
                             </div>
                         {% endfor %}
                     {% endif %}
 
-                <form action="{% url 'solicitar_acceso' %}" method="POST" id="solicitudForm">
+                    <form action="{% url 'solicitar_acceso' %}" method="POST" id="solicitudForm">
                         {% csrf_token %}
+                        <input type="hidden" name="colegio" id="colegio_id_hidden">
+                        <input type="hidden" name="rol_solicitado" id="rol_seleccionado">
 
-                        <!-- 1. Buscar colegio -->
-                        <div class="mb-4">
-                            <label class="form-label-custom" for="busqueda_colegio">Busca tu colegio</label>
-                            <div class="search-wrapper">
-                                <i class="bi bi-search search-icon"></i>
-                                <input
-                                    type="text"
-                                    class="form-control-custom"
-                                    id="busqueda_colegio"
-                                    placeholder="Escribe el nombre de tu institución..."
-                                    autocomplete="off"
-                                >
-                                <input type="hidden" name="colegio" id="colegio_id_hidden">
+                        <!-- SECCIÓN 1: BUSCADOR DE COLEGIO CON PREVIEW ENRIQUECIDO -->
+                        <div class="form-section-box">
+                            <div class="form-section-header">
+                                <div class="section-icon-badge">
+                                    <i class="bi bi-buildings"></i>
+                                </div>
+                                <h6 class="form-section-title">1. Selecciona tu Establecimiento</h6>
+                            </div>
+
+                            <!-- Input de búsqueda con Dropdown -->
+                            <div class="search-wrapper" id="searchWrapper">
+                                <label class="form-label-custom" for="busqueda_colegio">Buscar colegio por nombre oficial o comuna *</label>
+                                <div class="position-relative">
+                                    <i class="bi bi-search search-icon"></i>
+                                    <input
+                                        type="text"
+                                        class="form-control-search"
+                                        id="busqueda_colegio"
+                                        placeholder="Ej: Colegio San Bernardo, Instituto Nacional..."
+                                        autocomplete="off"
+                                    >
+                                </div>
+                                <!-- Dropdown de sugerencias enriquecidas -->
                                 <div class="suggestions-dropdown" id="suggestionsDropdown"></div>
+                            </div>
+
+                            <!-- Tarjeta de Colegio Seleccionado (Live Preview) -->
+                            <div class="selected-school-preview" id="selectedSchoolPreview">
+                                <span class="selected-header-badge"><i class="bi bi-check-circle-fill me-1"></i> Colegio Seleccionado</span>
+                                <div class="selected-school-inner">
+                                    <div class="selected-left-info">
+                                        <div id="selectedLogoContainer"></div>
+                                        <div>
+                                            <div class="selected-school-title" id="selectedTitle"></div>
+                                            <div class="selected-school-slogan" id="selectedSlogan"></div>
+                                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                                <span class="badge bg-light text-dark border" id="selectedType"></span>
+                                                <span class="extra-small text-muted" id="selectedLocation"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn-change-school" onclick="cambiarColegio()">
+                                        <i class="bi bi-arrow-repeat me-1"></i> Cambiar
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- 2. Rol -->
-                        <div class="mb-4">
-                            <label class="form-label-custom">Selecciona tu rol en la institución</label>
-                            <input type="hidden" name="rol_solicitado" id="rol_seleccionado">
+                        <!-- SECCIÓN 2: SELECCIÓN DE ROL -->
+                        <div class="form-section-box">
+                            <div class="form-section-header">
+                                <div class="section-icon-badge" style="background:#ECFDF5; color:#10B981;">
+                                    <i class="bi bi-person-badge"></i>
+                                </div>
+                                <h6 class="form-section-title">2. Selecciona tu Rol en la Institución *</h6>
+                            </div>
+
                             <div class="roles-grid">
                                 <div class="role-card" data-rol="profesor" onclick="seleccionarRol(this)">
-                                    <i class="bi bi-display"></i>
-                                    <span>Profesor</span>
+                                    <i class="bi bi-mortarboard"></i>
+                                    <span>Profesor / Docente</span>
                                 </div>
                                 <div class="role-card" data-rol="inspector" onclick="seleccionarRol(this)">
                                     <i class="bi bi-person-badge"></i>
-                                    <span>Inspector</span>
+                                    <span>Inspectoría</span>
                                 </div>
                                 <div class="role-card" data-rol="director" onclick="seleccionarRol(this)">
-                                    <i class="bi bi-person-workspace"></i>
-                                    <span>Director</span>
+                                    <i class="bi bi-award"></i>
+                                    <span>Directivo / UTP</span>
                                 </div>
                                 <div class="role-card" data-rol="administrativo" onclick="seleccionarRol(this)">
                                     <i class="bi bi-briefcase"></i>
                                     <span>Administrativo</span>
                                 </div>
                                 <div class="role-card" data-rol="contabilidad" onclick="seleccionarRol(this)">
-                                    <i class="bi bi-calculator"></i>
-                                    <span>Contabilidad</span>
+                                    <i class="bi bi-cash-stack"></i>
+                                    <span>Finanzas</span>
                                 </div>
                                 <div class="role-card" data-rol="otro" onclick="seleccionarRol(this)">
                                     <i class="bi bi-three-dots"></i>
-                                    <span>Otro rol</span>
+                                    <span>Otro Rol</span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- 3. Mensaje -->
-                        <div class="mb-4">
-                            <label class="form-label-custom" for="mensaje">Mensaje opcional</label>
+                        <!-- SECCIÓN 3: MENSAJE OPCIONAL -->
+                        <div class="form-section-box">
+                            <div class="form-section-header">
+                                <div class="section-icon-badge" style="background:#EFF6FF; color:#2563EB;">
+                                    <i class="bi bi-chat-left-text"></i>
+                                </div>
+                                <h6 class="form-section-title">3. Mensaje para el Administrador (Opcional)</h6>
+                            </div>
+
+                            <label class="form-label-custom" for="mensaje">Detalle sobre tus asignaturas o funciones</label>
                             <textarea
                                 class="textarea-custom"
                                 id="mensaje"
                                 name="mensaje"
                                 maxlength="250"
-                                placeholder="Ej: Soy profesor de matemáticas para 5to y 6to básico."
+                                placeholder="Ej: Soy docente de Matemáticas y Física para Enseñanza Media (1° a 4° Medio)."
                                 oninput="document.getElementById('charCount').textContent = this.value.length"
                             ></textarea>
-                            <div class="char-counter"><span id="charCount">0</span>/250</div>
+                            <div class="char-counter"><span id="charCount">0</span>/250 caracteres</div>
                         </div>
 
-                        <!-- 4. Aviso -->
+                        <!-- Aviso Informativo -->
                         <div class="notice-box mb-4">
-                            <i class="bi bi-info-circle-fill"></i>
+                            <i class="bi bi-shield-check"></i>
                             <p>
-                                <strong>Solicitud pendiente</strong>
-                                Tu solicitud quedará pendiente hasta que sea aprobada por un administrador de tu colegio.
+                                <strong>Proceso de Aprobación Institucional</strong>
+                                Una vez enviada, el Administrador o Director de tu colegio recibirá una notificación para validar tu identidad y asignarte tus cursos.
                             </p>
                         </div>
 
-                        <button type="submit" class="btn-login">
-                            Enviar solicitud
+                        <!-- Botón Submit -->
+                        <button type="submit" class="btn-submit-pro" id="btnSubmitSolicitud">
+                            <span id="btnSubmitText">Enviar Solicitud de Acceso</span>
+                            <i class="bi bi-send-fill fs-5" id="btnSubmitIcon"></i>
+                            <span class="spinner-border spinner-border-sm d-none" id="btnSubmitSpinner" role="status"></span>
                         </button>
 
                     </form>
@@ -163,7 +246,8 @@
         </div>
     </div>
 
+    <!-- Bootstrap JS Bundle -->
     <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
-    <script src="{% static 'js/solicitar_acceso.js' %}"></script>
+    <script src="{% static 'js/solicitar_acceso.js' %}?v=8"></script>
 </body>
 </html>

@@ -22,7 +22,7 @@
   min-height: 100vh;
   display: flex;
   align-items: center;
-  padding: 2.5rem 2rem;
+  padding: 5rem 2rem 2.5rem 2rem;
 }
 
 /* ==========================================================================
@@ -148,46 +148,50 @@
   z-index: 1;
 }
 
-/* Testimonio de Confianza */
 .testimonial-badge-pro {
-  background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(240,237,255,0.85) 100%);
-  backdrop-filter: blur(14px);
-  border: 1.5px solid rgba(255, 255, 255, 0.9);
-  border-radius: 20px;
-  padding: 1.25rem 1.5rem;
-  box-shadow: 0 10px 30px rgba(21, 26, 53, 0.06);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid var(--reg-border);
+  border-radius: 16px;
+  padding: 1rem 1.25rem;
+  box-shadow: 0 10px 25px rgba(21, 26, 53, 0.04);
 }
 
 /* ==========================================================================
-   COLUMNA DERECHA - STEPPER & FORMULARIO
+   COLUMNA DERECHA - TARJETA DE FORMULARIO MODERNA
    ========================================================================== */
+.register-card-modern {
+  background: #ffffff;
+  border-radius: 28px;
+  padding: 2.75rem 3rem;
+  box-shadow: 0 20px 60px rgba(21, 26, 53, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  position: relative;
+}
 
-/* Stepper de Progreso Amplio */
+/* Stepper Superior */
 .stepper-container {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   position: relative;
-  margin-bottom: 2.5rem;
+  margin-bottom: 2.25rem;
   padding: 0 1rem;
 }
 
 .stepper-progress-bar {
   position: absolute;
-  top: 22px;
-  left: 45px;
-  right: 45px;
-  height: 4px;
+  top: 18px;
+  left: 40px;
+  right: 40px;
+  height: 3px;
   background: #E2E8F0;
-  border-radius: 4px;
   z-index: 1;
 }
 
 .stepper-progress-fill {
   height: 100%;
-  width: 15%;
-  background: linear-gradient(90deg, #7C5CFC 0%, #0D9488 100%);
-  border-radius: 4px;
+  width: 20%;
+  background: var(--reg-primary);
   transition: width 0.4s ease;
 }
 
@@ -201,39 +205,32 @@
 }
 
 .step-node {
-  width: 44px;
-  height: 44px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   background: #ffffff;
-  border: 2.5px solid #CBD5E1;
+  border: 2px solid #CBD5E1;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 800;
-  font-size: 1rem;
+  font-size: 0.95rem;
   color: #64748B;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
 .stepper-step.active .step-node {
-  background: linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%);
-  border-color: #7C5CFC;
+  background: var(--reg-primary);
+  border-color: var(--reg-primary);
   color: #ffffff;
-  box-shadow: 0 0 0 6px rgba(124, 92, 252, 0.2);
-}
-
-.stepper-step.completed .step-node {
-  background: #10B981;
-  border-color: #10B981;
-  color: #ffffff;
+  box-shadow: 0 0 0 5px rgba(124, 92, 252, 0.2);
 }
 
 .step-label {
-  font-size: 0.85rem;
+  font-size: 0.78rem;
   font-weight: 700;
   color: #64748B;
-  margin-top: 0.5rem;
+  margin-top: 0.4rem;
   white-space: nowrap;
 }
 
@@ -241,62 +238,40 @@
   color: var(--reg-primary);
 }
 
-/* Tarjeta Principal de Registro */
-.register-card-modern {
-  background: rgba(255, 255, 255, 0.97);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border-radius: 32px;
-  padding: 3rem 3.25rem;
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 0 30px 70px rgba(21, 26, 53, 0.08), 0 0 0 1px rgba(226, 232, 240, 0.7);
-  position: relative;
-  z-index: 2;
-}
-
-/* Secciones del Formulario */
+/* Cajas de Sección del Formulario */
 .form-section-box {
   background: #F8FAFC;
   border: 1px solid #E2E8F0;
-  border-radius: 22px;
-  padding: 1.85rem 1.75rem;
-  margin-bottom: 2rem;
-  position: relative;
-  transition: all 0.3s ease;
-}
-
-.form-section-box:focus-within {
-  background: #ffffff;
-  border-color: rgba(124, 92, 252, 0.4);
-  box-shadow: 0 10px 25px rgba(124, 92, 252, 0.07);
+  border-radius: 18px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .form-section-header {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  margin-bottom: 1.4rem;
-  padding-bottom: 0.85rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
   border-bottom: 1px dashed #E2E8F0;
 }
 
-.form-section-title {
-  font-size: 1.05rem;
-  font-weight: 800;
-  color: var(--reg-dark);
-  margin: 0;
-  letter-spacing: -0.01em;
-}
-
 .section-icon-badge {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border-radius: 10px;
   background: var(--reg-primary-soft);
   color: var(--reg-primary);
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 1.15rem;
+}
+
+.form-section-title {
+  margin: 0;
+  font-weight: 800;
+  color: var(--reg-dark);
   font-size: 1rem;
 }
 
@@ -345,6 +320,17 @@
   background-color: #ffffff;
 }
 
+/* Estilos de Validación de RUT */
+.form-control-pro.is-valid-rut {
+  border-color: #10B981 !important;
+  background-color: #F0FDF4;
+}
+
+.form-control-pro.is-invalid-rut {
+  border-color: #EF4444 !important;
+  background-color: #FEF2F2;
+}
+
 .form-label-pro {
   font-size: 0.86rem;
   font-weight: 700;
@@ -353,7 +339,7 @@
   display: block;
 }
 
-/* Password Strength Meter */
+/* Password Strength Meter & Checklist */
 .password-meter-bar {
   height: 5px;
   border-radius: 6px;
@@ -374,6 +360,64 @@
   font-weight: 700;
   margin-top: 5px;
   display: block;
+}
+
+.password-req-checklist {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.35rem 0.75rem;
+  margin-top: 0.65rem;
+  background: #F8FAFC;
+  padding: 0.65rem 0.85rem;
+  border-radius: 10px;
+  border: 1px solid #E2E8F0;
+}
+
+.req-item {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #64748B;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: color 0.2s ease;
+}
+
+.req-item.valid {
+  color: #059669;
+  font-weight: 700;
+}
+
+.req-item.valid i {
+  color: #10B981;
+}
+
+/* Modal de Términos */
+.modal-content-terms {
+  border-radius: 24px;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.15);
+  overflow: hidden;
+}
+
+.terms-scroll-body {
+  max-height: 420px;
+  overflow-y: auto;
+  padding: 1.5rem;
+  font-size: 0.88rem;
+  color: #475569;
+  line-height: 1.6;
+}
+
+.terms-section-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #0F172A;
+  margin-top: 1.25rem;
+  margin-bottom: 0.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
 }
 
 /* Botón Submit */
@@ -403,7 +447,7 @@
 /* Responsive adjustments */
 @media (max-width: 991px) {
   .onboarding-container {
-    padding: 1.5rem 1rem;
+    padding: 4.5rem 1rem 1.5rem 1rem;
   }
   .register-card-modern {
     padding: 2rem 1.5rem;
@@ -411,5 +455,8 @@
   }
   .form-section-box {
     padding: 1.25rem 1rem;
+  }
+  .password-req-checklist {
+    grid-template-columns: 1fr;
   }
 }

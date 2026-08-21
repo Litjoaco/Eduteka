@@ -129,11 +129,28 @@ def registro_colegio_paso2_view(request, colegio_id):
     return render(request, 'registrocolegiopaso2.html', {'form': form, 'colegio': colegio})
 
 def api_buscar_colegios(request):
-    q = request.GET.get('q', '').lower()
-    if len(q) < 2:
-        return JsonResponse([], safe=False)
-    colegios = Colegio.objects.filter(nombre__icontains=q)[:10]
-    resultados = [{'id': c.id, 'nombre': c.nombre, 'ciudad': c.ciudad_comuna} for c in colegios]
+    q = request.GET.get('q', '').strip()
+    if q:
+        colegios = Colegio.objects.filter(nombre__icontains=q)[:10]
+    else:
+        # Si no hay query, mostrar colegios activos recientes como sugerencia inicial
+        colegios = Colegio.objects.all().order_by('-id')[:8]
+
+    resultados = []
+    for c in colegios:
+        logo_url = c.logo.url if (c.logo and hasattr(c.logo, 'url')) else ''
+        tipo_str = c.get_tipo_institucion_display() if hasattr(c, 'get_tipo_institucion_display') else (c.tipo_institucion or 'Colegio')
+        resultados.append({
+            'id': c.id,
+            'nombre': c.nombre,
+            'nombre_corto': c.nombre_corto or '',
+            'eslogan': c.eslogan or '',
+            'logo_url': logo_url,
+            'color_principal': c.color_principal or '#7C5CFC',
+            'ciudad_comuna': c.ciudad_comuna or '',
+            'region': c.region or '',
+            'tipo_institucion': tipo_str,
+        })
     return JsonResponse(resultados, safe=False)
 
 def configuracion_colegio_paso1_view(request, colegio_id):

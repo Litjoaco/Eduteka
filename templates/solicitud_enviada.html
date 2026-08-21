@@ -5,23 +5,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Solicitud Enviada - Eduteka</title>
+    
+    <!-- Google Fonts: Inter & Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap CSS -->
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="{% static 'css/login.css' %}">
     <link rel="stylesheet" href="{% static 'css/backbutton.css' %}">
-    <link rel="stylesheet" href="{% static 'css/solicitud_enviada.css' %}">
+    <link rel="stylesheet" href="{% static 'css/solicitud_enviada.css' %}?v=8">
 </head>
 <body class="login-body">
 
-    <!-- Botón volver -->
+    <!-- Botón volver flotante -->
     <a href="{% url 'landing_page' %}" class="back-button">
-        <i class="bi bi-arrow-left"></i> Volver
+        <i class="bi bi-arrow-left"></i> Volver al Inicio
     </a>
 
-    <!-- Fondos orgánicos (heredados de login.css) -->
+    <!-- Fondos orgánicos -->
     <div class="bg-shapes">
         <div class="shape shape-1"></div>
         <div class="shape shape-2"></div>
@@ -31,140 +38,128 @@
         <div class="pattern-dots dots-2"></div>
     </div>
 
-    <div class="container page-wrapper">
-        <div class="row w-100 m-0 align-items-center justify-content-center">
+    <div class="page-wrapper">
+        <div class="row w-100 align-items-center justify-content-center g-4 g-lg-5">
 
-            <!-- ══ COLUMNA IZQUIERDA ══ -->
-            <div class="col-lg-6 d-none d-lg-flex flex-column justify-content-center left-col">
+            <!-- ══ COLUMNA IZQUIERDA: BRANDING & BENEFICIOS ══ -->
+            <div class="col-lg-5 d-none d-lg-flex flex-column justify-content-center left-col">
 
                 <div class="mb-3">
-                    <img src="{% static 'img/logo.png' %}" alt="Eduteka Logo" class="logo-blend" style="height: 140px;">
+                    <img src="{% static 'img/logo.png' %}" alt="Eduteka Logo" class="brand-logo-large logo-blend" style="max-height: 100px; width: auto; max-width: 220px; object-fit: contain;">
+                </div>
+
+                <div class="brand-status-pill">
+                    <i class="bi bi-check-circle-fill"></i> Solicitud Registrada
                 </div>
 
                 <h1 class="main-title">
-                    Solicitud enviada<br>
-                    <span>correctamente</span>
+                    Solicitud enviada <span style="color:#7C5CFC;">con éxito</span>
                 </h1>
 
                 <p class="main-desc">
-                    Tu solicitud de acceso fue enviada al administrador del colegio.
-                    Cuando sea revisada, recibirás una notificación por correo y podrás
-                    ingresar a los módulos disponibles según tu rol.
+                    Tu solicitud de acceso ya está en la bandeja de entrada del administrador de tu colegio. Te notificaremos apenas sea aprobada para que ingreses a tus módulos.
                 </p>
 
                 <!-- Cards de beneficios -->
-                <div class="benefit-cards">
-                    <div class="benefit-card">
-                        <div class="bc-icon"><i class="bi bi-shield-fill-check"></i></div>
-                        <p class="bc-title">Proceso seguro</p>
-                        <p class="bc-desc">Tu información y solicitud están protegidas.</p>
+                <div class="left-feature-stack">
+                    <div class="left-feature-card">
+                        <div class="feature-card-icon" style="background:#ECFDF5; color:#10B981;">
+                            <i class="bi bi-bell-fill"></i>
+                        </div>
+                        <div>
+                            <div class="feature-card-title">Notificación Automática</div>
+                            <div class="feature-card-desc">El administrador del colegio ya fue avisado de tu solicitud.</div>
+                        </div>
                     </div>
-                    <div class="benefit-card">
-                        <div class="bc-icon"><i class="bi bi-clock-fill" style="color:#22c55e;"></i></div>
-                        <p class="bc-title">Respuesta rápida</p>
-                        <p class="bc-desc">Te notificaremos apenas tu solicitud sea revisada.</p>
-                    </div>
-                    <div class="benefit-card">
-                        <div class="bc-icon"><i class="bi bi-people-fill" style="color:#f59e0b;"></i></div>
-                        <p class="bc-title">Roles personalizados</p>
-                        <p class="bc-desc">Accede solo a lo que necesitas según tu rol.</p>
+
+                    <div class="left-feature-card">
+                        <div class="feature-card-icon" style="background:#F0EDFF; color:#7C5CFC;">
+                            <i class="bi bi-shield-lock-fill"></i>
+                        </div>
+                        <div>
+                            <div class="feature-card-title">Validación Segura</div>
+                            <div class="feature-card-desc">Tus credenciales y datos pedagógicos permanecen protegidos.</div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Ilustración + chips de pasos -->
-                <div class="illustration-area">
-                    <img src="{% static 'img/colegio.png' %}" alt="Proceso de solicitud Eduteka">
-
-                    <div class="step-chip chip-1">
-                        <div class="chip-dot green"><i class="bi bi-check"></i></div>
-                        Solicitud enviada
-                    </div>
-
-                    <div class="step-chip chip-2">
-                        <div class="chip-dot yellow"><i class="bi bi-clock"></i></div>
-                        Administrador revisa tu solicitud
-                    </div>
-
-                    <div class="step-chip chip-3">
-                        <div class="chip-dot purple"><i class="bi bi-person-fill"></i></div>
-                        Accede a Eduteka según tu rol
-                    </div>
+                <!-- Ilustración -->
+                <div class="illustration-hero-frame">
+                    <div class="illustration-aura-glow"></div>
+                    <img src="{% static 'img/colegio.png' %}" alt="Proceso de solicitud Eduteka" class="img-fluid floating-illustration" style="max-height: 270px; object-fit: contain; position: relative; z-index: 2;">
                 </div>
 
             </div>
 
-            <!-- ══ COLUMNA DERECHA ══ -->
-            <div class="col-12 col-md-10 col-lg-6">
+            <!-- ══ COLUMNA DERECHA: TARJETA DE ESTADO Y RESUMEN ══ -->
+            <div class="col-12 col-lg-7">
                 <div class="status-card">
 
-                    <!-- Ícono avión con check -->
-                    <div class="text-center">
-                        <img src="{% static 'img/logo.png' %}" alt="Eduteka Logo" class="logo-blend" style="height: 80px; margin-bottom: 1.5rem;">
-                        <div class="send-icon-wrap">
-                            <div class="send-icon-bg">
-                                <i class="bi bi-send-fill"></i>
+                    <!-- Ícono de Éxito Superior -->
+                    <div class="status-header-icon">
+                        <i class="bi bi-send-check-fill"></i>
+                    </div>
+
+                    <h2 class="card-title-pro">Tu solicitud está en revisión</h2>
+                    <p class="card-subtitle-pro">
+                        El equipo directivo del colegio revisará tus datos y habilitará tus asignaturas correspondientes.
+                    </p>
+
+                    <!-- Timeline de Pasos de Aprobación -->
+                    <div class="approval-timeline">
+                        <div class="timeline-step completed">
+                            <div class="timeline-icon"><i class="bi bi-check2"></i></div>
+                            <div class="timeline-info">
+                                <div class="timeline-title">1. Solicitud enviada</div>
+                                <p class="timeline-desc">Tus datos fueron registrados en la plataforma.</p>
                             </div>
-                            <div class="check-badge">
-                                <i class="bi bi-check"></i>
+                        </div>
+
+                        <div class="timeline-step current">
+                            <div class="timeline-icon"><i class="bi bi-clock-history"></i></div>
+                            <div class="timeline-info">
+                                <div class="timeline-title">2. Validación del administrador</div>
+                                <p class="timeline-desc">En espera de confirmación por la dirección del colegio.</p>
                             </div>
                         </div>
 
-                        <h2 class="card-title">Tu solicitud está en proceso</h2>
-                        <p class="card-subtitle">
-                            El administrador del colegio revisará tu solicitud
-                            y te notificaremos por correo.
-                        </p>
-                    </div>
-
-                    <!-- Estado -->
-                    <div class="status-pill">
-                        <i class="bi bi-clock-history"></i>
-                        <div>
-                            <p class="sp-label">Estado:</p>
-                            <p class="sp-value">Pendiente de aprobación</p>
+                        <div class="timeline-step">
+                            <div class="timeline-icon"><i class="bi bi-unlock"></i></div>
+                            <div class="timeline-info">
+                                <div class="timeline-title">3. Acceso completo a módulos</div>
+                                <p class="timeline-desc">Libro de clases, notas y asistencia habilitados.</p>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Detalle -->
-                    <div class="detail-table">
-                        <div class="detail-row">
-                            <i class="bi bi-building"></i>
-                            <span class="dr-label">Colegio solicitado</span>
-                            <span class="dr-value">{{ solicitud.colegio.nombre|default:"Colegio San Bernardo" }}</span>
+                    <!-- Ficha Resumen de la Solicitud -->
+                    <div class="summary-box">
+                        <div class="summary-row">
+                            <span class="summary-label"><i class="bi bi-building"></i> Colegio solicitado:</span>
+                            <span class="summary-val">{% if solicitud and solicitud.colegio %}{{ solicitud.colegio.nombre }}{% else %}Establecimiento Educacional{% endif %}</span>
                         </div>
-                        <div class="detail-row">
-                            <i class="bi bi-person"></i>
-                            <span class="dr-label">Rol solicitado</span>
-                            <span class="dr-value">{{ solicitud.get_rol_display|default:"Profesor" }}</span>
+                        <div class="summary-row">
+                            <span class="summary-label"><i class="bi bi-person-badge"></i> Rol solicitado:</span>
+                            <span class="summary-val text-capitalize">{% if solicitud %}{{ solicitud.get_rol_solicitado_display|default:solicitud.rol_solicitado }}{% else %}Profesor / Docente{% endif %}</span>
                         </div>
-                        <div class="detail-row">
-                            <i class="bi bi-calendar3"></i>
-                            <span class="dr-label">Fecha de solicitud</span>
-                            <span class="dr-value">{{ solicitud.creado_en|date:"j \d\e F \d\e Y"|default:"22 de mayo de 2026" }}</span>
+                        <div class="summary-row">
+                            <span class="summary-label"><i class="bi bi-calendar3"></i> Fecha de envío:</span>
+                            <span class="summary-val">{% if solicitud and solicitud.creado_en %}{{ solicitud.creado_en|date:"j \d\e F \d\e Y" }}{% else %}Hoy{% endif %}</span>
                         </div>
-                        <div class="detail-row">
-                            <i class="bi bi-clock"></i>
-                            <span class="dr-label">Tiempo estimado</span>
-                            <span class="dr-value">Depende del administrador</span>
+                        <div class="summary-row">
+                            <span class="summary-label"><i class="bi bi-hourglass-split text-warning"></i> Estado actual:</span>
+                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle fw-bold px-2.5 py-1">
+                                <i class="bi bi-clock-history me-1"></i> Pendiente de aprobación
+                            </span>
                         </div>
                     </div>
 
-                    <!-- Qué sigue -->
-                    <div class="next-box">
-                        <div class="nb-icon"><i class="bi bi-info-lg"></i></div>
-                        <p>
-                            <strong>¿Qué sigue?</strong>
-                            El administrador del colegio revisará tu solicitud. Cuando sea aprobada,
-                            recibirás un correo para ingresar a Eduteka y comenzar a usar la plataforma.
-                        </p>
-                    </div>
-
-                    <!-- Botones -->
-                    <a href="{% url 'landing_page' %}" class="btn-primary-custom">
-                        <i class="bi bi-house-fill"></i> Volver al inicio
+                    <!-- Botones de Acción -->
+                    <a href="{% url 'landing_page' %}" class="btn-home-pro">
+                        <i class="bi bi-house-door-fill"></i> Volver al Inicio
                     </a>
-                    <a href="#" class="btn-outline-custom">
-                        <i class="bi bi-arrow-clockwise"></i> Revisar estado de solicitud
+                    <a href="{% url 'login' %}" class="btn-login-alt">
+                        <i class="bi bi-box-arrow-in-right"></i> Ir a Iniciar Sesión
                     </a>
 
                 </div>
@@ -173,6 +168,7 @@
         </div>
     </div>
 
+    <!-- Bootstrap JS -->
     <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 </body>
 </html>

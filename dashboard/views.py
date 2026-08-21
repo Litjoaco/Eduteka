@@ -18,39 +18,55 @@ def dashboard_view(request):
 def aprobar_solicitud(request, solicitud_id):
     if request.method == 'POST':
         solicitud = get_object_or_404(SolicitudAcceso, id=solicitud_id)
-        # Verificamos por seguridad que el usuario logueado es el administrador del colegio
-        if request.user == solicitud.colegio.administrador:
-            solicitud.estado = 'aprobada'
-            solicitud.save()
+        # Verificamos por seguridad que el usuario logueado es el administrador del colegio o directivo
+        if request.user == solicitud.colegio.administrador or MiembroColegio.objects.filter(usuario=request.user, colegio=solicitud.colegio, rol__nombre__in=['Administrador', 'Director'], activo=True).exists():
+            rol_id = request.POST.get('rol_id')
+            rol_nombre = request.POST.get('rol_asignado')
             
-            # Buscar el rol correspondiente en el colegio
-            # Si el rol solicitado no existe, podríamos asignar uno por defecto o el que solicitó si es base
-            rol_nombre = solicitud.rol_solicitado.capitalize()
-            rol_obj = RolColegio.objects.filter(colegio=solicitud.colegio, nombre__iexact=rol_nombre).first()
+            rol_obj = None
+            if rol_id:
+                rol_obj = RolColegio.objects.filter(colegio=solicitud.colegio, id=rol_id).first()
+            elif rol_nombre:
+                rol_obj = RolColegio.objects.filter(colegio=solicitud.colegio, nombre__iexact=rol_nombre).first()
+                if not rol_obj:
+                    rol_obj = RolColegio.objects.filter(nombre__iexact=rol_nombre).first()
             
             if not rol_obj:
-                # Si no existe, usamos el primer rol activo o Administrador por defecto (aunque mejor uno menor)
+                # Fallback al rol solicitado
+                rol_obj = RolColegio.objects.filter(colegio=solicitud.colegio, nombre__iexact=solicitud.rol_solicitado).first()
+            
+            if not rol_obj:
                 rol_obj = RolColegio.objects.filter(colegio=solicitud.colegio, activo=True).exclude(nombre='Administrador').first()
 
-            MiembroColegio.objects.get_or_create(
+            solicitud.estado = 'aprobada'
+            if rol_obj:
+                solicitud.rol_solicitado = rol_obj.nombre.lower()
+            solicitud.save()
+
+            miembro, created = MiembroColegio.objects.update_or_create(
                 usuario=solicitud.usuario,
                 colegio=solicitud.colegio,
                 defaults={'rol': rol_obj, 'activo': True}
             )
             
-            messages.success(request, f"Acceso aprobado para {solicitud.usuario.perfil.nombre_completo}.")
+            nombre_u = getattr(solicitud.usuario, 'perfil', None)
+            nombre_str = nombre_u.nombre_completo if nombre_u else (solicitud.usuario.get_full_name() or solicitud.usuario.email)
+            rol_str = rol_obj.nombre if rol_obj else 'Miembro'
+            messages.success(request, f"¡Solicitud aprobada! Se asignó el rol '{rol_str}' a {nombre_str}.")
         else:
             messages.error(request, "No tienes permiso para aprobar esta solicitud.")
-    return redirect('dashboard_profesor')
+    return redirect('dashboard_usuario')
 
 @login_required
 def rechazar_solicitud(request, solicitud_id):
     if request.method == 'POST':
         solicitud = get_object_or_404(SolicitudAcceso, id=solicitud_id)
-        if request.user == solicitud.colegio.administrador:
+        if request.user == solicitud.colegio.administrador or MiembroColegio.objects.filter(usuario=request.user, colegio=solicitud.colegio, rol__nombre__in=['Administrador', 'Director'], activo=True).exists():
             solicitud.estado = 'rechazada'
             solicitud.save()
-            messages.success(request, f"Solicitud de {solicitud.usuario.perfil.nombre_completo} rechazada.")
+            nombre_u = getattr(solicitud.usuario, 'perfil', None)
+            nombre_str = nombre_u.nombre_completo if nombre_u else (solicitud.usuario.get_full_name() or solicitud.usuario.email)
+            messages.success(request, f"La solicitud de {nombre_str} fue rechazada.")
         else:
             messages.error(request, "No tienes permiso para rechazar esta solicitud.")
-    return redirect('dashboard_profesor')
+    return redirect('dashboard_usuario')
