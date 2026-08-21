@@ -5,10 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crea tu cuenta - Eduteka</title>
-    <!-- Google Fonts: Inter -->
+    
+    <!-- Google Fonts: Inter & Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet">
+    
     <!-- Bootstrap CSS -->
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -16,14 +18,14 @@
     
     <!-- Custom Login/Register CSS -->
     <link rel="stylesheet" href="{% static 'css/login.css' %}">
-    <link rel="stylesheet" href="{% static 'css/registropersonal.css' %}">
+    <link rel="stylesheet" href="{% static 'css/registropersonal.css' %}?v=8">
     <link rel="stylesheet" href="{% static 'css/backbutton.css' %}">
 </head>
 <body class="login-body">
 
-    <!-- Botón volver -->
+    <!-- Botón volver flotante -->
     <a href="{% url 'landing_page' %}" class="back-button">
-        <i class="bi bi-arrow-left"></i> Volver
+        <i class="bi bi-arrow-left"></i> Volver al Inicio
     </a>
 
     <!-- Organic Background Shapes & Patterns -->
@@ -36,129 +38,269 @@
         <div class="pattern-dots dots-2"></div>
     </div>
 
-    <div class="container login-container">
-        <div class="row w-100 m-0 align-items-center justify-content-center">
+    <div class="login-container container">
+        <div class="row w-100 align-items-center justify-content-center g-4 g-lg-5">
             
-            <!-- Left Column: Welcome & Illustration (Hidden on mobile) -->
-            <div class="col-lg-6 d-none d-lg-flex flex-column justify-content-center welcome-section">
-                <!-- Header with logo in left column -->
+            <!-- Columna Izquierda: Branding, Beneficios e Ilustración -->
+            <div class="col-lg-5 d-none d-lg-flex flex-column justify-content-center brand-hero-left">
+                
                 <div class="mb-3">
-                    <img src="{% static 'img/logo.png' %}" alt="Eduteka Logo" class="logo-blend" style="height: 140px;">
+                    <img src="{% static 'img/logo.png' %}" alt="Eduteka Logo" class="brand-logo-large logo-blend" style="max-height: 100px; width: auto; max-width: 220px; object-fit: contain;">
                 </div>
                 
-                <h1 class="welcome-title">Crea tu cuenta en Eduteka</h1>
-                <p class="welcome-desc">Regístrate como usuario para acceder a la plataforma y luego solicitar acceso a tu colegio.</p>
+                <div class="brand-status-pill">
+                    <i class="bi bi-person-badge-fill"></i> Acceso Docente & Administrativo
+                </div>
+
+                <h1 class="welcome-title-pro">
+                    Tu portal escolar en una sola <span style="color:#7C5CFC;">plataforma</span>
+                </h1>
+                <p class="welcome-desc-pro">
+                    Crea tu cuenta de usuario para ingresar al Libro de Clases Digital, pasar lista, registrar calificaciones y colaborar con tu equipo pedagógico.
+                </p>
+
+                <!-- Stack de Beneficios -->
+                <div class="left-feature-stack">
+                    <div class="left-feature-card">
+                        <div class="feature-card-icon" style="background:#ECFDF5; color:#10B981;">
+                            <i class="bi bi-journal-check"></i>
+                        </div>
+                        <div>
+                            <div class="feature-card-title">Libro de Clases en Tiempo Real</div>
+                            <div class="feature-card-desc">Planillas de notas y firmas de objetivos digitales.</div>
+                        </div>
+                    </div>
+
+                    <div class="left-feature-card">
+                        <div class="feature-card-icon" style="background:#F0EDFF; color:#7C5CFC;">
+                            <i class="bi bi-fingerprint"></i>
+                        </div>
+                        <div>
+                            <div class="feature-card-title">Seguridad y Trazabilidad</div>
+                            <div class="feature-card-desc">Firma electrónica con validez MINEDUC.</div>
+                        </div>
+                    </div>
+                </div>
                 
-                <!-- Conceptual Illustration (Image) -->
-                <div class="illustration-wrapper">
-                    <!-- Using the existing libro.png, matching the prompt's description contextually -->
-                    <img src="{% static 'img/libro.png' %}" alt="Libro abierto con módulos digitales flotantes como asistencia, calendario y perfil" class="img-fluid floating-illustration">
+                <!-- Ilustración con Aura -->
+                <div class="illustration-hero-frame">
+                    <div class="illustration-aura-glow"></div>
+                    <img src="{% static 'img/libro.png' %}" alt="Libro abierto digital" class="img-fluid floating-illustration" style="max-height: 260px; object-fit: contain; position: relative; z-index: 2;">
                 </div>
             </div>
 
-            <!-- Right Column: Register Form Card -->
-            <div class="col-12 col-md-8 col-lg-5 offset-lg-1">
-                <div class="register-card">
-                    <div class="register-header">
-                        <!-- Logo display always visible -->
-                        <img src="{% static 'img/logo.png' %}" alt="Eduteka Logo" class="logo-blend" style="height: 80px; margin-bottom: 1.5rem;">
-                        
-                        <h2>Registrarme</h2>
-                        <p>Crea tu cuenta como usuario</p>
+            <!-- Columna Derecha: Tarjeta de Formulario Elevada -->
+            <div class="col-12 col-lg-7 col-xl-7">
+                <div class="register-card-modern">
+                    
+                    <div class="register-card-header">
+                        <div class="register-badge">
+                            <i class="bi bi-stars"></i> Registro de Usuario
+                        </div>
+                        <h2 class="register-title">Crear Cuenta de Usuario</h2>
+                        <p class="register-subtitle">Completa tus datos para solicitar acceso a tu colegio.</p>
                     </div>
 
-                    <form action="{% url 'registro' %}" method="POST">
-                        {% csrf_token %}
-                        
-                        {% if form.errors %}
-                            <div class="alert alert-danger" style="font-size: 0.9rem; border-radius: 8px;">
-                                <ul class="mb-0" style="padding-left: 1rem;">
+                    <!-- Mensajes de Error Django -->
+                    {% if form.errors %}
+                        <div class="alert alert-danger rounded-4 shadow-sm border-0 d-flex align-items-start gap-2 mb-4 p-3" style="font-size: 0.88rem;">
+                            <i class="bi bi-exclamation-triangle-fill text-danger fs-5 mt-0.5"></i>
+                            <ul class="mb-0 ps-3">
                                 {% for field, errors in form.errors.items %}
                                     {% for error in errors %}
-                                        <li>{{ error }}</li>
+                                        <li><strong>{{ field|capfirst }}:</strong> {{ error }}</li>
                                     {% endfor %}
                                 {% endfor %}
-                                </ul>
-                            </div>
-                        {% endif %}
+                            </ul>
+                        </div>
+                    {% endif %}
 
-                        <div class="row g-2 mb-3">
-                            <!-- Nombre Completo -->
-                            <div class="col-12">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control" id="nameInput" name="nombre_completo" placeholder="Nombre completo" value="{{ form.nombre_completo.value|default_if_none:'' }}" required>
-                                    <label for="nameInput">Nombre completo</label>
-                                </div>
-                            </div>
+                    <form action="{% url 'registro' %}" method="POST" id="registroPersonalForm">
+                        {% csrf_token %}
 
-                            <!-- RUT -->
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control rut-input" id="rutInput" name="rut" placeholder="12.345.678-9" value="{{ form.rut.value|default_if_none:'' }}" maxlength="12" required>
-                                    <label for="rutInput">RUT</label>
+                        <!-- BLOQUE 1: DATOS PERSONALES -->
+                        <div class="form-section-box">
+                            <div class="form-section-header">
+                                <div class="section-icon-badge">
+                                    <i class="bi bi-person-vcard"></i>
                                 </div>
-                            </div>
-                            
-                            <!-- Teléfono -->
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control" id="telefonoInput" name="telefono" placeholder="+56 9 1234 5678" value="{{ form.telefono.value|default_if_none:'' }}" required>
-                                    <label for="telefonoInput">Teléfono</label>
-                                </div>
+                                <h6 class="form-section-title">1. Datos Personales & Contacto</h6>
                             </div>
 
-                            <!-- Correo Institucional -->
-                            <div class="col-12">
-                                <div class="form-floating">
-                                    <input type="email" class="form-control" id="emailInput" name="email" placeholder="correo@colegio.edu" value="{{ form.email.value|default_if_none:'' }}" autocapitalize="none" required>
-                                    <label for="emailInput">Correo institucional</label>
+                            <div class="row g-3">
+                                <!-- Nombre Completo -->
+                                <div class="col-12">
+                                    <label class="form-label-pro" for="nameInput">Nombre completo del usuario *</label>
+                                    <div class="input-icon-group">
+                                        <i class="bi bi-person input-icon"></i>
+                                        <input type="text" class="form-control-pro" id="nameInput" name="nombre_completo" placeholder="Ej: Juan Pérez Morales" value="{{ form.nombre_completo.value|default_if_none:'' }}" required>
+                                    </div>
                                 </div>
-                            </div>
-                            
-                            <!-- Contraseña -->
-                            <div class="col-12">
-                                <div class="form-floating position-relative">
-                                    <input type="password" class="form-control" id="passwordInput" name="password" placeholder="Contraseña" required>
-                                    <label for="passwordInput">Contraseña</label>
-                                    <button type="button" class="btn border-0 position-absolute end-0 top-50 translate-middle-y" onclick="togglePassword('passwordInput', this)" style="z-index: 5; color: #6c757d; padding: 0.5rem 1rem;">
-                                        <i class="bi bi-eye"></i>
-                                    </button>
-                                </div>
-                            </div>
 
-                            <!-- Confirmar Contraseña -->
-                            <div class="col-12">
-                                <div class="form-floating position-relative">
-                                    <input type="password" class="form-control" id="passwordConfirmInput" name="password_confirm" placeholder="Confirmar contraseña" required>
-                                    <label for="passwordConfirmInput">Confirmar contraseña</label>
-                                    <button type="button" class="btn border-0 position-absolute end-0 top-50 translate-middle-y" onclick="togglePassword('passwordConfirmInput', this)" style="z-index: 5; color: #6c757d; padding: 0.5rem 1rem;">
-                                        <i class="bi bi-eye"></i>
-                                    </button>
+                                <!-- RUT con Validador en Vivo -->
+                                <div class="col-md-6">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <label class="form-label-pro mb-0" for="rutInput">RUT chileno *</label>
+                                        <span id="rutStatusBadge" class="badge" style="font-size: 0.72rem; display: none;"></span>
+                                    </div>
+                                    <div class="input-icon-group">
+                                        <i class="bi bi-card-text input-icon"></i>
+                                        <input type="text" class="form-control-pro rut-input" id="rutInput" name="rut" placeholder="12.345.678-9" value="{{ form.rut.value|default_if_none:'' }}" maxlength="12" required autocomplete="off">
+                                    </div>
+                                </div>
+
+                                <!-- Teléfono -->
+                                <div class="col-md-6">
+                                    <label class="form-label-pro" for="telefonoInput">Teléfono móvil *</label>
+                                    <div class="input-icon-group">
+                                        <i class="bi bi-phone input-icon"></i>
+                                        <input type="text" class="form-control-pro" id="telefonoInput" name="telefono" placeholder="+56 9 8765 4321" value="{{ form.telefono.value|default_if_none:'' }}" required>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Terms and Conditions Checkbox -->
-                        <div class="form-check mb-4">
-                            <input class="form-check-input" type="checkbox" id="termsCheck" required>
-                            <label class="form-check-label" for="termsCheck">
-                                Acepto los <a href="#" style="color: var(--login-primary); font-weight: 500;">términos y condiciones</a>
+                        <!-- BLOQUE 2: CREDENCIALES DE ACCESO -->
+                        <div class="form-section-box">
+                            <div class="form-section-header">
+                                <div class="section-icon-badge" style="background:#ECFDF5; color:#10B981;">
+                                    <i class="bi bi-shield-lock"></i>
+                                </div>
+                                <h6 class="form-section-title">2. Credenciales de Seguridad</h6>
+                            </div>
+
+                            <div class="row g-3">
+                                <!-- Correo Institucional -->
+                                <div class="col-12">
+                                    <label class="form-label-pro" for="emailInput">Correo electrónico *</label>
+                                    <div class="input-icon-group">
+                                        <i class="bi bi-envelope input-icon"></i>
+                                        <input type="email" class="form-control-pro" id="emailInput" name="email" placeholder="profesor@colegio.cl" value="{{ form.email.value|default_if_none:'' }}" autocapitalize="none" required>
+                                    </div>
+                                    <span class="extra-small text-muted mt-1 d-block">Este correo será tu usuario de acceso a Eduteka.</span>
+                                </div>
+
+                                <!-- Contraseña con Medidor y Checklist -->
+                                <div class="col-md-6">
+                                    <label class="form-label-pro" for="passwordInput">Crear contraseña segura *</label>
+                                    <div class="input-icon-group">
+                                        <i class="bi bi-lock input-icon"></i>
+                                        <input type="password" class="form-control-pro pe-5" id="passwordInput" name="password" placeholder="Mínimo 8 caracteres" required oninput="evaluarContrasena(this.value)">
+                                        <button type="button" class="btn border-0 position-absolute end-0 top-50 translate-middle-y text-muted px-3" onclick="togglePassword('passwordInput', this)" tabindex="-1">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+
+                                    <div class="password-meter-bar">
+                                        <div class="password-meter-fill" id="passMeterFill"></div>
+                                    </div>
+                                    <span class="password-meter-text text-muted" id="passMeterText">Seguridad: Ingresa una contraseña</span>
+
+                                    <!-- Checklist Visual de Requisitos -->
+                                    <div class="password-req-checklist mt-2" id="passReqList">
+                                        <div class="req-item" id="reqLength"><i class="bi bi-circle"></i> Mínimo 8 caracteres</div>
+                                        <div class="req-item" id="reqUpper"><i class="bi bi-circle"></i> Mayúscula (A-Z)</div>
+                                        <div class="req-item" id="reqNumber"><i class="bi bi-circle"></i> Un número (0-9)</div>
+                                        <div class="req-item" id="reqSymbol"><i class="bi bi-circle"></i> Símbolo (@, #, $)</div>
+                                    </div>
+                                </div>
+
+                                <!-- Confirmar Contraseña -->
+                                <div class="col-md-6">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <label class="form-label-pro mb-0" for="passwordConfirmInput">Confirmar contraseña *</label>
+                                        <span id="passMatchBadge" class="badge" style="font-size: 0.72rem; display: none;"></span>
+                                    </div>
+                                    <div class="input-icon-group">
+                                        <i class="bi bi-shield-check input-icon"></i>
+                                        <input type="password" class="form-control-pro pe-5" id="passwordConfirmInput" name="password_confirm" placeholder="Repite tu contraseña" required oninput="verificarCoincidencia()">
+                                        <button type="button" class="btn border-0 position-absolute end-0 top-50 translate-middle-y text-muted px-3" onclick="togglePassword('passwordConfirmInput', this)" tabindex="-1">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Términos y Condiciones Checkbox -->
+                        <div class="form-check mt-3 mb-4 d-flex align-items-center gap-2">
+                            <input class="form-check-input mt-0" type="checkbox" id="termsCheck" required checked style="width: 1.25em; height: 1.25em; cursor: pointer;">
+                            <label class="form-check-label small text-muted" for="termsCheck">
+                                Acepto los <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#termsModal" class="fw-bold text-decoration-underline" style="color: var(--reg-primary);">términos de servicio</a> y las <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#termsModal" class="fw-bold text-decoration-underline" style="color: var(--reg-primary);">políticas de privacidad</a>
                             </label>
                         </div>
 
                         <!-- Submit Button -->
-                        <button type="submit" class="btn btn-register">
-                            Crear cuenta
+                        <button type="submit" class="btn-submit-pro" id="btnSubmitRegister">
+                            <span id="btnSubmitText">Crear mi cuenta de usuario</span>
+                            <i class="bi bi-arrow-right-short fs-3" id="btnSubmitIcon"></i>
+                            <span class="spinner-border spinner-border-sm d-none" id="btnSubmitSpinner" role="status"></span>
                         </button>
 
-                        <!-- Login link -->
-                        <div class="login-link">
-                            ¿Ya tienes cuenta? <a href="{% url 'login' %}">Iniciar sesión</a>
+                        <!-- Enlace a Login -->
+                        <div class="login-link-pro">
+                            ¿Ya tienes una cuenta registrada? <a href="{% url 'login' %}">Iniciar Sesión</a>
                         </div>
                     </form>
+
                 </div>
             </div>
 
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+         MODAL DE TÉRMINOS Y CONDICIONES Y PRIVACIDAD DE DATOS (LEGAL & SEGURO)
+         ========================================================================== -->
+    <div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content modal-content-terms">
+                
+                <div class="modal-header bg-light border-bottom p-3 px-4">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="rounded-3 d-flex align-items-center justify-content-center" style="width:36px; height:36px; background:#F0EDFF; color:#7C5CFC;">
+                            <i class="bi bi-shield-check fs-5"></i>
+                        </div>
+                        <div>
+                            <h5 class="modal-title fw-bold text-dark mb-0" id="termsModalLabel" style="font-size:1.05rem;">Términos de Servicio y Privacidad</h5>
+                            <span class="extra-small text-muted">Plataforma de Gestión Escolar Eduteka — Chile</span>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+
+                <div class="modal-body terms-scroll-body">
+                    <p class="mb-3">Bienvenido a <strong>Eduteka</strong>. Al registrarte como usuario institucional, aceptas los siguientes acuerdos conforme a la legislación educacional chilena:</p>
+
+                    <div class="terms-section-title">
+                        <i class="bi bi-patch-check-fill text-primary"></i> 1. Cumplimiento de Normativa MINEDUC
+                    </div>
+                    <p>La plataforma opera según la <strong>Circular N° 30 de la Superintendencia de Educación</strong> y el <strong>Decreto 67</strong>, resguardando la trazabilidad, firmas digitales y actas de evaluación escolar.</p>
+
+                    <div class="terms-section-title">
+                        <i class="bi bi-lock-fill text-success"></i> 2. Protección de Datos Personales (Ley 19.628)
+                    </div>
+                    <p>En conformidad con la <strong>Ley N° 19.628</strong> sobre Protección de la Vida Privada, tus datos personales y los registros de los alumnos son confidenciales, no comercializables y propiedad exclusiva del establecimiento educacional.</p>
+
+                    <div class="terms-section-title">
+                        <i class="bi bi-cloud-arrow-up-fill text-info"></i> 3. Seguridad y Respaldo en la Nube
+                    </div>
+                    <p>Toda la información es transmitida con cifrado SSL/TLS de 256 bits y almacenada en infraestructuras seguras con respaldos automáticos diarios.</p>
+
+                    <div class="terms-section-title">
+                        <i class="bi bi-person-badge text-warning"></i> 4. Uso de Credenciales y Responsabilidad
+                    </div>
+                    <p>Cada usuario es responsable del uso de sus credenciales institucionales y del resguardo de las calificaciones y asistencias que ingrese al sistema.</p>
+                </div>
+
+                <div class="modal-footer bg-light border-top p-3 px-4 d-flex justify-content-between">
+                    <button type="button" class="btn btn-outline-secondary rounded-3 px-3 py-2 fw-bold" data-bs-dismiss="modal" style="font-size:0.88rem;">Cerrar</button>
+                    <button type="button" class="btn btn-primary rounded-3 px-4 py-2 fw-bold" onclick="acceptTermsModal()" style="background:#7C5CFC; border:none; font-size:0.88rem;">
+                        <i class="bi bi-check-circle-fill me-1"></i> Aceptar Términos y Condiciones
+                    </button>
+                </div>
+
+            </div>
         </div>
     </div>
 
@@ -166,27 +308,214 @@
     <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
     
     <script>
+        let isRutValid = false;
+
         document.addEventListener('DOMContentLoaded', function() {
-            // Formateador dinámico de RUT
-            document.querySelectorAll('.rut-input').forEach(input => {
-                input.addEventListener('input', function(e) {
-                    // Quitamos lo que no sea número o K, y limitamos a máximo 9 dígitos la base
-                    let value = e.target.value.replace(/[^0-9kK]/g, '').toUpperCase().slice(0, 9);
-                    
-                    if (value.length > 1) {
-                        value = value.slice(0, -1) + '-' + value.slice(-1);
+            // ==========================================
+            // Validador y Formateador de RUT Chileno (Módulo 11)
+            // ==========================================
+            const rutInput = document.getElementById('rutInput');
+            const rutBadge = document.getElementById('rutStatusBadge');
+
+            function validarRUTChileno(rutCompleto) {
+                let limpio = rutCompleto.replace(/\./g, '').replace(/-/g, '').trim().toUpperCase();
+                if (limpio.length < 8 || limpio.length > 9) return false;
+
+                const cuerpo = limpio.slice(0, -1);
+                const dv = limpio.slice(-1);
+
+                if (!/^\d+$/.test(cuerpo)) return false;
+
+                let suma = 0;
+                let multiplo = 2;
+                for (let i = cuerpo.length - 1; i >= 0; i--) {
+                    suma += parseInt(cuerpo.charAt(i)) * multiplo;
+                    multiplo = multiplo < 7 ? multiplo + 1 : 2;
+                }
+
+                let dvEsperado = 11 - (suma % 11);
+                dvEsperado = dvEsperado === 11 ? '0' : dvEsperado === 10 ? 'K' : dvEsperado.toString();
+
+                return dv === dvEsperado;
+            }
+
+            function formatearRUT(val) {
+                let limpio = val.replace(/[^0-9kK]/g, '').toUpperCase().slice(0, 9);
+                if (limpio.length === 0) return '';
+                let cuerpo = limpio.slice(0, -1);
+                let dv = limpio.slice(-1);
+
+                if (cuerpo.length === 0) return dv;
+
+                let cuerpoFormateado = '';
+                while (cuerpo.length > 3) {
+                    cuerpoFormateado = '.' + cuerpo.slice(-3) + cuerpoFormateado;
+                    cuerpo = cuerpo.slice(0, -3);
+                }
+                cuerpoFormateado = cuerpo + cuerpoFormateado;
+
+                return cuerpoFormateado + '-' + dv;
+            }
+
+            if (rutInput) {
+                rutInput.addEventListener('input', function(e) {
+                    let formateado = formatearRUT(e.target.value);
+                    e.target.value = formateado;
+
+                    const limpio = formateado.replace(/\./g, '').replace(/-/g, '');
+                    if (limpio.length >= 8) {
+                        if (validarRUTChileno(formateado)) {
+                            isRutValid = true;
+                            rutInput.classList.add('is-valid-rut');
+                            rutInput.classList.remove('is-invalid-rut');
+                            rutBadge.style.display = 'inline-block';
+                            rutBadge.className = 'badge bg-success-subtle text-success border border-success-subtle';
+                            rutBadge.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i>RUT Válido';
+                        } else {
+                            isRutValid = false;
+                            rutInput.classList.add('is-invalid-rut');
+                            rutInput.classList.remove('is-valid-rut');
+                            rutBadge.style.display = 'inline-block';
+                            rutBadge.className = 'badge bg-danger-subtle text-danger border border-danger-subtle';
+                            rutBadge.innerHTML = '<i class="bi bi-x-circle-fill me-1"></i>RUT Inválido';
+                        }
+                    } else {
+                        isRutValid = false;
+                        rutInput.classList.remove('is-valid-rut', 'is-invalid-rut');
+                        rutBadge.style.display = 'none';
                     }
-                    if (value.length > 5) {
-                        value = value.slice(0, -5) + '.' + value.slice(-5);
-                    }
-                    if (value.length > 9) {
-                        value = value.slice(0, -9) + '.' + value.slice(-9);
-                    }
-                    e.target.value = value;
                 });
+
+                if (rutInput.value) {
+                    rutInput.dispatchEvent(new Event('input'));
+                }
+            }
+
+            // Submit con Validación Completa
+            const form = document.getElementById('registroPersonalForm');
+            form.addEventListener('submit', function(e) {
+                if (!isRutValid && rutInput.value.trim().length > 0) {
+                    e.preventDefault();
+                    alert('Por favor, ingresa un RUT chileno válido antes de continuar.');
+                    rutInput.focus();
+                    return false;
+                }
+
+                const p1 = document.getElementById('passwordInput').value;
+                const p2 = document.getElementById('passwordConfirmInput').value;
+                if (p1 !== p2) {
+                    e.preventDefault();
+                    alert('Las contraseñas no coinciden. Por favor verifícalas.');
+                    document.getElementById('passwordConfirmInput').focus();
+                    return false;
+                }
+
+                const termsCheck = document.getElementById('termsCheck');
+                if (!termsCheck.checked) {
+                    e.preventDefault();
+                    alert('Debes aceptar los términos y condiciones para crear tu cuenta.');
+                    termsCheck.focus();
+                    return false;
+                }
+
+                const btn = document.getElementById('btnSubmitRegister');
+                const txt = document.getElementById('btnSubmitText');
+                const icon = document.getElementById('btnSubmitIcon');
+                const spinner = document.getElementById('btnSubmitSpinner');
+
+                btn.disabled = true;
+                txt.textContent = 'Creando tu cuenta...';
+                icon.classList.add('d-none');
+                spinner.classList.remove('d-none');
             });
         });
-        
+
+        // ==========================================
+        // Medidor de Contraseña y Checklist
+        // ==========================================
+        function evaluarContrasena(pass) {
+            const fill = document.getElementById('passMeterFill');
+            const text = document.getElementById('passMeterText');
+
+            const reqLength = document.getElementById('reqLength');
+            const reqUpper = document.getElementById('reqUpper');
+            const reqNumber = document.getElementById('reqNumber');
+            const reqSymbol = document.getElementById('reqSymbol');
+
+            const isLen = pass.length >= 8;
+            const isUp = /[A-Z]/.test(pass);
+            const isNum = /[0-9]/.test(pass);
+            const isSym = /[^A-Za-z0-9]/.test(pass);
+
+            updateReqItem(reqLength, isLen);
+            updateReqItem(reqUpper, isUp);
+            updateReqItem(reqNumber, isNum);
+            updateReqItem(reqSymbol, isSym);
+
+            let score = 0;
+            if (isLen) score++;
+            if (isUp) score++;
+            if (isNum) score++;
+            if (isSym) score++;
+
+            if (pass.length === 0) {
+                fill.style.width = '0%';
+                text.textContent = 'Seguridad: Ingresa una contraseña';
+                text.className = 'password-meter-text text-muted';
+            } else if (score <= 1) {
+                fill.style.width = '25%';
+                fill.style.backgroundColor = '#EF4444';
+                text.textContent = 'Seguridad: Débil (mínimo 8 caracteres)';
+                text.className = 'password-meter-text text-danger';
+            } else if (score === 2) {
+                fill.style.width = '55%';
+                fill.style.backgroundColor = '#F59E0B';
+                text.textContent = 'Seguridad: Media (agrega números o símbolos)';
+                text.className = 'password-meter-text text-warning';
+            } else if (score === 3) {
+                fill.style.width = '80%';
+                fill.style.backgroundColor = '#3B82F6';
+                text.textContent = 'Seguridad: Buena';
+                text.className = 'password-meter-text text-primary';
+            } else {
+                fill.style.width = '100%';
+                fill.style.backgroundColor = '#10B981';
+                text.textContent = 'Seguridad: Excelente y Muy Segura ✓';
+                text.className = 'password-meter-text text-success';
+            }
+            verificarCoincidencia();
+        }
+
+        function updateReqItem(el, isValid) {
+            if (isValid) {
+                el.className = 'req-item valid';
+                el.querySelector('i').className = 'bi bi-check-circle-fill';
+            } else {
+                el.className = 'req-item';
+                el.querySelector('i').className = 'bi bi-circle';
+            }
+        }
+
+        function verificarCoincidencia() {
+            const p1 = document.getElementById('passwordInput').value;
+            const p2 = document.getElementById('passwordConfirmInput').value;
+            const badge = document.getElementById('passMatchBadge');
+
+            if (p2.length === 0) {
+                badge.style.display = 'none';
+                return;
+            }
+
+            badge.style.display = 'inline-block';
+            if (p1 === p2) {
+                badge.className = 'badge bg-success-subtle text-success border border-success-subtle';
+                badge.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i>Coinciden';
+            } else {
+                badge.className = 'badge bg-danger-subtle text-danger border border-danger-subtle';
+                badge.innerHTML = '<i class="bi bi-x-circle-fill me-1"></i>No coinciden';
+            }
+        }
+
         function togglePassword(inputId, btn) {
             const input = document.getElementById(inputId);
             const icon = btn.querySelector('i');
@@ -198,6 +527,16 @@
                 input.type = 'password';
                 icon.classList.remove('bi-eye-slash');
                 icon.classList.add('bi-eye');
+            }
+        }
+
+        function acceptTermsModal() {
+            const termsCheck = document.getElementById('termsCheck');
+            termsCheck.checked = true;
+            const modalEl = document.getElementById('termsModal');
+            const modalInstance = bootstrap.Modal.getInstance(modalEl);
+            if (modalInstance) {
+                modalInstance.hide();
             }
         }
     </script>

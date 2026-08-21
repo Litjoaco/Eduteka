@@ -26,10 +26,9 @@ body.login-body {
     -webkit-font-smoothing: antialiased;
 }
 
-/* Logo integration trick (removes white backgrounds on images placed over light/pastel BGs) */
+/* Logo integration */
 .logo-blend {
-    mix-blend-mode: multiply;
-    filter: contrast(1.05); /* Keeps colors vibrant */
+    object-fit: contain;
     border: none;
     outline: none;
 }

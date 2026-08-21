@@ -31,6 +31,7 @@ def solicitar_acceso_view(request):
 
 @login_required
 def solicitud_enviada_view(request):
-    return render(request, 'solicitud_enviada.html')
+    solicitud = SolicitudAcceso.objects.filter(usuario=request.user).order_by('-id').first()
+    return render(request, 'solicitud_enviada.html', {'solicitud': solicitud})
 
 

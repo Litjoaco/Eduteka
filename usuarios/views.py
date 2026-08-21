@@ -119,6 +119,11 @@ def dashboard_usuarios_view(request):
         or (miembro and miembro.rol and miembro.rol.nombre in ['Administrador', 'Director'])
     )
 
+    from colegios.models import RolColegio
+    roles_colegio = RolColegio.objects.filter(colegio=colegio, activo=True).order_by('nombre')
+    if not roles_colegio.exists():
+        roles_colegio = RolColegio.objects.filter(es_base=True).order_by('nombre')
+
     context = {
         'colegio': colegio,
         'miembro': miembro,
@@ -129,6 +134,7 @@ def dashboard_usuarios_view(request):
         'usuarios_colegio_count': usuarios_colegio_count,
         'solicitudes_pendientes': solicitudes_pendientes,
         'solicitudes_pendientes_count': solicitudes_pendientes_count,
+        'roles_colegio': roles_colegio,
         'alumnos_en_riesgo': alumnos_en_riesgo[:6],
         'alumnos_en_riesgo_count': alumnos_en_riesgo_count,
         'eventos_hoy': eventos_hoy,

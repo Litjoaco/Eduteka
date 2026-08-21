@@ -29,30 +29,70 @@ def dashboard_view(request):
 def aprobar_solicitud(request, solicitud_id):
     if request.method == 'POST':
         solicitud = get_object_or_404(SolicitudAcceso, id=solicitud_id)
-        # Verificamos por seguridad que el usuario logueado es el administrador del colegio
-        if request.user == solicitud.colegio.administrador:
-            solicitud.estado = 'aprobada'
-            solicitud.save()
+        if request.user == solicitud.colegio.administrador or MiembroColegio.objects.filter(usuario=request.user, colegio=solicitud.colegio, rol__nombre__in=['Administrador', 'Director'], activo=True).exists():
+            rol_id = request.POST.get('rol_id')
+            rol_nombre = request.POST.get('rol_asignado')
             
-            # Buscar el rol correspondiente en el colegio
-            # Si el rol solicitado no existe, podríamos asignar uno por defecto o el que solicitó si es base
-            rol_nombre = solicitud.rol_solicitado.capitalize()
-            rol_obj = RolColegio.objects.filter(colegio=solicitud.colegio, nombre__iexact=rol_nombre).first()
+            rol_obj = None
+            if rol_id:
+                rol_obj = RolColegio.objects.filter(colegio=solicitud.colegio, id=rol_id).first()
+            elif rol_nombre:
+                rol_obj = RolColegio.objects.filter(colegio=solicitud.colegio, nombre__iexact=rol_nombre).first()
+                if not rol_obj:
+                    rol_obj = RolColegio.objects.filter(nombre__iexact=rol_nombre).first()
             
             if not rol_obj:
-                # Si no existe, usamos el primer rol activo o Administrador por defecto (aunque mejor uno menor)
+                rol_obj = RolColegio.objects.filter(colegio=solicitud.colegio, nombre__iexact=solicitud.rol_solicitado).first()
+            
+            if not rol_obj:
                 rol_obj = RolColegio.objects.filter(colegio=solicitud.colegio, activo=True).exclude(nombre='Administrador').first()
 
-            MiembroColegio.objects.get_or_create(
+            solicitud.estado = 'aprobada'
+            if rol_obj:
+                solicitud.rol_solicitado = rol_obj.nombre.lower()
+            solicitud.save()
+
+            miembro, created = MiembroColegio.objects.update_or_create(
                 usuario=solicitud.usuario,
                 colegio=solicitud.colegio,
                 defaults={'rol': rol_obj, 'activo': True}
             )
             
-            messages.success(request, f"Acceso aprobado para {solicitud.usuario.perfil.nombre_completo}.")
+            nombre_u = getattr(solicitud.usuario, 'perfil', None)
+            nombre_str = nombre_u.nombre_completo if nombre_u else (solicitud.usuario.get_full_name() or solicitud.usuario.email)
+            rol_str = rol_obj.nombre if rol_obj else 'Miembro'
+            messages.success(request, f"¡Solicitud aprobada! Se asignó el rol '{rol_str}' a {nombre_str}.")
         else:
             messages.error(request, "No tienes permiso para aprobar esta solicitud.")
-    return redirect('dashboard_profesor')
+    return redirect('dashboard_usuario')
+
+@login_required
+def rechazar_solicitud(request, solicitud_id):
+    if request.method == 'POST':
+        solicitud = get_object_or_404(SolicitudAcceso, id=solicitud_id)
+        if request.user == solicitud.colegio.administrador or MiembroColegio.objects.filter(usuario=request.user, colegio=solicitud.colegio, rol__nombre__in=['Administrador', 'Director'], activo=True).exists():
+            solicitud.estado = 'rechazada'
+            solicitud.save()
+            nombre_u = getattr(solicitud.usuario, 'perfil', None)
+            nombre_str = nombre_u.nombre_completo if nombre_u else (solicitud.usuario.get_full_name() or solicitud.usuario.email)
+            messages.success(request, f"La solicitud de {nombre_str} fue rechazada.")
+        else:
+            messages.error(request, "No tienes permiso para rechazar esta solicitud.")
+    return redirect('dashboard_usuario')
+
+# ── Decorador de Seguridad para Vistas de Super Administrador ────────────────
+from functools import wraps
+
+def superadmin_required(view_func):
+    """Garantiza que sólo Superusuarios o Staff autenticados accedan a las vistas ejecutivas."""
+    @wraps(view_func)
+    @login_required
+    def _wrapped_view(request, *args, **kwargs):
+        if not (request.user.is_superuser or request.user.is_staff):
+            messages.error(request, "Acceso restringido: Se requieren permisos de Super Administrador.")
+            return redirect('dashboard_usuario')
+        return view_func(request, *args, **kwargs)
+    return _wrapped_view
 
 @login_required
 def rechazar_solicitud(request, solicitud_id):
@@ -66,6 +106,7 @@ def rechazar_solicitud(request, solicitud_id):
             messages.error(request, "No tienes permiso para rechazar esta solicitud.")
     return redirect('dashboard_profesor')
 
+@superadmin_required
 def dashboard_superadmin_view(request):
     """
     Centro de Comando Ejecutivo - Resumen Global SaaS.
@@ -186,6 +227,7 @@ def dashboard_superadmin_view(request):
     return render(request, 'dashboard_superadmin.html', context)
 
 
+@superadmin_required
 def dashboard_superadmin_colegios_view(request):
     if request.method == 'POST':
         nombre = request.POST.get('nombre', '').strip()
@@ -290,6 +332,7 @@ def dashboard_superadmin_colegios_view(request):
     }
     return render(request, 'dashboard_superadmin_colegios.html', context)
 
+@superadmin_required
 def dashboard_superadmin_planes_view(request):
     from planes.models import Plan
     planes = Plan.objects.all()
@@ -301,6 +344,7 @@ def dashboard_superadmin_planes_view(request):
     return render(request, 'dashboard_superadmin_planes.html', {'planes': planes})
 
 
+@superadmin_required
 def dashboard_superadmin_facturacion_view(request):
     """
     Vista del panel de Facturación y SII.
@@ -435,7 +479,7 @@ def dashboard_superadmin_facturacion_view(request):
     return render(request, 'dashboard_superadmin_facturacion.html', context)
 
 
-@login_required
+@superadmin_required
 def dashboard_superadmin_factura_manual_view(request):
     """
     Vista para la emisión manual de Documentos Tributarios Electrónicos (DTE) con el SII.
@@ -476,10 +520,11 @@ def dashboard_superadmin_factura_manual_view(request):
     return render(request, 'dashboard_superadmin_factura_manual.html', context)
 
 
+@superadmin_required
 def dashboard_superadmin_ordenes_view(request):
     return render(request, 'dashboard_superadmin_ordenes.html')
 
-@login_required
+@superadmin_required
 def dashboard_superadmin_configuracion_view(request):
     """
     Vista de Configuración Global del Sistema (Singleton).
@@ -517,6 +562,7 @@ def dashboard_superadmin_configuracion_view(request):
     }
     return render(request, 'dashboard_superadmin_configuracion.html', context)
 
+@superadmin_required
 def dashboard_superadmin_estadisticas_view(request):
     """
     Vista del Centro de Inteligencia de Negocios / Estadísticas Globales.
@@ -643,7 +689,7 @@ def dashboard_superadmin_estadisticas_view(request):
     }
     return render(request, 'dashboard_superadmin_estadisticas.html', context)
 
-@login_required
+@superadmin_required
 def dashboard_superadmin_modulos_erp_view(request):
     from colegios.models import Colegio
     from planes.models import Plan, Modulo
@@ -659,11 +705,13 @@ def dashboard_superadmin_modulos_erp_view(request):
 
 # ─── Control de Accesos ───────────────────────────────────────────────────────
 
+@superadmin_required
 def dashboard_superadmin_roles_view(request):
     """Maqueta visual de Gestión de Roles y Permisos (sin lógica de backend aún)."""
     return render(request, 'dashboard_superadmin_roles.html')
 
 
+@superadmin_required
 def dashboard_superadmin_usuarios_view(request):
     """
     Panel de Gestión Global de Usuarios del Super Admin.
@@ -931,6 +979,7 @@ def dashboard_superadmin_usuarios_view(request):
     return render(request, 'dashboard_superadmin_usuarios.html', context)
 
 
+@superadmin_required
 def dashboard_superadmin_solicitudes_view(request):
     """Cola Global de Solicitudes de Nuevos Colegios - conectada a datos reales."""
     from dashboard.models import SolicitudNuevoColegio
@@ -1005,6 +1054,7 @@ def dashboard_superadmin_solicitudes_view(request):
 
 # ─── Éxito del Cliente (CSM) ──────────────────────────────────────────────────
 
+@superadmin_required
 def dashboard_superadmin_onboarding_view(request):
     """Monitor de Onboarding - Conectado al nuevo modelo EstadoOnboarding."""
     from dashboard.models import EstadoOnboarding
@@ -1092,6 +1142,7 @@ def dashboard_superadmin_onboarding_view(request):
 
 # ─── Comunicación ─────────────────────────────────────────────────────────────
 
+@superadmin_required
 def dashboard_superadmin_comunicados_view(request):
     """Centro de Comunicados Global - creación, publicación y gestión de notificaciones."""
     from dashboard.models import ComunicadoGlobal
@@ -1205,7 +1256,7 @@ def dashboard_superadmin_comunicados_view(request):
 # URL: /dashboard/superadmin/reportes/descargar/
 # ══════════════════════════════════════════════════════════════════════════════
 
-@login_required
+@superadmin_required
 def exportar_reporte_colegios_excel(request):
     """
     Genera y descarga un archivo Excel (.xlsx) con el directorio completo
@@ -1360,6 +1411,7 @@ def exportar_reporte_colegios_excel(request):
 
 # ─── Gestión Académica Global ──────────────────────────────────────────────────
 
+@superadmin_required
 def dashboard_superadmin_academico_view(request):
     """Monitor de Actividad Académica Global - Datos 100% reales sin fallbacks hardcodeados."""
     import json
