@@ -337,125 +337,252 @@
       background: #FFFFFF;
       border-color: #CBD5E1;
       box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-    /* ═══ ESTILOS PREMIUM PARA SOLICITUDES DE ACCESO ═════════════════════ */
+    }
+
+    /* ═══ ESTILOS TOPBAR & MODAL SOLICITUDES ═════════════════════════════ */
+    .btn-topbar-solicitudes {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      background: #FEF9C3;
+      border: 1.5px solid #FACC15;
+      border-radius: 12px;
+      padding: 0.4rem 0.85rem;
+      color: #854D0E;
+      font-weight: 800;
+      font-size: 0.82rem;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(234, 179, 8, 0.15);
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    .btn-topbar-solicitudes:hover {
+      background: #FEF08A;
+      border-color: #EAB308;
+      color: #713F12;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(234, 179, 8, 0.25);
+    }
+    .bell-icon-wrapper {
+      width: 26px;
+      height: 26px;
+      background: #EAB308;
+      color: #FFFFFF;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+    }
+    .sol-count-pill {
+      background: #854D0E;
+      color: #FFFFFF;
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 0.12rem 0.5rem;
+      border-radius: 20px;
+    }
+
+    /* Modal Container & Header */
     .modal-solicitudes-premium {
       border: none !important;
-      border-radius: 28px !important;
+      border-radius: 24px !important;
       overflow: hidden;
-      box-shadow: 0 25px 70px rgba(15, 23, 42, 0.3) !important;
+      box-shadow: 0 25px 70px rgba(15, 23, 42, 0.28) !important;
+      background: #F8FAFC;
     }
-    .modal-solicitudes-header {
-      background: linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #4338CA 100%);
-      color: #FFFFFF;
-      padding: 1.75rem 2rem 1.5rem;
-      border-bottom: none;
-      position: relative;
-    }
-    .modal-solicitudes-header::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, #F59E0B, #EC4899, #8B5CF6);
+    .modal-solicitudes-header-amber {
+      background: linear-gradient(135deg, #FEF9C3 0%, #FEF08A 100%);
+      color: #1E293B;
+      padding: 1.35rem 1.75rem;
+      border-bottom: 1.5px solid #FDE047;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
     .pulse-glow-amber {
       animation: pulseGlowAmber 2s infinite;
     }
     @keyframes pulseGlowAmber {
-      0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
-      70% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+      0% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(234, 179, 8, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0); }
     }
-    .solicitud-card-modern {
+
+    /* Request Card Component */
+    .solicitud-card-redesign {
       background: #FFFFFF;
-      border: 1.5px solid #F1F5F9;
-      border-radius: 18px;
-      padding: 1.25rem 1.4rem;
-      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+      border: 1.5px solid #E2E8F0;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+      transition: all 0.25s ease;
+      margin-bottom: 1.25rem;
     }
-    .solicitud-card-modern:hover {
+    .solicitud-card-redesign:hover {
       border-color: #CBD5E1;
+      box-shadow: 0 10px 30px rgba(124, 92, 252, 0.1);
       transform: translateY(-2px);
-      box-shadow: 0 12px 28px rgba(124, 92, 252, 0.1);
     }
-    .solicitud-avatar-circle {
-      width: 46px; height: 46px;
-      border-radius: 14px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.15rem; font-weight: 800; color: #FFFFFF;
+    .card-user-header {
+      background: linear-gradient(135deg, #FFFDF0 0%, #FEF9C3 100%);
+      border-bottom: 1.5px solid #FEF08A;
+      padding: 1.15rem 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .user-portrait-circle {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
       background: linear-gradient(135deg, #7C5CFC 0%, #4F46E5 100%);
-      box-shadow: 0 4px 12px rgba(124, 92, 252, 0.3);
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      font-weight: 800;
+      box-shadow: 0 4px 14px rgba(124, 92, 252, 0.3);
       flex-shrink: 0;
+      border: 2px solid #FFFFFF;
     }
-    .badge-role-pill {
-      background: rgba(124, 92, 252, 0.08);
-      color: #6D28D9;
-      border: 1px solid rgba(124, 92, 252, 0.2);
-      font-weight: 700;
+    .user-meta-name {
+      font-size: 1.08rem;
+      font-weight: 800;
+      color: #0F172A;
+      margin-bottom: 0.15rem;
+    }
+    .user-meta-tags {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
       font-size: 0.78rem;
-      padding: 0.35rem 0.75rem;
-      border-radius: 50px;
-      display: inline-flex; align-items: center; gap: 0.35rem;
-    }
-    .solicitud-quote-box {
-      background: #F8FAFC;
-      border-left: 3px solid #7C5CFC;
-      border-radius: 0 12px 12px 0;
-      padding: 0.65rem 0.9rem;
-      font-size: 0.82rem;
       color: #475569;
-      font-style: italic;
     }
-    .btn-approve-modern {
+    .badge-rol-highlight {
+      background: #EDE9FE;
+      color: #6D28D9;
+      border: 1.5px solid #DDD6FE;
+      font-size: 0.78rem;
+      font-weight: 800;
+      padding: 0.4rem 0.85rem;
+      border-radius: 50px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      box-shadow: 0 2px 6px rgba(109, 40, 217, 0.08);
+    }
+    .card-body-content {
+      padding: 1.35rem 1.4rem;
+    }
+    .quote-message-block {
+      background: #F8FAFC;
+      border-left: 4px solid #7C5CFC;
+      border-radius: 0 14px 14px 0;
+      padding: 0.85rem 1.15rem;
+      font-size: 0.86rem;
+      color: #334155;
+      font-style: italic;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    .step-workflow-container {
+      background: #FAFAFA;
+      border: 1px solid #E2E8F0;
+      border-radius: 16px;
+      padding: 1.15rem 1.25rem;
+      margin-bottom: 0.75rem;
+    }
+    .step-header-label {
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: #1E293B;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .role-input-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .role-input-field {
+      background: #FFFFFF;
+      border: 1.5px solid #CBD5E1;
+      border-radius: 12px;
+      padding: 0.6rem 0.95rem;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #0F172A;
+      width: 100%;
+      transition: all 0.2s ease;
+    }
+    .role-input-field:focus {
+      border-color: #7C5CFC;
+      box-shadow: 0 0 0 3px rgba(124, 92, 252, 0.15);
+      outline: none;
+    }
+    .btn-approve-wide {
       background: linear-gradient(135deg, #10B981 0%, #059669 100%);
       color: #FFFFFF !important;
       border: none;
-      font-weight: 700;
-      border-radius: 10px;
-      padding: 0.55rem 1.15rem;
-      font-size: 0.84rem;
-      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+      font-weight: 800;
+      font-size: 0.88rem;
+      border-radius: 12px;
+      padding: 0.75rem 1.4rem;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      cursor: pointer;
       transition: all 0.2s ease;
-      display: inline-flex; align-items: center; gap: 0.4rem;
-      text-decoration: none;
+      flex: 1;
     }
-    .btn-approve-modern:hover {
+    .btn-approve-wide:hover {
       background: linear-gradient(135deg, #059669 0%, #047857 100%);
       transform: translateY(-1px);
       box-shadow: 0 6px 18px rgba(16, 185, 129, 0.45);
     }
-    .btn-reject-modern {
+    .btn-reject-pill {
       background: #FFF1F2;
       color: #E11D48 !important;
-      border: 1px solid #FECDD3;
-      font-weight: 700;
-      border-radius: 10px;
-      padding: 0.55rem 0.9rem;
-      font-size: 0.84rem;
+      border: 1.5px solid #FECDD3;
+      font-weight: 800;
+      font-size: 0.88rem;
+      border-radius: 12px;
+      padding: 0.75rem 1.25rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      cursor: pointer;
       transition: all 0.2s ease;
-      display: inline-flex; align-items: center; gap: 0.35rem;
-      text-decoration: none;
     }
-    .btn-reject-modern:hover {
+    .btn-reject-pill:hover {
       background: #FFE4E6;
       border-color: #FDA4AF;
       color: #BE123C !important;
     }
-    .role-select-styled {
-      background-color: #F8FAFC;
-      border: 1.5px solid #CBD5E1;
-      border-radius: 10px;
-      font-size: 0.84rem;
-      font-weight: 700;
-      color: #1E293B;
-      padding: 0.5rem 0.85rem;
-      transition: all 0.2s ease;
-    }
-    .role-select-styled:focus {
-      border-color: #7C5CFC;
-      background-color: #FFFFFF;
-      box-shadow: 0 0 0 3px rgba(124, 92, 252, 0.15);
+    .card-footer-subtle {
+      padding: 0.65rem 1.4rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #94A3B8;
+      font-size: 0.76rem;
+      font-weight: 600;
     }
   </style>
 </head>
@@ -485,13 +612,12 @@
         {% endif %}
 
         {% if is_admin and solicitudes_pendientes_count > 0 %}
-        <button type="button" class="btn btn-sm fw-extrabold px-3 py-2 shadow-sm d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#modalSolicitudesPendientes" style="border-radius:10px; background:#FFFBEB; border: 1.5px solid #F59E0B; color:#92400E;">
-          <span class="position-relative d-inline-flex align-items-center">
-            <i class="bi bi-bell-fill text-warning"></i>
-            <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
+        <button type="button" class="btn-topbar-solicitudes" data-bs-toggle="modal" data-bs-target="#modalSolicitudesPendientes">
+          <span class="bell-icon-wrapper pulse-glow-amber">
+            <i class="bi bi-bell-fill"></i>
           </span>
           <span>Solicitudes</span>
-          <span class="badge bg-warning text-dark fw-extrabold px-1.5 py-0.5" style="border-radius:6px; font-size:0.75rem;">{{ solicitudes_pendientes_count }}</span>
+          <span class="sol-count-pill">{{ solicitudes_pendientes_count }}</span>
         </button>
         {% endif %}
 
@@ -1286,88 +1412,94 @@
 </script>
 
   <!-- ==========================================================================
-       MODAL POPUP DE SOLICITUDES PENDIENTES (ALERTA DIRECTIVA ULTRA-PREMIUM)
+       MODAL POPUP DE SOLICITUDES PENDIENTES (REDDISEÑO MODERNO PASO A PASO)
        ========================================================================== -->
   {% if is_admin and solicitudes_pendientes %}
   <div class="modal fade" id="modalSolicitudesPendientes" tabindex="-1" aria-labelledby="modalSolLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content modal-solicitudes-premium">
         
-        <!-- Header -->
-        <div class="modal-header modal-solicitudes-header">
+        <!-- Header con fondo ámbar suave -->
+        <div class="modal-solicitudes-header-amber">
           <div class="d-flex align-items-center gap-3">
-            <div class="rounded-circle d-flex align-items-center justify-content-center pulse-glow-amber shadow-sm flex-shrink-0" style="width:48px; height:48px; background:linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color:#FFFFFF;">
-              <i class="bi bi-bell-fill fs-5"></i>
+            <div class="rounded-circle d-flex align-items-center justify-content-center pulse-glow-amber shadow-sm flex-shrink-0" style="width:44px; height:44px; background:#EAB308; color:#FFFFFF;">
+              <i class="bi bi-person-plus-fill fs-5"></i>
             </div>
             <div>
               <div class="d-flex align-items-center gap-2">
-                <h5 class="modal-title fw-extrabold text-white mb-0 fs-5" id="modalSolLabel">Solicitudes de Acceso Pendientes</h5>
-                <span class="badge bg-warning text-dark fw-extrabold px-2 py-0.5" style="border-radius: 20px; font-size: 0.75rem;">
-                  {{ solicitudes_pendientes_count }} Nueva{{ solicitudes_pendientes_count|pluralize:"s" }}
-                </span>
+                <h5 class="modal-title fw-extrabold mb-0 fs-5 text-dark" id="modalSolLabel">Solicitudes de Incorporación Docente</h5>
+                <span class="sol-count-pill">{{ solicitudes_pendientes_count }} Pendiente{{ solicitudes_pendientes_count|pluralize:"s" }}</span>
               </div>
-              <p class="mb-0 text-white-50 extra-small mt-0.5">
-                Establecimiento: <strong>{{ colegio.nombre }}</strong> • Revisa los perfiles antes de autorizar el ingreso.
+              <p class="mb-0 text-muted extra-small mt-0.5">
+                {{ colegio.nombre }} • Revisa y valida los permisos de acceso antes de autorizar.
               </p>
             </div>
           </div>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
 
-        <!-- Body -->
-        <div class="modal-body p-4" style="background: #F8FAFC; max-height: 520px; overflow-y: auto;">
-          <div class="d-flex flex-column gap-3">
-            {% for sol in solicitudes_pendientes %}
-              <div class="solicitud-card-modern">
-                <!-- Solicitante Header -->
-                <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap">
-                  <div class="d-flex align-items-center gap-3">
-                    <div class="solicitud-avatar-circle">
-                      {{ sol.usuario.first_name|default:sol.usuario.username|slice:":1"|upper }}
+        <!-- Body con tarjetas paso a paso -->
+        <div class="modal-body p-3 p-md-4" style="background: #F8FAFC; max-height: 560px; overflow-y: auto;">
+          {% for sol in solicitudes_pendientes %}
+            <div class="solicitud-card-redesign">
+              
+              <!-- 1. Cabecera de la Tarjeta (Light-Yellow / Ámbar) -->
+              <div class="card-user-header">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="user-portrait-circle">
+                    {{ sol.usuario.first_name|default:sol.usuario.username|slice:":1"|upper }}
+                  </div>
+                  <div>
+                    <div class="user-meta-name">
+                      {{ sol.usuario.perfil.nombre_completo|default:sol.usuario.get_full_name|default:sol.usuario.username }}
                     </div>
-                    <div>
-                      <h6 class="fw-extrabold text-dark mb-0 fs-6">
-                        {{ sol.usuario.perfil.nombre_completo|default:sol.usuario.get_full_name|default:sol.usuario.username }}
-                      </h6>
-                      <div class="text-muted extra-small d-flex align-items-center gap-2 flex-wrap mt-0.5">
-                        <span class="d-flex align-items-center gap-1 text-primary fw-bold">
-                          <i class="bi bi-envelope-at-fill"></i> {{ sol.usuario.email }}
-                        </span>
-                        {% if sol.usuario.perfil.rut %}
-                          <span class="text-secondary fw-bold">• <i class="bi bi-person-vcard-fill me-0.5"></i> RUT: {{ sol.usuario.perfil.rut }}</span>
-                        {% endif %}
-                        {% if sol.usuario.perfil.telefono %}
-                          <span>• <i class="bi bi-telephone-fill me-0.5"></i> {{ sol.usuario.perfil.telefono }}</span>
-                        {% endif %}
-                        <span>• <i class="bi bi-clock-history me-0.5"></i> {{ sol.fecha_solicitud|date:"d/m/Y H:i" }}</span>
-                      </div>
+                    <div class="user-meta-tags">
+                      <span class="text-primary fw-bold"><i class="bi bi-envelope-at-fill me-0.5"></i> {{ sol.usuario.email }}</span>
+                      {% if sol.usuario.perfil.rut %}
+                        <span class="fw-bold">• <i class="bi bi-person-vcard me-0.5"></i> RUT: {{ sol.usuario.perfil.rut }}</span>
+                      {% endif %}
+                      {% if sol.usuario.perfil.telefono %}
+                        <span>• <i class="bi bi-telephone-fill me-0.5"></i> {{ sol.usuario.perfil.telefono }}</span>
+                      {% endif %}
                     </div>
                   </div>
-
-                  <span class="badge-role-pill">
-                    <i class="bi bi-tag-fill"></i> Rol pedido: <strong class="text-capitalize">{{ sol.rol_solicitado }}</strong>
-                  </span>
                 </div>
 
-                <!-- Mensaje del postulante -->
+                <!-- ROL SOLICITADO HIGHLIGHT -->
+                <div class="badge-rol-highlight">
+                  <i class="bi bi-award-fill"></i>
+                  <span>ROL SOLICITADO: <strong>{{ sol.rol_solicitado }}</strong></span>
+                </div>
+              </div>
+
+              <!-- 2. Cuerpo de la Tarjeta -->
+              <div class="card-body-content">
+                
+                <!-- Mensaje con comillas -->
                 {% if sol.mensaje %}
-                  <div class="solicitud-quote-box mt-3">
-                    <i class="bi bi-chat-left-quote-fill me-1 text-primary"></i> "{{ sol.mensaje }}"
+                  <div class="quote-message-block">
+                    <i class="bi bi-quote fs-4 text-primary lh-1"></i>
+                    <span>"{{ sol.mensaje }}"</span>
                   </div>
                 {% endif %}
 
-                <!-- Formulario de Aprobación / Cambio de Rol -->
-                <div class="d-flex align-items-center justify-content-between gap-3 pt-3 border-top mt-3 flex-wrap">
-                  <form id="formModalAprobar{{ sol.id }}" method="POST" action="{% url 'aprobar_solicitud' sol.id %}" class="d-flex align-items-center gap-2 flex-grow-1">
-                    {% csrf_token %}
-                    <div class="d-flex align-items-center gap-2">
-                      <label class="extra-small fw-extrabold text-muted text-nowrap mb-0 d-flex align-items-center gap-1">
-                        <i class="bi bi-person-gear text-primary"></i> Asignar Rol:
-                      </label>
-                      <select name="rol_id" class="role-select-styled form-select form-select-sm" style="max-width: 220px;">
+                <!-- Formulario con workflow iterativo (Paso 1 y Paso 2) -->
+                <form id="formModalAprobar{{ sol.id }}" method="POST" action="{% url 'aprobar_solicitud' sol.id %}">
+                  {% csrf_token %}
+                  
+                  <!-- PASO 1: Confirme o Asigne el Rol -->
+                  <div class="step-workflow-container">
+                    <div class="step-header-label">
+                      <i class="bi bi-tag-fill text-primary"></i>
+                      <span>Paso 1: Confirme o Asigne el Rol</span>
+                      <i class="bi bi-pencil-fill text-muted ms-1" style="font-size:0.7rem;" title="Puedes cambiar el rol antes de aprobar"></i>
+                    </div>
+                    
+                    <div class="role-input-group">
+                      <select name="rol_id" class="role-input-field form-select">
                         {% for r in roles_colegio %}
                           <option value="{{ r.id }}" {% if r.nombre|lower == sol.rol_solicitado|lower %}selected{% endif %}>
-                            {{ r.nombre }}
+                            {{ r.nombre }} {% if r.nombre|lower == sol.rol_solicitado|lower %}(Solicitado por el docente){% endif %}
                           </option>
                         {% empty %}
                           <option value="profesor" selected>Profesor</option>
@@ -1377,30 +1509,50 @@
                         {% endfor %}
                       </select>
                     </div>
-                  </form>
-
-                  <div class="d-flex align-items-center gap-2">
-                    <button type="submit" form="formModalAprobar{{ sol.id }}" class="btn-approve-modern" title="Autorizar ingreso al colegio">
-                      <i class="bi bi-check-circle-fill"></i> Aprobar Acceso
-                    </button>
-                    <form method="POST" action="{% url 'rechazar_solicitud' sol.id %}" class="d-inline" onsubmit="return confirm('¿Seguro que deseas rechazar la solicitud de {{ sol.usuario.perfil.nombre_completo|default:sol.usuario.email }}?');">
-                      {% csrf_token %}
-                      <button type="submit" class="btn-reject-modern" title="Rechazar solicitud">
-                        <i class="bi bi-x-circle-fill"></i> Rechazar
-                      </button>
-                    </form>
                   </div>
-                </div>
+
+                  <!-- PASO 2: Tome una Decisión -->
+                  <div class="step-workflow-container mb-0">
+                    <div class="step-header-label">
+                      <i class="bi bi-shield-check text-success"></i>
+                      <span>Paso 2: Tome una Decisión</span>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                      <button type="submit" class="btn-approve-wide">
+                        <i class="bi bi-check-circle-fill"></i>
+                        <span>Aprobar Solicitud con Rol Confirmado</span>
+                      </button>
+
+                      <button type="submit" form="formModalRechazar{{ sol.id }}" class="btn-reject-pill">
+                        <i class="bi bi-x-circle-fill"></i>
+                        <span>Rechazar Solicitud</span>
+                      </button>
+                    </div>
+                  </div>
+                </form>
+
+                <!-- Formulario oculto de rechazo -->
+                <form id="formModalRechazar{{ sol.id }}" method="POST" action="{% url 'rechazar_solicitud' sol.id %}" onsubmit="return confirm('¿Confirmas el rechazo de la solicitud de {{ sol.usuario.perfil.nombre_completo|default:sol.usuario.email }}?');">
+                  {% csrf_token %}
+                </form>
 
               </div>
-            {% endfor %}
-          </div>
+
+              <!-- 3. Pie sutil con Fecha -->
+              <div class="card-footer-subtle border-top">
+                <span><i class="bi bi-shield-lock text-primary me-1"></i> La cuenta tendrá acceso de inmediato a los módulos de su rol.</span>
+                <span><i class="bi bi-clock-history me-1"></i> Enviado el {{ sol.fecha_solicitud|date:"d/m/Y \a \l\a\s H:i \h\\r\s" }}</span>
+              </div>
+
+            </div>
+          {% endfor %}
         </div>
 
         <!-- Footer -->
         <div class="modal-footer p-3 px-4 bg-white border-top d-flex justify-content-between align-items-center">
           <span class="extra-small text-muted d-flex align-items-center gap-1.5">
-            <i class="bi bi-shield-lock-fill text-primary"></i> Las aprobaciones asignan automáticamente los permisos y accesos del rol seleccionado.
+            <i class="bi bi-info-circle-fill text-primary"></i> También puedes consultar estas solicitudes desde la tabla inferior del dashboard.
           </span>
           <button type="button" class="btn btn-sm btn-outline-secondary fw-bold px-3 py-1.5" data-bs-dismiss="modal" style="border-radius:10px; font-size:0.84rem;">
             Cerrar Ventana
