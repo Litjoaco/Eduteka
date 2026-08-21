@@ -50,8 +50,8 @@ def login_view(request):
             if next_url:
                 return redirect(next_url)
             
-            # 0. Si es superusuario -> dashboard superadmin
-            if user.is_superuser:
+            # 0. Si es superusuario o staff global -> dashboard superadmin
+            if user.is_superuser or user.is_staff:
                 return redirect('dashboard_superadmin')
 
             # 1. Si es administrador de un colegio -> dashboard admin

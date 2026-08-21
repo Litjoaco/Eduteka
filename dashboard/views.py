@@ -20,6 +20,8 @@ from openpyxl.utils import get_column_letter
 
 @login_required
 def dashboard_view(request):
+    if request.user.is_superuser:
+        return redirect('dashboard_superadmin')
     return redirect('dashboard_usuario')
 
 
@@ -1249,6 +1251,18 @@ def dashboard_superadmin_comunicados_view(request):
         'total_comunicados': comunicados_qs.count(),
     }
     return render(request, 'dashboard_superadmin_comunicados.html', context)
+
+
+@superadmin_required
+def dashboard_superadmin_auditoria_view(request):
+    """Registro de Auditoría Global del Super Administrador."""
+    return render(request, 'dashboard_superadmin_auditoria.html')
+
+
+@superadmin_required
+def dashboard_superadmin_reportes_view(request):
+    """Centro de Reportes y Descarga de Métricas del Super Administrador."""
+    return render(request, 'dashboard_superadmin_reportes.html')
 
 
 # ══════════════════════════════════════════════════════════════════════════════

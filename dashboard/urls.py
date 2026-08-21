@@ -22,11 +22,11 @@ urlpatterns = [
     # Comunicación
     path('superadmin/comunicados/', views.dashboard_superadmin_comunicados_view, name='dashboard_superadmin_comunicados'),
     # Seguridad y Auditoría
-    path('superadmin/auditoria/', TemplateView.as_view(template_name='dashboard_superadmin_auditoria.html'), name='dashboard_superadmin_auditoria'),
+    path('superadmin/auditoria/', views.dashboard_superadmin_auditoria_view, name='dashboard_superadmin_auditoria'),
     # Gestión Académica Global
     path('superadmin/academico/', views.dashboard_superadmin_academico_view, name='dashboard_superadmin_academico'),
     # Generador de Reportes Personalizables (openpyxl)
-    path('superadmin/reportes/', TemplateView.as_view(template_name='dashboard_superadmin_reportes.html'), name='dashboard_superadmin_reportes'),
+    path('superadmin/reportes/', views.dashboard_superadmin_reportes_view, name='dashboard_superadmin_reportes'),
     path('superadmin/reportes/descargar/', views.exportar_reporte_colegios_excel, name='descargar_excel'),
     path('solicitudes/<int:solicitud_id>/aprobar/', views.aprobar_solicitud, name='aprobar_solicitud'),
     path('solicitudes/<int:solicitud_id>/rechazar/', views.rechazar_solicitud, name='rechazar_solicitud'),

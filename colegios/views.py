@@ -515,6 +515,10 @@ def obtener_colegio_usuario(user):
         miembro = MiembroColegio.objects.filter(usuario=user, activo=True).order_by('-fecha_ingreso').first()
         if miembro:
             colegio = miembro.colegio
+    if not colegio and (getattr(user, 'is_superuser', False) or getattr(user, 'is_staff', False)):
+        colegio = Colegio.objects.filter(estado='activo').order_by('-fecha_creacion').first()
+        if not colegio:
+            colegio = Colegio.objects.order_by('-fecha_creacion').first()
     if colegio:
         asegurar_roles_base_colegio(colegio, user)
     return colegio
@@ -2084,6 +2088,9 @@ def exportar_ical_agenda_view(request):
     colegio_id = request.GET.get('colegio_id')
     if not colegio and colegio_id and colegio_id.isdigit():
         colegio = Colegio.objects.filter(id=colegio_id).first()
+
+    if not colegio:
+        colegio = Colegio.objects.first()
 
     if not colegio:
         return HttpResponse("Colegio no encontrado.", status=404)

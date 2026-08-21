@@ -358,6 +358,13 @@
       </div>
 
       <div class="topbar-right d-flex align-items-center gap-2.5">
+        {% if request.user.is_superuser or request.user.is_staff %}
+        <a href="{% url 'dashboard_superadmin' %}" class="btn btn-sm fw-extrabold px-3 py-2 shadow-sm d-flex align-items-center gap-1.5" style="border-radius:10px; background:#151A35; color:#FFFFFF; text-decoration:none;">
+          <i class="bi bi-shield-shaded text-warning"></i>
+          <span>Panel Super Admin</span>
+        </a>
+        {% endif %}
+
         {% if is_admin and solicitudes_pendientes_count > 0 %}
         <button type="button" class="btn btn-sm fw-extrabold px-3 py-2 shadow-sm d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#modalSolicitudesPendientes" style="border-radius:10px; background:#FFFBEB; border: 1.5px solid #F59E0B; color:#92400E;">
           <span class="position-relative d-inline-flex align-items-center">
