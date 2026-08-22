@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Código de Recuperación de PIN de Firma - Eduteka</title>
+  <style>
+    body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #F8FAFC; margin: 0; padding: 30px 10px; color: #1E293B; }
+    .container { max-width: 580px; margin: 0 auto; background: #FFFFFF; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); border: 1px solid #E2E8F0; }
+    .header { background: linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #4F46E5 100%); padding: 35px 30px; text-align: center; color: #FFFFFF; }
+    .header h1 { margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+    .content { padding: 35px 30px; line-height: 1.6; }
+    .otp-card { background: #FAF5FF; border: 2px dashed #7C5CFC; border-radius: 16px; padding: 25px; text-align: center; margin: 25px 0; }
+    .otp-code { font-family: monospace, 'Courier New', Courier; font-size: 36px; font-weight: 900; letter-spacing: 8px; color: #6D28D9; display: inline-block; margin: 10px 0; }
+    .alert-box { background: #FEF2F2; border: 1px solid #FEE2E2; border-radius: 12px; padding: 15px 20px; font-size: 13px; color: #991B1B; margin-top: 20px; }
+    .footer { background: #F8FAFC; padding: 20px 30px; text-align: center; font-size: 12px; color: #94A3B8; border-top: 1px solid #E2E8F0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Eduteka</h1>
+      <p style="margin: 5px 0 0; opacity: 0.85; font-size: 14px;">Firma Electrónica Simple & Seguridad</p>
+    </div>
+    
+    <div class="content">
+      <h2 style="font-size: 20px; color: #0F172A; margin-top: 0;">Hola, {{ nombre|default:user.username }}</h2>
+      <p style="font-size: 15px; color: #475569;">
+        Has solicitado un código para restablecer o desbloquear tu <strong>PIN de Firma Electrónica de 4 Dígitos</strong> en Eduteka.
+      </p>
+
+      <div class="otp-card">
+        <span style="font-size: 13px; font-weight: 700; text-transform: uppercase; color: #7C5CFC; letter-spacing: 1px;">Tu Código de Verificación OTP</span>
+        <div class="otp-code">{{ codigo }}</div>
+        <span style="font-size: 12px; color: #64748B; display: block;">Ingresa este código de 6 números en la pantalla para fijar tu nuevo PIN</span>
+      </div>
+
+      <div class="alert-box">
+        <strong>Validez Temporal:</strong> Este código de 6 dígitos expirará en <strong>10 minutos</strong>. Nunca compartas este código con otras personas.
+      </div>
+    </div>
+
+    <div class="footer">
+      <p style="margin: 0;">&copy; 2026 Eduteka. Todos los derechos reservados.</p>
+      <p style="margin: 4px 0 0;">Mensaje de autenticación generado automáticamente por el sistema.</p>
+    </div>
+  </div>
+</body>
+</html>

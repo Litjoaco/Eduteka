@@ -302,3 +302,176 @@ def perfil_usuario_view(request):
     }
     return render(request, 'usuarios/perfil.html', context)
 
+
+# =========================================================================
+# RECUPERACIÓN DE CONTRASEÑA POR CORREO ELECTRÓNICO
+# =========================================================================
+from django.urls import reverse
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.contrib.auth.tokens import default_token_generator
+from django.conf import settings
+
+def solicitar_recuperacion_password_view(request):
+    """Permite al usuario solicitar un enlace seguro para restablecer su contraseña."""
+    if request.method == 'POST':
+        email = request.POST.get('email', '').strip()
+        if not email:
+            messages.error(request, "Por favor ingresa tu correo electrónico.")
+        else:
+            usuarios = User.objects.filter(email__iexact=email) | User.objects.filter(username__iexact=email)
+            usuarios = usuarios.distinct()
+            
+            for u in usuarios:
+                uidb64 = urlsafe_base64_encode(force_bytes(u.pk))
+                token = default_token_generator.make_token(u)
+                reset_url = request.build_absolute_uri(
+                    reverse('password_reset_confirmar', kwargs={'uidb64': uidb64, 'token': token})
+                )
+                
+                perfil = getattr(u, 'perfil', None)
+                nombre = perfil.nombre_completo if perfil else (u.get_full_name() or u.username)
+
+                html_content = render_to_string('emails/reset_password_email.html', {
+                    'user': u,
+                    'nombre': nombre,
+                    'reset_url': reset_url,
+                })
+                text_content = f"Hola {nombre},\n\nPara restablecer tu contraseña en Eduteka, ingresa al siguiente enlace:\n{reset_url}\n\nEste enlace expira en 15 minutos."
+                
+                msg = EmailMultiAlternatives(
+                    subject="[Eduteka] Restablecer tu Contraseña de Acceso",
+                    body=text_content,
+                    from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', 'Eduteka <notificaciones@eduteka.cl>'),
+                    to=[u.email or email],
+                )
+                msg.attach_alternative(html_content, "text/html")
+                try:
+                    msg.send(fail_silently=False)
+                except Exception as e:
+                    print(f"Error enviando correo de recuperación: {e}")
+
+            messages.success(request, f"Si el correo '{email}' está registrado, te hemos enviado un enlace de recuperación con validez de 15 minutos.")
+            return redirect('login')
+
+    return render(request, 'usuarios/password_reset_solicitar.html')
+
+
+def confirmar_recuperacion_password_view(request, uidb64, token):
+    """Valida el token recibido y permite al usuario definir una nueva contraseña."""
+    user = None
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except Exception:
+        user = None
+
+    if user is None or not default_token_generator.check_token(user, token):
+        messages.error(request, "El enlace de recuperación es inválido o ha expirado. Por favor solicita uno nuevo.")
+        return redirect('password_reset_solicitar')
+
+    if request.method == 'POST':
+        p1 = request.POST.get('password1', '')
+        p2 = request.POST.get('password2', '')
+
+        if not p1 or len(p1) < 6:
+            messages.error(request, "La nueva contraseña debe tener al menos 6 caracteres.")
+        elif p1 != p2:
+            messages.error(request, "Las contraseñas ingresadas no coinciden.")
+        else:
+            user.set_password(p1)
+            user.save()
+            messages.success(request, "¡Tu contraseña ha sido restablecida exitosamente! Ya puedes iniciar sesión.")
+            return redirect('login')
+
+    return render(request, 'usuarios/password_reset_confirmar.html', {'usuario_valido': user})
+
+
+# =========================================================================
+# RECUPERACIÓN DE PIN DE FIRMA VÍA CÓDIGO OTP POR CORREO
+# =========================================================================
+
+@login_required
+@require_POST
+def api_solicitar_reset_pin(request):
+    """Genera un código OTP de 6 dígitos y lo envía al correo del usuario para autorizar el cambio de PIN."""
+    user = request.user
+    perfil, _ = PerfilUsuario.objects.get_or_create(usuario=user, defaults={'nombre_completo': user.get_full_name() or user.username})
+
+    destinatario = user.email or request.POST.get('email', '').strip()
+    if not destinatario:
+        return JsonResponse({'exito': False, 'mensaje': 'Tu cuenta no tiene un correo electrónico configurado.'}, status=400)
+
+    codigo = perfil.generar_codigo_reset_pin()
+
+    html_content = render_to_string('emails/reset_pin_email.html', {
+        'user': user,
+        'nombre': perfil.nombre_completo or user.username,
+        'codigo': codigo,
+    })
+    text_content = f"Hola {perfil.nombre_completo},\n\nTu código de verificación para recuperar tu PIN de Firma es: {codigo}\n\nVálido por 10 minutos."
+
+    msg = EmailMultiAlternatives(
+        subject="[Eduteka] Código de Recuperación de PIN de Firma",
+        body=text_content,
+        from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', 'Eduteka <notificaciones@eduteka.cl>'),
+        to=[destinatario],
+    )
+    msg.attach_alternative(html_content, "text/html")
+    try:
+        msg.send(fail_silently=False)
+        return JsonResponse({
+            'exito': True,
+            'mensaje': f'Código de seguridad de 6 dígitos enviado exitosamente a {destinatario}. Válido por 10 minutos.'
+        })
+    except Exception as e:
+        return JsonResponse({'exito': False, 'mensaje': f'Error al enviar el correo: {str(e)}'}, status=500)
+
+
+@login_required
+@require_POST
+def api_verificar_reset_pin(request):
+    """Valida el código OTP de 6 dígitos y establece el nuevo PIN de 4 dígitos."""
+    try:
+        data = json.loads(request.body) if request.body else request.POST
+    except Exception:
+        data = request.POST
+
+    codigo = str(data.get('codigo', '')).strip()
+    nuevo_pin = str(data.get('nuevo_pin', '')).strip()
+    confirmar_pin = str(data.get('confirmar_pin', '')).strip()
+
+    if not codigo or len(codigo) != 6:
+        return JsonResponse({'exito': False, 'mensaje': 'Debes ingresar el código de verificación de 6 dígitos.'}, status=400)
+
+    if not nuevo_pin or len(nuevo_pin) != 4 or not nuevo_pin.isdigit():
+        return JsonResponse({'exito': False, 'mensaje': 'El nuevo PIN debe tener exactamente 4 dígitos numéricos.'}, status=400)
+
+    if nuevo_pin != confirmar_pin:
+        return JsonResponse({'exito': False, 'mensaje': 'Los nuevos PINs ingresados no coinciden.'}, status=400)
+
+    perfil, _ = PerfilUsuario.objects.get_or_create(usuario=request.user, defaults={'nombre_completo': request.user.get_full_name() or request.user.username})
+
+    valido, mensaje = perfil.verificar_codigo_reset_pin(codigo)
+    if not valido:
+        return JsonResponse({'exito': False, 'mensaje': mensaje}, status=400)
+
+    # Establecer el nuevo PIN
+    try:
+        perfil.establecer_pin(nuevo_pin)
+        # Limpiar el código OTP ya usado
+        perfil.pin_reset_codigo = None
+        perfil.pin_reset_expira = None
+        perfil.save(update_fields=['pin_reset_codigo', 'pin_reset_expira'])
+
+        return JsonResponse({
+            'exito': True,
+            'mensaje': '¡PIN de 4 dígitos restablecido y desbloqueado exitosamente! Tendrá 90 días de vigencia.',
+            'dias_restantes': 90
+        })
+    except Exception as e:
+        return JsonResponse({'exito': False, 'mensaje': str(e)}, status=500)
+
+

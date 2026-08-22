@@ -15,6 +15,8 @@ class PerfilUsuario(models.Model):
     pin_fecha_actualizacion = models.DateTimeField(null=True, blank=True, help_text="Fecha en que se configuró o renovó el PIN")
     pin_intentos_fallidos = models.PositiveIntegerField(default=0, help_text="Contador de intentos fallidos consecutivos")
     pin_bloqueado_hasta = models.DateTimeField(null=True, blank=True, help_text="Bloqueo temporal por intentos fallidos")
+    pin_reset_codigo = models.CharField(max_length=6, blank=True, null=True, help_text="Código OTP de 6 dígitos para recuperación de PIN")
+    pin_reset_expira = models.DateTimeField(null=True, blank=True, help_text="Expiración del código OTP (10 min)")
 
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
@@ -90,4 +92,28 @@ class PerfilUsuario(models.Model):
                 intentos_restantes = 3 - self.pin_intentos_fallidos
                 self.save(update_fields=['pin_intentos_fallidos'])
                 return False, f"PIN incorrecto. Te quedan {intentos_restantes} intento(s)."
+
+    def generar_codigo_reset_pin(self):
+        """Genera un código OTP aleatorio de 6 dígitos con vigencia de 10 minutos."""
+        import random
+        codigo = f"{random.randint(100000, 999999)}"
+        self.pin_reset_codigo = codigo
+        self.pin_reset_expira = timezone.now() + timedelta(minutes=10)
+        self.save(update_fields=['pin_reset_codigo', 'pin_reset_expira'])
+        return codigo
+
+    def verificar_codigo_reset_pin(self, codigo_str):
+        """Valida si el código OTP de 6 dígitos es correcto y no ha expirado."""
+        if not self.pin_reset_codigo or not self.pin_reset_expira:
+            return False, "No se ha solicitado ningún código de recuperación."
+        if timezone.now() > self.pin_reset_expira:
+            return False, "El código de recuperación ha expirado (validez de 10 minutos). Solicita uno nuevo."
+        if str(codigo_str).strip() == str(self.pin_reset_codigo).strip():
+            # Desbloquear PIN y reiniciar intentos
+            self.pin_bloqueado_hasta = None
+            self.pin_intentos_fallidos = 0
+            self.save(update_fields=['pin_bloqueado_hasta', 'pin_intentos_fallidos'])
+            return True, "Código de verificación correcto."
+        return False, "El código de 6 dígitos ingresado es incorrecto."
+
 

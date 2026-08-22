@@ -156,3 +156,9 @@ LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'dashboard_profesor'
 LOGOUT_REDIRECT_URL = 'landing_page'
 
+# Email Configuration (Console backend para desarrollo / Logs)
+EMAIL_BACKEND = os.environ.get('DJANGO_EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'Eduteka <notificaciones@eduteka.cl>')
+SERVER_EMAIL = os.environ.get('SERVER_EMAIL', 'Eduteka <notificaciones@eduteka.cl>')
+EMAIL_SUBJECT_PREFIX = '[Eduteka] '
+
