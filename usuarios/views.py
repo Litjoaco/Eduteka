@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout
+from django.contrib.auth.models import User
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -216,4 +217,88 @@ def api_establecer_pin(request):
         })
     except Exception as e:
         return JsonResponse({'exito': False, 'mensaje': str(e)}, status=500)
+
+
+from django.contrib.auth import update_session_auth_hash
+
+@login_required
+def perfil_usuario_view(request):
+    """Vista de gestión integral de Mi Perfil: Datos personales, cambio de contraseña y PIN de firma."""
+    user = request.user
+    perfil, _ = PerfilUsuario.objects.get_or_create(
+        usuario=user,
+        defaults={'nombre_completo': user.get_full_name() or user.username}
+    )
+
+    # Identificar colegio y rol activo
+    colegio = None
+    miembro = None
+    if user.is_authenticated:
+        colegio_admin = Colegio.objects.filter(administrador=user).first()
+        if colegio_admin:
+            colegio = colegio_admin
+        else:
+            miembro = MiembroColegio.objects.filter(usuario=user, activo=True).select_related('colegio', 'rol').first()
+            if miembro:
+                colegio = miembro.colegio
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+
+        # 1. Actualizar Datos Personales
+        if action == 'actualizar_datos':
+            nombre = request.POST.get('nombre_completo', '').strip()
+            email = request.POST.get('email', '').strip()
+            rut = request.POST.get('rut', '').strip()
+            telefono = request.POST.get('telefono', '').strip()
+
+            if not nombre:
+                messages.error(request, "El nombre completo no puede estar vacío.")
+            elif not email:
+                messages.error(request, "El correo electrónico es obligatorio.")
+            else:
+                # Comprobar si el email ya existe en otro usuario
+                if User.objects.filter(email=email).exclude(pk=user.pk).exists() or User.objects.filter(username=email).exclude(pk=user.pk).exists():
+                    messages.error(request, "Ese correo electrónico ya está registrado por otro usuario.")
+                else:
+                    perfil.nombre_completo = nombre
+                    perfil.rut = rut
+                    perfil.telefono = telefono
+                    perfil.save()
+
+                    user.email = email
+                    user.first_name = nombre.split()[0] if nombre else ''
+                    user.last_name = ' '.join(nombre.split()[1:]) if len(nombre.split()) > 1 else ''
+                    user.save(update_fields=['email', 'first_name', 'last_name'])
+
+                    messages.success(request, "¡Tus datos personales se han actualizado correctamente!")
+            return redirect('perfil_usuario')
+
+        # 2. Cambiar Contraseña de Acceso
+        elif action == 'cambiar_password':
+            current_pass = request.POST.get('current_password', '')
+            new_pass1 = request.POST.get('new_password', '')
+            new_pass2 = request.POST.get('confirm_password', '')
+
+            if not user.check_password(current_pass):
+                messages.error(request, "La contraseña actual ingresada es incorrecta.")
+            elif len(new_pass1) < 6:
+                messages.error(request, "La nueva contraseña debe tener al menos 6 caracteres.")
+            elif new_pass1 != new_pass2:
+                messages.error(request, "Las nuevas contraseñas no coinciden.")
+            else:
+                user.set_password(new_pass1)
+                user.save()
+                update_session_auth_hash(request, user)
+                messages.success(request, "¡Tu contraseña de acceso ha sido actualizada con éxito!")
+            return redirect('perfil_usuario')
+
+    context = {
+        'perfil': perfil,
+        'colegio': colegio,
+        'miembro': miembro,
+        'active_page': 'perfil',
+        'hoy': timezone.now(),
+    }
+    return render(request, 'usuarios/perfil.html', context)
 

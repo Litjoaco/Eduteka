@@ -458,6 +458,9 @@
 
 
   <div class="sidebar-footer">
+    <a href="{% url 'perfil_usuario' %}" class="nav-item {% if active_page == 'perfil' %}active{% endif %}" data-label="Mi Perfil">
+      <i class="bi bi-person-circle"></i> <span>Mi Perfil</span>
+    </a>
     {% if is_admin %}
       <a href="{% url 'configuracion_politicas' %}" class="nav-item {% if active_page == 'configuracion' %}active{% endif %}" data-label="Configuración">
         <i class="bi bi-gear"></i> <span>Configuración</span>

@@ -780,10 +780,10 @@
         </button>
         {% endif %}
 
-        <button type="button" class="btn-topbar-custom" onclick="solicitarFirmaPIN()">
-          <i class="bi bi-shield-lock-fill text-primary"></i>
-          <span>PIN de Firma</span>
-        </button>
+        <a href="{% url 'perfil_usuario' %}" class="btn-topbar-custom" title="Mi Perfil">
+          <i class="bi bi-person-circle text-primary"></i>
+          <span>Mi Perfil</span>
+        </a>
 
         <button type="button" class="btn-topbar-custom" data-bs-toggle="modal" data-bs-target="#modalCustomizeShortcuts">
           <i class="bi bi-sliders2-vertical text-primary"></i>

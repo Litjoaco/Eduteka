@@ -1,0 +1,419 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Perfil y Seguridad - Eduteka</title>
+  
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #7C5CFC;
+      --primary-soft: rgba(124, 92, 252, 0.08);
+      --primary-hover: #6747E3;
+      --primary-dark: #1E1B4B;
+      --secondary: #10B981;
+      --accent: #3B82F6;
+      --bg: #F8FAFC;
+      --surface: #FFFFFF;
+      --dark: #0F172A;
+      --gray-text: #64748B;
+      --border: #E2E8F0;
+      --border-purple: #EDE9FE;
+      --radius-xl: 24px;
+      --radius-lg: 18px;
+      --radius-md: 14px;
+    }
+
+    * { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+      overflow-x: hidden;
+    }
+
+    .wrapper { display: flex; flex: 1; position: relative; }
+
+    /* Topbar */
+    .topbar {
+      height: 72px;
+      background: rgba(255, 255, 255, 0.9) !important;
+      backdrop-filter: blur(14px) !important;
+      -webkit-backdrop-filter: blur(14px) !important;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2.25rem; position: sticky; top: 0; z-index: 98;
+    }
+    .content-body {
+      padding: 2.25rem;
+      flex-grow: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    /* Hero Profile Banner */
+    .hero-profile-banner {
+      background: linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #4F46E5 100%);
+      border-radius: var(--radius-xl);
+      padding: 2.25rem 2.5rem;
+      margin-bottom: 2rem;
+      color: #FFFFFF;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 16px 40px rgba(30, 27, 75, 0.22);
+    }
+    .hero-profile-banner::after {
+      content: '';
+      position: absolute;
+      top: -30%; right: -10%;
+      width: 380px; height: 380px;
+      background: radial-gradient(circle, rgba(124, 92, 252, 0.35) 0%, rgba(124, 92, 252, 0) 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .avatar-large-profile {
+      width: 84px;
+      height: 84px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, #7C5CFC 0%, #6366F1 100%);
+      color: #FFFFFF;
+      font-size: 2.2rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 3px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+      flex-shrink: 0;
+    }
+
+    /* Cards Layout */
+    .profile-card {
+      background: #FFFFFF;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      margin-bottom: 1.75rem;
+      box-shadow: 0 6px 24px rgba(15, 23, 42, 0.03);
+      transition: border-color 0.2s ease;
+    }
+    .profile-card:hover {
+      border-color: #CBD5E1;
+    }
+    .profile-card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #F1F5F9;
+    }
+
+    .input-field-custom {
+      background: #F8FAFC;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 12px;
+      padding: 0.7rem 1.1rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #0F172A;
+      transition: all 0.2s ease;
+    }
+    .input-field-custom:focus {
+      background: #FFFFFF;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(124, 92, 252, 0.12);
+      outline: none;
+    }
+
+    .input-label-custom {
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: #334155;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-bottom: 0.45rem;
+      display: block;
+    }
+
+    .btn-save-profile {
+      background: linear-gradient(135deg, #7C5CFC 0%, #5B21B6 100%);
+      color: #FFFFFF !important;
+      border: none;
+      font-weight: 800;
+      font-size: 0.9rem;
+      border-radius: 12px;
+      padding: 0.75rem 1.75rem;
+      box-shadow: 0 4px 14px rgba(124, 92, 252, 0.25);
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .btn-save-profile:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 22px rgba(124, 92, 252, 0.35);
+    }
+
+    .btn-change-password {
+      background: linear-gradient(135deg, #1E1B4B 0%, #312E81 100%);
+      color: #FFFFFF !important;
+      border: none;
+      font-weight: 800;
+      font-size: 0.9rem;
+      border-radius: 12px;
+      padding: 0.75rem 1.75rem;
+      box-shadow: 0 4px 14px rgba(30, 27, 75, 0.25);
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .btn-change-password:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 22px rgba(30, 27, 75, 0.35);
+    }
+  </style>
+</head>
+<body>
+
+<div class="wrapper">
+  {% include 'colegios/_sidebar.html' with active_page='perfil' %}
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+    
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn" style="border:none; background:var(--primary-soft); color:var(--primary);">
+          <i class="bi bi-list fs-5"></i>
+        </button>
+        <div class="d-flex align-items-center gap-2">
+          <span class="rounded-3 d-flex align-items-center justify-content-center" style="width:34px; height:34px; background:#EDE9FE; color:#7C5CFC;">
+            <i class="bi bi-person-fill-gear"></i>
+          </span>
+          <div>
+            <span class="fw-extrabold text-dark fs-6 d-block lh-1">Mi Perfil & Seguridad</span>
+            <span class="text-muted extra-small">Gestión de cuenta personal y firma electrónica</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex align-items-center gap-2">
+        <a href="{% url 'dashboard_usuario' %}" class="btn btn-sm btn-light border fw-bold text-dark px-3 py-2" style="border-radius:10px;">
+          <i class="bi bi-arrow-left me-1"></i> Volver al Panel
+        </a>
+      </div>
+    </header>
+
+    <!-- CONTENT BODY -->
+    <main class="content-body">
+
+      <!-- MENSAJES DJANGO -->
+      {% if messages %}
+        <div class="mb-4">
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show rounded-4 shadow-sm border-0 py-3 px-4 fw-bold" role="alert">
+              <i class="bi {% if message.tags == 'error' %}bi-exclamation-octagon-fill text-danger{% else %}bi-check-circle-fill text-success{% endif %} me-2"></i>
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <!-- HERO PROFILE BANNER -->
+      <div class="hero-profile-banner">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-4 position-relative" style="z-index: 1;">
+          <div class="d-flex align-items-center gap-4">
+            <div class="avatar-large-profile">
+              {{ perfil.nombre_completo|slice:":2"|upper|default:request.user.username|slice:":2"|upper }}
+            </div>
+            <div>
+              <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                <h1 class="fw-extrabold mb-0 fs-3 text-white">{{ perfil.nombre_completo|default:request.user.username }}</h1>
+                <span class="badge px-3 py-1.5 fw-extrabold" style="background: rgba(255,255,255,0.2); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.35); border-radius: 50px; font-size: 0.78rem;">
+                  <i class="bi bi-shield-check text-warning me-1"></i> {{ miembro.rol.nombre|default:'Administrador' }}
+                </span>
+              </div>
+              <p class="mb-0 text-white-50 small fw-medium">
+                <i class="bi bi-envelope me-1"></i> {{ request.user.email }} &nbsp;•&nbsp; <i class="bi bi-building me-1"></i> {{ colegio.nombre|default:'Establecimiento Escolar' }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        
+        <!-- COLUMNA IZQUIERDA: DATOS PERSONALES -->
+        <div class="col-lg-7">
+          <div class="profile-card">
+            <div class="profile-card-header">
+              <span class="rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: #EDE9FE; color: #7C5CFC;">
+                <i class="bi bi-person-lines-fill fs-5"></i>
+              </span>
+              <div>
+                <h4 class="fw-extrabold text-dark mb-0 fs-6">Datos Personales & Contacto</h4>
+                <span class="text-muted extra-small">Actualiza tu información de contacto institucional</span>
+              </div>
+            </div>
+
+            <form method="POST">
+              {% csrf_token %}
+              <input type="hidden" name="action" value="actualizar_datos">
+
+              <div class="row g-3">
+                <div class="col-12">
+                  <label class="input-label-custom">Nombre Completo</label>
+                  <input type="text" name="nombre_completo" class="form-control input-field-custom" value="{{ perfil.nombre_completo }}" required placeholder="Ej: Juan Carlos Pérez Soto">
+                </div>
+
+                <div class="col-md-6">
+                  <label class="input-label-custom">Correo Electrónico</label>
+                  <input type="email" name="email" class="form-control input-field-custom" value="{{ request.user.email }}" required placeholder="correo@colegio.cl">
+                </div>
+
+                <div class="col-md-6">
+                  <label class="input-label-custom">RUT</label>
+                  <input type="text" name="rut" class="form-control input-field-custom" value="{{ perfil.rut|default:'' }}" placeholder="12.345.678-9">
+                </div>
+
+                <div class="col-12">
+                  <label class="input-label-custom">Teléfono de Contacto</label>
+                  <input type="text" name="telefono" class="form-control input-field-custom" value="{{ perfil.telefono|default:'' }}" placeholder="+56 9 1234 5678">
+                </div>
+              </div>
+
+              <div class="mt-4 pt-3 border-top d-flex justify-content-end">
+                <button type="submit" class="btn-save-profile d-inline-flex align-items-center gap-2">
+                  <i class="bi bi-check2-circle fs-5"></i>
+                  <span>Guardar Cambios</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- CAMBIO DE CONTRASEÑA -->
+          <div class="profile-card">
+            <div class="profile-card-header">
+              <span class="rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: #F1F5F9; color: #334155;">
+                <i class="bi bi-key-fill fs-5"></i>
+              </span>
+              <div>
+                <h4 class="fw-extrabold text-dark mb-0 fs-6">Seguridad de la Cuenta</h4>
+                <span class="text-muted extra-small">Cambia tu contraseña de inicio de sesión</span>
+              </div>
+            </div>
+
+            <form method="POST">
+              {% csrf_token %}
+              <input type="hidden" name="action" value="cambiar_password">
+
+              <div class="row g-3">
+                <div class="col-12">
+                  <label class="input-label-custom">Contraseña Actual</label>
+                  <input type="password" name="current_password" class="form-control input-field-custom" required placeholder="••••••••">
+                </div>
+
+                <div class="col-md-6">
+                  <label class="input-label-custom">Nueva Contraseña</label>
+                  <input type="password" name="new_password" class="form-control input-field-custom" required placeholder="Mínimo 6 caracteres">
+                </div>
+
+                <div class="col-md-6">
+                  <label class="input-label-custom">Confirmar Nueva Contraseña</label>
+                  <input type="password" name="confirm_password" class="form-control input-field-custom" required placeholder="••••••••">
+                </div>
+              </div>
+
+              <div class="mt-4 pt-3 border-top d-flex justify-content-end">
+                <button type="submit" class="btn-change-password d-inline-flex align-items-center gap-2">
+                  <i class="bi bi-shield-lock-fill"></i>
+                  <span>Actualizar Contraseña</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- COLUMNA DERECHA: FIRMA ELECTRÓNICA / PIN DE 4 DÍGITOS -->
+        <div class="col-lg-5">
+          <div class="profile-card" style="border: 1.5px solid #DDD6FE; background: linear-gradient(180deg, #FAF5FF 0%, #FFFFFF 100%);">
+            <div class="profile-card-header" style="border-bottom: 1.5px solid #EDE9FE;">
+              <span class="rounded-circle d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; background: #7C5CFC; color: #FFFFFF; box-shadow: 0 4px 14px rgba(124, 92, 252, 0.3);">
+                <i class="bi bi-shield-lock-fill fs-5"></i>
+              </span>
+              <div>
+                <h4 class="fw-extrabold text-dark mb-0 fs-6">PIN de Firma Electrónica</h4>
+                <span class="text-muted extra-small">Autorización de notas, asistencia y bitácora</span>
+              </div>
+            </div>
+
+            <!-- TARJETA DE ESTADO DEL PIN -->
+            <div class="p-3.5 rounded-4 mb-3 border" style="background: #FFFFFF;">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="extra-small fw-extrabold text-uppercase text-muted">Estado del PIN</span>
+                {% if perfil.tiene_pin and not perfil.pin_expirado %}
+                  <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1 fw-extrabold" style="border-radius: 20px; font-size: 0.76rem;">
+                    <i class="bi bi-check-circle-fill me-1"></i> Activo y Vigente
+                  </span>
+                {% elif perfil.tiene_pin and perfil.pin_expirado %}
+                  <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-1 fw-extrabold" style="border-radius: 20px; font-size: 0.76rem;">
+                    <i class="bi bi-exclamation-circle-fill me-1"></i> Expirado (90 días)
+                  </span>
+                {% else %}
+                  <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-1 fw-extrabold" style="border-radius: 20px; font-size: 0.76rem;">
+                    <i class="bi bi-clock-fill me-1"></i> Sin Configurar
+                  </span>
+                {% endif %}
+              </div>
+
+              <div class="d-flex align-items-center gap-3 mt-3">
+                <div class="d-flex align-items-center gap-1.5 font-monospace fs-4 fw-extrabold text-primary">
+                  <span>•</span><span>•</span><span>•</span><span>•</span>
+                </div>
+                <div class="border-start ps-3">
+                  <div class="fw-extrabold text-dark" style="font-size: 0.95rem;">
+                    {% if perfil.tiene_pin and not perfil.pin_expirado %}
+                      {{ perfil.dias_restantes_pin }} días restantes
+                    {% else %}
+                      Renovación Requerida
+                    {% endif %}
+                  </div>
+                  <span class="text-muted extra-small">Política de renovación trimestral</span>
+                </div>
+              </div>
+            </div>
+
+            <p class="text-muted small mb-4" style="line-height: 1.5;">
+              Este PIN de 4 dígitos te permite validar y asentar notas en el libro de clases, registrar la asistencia diaria y certificar anotaciones de convivencia sin salir de tu sesión.
+            </p>
+
+            <button type="button" class="btn w-100 py-2.5 fw-extrabold shadow-sm d-flex align-items-center justify-content-center gap-2" onclick="solicitarFirmaPIN()" style="background: linear-gradient(135deg, #7C5CFC 0%, #5B21B6 100%); color: #FFFFFF; border-radius: 14px; border: none; font-size: 0.92rem;">
+              <i class="bi bi-key-fill"></i>
+              <span>{% if perfil.tiene_pin %}Cambiar o Renovar PIN{% else %}Configurar mi PIN de 4 Dígitos{% endif %}</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+</div>
+
+{% include 'colegios/_modal_pin_firma.html' %}
+
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>
