@@ -19,16 +19,22 @@
       --primary: #7C5CFC;
       --primary-soft: rgba(124, 92, 252, 0.08);
       --primary-hover: #6747E3;
-      --secondary: #65CDBF;
-      --bg: #F8F9FD;
-      --white: #FFFFFF;
-      --dark: #151A35;
+      --primary-dark: #1E1B4B;
+      --secondary: #10B981;
+      --accent: #3B82F6;
+      --warning: #F59E0B;
+      --danger: #EF4444;
+      --bg: #F8FAFC;
+      --surface: #FFFFFF;
+      --dark: #0F172A;
       --gray-text: #64748B;
-      --border: #BCC0CF;
-      --radius-xl: 20px;
-      --radius-lg: 16px;
-      --radius-md: 12px;
-      --radius-sm: 8px;
+      --gray-light: #94A3B8;
+      --border: #E2E8F0;
+      --border-purple: #EDE9FE;
+      --radius-xl: 24px;
+      --radius-lg: 18px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
     }
 
     * { font-family: 'Plus Jakarta Sans', sans-serif; }
@@ -47,299 +53,52 @@
 
     /* Topbar */
     .topbar {
-      height: 70px;
-      background: rgba(255, 255, 255, 0.85) !important;
-      backdrop-filter: blur(12px) !important;
-      -webkit-backdrop-filter: blur(12px) !important;
+      height: 72px;
+      background: rgba(255, 255, 255, 0.9) !important;
+      backdrop-filter: blur(14px) !important;
+      -webkit-backdrop-filter: blur(14px) !important;
       border-bottom: 1px solid var(--border);
       display: flex; align-items: center; justify-content: space-between;
-      padding: 0 2rem; position: sticky; top: 0; z-index: 98;
+      padding: 0 2.25rem; position: sticky; top: 0; z-index: 98;
     }
-    .content-body { padding: 2rem; flex-grow: 1; max-width: 1440px; margin: 0 auto; width: 100%; box-sizing: border-box; }
-
-    /* Hero Banner Premium */
-    .hero-banner-dash {
-      background: linear-gradient(135deg, #7C5CFC 0%, #5B38EA 50%, #3B82F6 100%);
-      border-radius: var(--radius-xl);
-      padding: 2.25rem 2.5rem;
-      margin-bottom: 2rem;
-      color: #FFFFFF;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 12px 35px rgba(124, 92, 252, 0.22);
-    }
-    .hero-banner-dash::before {
-      content: '';
-      position: absolute;
-      top: -50%; right: -10%;
-      width: 400px; height: 400px;
-      background: radial-gradient(circle, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 70%);
-      border-radius: 50%;
-      pointer-events: none;
+    .content-body {
+      padding: 2.25rem;
+      flex-grow: 1;
+      max-width: 1460px;
+      margin: 0 auto;
+      width: 100%;
+      box-sizing: border-box;
     }
 
-    .hero-role-pill {
-      background: rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.35);
-      color: #FFFFFF;
-      font-weight: 700;
-      font-size: 0.76rem;
-      padding: 0.25rem 0.75rem;
-      border-radius: 50px;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-
-    .btn-hero-white {
-      background: #FFFFFF;
-      color: var(--primary);
-      font-weight: 800;
-      border: none;
-      border-radius: 12px;
-      padding: 0.65rem 1.35rem;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      transition: all 0.2s ease;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-    }
-    .btn-hero-white:hover {
-      background: #F8FAFC;
-      color: var(--primary-hover);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-    }
-
-    .btn-hero-glass {
-      background: rgba(255, 255, 255, 0.15);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      color: #FFFFFF;
-      font-weight: 700;
-      border-radius: 12px;
-      padding: 0.65rem 1.35rem;
-      backdrop-filter: blur(8px);
-      transition: all 0.2s ease;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-    }
-    .btn-hero-glass:hover {
-      background: rgba(255, 255, 255, 0.25);
-      color: #FFFFFF;
-      transform: translateY(-2px);
-    }
-
-    /* KPI Cards */
-    .kpi-grid-dashboard {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-      gap: 1.25rem;
-      margin-bottom: 2rem;
-    }
-
-    .kpi-card-vibrant {
-      background: #FFFFFF;
+    /* Topbar search & buttons */
+    .topbar-search-box {
+      background: #F1F5F9;
       border: 1px solid #E2E8F0;
-      border-radius: var(--radius-lg);
-      padding: 1.4rem 1.5rem;
-      box-shadow: 0 4px 20px rgba(15, 23, 42, 0.03);
-      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-      position: relative;
-      overflow: hidden;
+      border-radius: 12px;
+      padding: 0.45rem 0.95rem;
       display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-    .kpi-card-vibrant:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 30px rgba(124, 92, 252, 0.1);
-      border-color: #C5B6FF;
-    }
-    .kpi-card-vibrant::after {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 3px;
-      opacity: 0;
-      transition: opacity 0.2s ease;
-    }
-    .kpi-card-vibrant.purple::after { background: #7C5CFC; }
-    .kpi-card-vibrant.green::after { background: #10B981; }
-    .kpi-card-vibrant.blue::after { background: #3B82F6; }
-    .kpi-card-vibrant.rose::after { background: #E11D48; }
-    .kpi-card-vibrant:hover::after { opacity: 1; }
-
-    .kpi-icon-pill {
-      width: 48px; height: 48px;
-      border-radius: 14px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.4rem; flex-shrink: 0;
-    }
-
-    .trend-badge {
-      font-size: 0.74rem;
-      font-weight: 700;
-      padding: 0.2rem 0.55rem;
-      border-radius: 6px;
-      display: inline-flex;
       align-items: center;
-      gap: 0.25rem;
+      gap: 0.5rem;
+      width: 260px;
+      font-size: 0.82rem;
+      color: var(--gray-text);
+      transition: all 0.2s ease;
     }
-
-    /* Shortcuts Section */
-    .shortcuts-section {
-      background: #FFFFFF;
-      border: 1px solid #E2E8F0;
-      border-radius: var(--radius-lg);
-      padding: 1.65rem 1.75rem;
-      margin-bottom: 2rem;
-      box-shadow: 0 4px 20px rgba(15, 23, 42, 0.03);
-    }
-
-    .shortcuts-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
-      gap: 1.1rem;
-    }
-
-    .shortcut-card-elevated {
-      background: #F8FAFC;
-      border: 1.5px solid #E2E8F0;
-      border-radius: 14px;
-      padding: 1.25rem 1rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      text-decoration: none;
-      color: var(--dark);
-      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-      position: relative;
-    }
-    .shortcut-card-elevated:hover {
+    .topbar-search-box:focus-within {
       background: #FFFFFF;
       border-color: var(--primary);
-      transform: translateY(-4px);
-      box-shadow: 0 10px 25px rgba(124, 92, 252, 0.12);
-      color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(124, 92, 252, 0.12);
     }
-    .shortcut-icon-elevated {
-      width: 48px; height: 48px;
-      border-radius: 14px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.35rem;
-      margin-bottom: 0.75rem;
-      transition: transform 0.25s ease;
-    }
-    .shortcut-card-elevated:hover .shortcut-icon-elevated {
-      transform: scale(1.12);
-    }
-    .shortcut-title-elevated {
-      font-weight: 800;
-      font-size: 0.88rem;
-      margin-bottom: 0.25rem;
-    }
-    .shortcut-desc-elevated {
-      font-size: 0.74rem;
-      color: var(--gray-text);
-      line-height: 1.25;
-    }
-
-    /* 2 Column Main Grid */
-    .dashboard-two-cols {
-      display: grid;
-      grid-template-columns: 1.55fr 1fr;
-      gap: 1.75rem;
-      margin-bottom: 2rem;
-    }
-    @media (max-width: 1024px) {
-      .dashboard-two-cols { grid-template-columns: 1fr; }
-    }
-
-    .card-panel-dash {
-      background: var(--white);
-      border: 1px solid #E2E8F0;
-      border-radius: var(--radius-lg);
-      padding: 1.6rem 1.75rem;
-      box-shadow: 0 4px 20px rgba(15, 23, 42, 0.03);
-      margin-bottom: 1.75rem;
-    }
-
-    .panel-header-dash {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 1.25rem;
-      padding-bottom: 0.85rem;
-      border-bottom: 1px solid #F1F5F9;
-    }
-
-    /* Timeline Agenda Items */
-    .agenda-timeline {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      gap: 0.9rem;
-    }
-
-    .agenda-item-vibrant {
-      background: #F8FAFC;
-      border: 1px solid #E2E8F0;
-      border-left: 4px solid var(--primary);
-      border-radius: 12px;
-      padding: 1rem 1.15rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      transition: all 0.2s ease;
-    }
-    .agenda-item-vibrant:hover {
-      border-color: #CBD5E1;
-      border-left-color: var(--primary-hover);
-      background: #FFFFFF;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.04);
-      transform: translateX(2px);
-    }
-    .agenda-item-vibrant.evaluacion { border-left-color: #E11D48; }
-    .agenda-item-vibrant.reunion { border-left-color: #D97706; }
-    .agenda-item-vibrant.actividad { border-left-color: #10B981; }
-
-    /* Risk Table */
-    .table-risk th {
-      font-size: 0.74rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: #64748B;
-      background: #F8FAFC;
+    .topbar-search-box input {
       border: none;
-      padding: 0.75rem 1rem;
-    }
-    .table-risk td {
-      padding: 0.85rem 1rem;
-      vertical-align: middle;
-      border-bottom: 1px solid #F1F5F9;
-      font-size: 0.86rem;
-    }
-
-    /* Notes bubble */
-    .note-card-dash {
-      background: #F8FAFC;
-      border: 1px solid #E2E8F0;
-      border-radius: 12px;
-      padding: 1rem 1.15rem;
-      margin-bottom: 0.85rem;
-      transition: all 0.2s ease;
-    }
-    .note-card-dash:hover {
-      background: #FFFFFF;
-      border-color: #CBD5E1;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+      background: transparent;
+      outline: none;
+      width: 100%;
+      font-size: 0.82rem;
+      color: var(--dark);
+      font-weight: 600;
     }
 
-    /* ═══ ESTILOS TOPBAR & MODAL SOLICITUDES (MORADO INSTITUCIONAL) ═════ */
     .btn-topbar-solicitudes {
       display: inline-flex;
       align-items: center;
@@ -429,7 +188,340 @@
       box-shadow: 0 4px 14px rgba(124, 92, 252, 0.25);
     }
 
-    /* Modal Container & Header */
+    /* Hero Banner Premium */
+    .hero-banner-dash {
+      background: linear-gradient(135deg, #1E1B4B 0%, #312E81 35%, #4F46E5 70%, #7C5CFC 100%);
+      border-radius: var(--radius-xl);
+      padding: 2.25rem 2.75rem;
+      margin-bottom: 2rem;
+      color: #FFFFFF;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 16px 40px rgba(30, 27, 75, 0.28);
+    }
+    .hero-banner-dash::before {
+      content: '';
+      position: absolute;
+      top: -40%; right: -10%;
+      width: 480px; height: 480px;
+      background: radial-gradient(circle, rgba(124, 92, 252, 0.35) 0%, rgba(124, 92, 252, 0) 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .hero-banner-dash::after {
+      content: '';
+      position: absolute;
+      bottom: -30%; left: 30%;
+      width: 320px; height: 320px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.2) 0%, rgba(16, 185, 129, 0) 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .hero-meta-chip {
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      color: #FFFFFF;
+      font-weight: 700;
+      font-size: 0.76rem;
+      padding: 0.28rem 0.8rem;
+      border-radius: 50px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .btn-hero-action-primary {
+      background: #FFFFFF;
+      color: #4F46E5 !important;
+      font-weight: 800;
+      font-size: 0.86rem;
+      border: none;
+      border-radius: 12px;
+      padding: 0.65rem 1.4rem;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+    .btn-hero-action-primary:hover {
+      background: #F8FAFC;
+      color: #3730A3 !important;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-hero-action-glass {
+      background: rgba(255, 255, 255, 0.14);
+      border: 1.5px solid rgba(255, 255, 255, 0.28);
+      color: #FFFFFF !important;
+      font-weight: 700;
+      font-size: 0.86rem;
+      border-radius: 12px;
+      padding: 0.65rem 1.35rem;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: all 0.2s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+    .btn-hero-action-glass:hover {
+      background: rgba(255, 255, 255, 0.24);
+      border-color: rgba(255, 255, 255, 0.5);
+      color: #FFFFFF !important;
+      transform: translateY(-2px);
+    }
+
+    /* KPI Cards (Harmonious & Elevated) */
+    .kpi-grid-dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.35rem;
+      margin-bottom: 2rem;
+    }
+
+    .kpi-card-vibrant {
+      background: #FFFFFF;
+      border: 1.5px solid #F1F5F9;
+      border-radius: var(--radius-lg);
+      padding: 1.5rem 1.65rem;
+      box-shadow: 0 6px 24px rgba(15, 23, 42, 0.03);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .kpi-card-vibrant:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 14px 35px rgba(124, 92, 252, 0.1);
+      border-color: #DDD6FE;
+    }
+    .kpi-card-vibrant::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    .kpi-card-vibrant.purple::after { background: linear-gradient(90deg, #7C5CFC, #6366F1); }
+    .kpi-card-vibrant.green::after { background: linear-gradient(90deg, #10B981, #059669); }
+    .kpi-card-vibrant.blue::after { background: linear-gradient(90deg, #3B82F6, #0284C7); }
+    .kpi-card-vibrant.rose::after { background: linear-gradient(90deg, #EF4444, #F43F5E); }
+    .kpi-card-vibrant:hover::after { opacity: 1; }
+
+    .kpi-icon-pill {
+      width: 52px; height: 52px;
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.45rem; flex-shrink: 0;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+    }
+
+    .trend-badge {
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 0.25rem 0.65rem;
+      border-radius: 50px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    /* Segmented Hub Shortcuts Section */
+    .shortcuts-hub-section {
+      background: #FFFFFF;
+      border: 1.5px solid var(--border-purple);
+      border-radius: var(--radius-xl);
+      padding: 1.75rem 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 6px 28px rgba(124, 92, 252, 0.05);
+    }
+
+    .hub-tabs-container {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+    }
+    .hub-tab-btn {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      color: var(--gray-text);
+      font-weight: 700;
+      font-size: 0.8rem;
+      padding: 0.45rem 1rem;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .hub-tab-btn.active, .hub-tab-btn:hover {
+      background: #EDE9FE;
+      border-color: #C4B5FD;
+      color: #6D28D9;
+    }
+    .hub-tab-btn.active {
+      box-shadow: 0 2px 8px rgba(109, 40, 217, 0.15);
+    }
+
+    .shortcuts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 1.15rem;
+      margin-top: 1.25rem;
+    }
+
+    .shortcut-card-elevated {
+      background: #FAFAFA;
+      border: 1.5px solid #F1F5F9;
+      border-radius: 16px;
+      padding: 1.25rem 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      text-decoration: none;
+      color: var(--dark);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+    .shortcut-card-elevated:hover {
+      background: #FFFFFF;
+      border-color: #C4B5FD;
+      transform: translateY(-4px);
+      box-shadow: 0 12px 28px rgba(124, 92, 252, 0.12);
+      color: var(--primary);
+    }
+    .shortcut-icon-elevated {
+      width: 48px; height: 48px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      margin-bottom: 0.75rem;
+      transition: transform 0.25s ease;
+    }
+    .shortcut-card-elevated:hover .shortcut-icon-elevated {
+      transform: scale(1.12);
+    }
+    .shortcut-title-elevated {
+      font-weight: 800;
+      font-size: 0.88rem;
+      margin-bottom: 0.25rem;
+    }
+    .shortcut-desc-elevated {
+      font-size: 0.74rem;
+      color: var(--gray-text);
+      line-height: 1.25;
+    }
+
+    /* 2 Column Main Grid */
+    .dashboard-two-cols {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr;
+      gap: 1.75rem;
+      margin-bottom: 2rem;
+    }
+    @media (max-width: 1080px) {
+      .dashboard-two-cols { grid-template-columns: 1fr; }
+    }
+
+    .card-panel-dash {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.65rem 1.85rem;
+      box-shadow: 0 6px 24px rgba(15, 23, 42, 0.03);
+      margin-bottom: 1.75rem;
+      transition: border-color 0.2s ease;
+    }
+    .card-panel-dash:hover {
+      border-color: #CBD5E1;
+    }
+
+    .panel-header-dash {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.35rem;
+      padding-bottom: 0.95rem;
+      border-bottom: 1px solid #F1F5F9;
+    }
+
+    /* Table styles */
+    .table-risk th {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #64748B;
+      background: #F8FAFC;
+      border: none;
+      padding: 0.85rem 1rem;
+    }
+    .table-risk td {
+      padding: 0.95rem 1rem;
+      vertical-align: middle;
+      border-bottom: 1px solid #F1F5F9;
+      font-size: 0.86rem;
+    }
+
+    /* Agenda Items */
+    .agenda-timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+    }
+    .agenda-item-vibrant {
+      background: #F8FAFC;
+      border: 1.5px solid #F1F5F9;
+      border-left: 4px solid var(--primary);
+      border-radius: 14px;
+      padding: 1.05rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      transition: all 0.2s ease;
+    }
+    .agenda-item-vibrant:hover {
+      border-color: #CBD5E1;
+      border-left-color: var(--primary-hover);
+      background: #FFFFFF;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+      transform: translateX(3px);
+    }
+    .agenda-item-vibrant.evaluacion { border-left-color: #EF4444; }
+    .agenda-item-vibrant.reunion { border-left-color: #F59E0B; }
+    .agenda-item-vibrant.actividad { border-left-color: #10B981; }
+
+    /* Note card */
+    .note-card-dash {
+      background: #F8FAFC;
+      border: 1.5px solid #F1F5F9;
+      border-radius: 14px;
+      padding: 1.05rem 1.2rem;
+      margin-bottom: 0.85rem;
+      transition: all 0.2s ease;
+    }
+    .note-card-dash:hover {
+      background: #FFFFFF;
+      border-color: #C4B5FD;
+      box-shadow: 0 6px 18px rgba(124, 92, 252, 0.06);
+    }
+
+    /* Modal Styles */
     .modal-solicitudes-premium {
       border: none !important;
       border-radius: 24px !important;
@@ -455,7 +547,6 @@
       100% { box-shadow: 0 0 0 0 rgba(124, 92, 252, 0); }
     }
 
-    /* Request Card Component */
     .solicitud-card-redesign {
       background: #FFFFFF;
       border: 1.5px solid #E9D5FF;
@@ -629,6 +720,7 @@
       color: #94A3B8;
       font-size: 0.76rem;
       font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -639,16 +731,30 @@
   <!-- MAIN CONTENT -->
   <div class="main-content">
     
-    <!-- TOPBAR -->
+    <!-- TOPBAR ELEGANTE -->
     <header class="topbar">
       <div class="d-flex align-items-center gap-3">
         <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn" style="border:none; background:var(--primary-soft); color:var(--primary);">
           <i class="bi bi-list fs-5"></i>
         </button>
-        <span class="fw-extrabold text-dark fs-5"><i class="bi bi-speedometer2 text-primary me-2"></i>Panel General</span>
+        <div class="d-flex align-items-center gap-2">
+          <span class="rounded-3 d-flex align-items-center justify-content-center" style="width:34px; height:34px; background:#EDE9FE; color:#7C5CFC;">
+            <i class="bi bi-grid-1x2-fill"></i>
+          </span>
+          <div>
+            <span class="fw-extrabold text-dark fs-6 d-block lh-1">Panel General</span>
+            <span class="text-muted extra-small">{{ colegio.nombre|default:'Establecimiento Escolar' }}</span>
+          </div>
+        </div>
       </div>
 
       <div class="topbar-right d-flex align-items-center gap-2.5">
+        <!-- Quick Search Simulated Box -->
+        <div class="topbar-search-box d-none d-md-flex">
+          <i class="bi bi-search"></i>
+          <input type="text" id="dashboardQuickSearch" placeholder="Buscar módulo o alumno...">
+        </div>
+
         {% if request.user.is_superuser or request.user.is_staff %}
         <a href="{% url 'dashboard_superadmin' %}" class="btn-topbar-superadmin">
           <i class="bi bi-shield-shaded text-warning"></i>
@@ -671,7 +777,7 @@
           <span>Personalizar Accesos</span>
         </button>
 
-        <div class="topbar-date d-none d-sm-block text-muted small fw-bold px-3 py-2 bg-light border rounded-3">
+        <div class="topbar-date d-none d-lg-block text-muted small fw-bold px-3 py-2 bg-light border rounded-3">
           <i class="bi bi-calendar3 text-primary me-1"></i> {{ hoy|date:"l, d \d\e F \d\e Y"|title }}
         </div>
       </div>
@@ -680,53 +786,65 @@
     <!-- CONTENT BODY -->
     <main class="content-body">
 
-      <!-- HERO BANNER VIBRANTE -->
+      <!-- HERO COMMAND BANNER (ESTILO SAAS ELEGANTE) -->
       <div class="hero-banner-dash">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-4 position-relative" style="z-index: 1;">
           <div class="d-flex align-items-center gap-3.5">
-            <div class="rounded-circle d-flex align-items-center justify-content-center border border-2 border-white shadow" style="width: 64px; height: 64px; background: rgba(255,255,255,0.2); backdrop-filter: blur(8px); font-size:1.8rem;">
+            <div class="rounded-4 d-flex align-items-center justify-content-center border border-2 border-white shadow-lg" style="width: 70px; height: 70px; background: rgba(255,255,255,0.18); backdrop-filter: blur(10px); font-size:2rem;">
               🎓
             </div>
             <div>
               <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
-                <h1 class="fw-extrabold mb-0 fs-3 text-white">¡Bienvenido, {{ nombre_display }}!</h1>
-                <span class="hero-role-pill">
-                  <i class="bi bi-shield-check"></i> {{ miembro.rol.nombre|default:'Administrador General' }}
+                <h1 class="fw-extrabold mb-0 fs-3 text-white">¡Hola, {{ nombre_display }}!</h1>
+                <span class="hero-meta-chip">
+                  <i class="bi bi-shield-check text-warning"></i> {{ miembro.rol.nombre|default:'Administrador General' }}
                 </span>
               </div>
 
-              <p class="mb-0 text-white-50 small fw-medium">
-                {{ colegio.nombre }} &nbsp;•&nbsp; Período Escolar {{ periodo.anio_lectivo|default:2026 }} &nbsp;•&nbsp; <i class="bi bi-clock me-1"></i>Última actualización en vivo
-              </p>
+              <div class="d-flex align-items-center gap-2 flex-wrap text-white-50 small fw-medium mt-1">
+                <span><i class="bi bi-building me-1"></i>{{ colegio.nombre }}</span>
+                <span>•</span>
+                <span><i class="bi bi-calendar-range me-1"></i>Año Lectivo {{ periodo.anio_lectivo|default:2026 }}</span>
+                <span>•</span>
+                <span class="badge bg-success-subtle text-success px-2 py-0.5" style="border-radius:20px; font-size:0.72rem;">
+                  <i class="bi bi-circle-fill" style="font-size:6px;"></i> Sistema en Línea
+                </span>
+              </div>
             </div>
           </div>
 
           <div class="d-flex gap-2 flex-wrap">
-            <a href="{% url 'registrar_asistencia' %}" class="btn-hero-white">
-              <i class="bi bi-calendar-check-fill me-2"></i> Tomar Asistencia Hoy
+            <a href="{% url 'registrar_asistencia' %}" class="btn-hero-action-primary">
+              <i class="bi bi-clipboard2-check-fill text-primary"></i>
+              <span>Tomar Asistencia Hoy</span>
             </a>
-            <a href="{% url 'libro_calificaciones' %}" class="btn-hero-glass">
-              <i class="bi bi-journal-bookmark-fill me-2"></i> Calificaciones
+            <a href="{% url 'libro_calificaciones' %}" class="btn-hero-action-glass">
+              <i class="bi bi-journal-check"></i>
+              <span>Calificaciones</span>
+            </a>
+            <a href="{% url 'matricular_estudiante' %}" class="btn-hero-action-glass">
+              <i class="bi bi-person-plus-fill"></i>
+              <span>Matricular</span>
             </a>
           </div>
         </div>
 
         {% if is_admin and solicitudes_pendientes_count > 0 %}
-        <div class="mt-3.5 p-3 px-4 rounded-4 d-flex align-items-center justify-content-between flex-wrap gap-3 position-relative" style="background: rgba(255, 255, 255, 0.16); border: 1.5px solid rgba(255, 255, 255, 0.35); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); z-index: 1; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);">
+        <div class="mt-4 p-3 px-4 rounded-4 d-flex align-items-center justify-content-between flex-wrap gap-3 position-relative" style="background: rgba(255, 255, 255, 0.16); border: 1.5px solid rgba(255, 255, 255, 0.35); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); z-index: 1; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);">
           <div class="d-flex align-items-center gap-3 text-white small fw-bold">
-            <span class="rounded-circle d-flex align-items-center justify-content-center pulse-glow-purple shadow-sm flex-shrink-0" style="width:34px; height:34px; background:#FFFFFF; color:#7C5CFC;">
+            <span class="rounded-circle d-flex align-items-center justify-content-center pulse-glow-purple shadow-sm flex-shrink-0" style="width:36px; height:36px; background:#FFFFFF; color:#7C5CFC;">
               <i class="bi bi-person-plus-fill fs-6"></i>
             </span>
-            <span>Hay <strong>{{ solicitudes_pendientes_count }} solicitud{{ solicitudes_pendientes_count|pluralize:"es" }} de acceso</strong> de docentes/personal esperando tu autorización en este colegio.</span>
+            <span>Hay <strong>{{ solicitudes_pendientes_count }} solicitud{{ solicitudes_pendientes_count|pluralize:"es" }} de acceso docente/funcionario</strong> esperando tu autorización en este colegio.</span>
           </div>
-          <button type="button" class="btn btn-sm fw-extrabold px-3.5 py-1.5 shadow-sm d-flex align-items-center gap-1.5" data-bs-toggle="modal" data-bs-target="#modalSolicitudesPendientes" style="border-radius:10px; font-size:0.82rem; background:#FFFFFF; color:#6D28D9; border:none; transition: all .2s ease;">
-            <i class="bi bi-eye-fill text-primary"></i> Revisar Solicitudes Ahora
+          <button type="button" class="btn btn-sm fw-extrabold px-3.5 py-2 shadow-sm d-flex align-items-center gap-1.5" data-bs-toggle="modal" data-bs-target="#modalSolicitudesPendientes" style="border-radius:10px; font-size:0.82rem; background:#FFFFFF; color:#6D28D9; border:none; transition: all .2s ease;">
+            <i class="bi bi-eye-fill text-primary"></i> Gestionar Solicitudes Ahora
           </button>
         </div>
         {% endif %}
       </div>
 
-      <!-- 4 REAL KPI CARDS -->
+      <!-- 4 REAL KPI CARDS ELEVADAS -->
       <div class="kpi-grid-dashboard">
         <!-- Estudiantes -->
         <div class="kpi-card-vibrant purple">
@@ -753,7 +871,7 @@
             <div class="kpi-icon-pill" style="background:#ECFDF5; color:#10B981;"><i class="bi bi-diagram-3-fill"></i></div>
           </div>
           <div class="d-flex align-items-center justify-content-between pt-2 border-top">
-            <span class="trend-badge" style="background:#ECFDF5; color:#059669;"><i class="bi bi-mortarboard-fill"></i> Malla Completa</span>
+            <span class="trend-badge" style="background:#ECFDF5; color:#059669;"><i class="bi bi-mortarboard-fill"></i> Malla Vigente</span>
             <a href="{% url 'listar_cursos' %}" class="fw-bold small text-success text-decoration-none">Ver cursos <i class="bi bi-arrow-right"></i></a>
           </div>
         </div>
@@ -780,86 +898,106 @@
               <span class="text-muted extra-small text-uppercase fw-extrabold d-block mb-1">Alumnos en Riesgo</span>
               <span class="fs-2 fw-extrabold text-danger lh-1">{{ alumnos_en_riesgo_count|default:0 }}</span>
             </div>
-            <div class="kpi-icon-pill" style="background:#FFF1F2; color:#E11D48;"><i class="bi bi-exclamation-octagon-fill"></i></div>
+            <div class="kpi-icon-pill" style="background:#FFF1F2; color:#EF4444;"><i class="bi bi-exclamation-octagon-fill"></i></div>
           </div>
           <div class="d-flex align-items-center justify-content-between pt-2 border-top">
-            <span class="trend-badge" style="background:#FFF1F2; color:#E11D48;"><i class="bi bi-bell-fill"></i> Asistencia / Faltas</span>
+            <span class="trend-badge" style="background:#FFF1F2; color:#EF4444;"><i class="bi bi-bell-fill"></i> Asistencia Crítica</span>
             <a href="{% url 'convivencia_hub' %}" class="fw-bold small text-danger text-decoration-none">Revisar <i class="bi bi-arrow-right"></i></a>
           </div>
         </div>
       </div>
 
-      <!-- MÓDULO DE ACCESOS RÁPIDOS 100% REALES Y PERSONALIZABLES -->
-      <div class="shortcuts-section">
-        <div class="d-flex justify-content-between align-items-center mb-3">
+      <!-- MÓDULO DE ACCESOS RÁPIDOS SEGMENTADO Y ARMONIOSO -->
+      <div class="shortcuts-hub-section">
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-3">
           <div class="d-flex align-items-center gap-2">
-            <h3 class="fw-extrabold text-dark mb-0 fs-6"><i class="bi bi-grid-fill text-primary me-2"></i>Accesos Rápidos Institucionales</h3>
-            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-0.5" style="font-size:0.72rem; border-radius:50px;">Personalizable</span>
+            <h3 class="fw-extrabold text-dark mb-0 fs-6"><i class="bi bi-grid-fill text-primary me-2"></i>Módulos & Accesos Rápidos</h3>
+            <span class="badge fw-extrabold px-2.5 py-1" style="background:#EDE9FE; color:#6D28D9; border-radius:20px; font-size:0.72rem;">Hub Dinámico</span>
           </div>
+
+          <!-- Filter Category Pills -->
+          <div class="hub-tabs-container" id="hubFilterTabs">
+            <button type="button" class="hub-tab-btn active" data-filter="all">
+              <i class="bi bi-stars"></i> Todos
+            </button>
+            <button type="button" class="hub-tab-btn" data-filter="academico">
+              <i class="bi bi-journal-bookmark"></i> Académico
+            </button>
+            <button type="button" class="hub-tab-btn" data-filter="gestion">
+              <i class="bi bi-people"></i> Gestión & Personal
+            </button>
+            <button type="button" class="hub-tab-btn" data-filter="convivencia">
+              <i class="bi bi-shield-check"></i> Convivencia
+            </button>
+            <button type="button" class="hub-tab-btn" data-filter="finanzas">
+              <i class="bi bi-wallet2"></i> Administración
+            </button>
+          </div>
+
           <button type="button" class="btn btn-sm btn-link text-decoration-none text-primary fw-extrabold p-0" data-bs-toggle="modal" data-bs-target="#modalCustomizeShortcuts">
-            <i class="bi bi-gear-fill me-1"></i> Configurar accesos
+            <i class="bi bi-gear-fill me-1"></i> Personalizar
           </button>
         </div>
 
         <div class="shortcuts-grid" id="shortcutsGridContainer">
           <!-- 1. Tomar Asistencia -->
-          <a href="{% url 'registrar_asistencia' %}" class="shortcut-card-elevated" data-shortcut-id="sc_asistencia">
+          <a href="{% url 'registrar_asistencia' %}" class="shortcut-card-elevated" data-shortcut-id="sc_asistencia" data-category="academico">
             <div class="shortcut-icon-elevated" style="background:#F0EDFF; color:#7C5CFC;"><i class="bi bi-clipboard-check-fill"></i></div>
             <span class="shortcut-title-elevated">Tomar Asistencia</span>
             <span class="shortcut-desc-elevated">Registro diario por sección</span>
           </a>
 
           <!-- 2. Calificaciones -->
-          <a href="{% url 'libro_calificaciones' %}" class="shortcut-card-elevated" data-shortcut-id="sc_calificaciones">
+          <a href="{% url 'libro_calificaciones' %}" class="shortcut-card-elevated" data-shortcut-id="sc_calificaciones" data-category="academico">
             <div class="shortcut-icon-elevated" style="background:#EFF6FF; color:#3B82F6;"><i class="bi bi-journal-bookmark-fill"></i></div>
             <span class="shortcut-title-elevated">Calificaciones</span>
             <span class="shortcut-desc-elevated">Libro de notas y coeficientes</span>
           </a>
 
           <!-- 3. Matricular Alumno -->
-          <a href="{% url 'matricular_estudiante' %}" class="shortcut-card-elevated" data-shortcut-id="sc_matricula">
+          <a href="{% url 'matricular_estudiante' %}" class="shortcut-card-elevated" data-shortcut-id="sc_matricula" data-category="gestion">
             <div class="shortcut-icon-elevated" style="background:#ECFDF5; color:#10B981;"><i class="bi bi-person-plus-fill"></i></div>
             <span class="shortcut-title-elevated">Matricular Alumno</span>
             <span class="shortcut-desc-elevated">Ficha y diagnóstico PIE</span>
           </a>
 
           <!-- 4. Agenda y Calendario -->
-          <a href="{% url 'calendario_escolar' %}" class="shortcut-card-elevated" data-shortcut-id="sc_calendario">
+          <a href="{% url 'calendario_escolar' %}" class="shortcut-card-elevated" data-shortcut-id="sc_calendario" data-category="academico">
             <div class="shortcut-icon-elevated" style="background:#FEF3C7; color:#D97706;"><i class="bi bi-calendar2-week-fill"></i></div>
             <span class="shortcut-title-elevated">Agenda Escolar</span>
-            <span class="shortcut-desc-elevated">Clases, pruebas y reuniones</span>
+            <span class="shortcut-desc-elevated">Clases, pruebas y eventos</span>
           </a>
 
           <!-- 5. Convivencia Escolar -->
-          <a href="{% url 'convivencia_hub' %}" class="shortcut-card-elevated" data-shortcut-id="sc_convivencia">
-            <div class="shortcut-icon-elevated" style="background:#FFF1F2; color:#E11D48;"><i class="bi bi-shield-check"></i></div>
-            <span class="shortcut-title-elevated">Convivencia Escolar</span>
+          <a href="{% url 'convivencia_hub' %}" class="shortcut-card-elevated" data-shortcut-id="sc_convivencia" data-category="convivencia">
+            <div class="shortcut-icon-elevated" style="background:#FFF1F2; color:#EF4444;"><i class="bi bi-shield-check"></i></div>
+            <span class="shortcut-title-elevated">Convivencia</span>
             <span class="shortcut-desc-elevated">Bitácora y hoja de vida</span>
           </a>
 
           <!-- 6. Boletines y Reportes -->
-          <a href="{% url 'centro_reportes' %}" class="shortcut-card-elevated" data-shortcut-id="sc_reportes">
+          <a href="{% url 'centro_reportes' %}" class="shortcut-card-elevated" data-shortcut-id="sc_reportes" data-category="academico">
             <div class="shortcut-icon-elevated" style="background:#FDF2F8; color:#DB2777;"><i class="bi bi-file-earmark-bar-graph-fill"></i></div>
             <span class="shortcut-title-elevated">Centro Reportes</span>
             <span class="shortcut-desc-elevated">Boletines y certificados</span>
           </a>
 
           <!-- 7. Gestión Curricular -->
-          <a href="{% url 'listar_asignaturas' %}" class="shortcut-card-elevated" data-shortcut-id="sc_asignaturas">
+          <a href="{% url 'listar_asignaturas' %}" class="shortcut-card-elevated" data-shortcut-id="sc_asignaturas" data-category="academico">
             <div class="shortcut-icon-elevated" style="background:#F3E8FF; color:#9333EA;"><i class="bi bi-book-half"></i></div>
             <span class="shortcut-title-elevated">Asignaturas</span>
             <span class="shortcut-desc-elevated">Malla y asignación docente</span>
           </a>
 
           <!-- 8. Gestión de Personal -->
-          <a href="{% url 'listar_personal' %}" class="shortcut-card-elevated" data-shortcut-id="sc_personal">
+          <a href="{% url 'listar_personal' %}" class="shortcut-card-elevated" data-shortcut-id="sc_personal" data-category="gestion">
             <div class="shortcut-icon-elevated" style="background:#E0E7FF; color:#4F46E5;"><i class="bi bi-people-fill"></i></div>
             <span class="shortcut-title-elevated">Personal & Roles</span>
             <span class="shortcut-desc-elevated">Permisos por módulo</span>
           </a>
 
           <!-- 9. Políticas Académicas -->
-          <a href="{% url 'configuracion_politicas' %}" class="shortcut-card-elevated" data-shortcut-id="sc_politicas">
+          <a href="{% url 'configuracion_politicas' %}" class="shortcut-card-elevated" data-shortcut-id="sc_politicas" data-category="gestion">
             <div class="shortcut-icon-elevated" style="background:#F1F5F9; color:#475569;"><i class="bi bi-sliders"></i></div>
             <span class="shortcut-title-elevated">Políticas Colegio</span>
             <span class="shortcut-desc-elevated">Escalas y reglas de notas</span>
@@ -867,7 +1005,7 @@
 
           <!-- 10. Estadísticas & BI -->
           {% if is_admin %}
-          <a href="{% url 'estadisticas_colegio' %}" class="shortcut-card-elevated" data-shortcut-id="sc_estadisticas">
+          <a href="{% url 'estadisticas_colegio' %}" class="shortcut-card-elevated" data-shortcut-id="sc_estadisticas" data-category="finanzas">
             <div class="shortcut-icon-elevated" style="background:#ECFDF5; color:#059669;"><i class="bi bi-pie-chart-fill"></i></div>
             <span class="shortcut-title-elevated">Estadísticas</span>
             <span class="shortcut-desc-elevated">Demografía, notas y Excel</span>
@@ -876,7 +1014,7 @@
 
           <!-- 11. Finanzas & Caja Chica -->
           {% if is_admin or 'finanzas' in permisos_ver or 'contabilidad' in permisos_ver %}
-          <a href="{% url 'finanzas_dashboard' %}" class="shortcut-card-elevated" data-shortcut-id="sc_finanzas">
+          <a href="{% url 'finanzas_dashboard' %}" class="shortcut-card-elevated" data-shortcut-id="sc_finanzas" data-category="finanzas">
             <div class="shortcut-icon-elevated" style="background:#ECFDF5; color:#047857;"><i class="bi bi-wallet2"></i></div>
             <span class="shortcut-title-elevated">Finanzas & Caja</span>
             <span class="shortcut-desc-elevated">Caja chica, facturas y gastos</span>
@@ -885,7 +1023,7 @@
 
           <!-- 12. Inventario & Stock -->
           {% if is_admin or 'inventario' in permisos_ver or 'bodega' in permisos_ver %}
-          <a href="{% url 'inventario_dashboard' %}" class="shortcut-card-elevated" data-shortcut-id="sc_inventario">
+          <a href="{% url 'inventario_dashboard' %}" class="shortcut-card-elevated" data-shortcut-id="sc_inventario" data-category="finanzas">
             <div class="shortcut-icon-elevated" style="background:#EFF6FF; color:#2563EB;"><i class="bi bi-box-seam"></i></div>
             <span class="shortcut-title-elevated">Inventario & Stock</span>
             <span class="shortcut-desc-elevated">Insumos y alertas de stock</span>
@@ -894,7 +1032,7 @@
 
           <!-- 13. Proveedores -->
           {% if is_admin or 'proveedores' in permisos_ver %}
-          <a href="{% url 'proveedores_directorio' %}" class="shortcut-card-elevated" data-shortcut-id="sc_proveedores">
+          <a href="{% url 'proveedores_directorio' %}" class="shortcut-card-elevated" data-shortcut-id="sc_proveedores" data-category="finanzas">
             <div class="shortcut-icon-elevated" style="background:#FDF2F8; color:#DB2777;"><i class="bi bi-truck"></i></div>
             <span class="shortcut-title-elevated">Proveedores</span>
             <span class="shortcut-desc-elevated">Contactos y pedidos WhatsApp</span>
@@ -903,7 +1041,7 @@
 
           <!-- 14. Talleres Extracurriculares (ACLES) -->
           {% if is_admin or 'talleres' in permisos_ver or 'cursos' in permisos_ver %}
-          <a href="{% url 'talleres_dashboard' %}" class="shortcut-card-elevated" data-shortcut-id="sc_talleres">
+          <a href="{% url 'talleres_dashboard' %}" class="shortcut-card-elevated" data-shortcut-id="sc_talleres" data-category="academico">
             <div class="shortcut-icon-elevated" style="background:#FEF3C7; color:#D97706;"><i class="bi bi-star-fill"></i></div>
             <span class="shortcut-title-elevated">Talleres (ACLES)</span>
             <span class="shortcut-desc-elevated">Multicurso y asistencia</span>
@@ -912,7 +1050,7 @@
 
           <!-- 15. SIMCE & Diagnóstico DIA -->
           {% if is_admin or is_profesor or 'simce' in permisos_ver or 'reportes' in permisos_ver %}
-          <a href="{% url 'simce_dashboard' %}" class="shortcut-card-elevated" data-shortcut-id="sc_simce">
+          <a href="{% url 'simce_dashboard' %}" class="shortcut-card-elevated" data-shortcut-id="sc_simce" data-category="academico">
             <div class="shortcut-icon-elevated" style="background:#F0EDFF; color:#7C5CFC;"><i class="bi bi-award-fill"></i></div>
             <span class="shortcut-title-elevated">SIMCE & DIA</span>
             <span class="shortcut-desc-elevated">Ensayos y estándares MINEDUC</span>
@@ -921,39 +1059,39 @@
         </div>
       </div>
 
-
-
-
-
-
-      <!-- MAIN 2 COLUMNS -->
+      <!-- MAIN 2 COLUMNS ARMONIOSAS -->
       <div class="dashboard-two-cols">
         
-        <!-- LEFT COLUMN (GRAPHS & RISK MONITOR) -->
+        <!-- LEFT COLUMN (GRÁFICOS, ALUMNOS EN RIESGO Y SOLICITUDES) -->
         <div>
           
-          <!-- MONITOR DE ALUMNOS EN RIESGO -->
+          <!-- MONITOR DE ALUMNOS EN RIESGO (RADAR CONVIVENCIA) -->
           <div class="card-panel-dash">
             <div class="panel-header-dash">
               <div>
-                <h3 class="fw-extrabold text-dark mb-0 fs-6"><i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>Monitor de Alumnos en Riesgo</h3>
+                <h3 class="fw-extrabold text-dark mb-0 fs-6 d-flex align-items-center gap-2">
+                  <span class="rounded-circle d-flex align-items-center justify-content-center" style="width:30px; height:30px; background:#FFF1F2; color:#EF4444;">
+                    <i class="bi bi-exclamation-triangle-fill fs-6"></i>
+                  </span>
+                  Monitor de Asistencia & Convivencia en Riesgo
+                </h3>
                 <span class="text-muted extra-small">Estudiantes con asistencia crítica (&lt; 85%) o alertas activas</span>
               </div>
-              <a href="{% url 'convivencia_hub' %}" class="btn btn-sm btn-outline-danger fw-bold" style="border-radius:8px; font-size:0.78rem;">
+              <a href="{% url 'convivencia_hub' %}" class="btn btn-sm btn-outline-danger fw-bold" style="border-radius:10px; font-size:0.78rem;">
                 Ver Todo el Módulo
               </a>
             </div>
 
             {% if alumnos_en_riesgo %}
               <div class="table-responsive">
-                <table class="table table-risk mb-0">
+                <table class="table table-risk mb-0 align-middle">
                   <thead>
                     <tr>
-                      <th>Estudiante</th>
+                      <th style="border-radius: 8px 0 0 8px;">Estudiante</th>
                       <th>Curso</th>
-                      <th>Asistencia</th>
+                      <th>Nivel de Asistencia</th>
                       <th>Faltas</th>
-                      <th class="text-end">Acción</th>
+                      <th class="text-end" style="border-radius: 0 8px 8px 0;">Acción</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -961,7 +1099,9 @@
                       <tr>
                         <td>
                           <div class="d-flex align-items-center gap-2.5">
-                            <img src="https://ui-avatars.com/api/?name={{ item.estudiante.nombres }}+{{ item.estudiante.apellidos }}&background=E2E8F0&color=475569" style="width:32px; height:32px; border-radius:50%; object-fit:cover;">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold text-dark shadow-sm flex-shrink-0" style="width:36px; height:36px; background:#F1F5F9; font-size:0.85rem;">
+                              {{ item.estudiante.nombres|slice:":1" }}{{ item.estudiante.apellidos|slice:":1" }}
+                            </div>
                             <div>
                               <div class="fw-bold text-dark">{{ item.estudiante.apellidos }}, {{ item.estudiante.nombres }}</div>
                               {% if item.estudiante.es_pie %}
@@ -973,10 +1113,9 @@
                         <td><span class="badge bg-light text-dark border fw-bold">{{ item.estudiante.curso.nombre }}</span></td>
                         <td>
                           <div class="d-flex align-items-center gap-2">
-                            <div class="progress flex-grow-1" style="height: 6px; width: 60px; border-radius: 10px; background: #F1F5F9;">
+                            <div class="progress flex-grow-1" style="height: 6px; width: 70px; border-radius: 10px; background: #F1F5F9;">
                               <div class="progress-bar bar-pct {% if item.tasa < 85 %}bg-danger{% else %}bg-warning{% endif %}" data-pct="{{ item.tasa }}"></div>
                             </div>
-
                             <span class="fw-extrabold {% if item.tasa < 85 %}text-danger{% else %}text-warning{% endif %}" style="font-size:0.82rem;">
                               {{ item.tasa }}%
                             </span>
@@ -984,12 +1123,11 @@
                         </td>
                         <td><span class="text-danger fw-extrabold">{{ item.faltas }}</span></td>
                         <td class="text-end">
-                          <a href="{% url 'hoja_vida_estudiante' item.estudiante.id %}" class="btn btn-sm btn-light border fw-bold text-primary px-2.5 py-1" style="border-radius:8px; font-size:0.78rem;">
+                          <a href="{% url 'hoja_vida_estudiante' item.estudiante.id %}" class="btn btn-sm btn-light border fw-bold text-primary px-2.5 py-1.5" style="border-radius:8px; font-size:0.78rem;">
                             <i class="bi bi-file-person me-1"></i> Hoja Vida
                           </a>
                         </td>
                       </tr>
-
                     {% endfor %}
                   </tbody>
                 </table>
@@ -1007,14 +1145,19 @@
           <div class="card-panel-dash">
             <div class="panel-header-dash">
               <div>
-                <h3 class="fw-extrabold text-dark mb-0 fs-6"><i class="bi bi-graph-up-arrow text-primary me-2"></i>Evolución de Asistencia General</h3>
+                <h3 class="fw-extrabold text-dark mb-0 fs-6 d-flex align-items-center gap-2">
+                  <span class="rounded-circle d-flex align-items-center justify-content-center" style="width:30px; height:30px; background:#EDE9FE; color:#7C5CFC;">
+                    <i class="bi bi-graph-up-arrow fs-6"></i>
+                  </span>
+                  Evolución de Asistencia General
+                </h3>
                 <span class="text-muted extra-small">Promedio mensual del establecimiento</span>
               </div>
-              <a href="{% url 'historial_asistencia' %}" class="btn btn-sm btn-light border fw-bold text-dark" style="border-radius:8px; font-size:0.78rem;">
+              <a href="{% url 'historial_asistencia' %}" class="btn btn-sm btn-light border fw-bold text-dark" style="border-radius:10px; font-size:0.78rem;">
                 <i class="bi bi-calendar3 me-1"></i> Ver Detallado
               </a>
             </div>
-            <div style="position: relative; height: 250px; width: 100%;">
+            <div style="position: relative; height: 260px; width: 100%;">
               <canvas id="mainDashboardChart"></canvas>
             </div>
           </div>
@@ -1129,17 +1272,22 @@
 
         </div>
 
-        <!-- RIGHT COLUMN (AGENDA HOY & ACTIVIDAD) -->
+        <!-- RIGHT COLUMN (AGENDA HOY & ACTIVIDAD RECIENTE) -->
         <div>
           
-          <!-- MI AGENDA HOY (100% REAL) -->
+          <!-- MI AGENDA HOY -->
           <div class="card-panel-dash">
             <div class="panel-header-dash">
               <div>
-                <h3 class="fw-extrabold text-dark mb-0 fs-6"><i class="bi bi-calendar2-day-fill text-primary me-2"></i>Mi Agenda de Hoy</h3>
+                <h3 class="fw-extrabold text-dark mb-0 fs-6 d-flex align-items-center gap-2">
+                  <span class="rounded-circle d-flex align-items-center justify-content-center" style="width:30px; height:30px; background:#FEF3C7; color:#D97706;">
+                    <i class="bi bi-calendar2-day-fill fs-6"></i>
+                  </span>
+                  Mi Agenda de Hoy
+                </h3>
                 <span class="text-muted extra-small">{{ hoy|date:"l, d \d\e F"|title }}</span>
               </div>
-              <a href="{% url 'calendario_escolar' %}" class="btn btn-sm btn-light border fw-bold text-dark" style="border-radius:8px; font-size:0.78rem;">
+              <a href="{% url 'calendario_escolar' %}" class="btn btn-sm btn-light border fw-bold text-dark" style="border-radius:10px; font-size:0.78rem;">
                 <i class="bi bi-calendar-plus me-1"></i> Abrir Calendario
               </a>
             </div>
@@ -1166,15 +1314,15 @@
 
                     <div>
                       {% if ev.tipo == 'clase' %}
-                        <a href="{% url 'registrar_asistencia' %}" class="btn btn-sm btn-primary fw-bold px-3 py-1.5" style="border-radius:8px; font-size:0.78rem;">
+                        <a href="{% url 'registrar_asistencia' %}" class="btn btn-sm btn-primary fw-bold px-3 py-1.5" style="border-radius:10px; font-size:0.78rem;">
                           Pasar Lista
                         </a>
                       {% elif ev.tipo == 'evaluacion' %}
-                        <a href="{% url 'libro_calificaciones' %}" class="btn btn-sm btn-danger fw-bold px-3 py-1.5" style="border-radius:8px; font-size:0.78rem;">
+                        <a href="{% url 'libro_calificaciones' %}" class="btn btn-sm btn-danger fw-bold px-3 py-1.5" style="border-radius:10px; font-size:0.78rem;">
                           Calificar
                         </a>
                       {% else %}
-                        <a href="{% url 'calendario_escolar' %}" class="btn btn-sm btn-light border fw-bold text-dark px-3 py-1.5" style="border-radius:8px; font-size:0.78rem;">
+                        <a href="{% url 'calendario_escolar' %}" class="btn btn-sm btn-light border fw-bold text-dark px-3 py-1.5" style="border-radius:10px; font-size:0.78rem;">
                           Ver Detalle
                         </a>
                       {% endif %}
@@ -1187,7 +1335,7 @@
                 <i class="bi bi-calendar-check fs-2 text-muted d-block mb-1"></i>
                 <h6 class="fw-bold text-dark mb-1">Sin compromisos agendados hoy</h6>
                 <p class="text-muted small mb-3">No tienes clases o reuniones programadas para el día de hoy.</p>
-                <a href="{% url 'calendario_escolar' %}" class="btn btn-sm btn-outline-primary fw-bold px-3 py-1.5" style="border-radius:8px;">
+                <a href="{% url 'calendario_escolar' %}" class="btn btn-sm btn-outline-primary fw-bold px-3 py-1.5" style="border-radius:10px;">
                   <i class="bi bi-plus-circle me-1"></i> Agendar Evento
                 </a>
               </div>
@@ -1198,10 +1346,15 @@
           <div class="card-panel-dash">
             <div class="panel-header-dash">
               <div>
-                <h3 class="fw-extrabold text-dark mb-0 fs-6"><i class="bi bi-chat-left-quote-fill text-secondary me-2"></i>Últimas Anotaciones</h3>
+                <h3 class="fw-extrabold text-dark mb-0 fs-6 d-flex align-items-center gap-2">
+                  <span class="rounded-circle d-flex align-items-center justify-content-center" style="width:30px; height:30px; background:#F0EDFF; color:#7C5CFC;">
+                    <i class="bi bi-chat-left-quote-fill fs-6"></i>
+                  </span>
+                  Últimas Anotaciones
+                </h3>
                 <span class="text-muted extra-small">Bitácora de convivencia escolar</span>
               </div>
-              <a href="{% url 'convivencia_hub' %}" class="btn btn-sm btn-light border fw-bold text-dark" style="border-radius:8px; font-size:0.78rem;">
+              <a href="{% url 'convivencia_hub' %}" class="btn btn-sm btn-light border fw-bold text-dark" style="border-radius:10px; font-size:0.78rem;">
                 Ver Todas
               </a>
             </div>
@@ -1211,13 +1364,13 @@
                 <div class="note-card-dash">
                   <div class="d-flex justify-content-between align-items-center mb-1">
                     <span class="fw-bold text-dark small">{{ an.estudiante.apellidos }}, {{ an.estudiante.nombres }}</span>
-                    <span class="badge {% if an.tipo == 'positiva' %}bg-success-subtle text-success{% else %}bg-danger-subtle text-danger{% endif %} fw-bold" style="font-size:0.7rem;">
+                    <span class="badge {% if an.tipo == 'positiva' %}bg-success-subtle text-success{% else %}bg-danger-subtle text-danger{% endif %} fw-bold" style="font-size:0.7rem; border-radius:20px;">
                       {{ an.get_tipo_display|default:an.tipo|title }}
                     </span>
                   </div>
                   <p class="text-muted extra-small mb-2 text-truncate" style="max-width: 100%;">{{ an.descripcion }}</p>
                   <div class="d-flex justify-content-between align-items-center pt-1 border-top">
-                    <span class="text-muted" style="font-size:0.7rem;"><i class="bi bi-person me-1"></i>{{ an.docente.get_full_name|default:an.docente.username|default:'Docente' }}</span>
+                    <span class="text-muted extra-small"><i class="bi bi-person me-1"></i>{{ an.docente.get_full_name|default:an.docente.username|default:'Docente' }}</span>
                     <a href="{% url 'hoja_vida_estudiante' an.estudiante.id %}" class="text-primary fw-bold text-decoration-none" style="font-size:0.72rem;">Ver Alumno →</a>
                   </div>
                 </div>
@@ -1240,7 +1393,7 @@
 <!-- MODAL PERSONALIZAR ACCESOS RÁPIDOS -->
 <div class="modal fade" id="modalCustomizeShortcuts" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
       <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
         <div class="d-flex align-items-center gap-2">
           <div class="rounded-3 d-flex align-items-center justify-content-center" style="width:40px; height:40px; background:#F0EDFF; color:#7C5CFC;">
@@ -1339,7 +1492,7 @@
     if (ctx) {
       const chartCtx = ctx.getContext('2d');
       const gradient = chartCtx.createLinearGradient(0, 0, 0, 240);
-      gradient.addColorStop(0, 'rgba(124, 92, 252, 0.25)');
+      gradient.addColorStop(0, 'rgba(124, 92, 252, 0.28)');
       gradient.addColorStop(1, 'rgba(124, 92, 252, 0.0)');
 
       new Chart(ctx, {
@@ -1351,14 +1504,14 @@
             data: [93.5, 94.8, 92.1, 91.0, 95.2, 94.4, 93.8, 95.0, 94.2],
             borderColor: '#7C5CFC',
             backgroundColor: gradient,
-            borderWidth: 3,
+            borderWidth: 3.2,
             fill: true,
             tension: 0.35,
             pointBackgroundColor: '#FFFFFF',
             pointBorderColor: '#7C5CFC',
             pointBorderWidth: 2.5,
             pointRadius: 4.5,
-            pointHoverRadius: 6.5
+            pointHoverRadius: 7
           }]
         },
         options: {
@@ -1367,11 +1520,11 @@
           plugins: {
             legend: { display: false },
             tooltip: {
-              backgroundColor: '#151A35',
+              backgroundColor: '#1E1B4B',
               padding: 10,
               titleFont: { family: 'Plus Jakarta Sans', size: 12, weight: 'bold' },
               bodyFont: { family: 'Plus Jakarta Sans', size: 12 },
-              cornerRadius: 8,
+              cornerRadius: 10,
               displayColors: false,
               callbacks: {
                 label: (ctx) => `Asistencia: ${ctx.parsed.y}%`
@@ -1398,6 +1551,40 @@
             }
           }
         }
+      });
+    }
+
+    // Filtrado por categoría en Hub de Accesos Rápidos
+    const filterButtons = document.querySelectorAll('#hubFilterTabs .hub-tab-btn');
+    filterButtons.forEach(btn => {
+      btn.addEventListener('click', function() {
+        filterButtons.forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        const filter = this.getAttribute('data-filter');
+        
+        document.querySelectorAll('#shortcutsGridContainer .shortcut-card-elevated').forEach(card => {
+          if (filter === 'all' || card.getAttribute('data-category') === filter) {
+            card.style.display = 'flex';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+
+    // Quick Search Filter
+    const searchInput = document.getElementById('dashboardQuickSearch');
+    if (searchInput) {
+      searchInput.addEventListener('input', function() {
+        const query = this.value.toLowerCase().trim();
+        document.querySelectorAll('#shortcutsGridContainer .shortcut-card-elevated').forEach(card => {
+          const text = card.innerText.toLowerCase();
+          if (text.includes(query)) {
+            card.style.display = 'flex';
+          } else {
+            card.style.display = 'none';
+          }
+        });
       });
     }
 
@@ -1455,6 +1642,9 @@
     });
     document.querySelectorAll('.bar-pct[data-pct]').forEach(function(el) {
       el.style.width = (parseFloat(el.getAttribute('data-pct')) || 0) + '%';
+    });
+  }
+</script>= (parseFloat(el.getAttribute('data-pct')) || 0) + '%';
     });
   }
 </script>
