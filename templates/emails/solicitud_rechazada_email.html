@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Estado de Solicitud de Acceso - Eduteka</title>
+  <style>
+    body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #F8FAFC; margin: 0; padding: 30px 10px; color: #1E293B; }
+    .container { max-width: 580px; margin: 0 auto; background: #FFFFFF; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); border: 1px solid #E2E8F0; }
+    .header { background: linear-gradient(135deg, #7F1D1D 0%, #991B1B 50%, #DC2626 100%); padding: 35px 30px; text-align: center; color: #FFFFFF; }
+    .header h1 { margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+    .content { padding: 35px 30px; line-height: 1.6; }
+    .card-motivo { background: #FEF2F2; border: 1.5px solid #FECACA; border-radius: 14px; padding: 20px; margin: 20px 0; }
+    .motivo-text { color: #991B1B; font-style: italic; font-size: 15px; margin-top: 6px; }
+    .footer { background: #F8FAFC; padding: 20px 30px; text-align: center; font-size: 12px; color: #94A3B8; border-top: 1px solid #E2E8F0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Eduteka</h1>
+      <p style="margin: 5px 0 0; opacity: 0.9; font-size: 14px;">Actualización de Solicitud de Acceso</p>
+    </div>
+    
+    <div class="content">
+      <h2 style="font-size: 20px; color: #0F172A; margin-top: 0;">Estimado(a) {{ nombre|default:user.username }},</h2>
+      <p style="font-size: 15px; color: #475569;">
+        Te informamos que tu solicitud de vinculación para el colegio <strong>{{ colegio.nombre }}</strong> con el rol de <strong>{{ rol_solicitado }}</strong> no ha sido aprobada en esta oportunidad.
+      </p>
+
+      <div class="card-motivo">
+        <strong style="color: #991B1B; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Motivo indicado por la Dirección:</strong>
+        <div class="motivo-text">
+          "{{ motivo_rechazo }}"
+        </div>
+      </div>
+
+      <p style="font-size: 14px; color: #64748B;">
+        Si consideras que se trata de un error o necesitas mayor información, te recomendamos contactar directamente a la administración o equipo directivo del establecimiento.
+      </p>
+    </div>
+
+    <div class="footer">
+      <p style="margin: 0;">&copy; 2026 Eduteka. Todos los derechos reservados.</p>
+      <p style="margin: 4px 0 0;">Notificación automática del sistema de gestión escolar.</p>
+    </div>
+  </div>
+</body>
+</html>
