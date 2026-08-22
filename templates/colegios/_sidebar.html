@@ -315,15 +315,6 @@
     <button type="button" class="sidebar-toggle-btn d-none d-lg-flex" id="sidebarCollapseToggle" title="Contraer / Expandir menú">
       <i class="bi bi-layout-sidebar-inset"></i>
     </button>
-  </div>
-
-  <div style="padding: 0 .75rem .25rem;">
-    <div class="sidebar-school" title="{{ colegio.nombre|default:'Mi Colegio' }}">
-      <div class="sidebar-school-name">{{ colegio.nombre|default:"Mi Colegio" }}</div>
-      <div class="sidebar-school-sub">Año Escolar {{ periodo.anio_academico|default:"Actual" }}</div>
-    </div>
-  </div>
-
   <div style="padding: 0 .75rem .35rem;">
     <div class="sidebar-role-badge {% if is_admin %}admin{% endif %}" title="{{ rol_nombre|default:'Usuario' }}">
       {% if is_admin %}
