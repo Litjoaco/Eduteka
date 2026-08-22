@@ -287,7 +287,7 @@
                     <div class="d-flex justify-content-end gap-3 mt-4 mb-5">
                         <a href="/asistencia/registrar/?fecha={{ fecha_str }}" class="btn btn-light fw-semibold">Cancelar</a>
                         <button type="submit" class="btn btn-primary fw-semibold px-4 shadow-sm">
-                            <i class="bi bi-save me-1"></i> Guardar Asistencia
+                            <i class="bi bi-shield-lock-fill me-1"></i> Guardar y Firmar Asistencia
                         </button>
                     </div>
                 {% endif %}
@@ -295,6 +295,8 @@
         </main>
     </div>
 </div>
+
+{% include 'colegios/_modal_pin_firma.html' %}
 
 <!-- Scripts -->
 <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
@@ -306,6 +308,20 @@
         if(mobileBtn) {
             mobileBtn.addEventListener('click', () => {
                 sidebar.style.transform = sidebar.style.transform === 'translateX(0px)' ? 'translateX(-100%)' : 'translateX(0px)';
+            });
+        }
+
+        // Intercepción con PIN de Firma de 4 dígitos
+        const attendanceForm = document.getElementById('attendanceSheetForm');
+        if (attendanceForm) {
+            attendanceForm.addEventListener('submit', function(e) {
+                if (!attendanceForm.dataset.pinVerificado) {
+                    e.preventDefault();
+                    solicitarFirmaPIN(function(pin) {
+                        attendanceForm.dataset.pinVerificado = "true";
+                        attendanceForm.submit();
+                    });
+                }
             });
         }
     });

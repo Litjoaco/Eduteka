@@ -6,4 +6,9 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('dashboard/', views.dashboard_usuarios_view, name='dashboard_usuario'),
+    
+    # Rutas para el Sistema de Firma Electrónica / PIN de 4 Dígitos
+    path('pin/estado/', views.api_estado_pin, name='api_estado_pin'),
+    path('pin/verificar/', views.api_verificar_pin, name='api_verificar_pin'),
+    path('pin/establecer/', views.api_establecer_pin, name='api_establecer_pin'),
 ]

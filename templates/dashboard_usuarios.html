@@ -780,9 +780,14 @@
         </button>
         {% endif %}
 
+        <button type="button" class="btn-topbar-custom" onclick="solicitarFirmaPIN()">
+          <i class="bi bi-shield-lock-fill text-primary"></i>
+          <span>PIN de Firma</span>
+        </button>
+
         <button type="button" class="btn-topbar-custom" data-bs-toggle="modal" data-bs-target="#modalCustomizeShortcuts">
           <i class="bi bi-sliders2-vertical text-primary"></i>
-          <span>Personalizar Accesos</span>
+          <span>Personalizar</span>
         </button>
 
         <div class="topbar-date d-none d-lg-block text-muted small fw-bold px-3 py-2 bg-light border rounded-3">
@@ -1818,6 +1823,8 @@
     });
   </script>
   {% endif %}
+
+  {% include 'colegios/_modal_pin_firma.html' %}
 </body>
 
 </html>

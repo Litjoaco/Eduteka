@@ -146,3 +146,74 @@ def dashboard_usuarios_view(request):
     }
     return render(request, 'dashboard_usuarios.html', context)
 
+
+import json
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST, require_GET
+from .models import PerfilUsuario
+
+@login_required
+@require_GET
+def api_estado_pin(request):
+    """Retorna el estado de vigencia y existencia del PIN de 4 dígitos del usuario actual."""
+    perfil, _ = PerfilUsuario.objects.get_or_create(usuario=request.user, defaults={'nombre_completo': request.user.get_full_name() or request.user.username})
+    return JsonResponse({
+        'tiene_pin': perfil.tiene_pin(),
+        'expirado': perfil.pin_expirado(),
+        'bloqueado': perfil.esta_bloqueado_pin(),
+        'dias_restantes': perfil.dias_restantes_pin(),
+    })
+
+@login_required
+@require_POST
+def api_verificar_pin(request):
+    """Verifica el PIN de 4 dígitos ingresado por el usuario."""
+    try:
+        data = json.loads(request.body) if request.body else request.POST
+        pin = data.get('pin', '').strip()
+    except Exception:
+        pin = request.POST.get('pin', '').strip()
+
+    if not pin or len(pin) != 4 or not pin.isdigit():
+        return JsonResponse({'valido': False, 'mensaje': 'Debes ingresar un PIN de 4 dígitos numéricos.'}, status=400)
+
+    perfil, _ = PerfilUsuario.objects.get_or_create(usuario=request.user, defaults={'nombre_completo': request.user.get_full_name() or request.user.username})
+    
+    valido, mensaje = perfil.verificar_pin(pin)
+    return JsonResponse({
+        'valido': valido,
+        'mensaje': mensaje,
+        'expirado': perfil.pin_expirado(),
+        'bloqueado': perfil.esta_bloqueado_pin(),
+        'dias_restantes': perfil.dias_restantes_pin()
+    })
+
+@login_required
+@require_POST
+def api_establecer_pin(request):
+    """Crea o actualiza el PIN de 4 dígitos con expiración a 90 días."""
+    try:
+        data = json.loads(request.body) if request.body else request.POST
+        nuevo_pin = str(data.get('nuevo_pin', '')).strip()
+        confirmar_pin = str(data.get('confirmar_pin', '')).strip()
+    except Exception:
+        nuevo_pin = str(request.POST.get('nuevo_pin', '')).strip()
+        confirmar_pin = str(request.POST.get('confirmar_pin', '')).strip()
+
+    if not nuevo_pin or len(nuevo_pin) != 4 or not nuevo_pin.isdigit():
+        return JsonResponse({'exito': False, 'mensaje': 'El PIN debe componerse de exactamente 4 números.'}, status=400)
+
+    if nuevo_pin != confirmar_pin:
+        return JsonResponse({'exito': False, 'mensaje': 'Los PINs ingresados no coinciden.'}, status=400)
+
+    perfil, _ = PerfilUsuario.objects.get_or_create(usuario=request.user, defaults={'nombre_completo': request.user.get_full_name() or request.user.username})
+    try:
+        perfil.establecer_pin(nuevo_pin)
+        return JsonResponse({
+            'exito': True,
+            'mensaje': '¡PIN de 4 dígitos configurado exitosamente! Tendrá una vigencia de 90 días (3 meses).',
+            'dias_restantes': 90
+        })
+    except Exception as e:
+        return JsonResponse({'exito': False, 'mensaje': str(e)}, status=500)
+
