@@ -437,13 +437,16 @@
     /* 2 Column Main Grid */
     .dashboard-two-cols {
       display: grid;
-      grid-template-columns: 1.6fr 1fr;
+      grid-template-columns: minmax(0, 1.6fr) minmax(360px, 1fr);
       gap: 1.75rem;
       align-items: start;
       margin-bottom: 2rem;
     }
-    @media (max-width: 1080px) {
-      .dashboard-two-cols { grid-template-columns: 1fr; }
+    .dashboard-two-cols > * {
+      min-width: 0;
+    }
+    @media (max-width: 1240px) {
+      .dashboard-two-cols { grid-template-columns: 1fr !important; }
     }
 
     .card-panel-dash {
@@ -1775,10 +1778,27 @@
                         <span>Aprobar Solicitud con Rol Confirmado</span>
                       </button>
 
-                      <button type="button" class="btn-reject-pill" onclick="confirmarRechazoSolicitud('{{ sol.id }}', '{{ sol.usuario.perfil.nombre_completo|default:sol.usuario.email|escapejs }}', 'formModalRechazar', 'inputMotivoRechazoModal')">
+                      <button type="button" class="btn-reject-pill" onclick="mostrarCajaRechazoInline('{{ sol.id }}')">
                         <i class="bi bi-x-circle-fill"></i>
                         <span>Rechazar Solicitud</span>
                       </button>
+                    </div>
+
+                    <!-- CAJA DE MOTIVO DE RECHAZO INLINE DENTRO DE LA TARJETA -->
+                    <div id="boxRechazoModal{{ sol.id }}" class="d-none mt-3 p-3 rounded-4" style="background:#FFF1F2; border:1.5px solid #FECDD3;">
+                      <label class="form-label fw-bold extra-small text-uppercase text-danger d-block mb-1.5">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i> Motivo del Rechazo (se notificará al docente por correo):
+                      </label>
+                      <textarea id="textMotivoModal{{ sol.id }}" class="form-control mb-2.5" rows="2" placeholder="Escribe aquí el motivo del rechazo para informar al solicitante..." style="border-radius: 12px; font-size: 0.88rem; border-color: #FECDD3;"></textarea>
+                      <div class="d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-sm btn-light fw-bold px-3 py-1.5" style="border-radius: 9px; font-size: 0.82rem;" onclick="ocultarCajaRechazoInline('{{ sol.id }}')">
+                          Cancelar
+                        </button>
+                        <button type="button" class="btn btn-sm fw-bold px-3 py-1.5 d-flex align-items-center gap-1.5" style="border-radius: 9px; font-size: 0.82rem; background: #DC2626; color: #FFFFFF; border: none;" onclick="ejecutarRechazoInline('{{ sol.id }}')">
+                          <i class="bi bi-x-circle-fill"></i>
+                          <span>Confirmar Rechazo y Enviar Correo</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </form>
@@ -1824,56 +1844,55 @@
       }
     });
 
-    function confirmarRechazoSolicitud(solId, nombre, formPrefix, inputPrefix) {
-      if (typeof Swal === 'undefined') {
-        const motivo = prompt('¿Estás seguro de rechazar la solicitud de ' + nombre + '?\n\nIngresa el motivo del rechazo para notificar por correo:');
-        if (motivo !== null) {
-          const form = document.getElementById(formPrefix + solId);
-          const input = document.getElementById(inputPrefix + solId);
-          if (form && input) {
-            input.value = motivo.trim() || 'No se especificó un motivo.';
-            form.submit();
-          }
+    function mostrarCajaRechazoInline(solId) {
+      const box = document.getElementById('boxRechazoModal' + solId);
+      if (box) {
+        box.classList.remove('d-none');
+        const textarea = document.getElementById('textMotivoModal' + solId);
+        if (textarea) {
+          textarea.focus();
         }
+      }
+    }
+
+    function ocultarCajaRechazoInline(solId) {
+      const box = document.getElementById('boxRechazoModal' + solId);
+      if (box) box.classList.add('d-none');
+    }
+
+    function ejecutarRechazoInline(solId) {
+      const textarea = document.getElementById('textMotivoModal' + solId);
+      const motivo = textarea ? textarea.value.trim() : '';
+
+      if (!motivo) {
+        alert('Por favor escribe el motivo del rechazo para informar al solicitante por correo.');
+        if (textarea) textarea.focus();
         return;
       }
 
-      Swal.fire({
-        title: '¿Estás seguro de rechazar la solicitud?',
-        html: `
-          <p class="text-muted small mb-3">La solicitud de <strong>${nombre}</strong> será rechazada y se le enviará una notificación por correo electrónico con el motivo indicado.</p>
-          <div class="text-start">
-            <label class="form-label fw-bold extra-small text-uppercase text-dark mb-1 d-block">
-              Motivo del rechazo (se enviará al docente por correo):
-            </label>
-            <textarea id="swalMotivoRechazo" class="form-control" rows="3" placeholder="Ej: No se encuentra en la nómina de docentes contratados para este semestre." style="border-radius: 12px; font-size: 0.88rem;"></textarea>
-          </div>
-        `,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#DC2626',
-        cancelButtonColor: '#64748B',
-        confirmButtonText: '<i class="bi bi-x-circle-fill me-1"></i> Sí, Rechazar Solicitud',
-        cancelButtonText: 'Cancelar',
-        focusCancel: true,
-        preConfirm: () => {
-          const motivo = document.getElementById('swalMotivoRechazo').value.trim();
-          if (!motivo) {
-            Swal.showValidationMessage('Por favor escribe el motivo del rechazo para informar al docente.');
-            return false;
-          }
-          return motivo;
-        }
-      }).then((result) => {
-        if (result.isConfirmed) {
-          const form = document.getElementById(formPrefix + solId);
-          const input = document.getElementById(inputPrefix + solId);
-          if (form && input) {
-            input.value = result.value;
-            form.submit();
-          }
-        }
-      });
+      if (!confirm('¿Confirmas que deseas rechazar esta solicitud y notificar el motivo por correo electrónico?')) {
+        return;
+      }
+
+      const form = document.getElementById('formModalRechazar' + solId);
+      const input = document.getElementById('inputMotivoRechazoModal' + solId);
+      if (form && input) {
+        input.value = motivo;
+        form.submit();
+      }
+    }
+
+    function confirmarRechazoSolicitud(solId, nombre, formPrefix, inputPrefix) {
+      const motivo = prompt('¿Estás seguro de rechazar la solicitud de ' + nombre + '?\n\nIngresa el motivo del rechazo para notificar por correo:');
+      if (motivo === null) return; // Cancelado
+
+      const motivoLimpio = motivo.trim() || 'No se especificó un motivo adicional.';
+      const form = document.getElementById(formPrefix + solId);
+      const input = document.getElementById(inputPrefix + solId);
+      if (form && input) {
+        input.value = motivoLimpio;
+        form.submit();
+      }
     }
   </script>
   {% endif %}
