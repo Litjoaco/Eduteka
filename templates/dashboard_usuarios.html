@@ -71,18 +71,25 @@
     }
 
     /* Topbar search & buttons */
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
     .topbar-search-box {
       background: #F1F5F9;
       border: 1px solid #E2E8F0;
       border-radius: 12px;
-      padding: 0.45rem 0.95rem;
+      padding: 0.48rem 1rem;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      width: 260px;
+      gap: 0.6rem;
+      width: 250px;
       font-size: 0.82rem;
       color: var(--gray-text);
       transition: all 0.2s ease;
+      margin-right: 0.4rem;
     }
     .topbar-search-box:focus-within {
       background: #FFFFFF;
@@ -432,6 +439,7 @@
       display: grid;
       grid-template-columns: 1.6fr 1fr;
       gap: 1.75rem;
+      align-items: start;
       margin-bottom: 2rem;
     }
     @media (max-width: 1080px) {
@@ -748,7 +756,7 @@
         </div>
       </div>
 
-      <div class="topbar-right d-flex align-items-center gap-2.5">
+      <div class="topbar-right">
         <!-- Quick Search Simulated Box -->
         <div class="topbar-search-box d-none d-md-flex">
           <i class="bi bi-search"></i>
@@ -1642,9 +1650,6 @@
     });
     document.querySelectorAll('.bar-pct[data-pct]').forEach(function(el) {
       el.style.width = (parseFloat(el.getAttribute('data-pct')) || 0) + '%';
-    });
-  }
-</script>= (parseFloat(el.getAttribute('data-pct')) || 0) + '%';
     });
   }
 </script>
