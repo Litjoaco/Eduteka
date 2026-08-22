@@ -1107,18 +1107,18 @@
                       <tr>
                         <td>
                           <div class="d-flex align-items-center gap-2.5">
-                            <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold text-dark shadow-sm flex-shrink-0" style="width:36px; height:36px; background:#F1F5F9; font-size:0.85rem;">
-                              {{ item.estudiante.nombres|slice:":1" }}{{ item.estudiante.apellidos|slice:":1" }}
+                            <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm flex-shrink-0" style="width:36px; height:36px; background:#EDE9FE; color:#7C5CFC; font-size:0.85rem;">
+                              {{ item.estudiante.nombre_completo|slice:":2"|upper }}
                             </div>
                             <div>
-                              <div class="fw-bold text-dark">{{ item.estudiante.apellidos }}, {{ item.estudiante.nombres }}</div>
+                              <div class="fw-bold text-dark">{{ item.estudiante.nombre_completo }}</div>
                               {% if item.estudiante.es_pie %}
                                 <span class="badge px-1.5 py-0 fw-bold" style="background:#F0EDFF; color:#7C5CFC; font-size:0.65rem; border-radius:4px;">🧩 PIE</span>
                               {% endif %}
                             </div>
                           </div>
                         </td>
-                        <td><span class="badge bg-light text-dark border fw-bold">{{ item.estudiante.curso.nombre }}</span></td>
+                        <td><span class="badge bg-light text-dark border fw-bold">{{ item.estudiante.seccion.nombre|default:'Sin Sección' }}</span></td>
                         <td>
                           <div class="d-flex align-items-center gap-2">
                             <div class="progress flex-grow-1" style="height: 6px; width: 70px; border-radius: 10px; background: #F1F5F9;">
@@ -1371,7 +1371,7 @@
               {% for an in ultimas_anotaciones %}
                 <div class="note-card-dash">
                   <div class="d-flex justify-content-between align-items-center mb-1">
-                    <span class="fw-bold text-dark small">{{ an.estudiante.apellidos }}, {{ an.estudiante.nombres }}</span>
+                    <span class="fw-bold text-dark small">{{ an.estudiante.nombre_completo }}</span>
                     <span class="badge {% if an.tipo == 'positiva' %}bg-success-subtle text-success{% else %}bg-danger-subtle text-danger{% endif %} fw-bold" style="font-size:0.7rem; border-radius:20px;">
                       {{ an.get_tipo_display|default:an.tipo|title }}
                     </span>
