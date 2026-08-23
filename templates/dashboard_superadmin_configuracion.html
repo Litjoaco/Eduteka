@@ -207,24 +207,7 @@
     <main class="main-content">
 
         <!-- TOPBAR -->
-        <header class="topbar">
-            <div class="d-flex align-items-center gap-2">
-                <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn"
-                    style="border:none;background:var(--primary-soft);color:var(--primary);">
-                    <i class="bi bi-list fs-5"></i>
-                </button>
-            </div>
-            <div class="topbar-right">
-                <button style="background:none;border:none;color:var(--gray-text);font-size:1.1rem;position:relative;cursor:pointer;">
-                    <i class="bi bi-bell"></i>
-                    <span style="position:absolute;top:0;right:0;width:7px;height:7px;background:#F76F7A;border-radius:50%;border:2px solid white;"></span>
-                </button>
-                <div class="user-profile">
-                    <div class="user-avatar">AE</div>
-                    <span class="user-name">Admin Eduteka</span>
-                </div>
-            </div>
-        </header>
+        {% include '_topbar_superadmin.html' %}
 
         <div class="content-area">
 

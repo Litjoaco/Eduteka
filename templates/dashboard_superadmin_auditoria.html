@@ -240,21 +240,7 @@
     <main class="main-content flex-grow-1 min-vw-0">
 
         <!-- TOPBAR -->
-        <header class="topbar">
-            <div></div>
-
-            <div class="topbar-right">
-                <div class="hidden md:flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    Sistema Auditado 24/7
-                </div>
-
-                <div class="user-profile">
-                    <div class="user-avatar">SA</div>
-                    <span class="user-name">Super Admin</span>
-                </div>
-            </div>
-        </header>
+        {% include '_topbar_superadmin.html' with topbar_badge='Sistema Auditado 24/7' %}
 
         <!-- CONTENT AREA -->
         <div class="content-area space-y-6">

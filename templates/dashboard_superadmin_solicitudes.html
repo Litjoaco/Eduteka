@@ -253,20 +253,7 @@
     <main class="main-content flex-grow-1 min-vw-0">
 
         <!-- TOPBAR -->
-        <header class="topbar">
-            <div class="d-flex align-items-center gap-2">
-                <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn"
-                    style="border:none;background:var(--primary-soft);color:var(--primary);">
-                    <i class="bi bi-list fs-5"></i>
-                </button>
-            </div>
-            <div class="topbar-right">
-                <div class="user-profile">
-                    <div class="user-avatar">SA</div>
-                    <span class="user-name">Super Admin</span>
-                </div>
-            </div>
-        </header>
+        {% include '_topbar_superadmin.html' %}
 
         <div class="content-area">
 

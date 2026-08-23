@@ -249,24 +249,7 @@
     <main class="main-content" style="flex:1; overflow-y:auto;">
 
         <!-- Topbar -->
-        <header class="topbar">
-            <div class="d-flex align-items-center gap-2">
-                <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn"
-                    style="border:none; background:var(--primary-soft); color:var(--primary);">
-                    <i class="bi bi-list fs-5"></i>
-                </button>
-            </div>
-            <div class="topbar-right">
-                <div class="notif-bell">
-                    <i class="bi bi-bell"></i>
-                    <span class="notif-badge">{{ solicitudes_pendientes|default:"0" }}</span>
-                </div>
-                <div class="user-profile">
-                    <div class="user-avatar">AE</div>
-                    <span class="user-name">Admin Eduteka</span>
-                </div>
-            </div>
-        </header>
+        {% include '_topbar_superadmin.html' %}
 
         <div class="content-area">
 

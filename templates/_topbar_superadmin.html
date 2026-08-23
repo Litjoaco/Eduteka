@@ -1,0 +1,24 @@
+<!-- TOPBAR SUPER ADMIN GLOBAL (Componente Modular Reutilizable) -->
+<header class="topbar">
+    <div class="d-flex align-items-center gap-2">
+        <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn"
+            style="border:none; background:var(--primary-soft); color:var(--primary);"
+            title="Abrir menú de navegación">
+            <i class="bi bi-list fs-5"></i>
+        </button>
+        {% if topbar_badge %}
+            <div class="d-none d-md-flex align-items-center gap-2 text-xs font-semibold px-3 py-1 rounded-pill"
+                 style="background:var(--primary-soft); color:var(--primary); font-size:0.75rem; font-weight:700;">
+                <span class="spinner-grow spinner-grow-sm text-primary" style="width:7px;height:7px;" role="status"></span>
+                {{ topbar_badge }}
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="topbar-right">
+        <div class="user-profile">
+            <div class="user-avatar">SA</div>
+            <span class="user-name">Super Admin</span>
+        </div>
+    </div>
+</header>

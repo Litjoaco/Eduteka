@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 from django.contrib import messages
 from django.db.models import Sum, Count, Q
 from solicitudes.models import SolicitudAcceso, MiembroColegio
@@ -28,58 +29,58 @@ def dashboard_view(request):
 
 
 @login_required
+@require_POST
 def aprobar_solicitud(request, solicitud_id):
-    if request.method == 'POST':
-        solicitud = get_object_or_404(SolicitudAcceso, id=solicitud_id)
-        if request.user == solicitud.colegio.administrador or MiembroColegio.objects.filter(usuario=request.user, colegio=solicitud.colegio, rol__nombre__in=['Administrador', 'Director'], activo=True).exists():
-            rol_id = request.POST.get('rol_id')
-            rol_nombre = request.POST.get('rol_asignado')
-            
-            rol_obj = None
-            if rol_id:
-                rol_obj = RolColegio.objects.filter(colegio=solicitud.colegio, id=rol_id).first()
-            elif rol_nombre:
-                rol_obj = RolColegio.objects.filter(colegio=solicitud.colegio, nombre__iexact=rol_nombre).first()
-                if not rol_obj:
-                    rol_obj = RolColegio.objects.filter(nombre__iexact=rol_nombre).first()
-            
+    solicitud = get_object_or_404(SolicitudAcceso, id=solicitud_id)
+    if request.user == solicitud.colegio.administrador or MiembroColegio.objects.filter(usuario=request.user, colegio=solicitud.colegio, rol__nombre__in=['Administrador', 'Director'], activo=True).exists():
+        rol_id = request.POST.get('rol_id')
+        rol_nombre = request.POST.get('rol_asignado')
+        
+        rol_obj = None
+        if rol_id:
+            rol_obj = RolColegio.objects.filter(colegio=solicitud.colegio, id=rol_id).first()
+        elif rol_nombre:
+            rol_obj = RolColegio.objects.filter(colegio=solicitud.colegio, nombre__iexact=rol_nombre).first()
             if not rol_obj:
-                rol_obj = RolColegio.objects.filter(colegio=solicitud.colegio, nombre__iexact=solicitud.rol_solicitado).first()
-            
-            if not rol_obj:
-                rol_obj = RolColegio.objects.filter(colegio=solicitud.colegio, activo=True).exclude(nombre='Administrador').first()
+                rol_obj = RolColegio.objects.filter(nombre__iexact=rol_nombre).first()
+        
+        if not rol_obj:
+            rol_obj = RolColegio.objects.filter(colegio=solicitud.colegio, nombre__iexact=solicitud.rol_solicitado).first()
+        
+        if not rol_obj:
+            rol_obj = RolColegio.objects.filter(colegio=solicitud.colegio, activo=True).exclude(nombre='Administrador').first()
 
-            solicitud.estado = 'aprobada'
-            if rol_obj:
-                solicitud.rol_solicitado = rol_obj.nombre.lower()
-            solicitud.save()
+        solicitud.estado = 'aprobada'
+        if rol_obj:
+            solicitud.rol_solicitado = rol_obj.nombre.lower()
+        solicitud.save()
 
-            miembro, created = MiembroColegio.objects.update_or_create(
-                usuario=solicitud.usuario,
-                colegio=solicitud.colegio,
-                defaults={'rol': rol_obj, 'activo': True}
-            )
-            
-            nombre_u = getattr(solicitud.usuario, 'perfil', None)
-            nombre_str = nombre_u.nombre_completo if nombre_u else (solicitud.usuario.get_full_name() or solicitud.usuario.email)
-            rol_str = rol_obj.nombre if rol_obj else 'Miembro'
-            messages.success(request, f"¡Solicitud aprobada! Se asignó el rol '{rol_str}' a {nombre_str}.")
-        else:
-            messages.error(request, "No tienes permiso para aprobar esta solicitud.")
+        miembro, created = MiembroColegio.objects.update_or_create(
+            usuario=solicitud.usuario,
+            colegio=solicitud.colegio,
+            defaults={'rol': rol_obj, 'activo': True}
+        )
+        
+        nombre_u = getattr(solicitud.usuario, 'perfil', None)
+        nombre_str = nombre_u.nombre_completo if nombre_u else (solicitud.usuario.get_full_name() or solicitud.usuario.email)
+        rol_str = rol_obj.nombre if rol_obj else 'Miembro'
+        messages.success(request, f"¡Solicitud aprobada! Se asignó el rol '{rol_str}' a {nombre_str}.")
+    else:
+        messages.error(request, "No tienes permiso para aprobar esta solicitud.")
     return redirect('dashboard_usuario')
 
 @login_required
+@require_POST
 def rechazar_solicitud(request, solicitud_id):
-    if request.method == 'POST':
-        solicitud = get_object_or_404(SolicitudAcceso, id=solicitud_id)
-        if request.user == solicitud.colegio.administrador or MiembroColegio.objects.filter(usuario=request.user, colegio=solicitud.colegio, rol__nombre__in=['Administrador', 'Director'], activo=True).exists():
-            solicitud.estado = 'rechazada'
-            solicitud.save()
-            nombre_u = getattr(solicitud.usuario, 'perfil', None)
-            nombre_str = nombre_u.nombre_completo if nombre_u else (solicitud.usuario.get_full_name() or solicitud.usuario.email)
-            messages.success(request, f"La solicitud de {nombre_str} fue rechazada.")
-        else:
-            messages.error(request, "No tienes permiso para rechazar esta solicitud.")
+    solicitud = get_object_or_404(SolicitudAcceso, id=solicitud_id)
+    if request.user == solicitud.colegio.administrador or MiembroColegio.objects.filter(usuario=request.user, colegio=solicitud.colegio, rol__nombre__in=['Administrador', 'Director'], activo=True).exists():
+        solicitud.estado = 'rechazada'
+        solicitud.save()
+        nombre_u = getattr(solicitud.usuario, 'perfil', None)
+        nombre_str = nombre_u.nombre_completo if nombre_u else (solicitud.usuario.get_full_name() or solicitud.usuario.email)
+        messages.success(request, f"La solicitud de {nombre_str} fue rechazada.")
+    else:
+        messages.error(request, "No tienes permiso para rechazar esta solicitud.")
     return redirect('dashboard_usuario')
 
 # ── Decorador de Seguridad para Vistas de Super Administrador ────────────────
@@ -543,13 +544,16 @@ def dashboard_superadmin_facturacion_view(request):
         fecha_emision__gte=inicio_mes, estado_pago='pagado'
     ).aggregate(Sum('monto_total'))['monto_total__sum'] or Decimal('0.0')
 
-    # MRR Proyectado desde Suscripciones
-    mrr_val = Decimal('0.0')
-    for s in Suscripcion.objects.filter(estado='activa').select_related('plan'):
-        if s.tipo_facturacion == 'anual':
-            mrr_val += (s.monto or (s.plan.precio_anual if s.plan else 0)) / Decimal('12')
-        else:
-            mrr_val += s.monto or (s.plan.precio_mensual if s.plan else 0)
+    # MRR Proyectado desde Suscripciones (Cálculo directo en SQL con aggregate)
+    mrr_mensual = Suscripcion.objects.filter(
+        estado='activa', tipo_facturacion='mensual'
+    ).aggregate(total=Sum('monto'))['total'] or Decimal('0.0')
+
+    mrr_anual = Suscripcion.objects.filter(
+        estado='activa', tipo_facturacion='anual'
+    ).aggregate(total=Sum('monto'))['total'] or Decimal('0.0')
+
+    mrr_val = Decimal(str(mrr_mensual)) + (Decimal(str(mrr_anual)) / Decimal('12'))
 
     # Facturas Vencidas
     vencidas_qs = todos_qs.filter(estado_pago='vencido')
@@ -646,12 +650,12 @@ def superadmin_descargar_factura_xml_view(request, factura_id):
 
 
 @superadmin_required
+@require_POST
 def superadmin_reenviar_factura_sii_view(request, factura_id):
     """Reenvía la factura electrónica al web service del SII."""
-    if request.method == 'POST':
-        from colegios.models import FacturaGasto
-        factura = get_object_or_404(FacturaGasto, id=factura_id)
-        messages.success(request, f'✅ Documento DTE #{factura.folio} de "{factura.colegio.nombre}" reenviado exitosamente al SII.')
+    from colegios.models import FacturaGasto
+    factura = get_object_or_404(FacturaGasto, id=factura_id)
+    messages.success(request, f'✅ Documento DTE #{factura.folio} de "{factura.colegio.nombre}" reenviado exitosamente al SII.')
     return redirect('dashboard_superadmin_facturacion')
 
 
@@ -849,14 +853,14 @@ def dashboard_superadmin_ordenes_view(request):
 
 
 @superadmin_required
+@require_POST
 def superadmin_aprobar_orden_view(request, orden_id):
     """Marca una orden de compra o factura como pagada / aprobada."""
-    if request.method == 'POST':
-        from colegios.models import FacturaGasto
-        orden = get_object_or_404(FacturaGasto, id=orden_id)
-        orden.estado_pago = 'pagado'
-        orden.save()
-        messages.success(request, f'✅ La orden {orden.folio} de "{orden.colegio.nombre}" ha sido marcada como PAGADA.')
+    from colegios.models import FacturaGasto
+    orden = get_object_or_404(FacturaGasto, id=orden_id)
+    orden.estado_pago = 'pagado'
+    orden.save()
+    messages.success(request, f'✅ La orden {orden.folio} de "{orden.colegio.nombre}" ha sido marcada como PAGADA.')
     return redirect('dashboard_superadmin_ordenes')
 
 
@@ -1195,14 +1199,14 @@ def dashboard_superadmin_roles_view(request):
 
 
 @superadmin_required
+@require_POST
 def superadmin_eliminar_rol_view(request, rol_id):
     """Elimina un rol del sistema."""
-    if request.method == 'POST':
-        from colegios.models import RolColegio
-        rol_obj = get_object_or_404(RolColegio, id=rol_id)
-        nombre_del = rol_obj.nombre
-        rol_obj.delete()
-        messages.success(request, f'🗑️ Rol "{nombre_del}" eliminado exitosamente.')
+    from colegios.models import RolColegio
+    rol_obj = get_object_or_404(RolColegio, id=rol_id)
+    nombre_del = rol_obj.nombre
+    rol_obj.delete()
+    messages.success(request, f'🗑️ Rol "{nombre_del}" eliminado exitosamente.')
     return redirect('dashboard_superadmin_roles')
 
 
@@ -1227,7 +1231,7 @@ def dashboard_superadmin_usuarios_view(request):
             colegio_id = request.POST.get('colegio_id')
             rol_nombre = request.POST.get('rol_nombre', 'Profesor').strip()
             estado_val = request.POST.get('estado', 'Activo')
-            password = request.POST.get('password', '').strip() or 'Eduteka2026!'
+            password = request.POST.get('password', '').strip() or User.objects.make_random_password()
 
             if not email:
                 messages.error(request, 'El correo institucional es obligatorio.')
@@ -1475,41 +1479,41 @@ def dashboard_superadmin_usuarios_view(request):
 
 
 @superadmin_required
+@require_POST
 def superadmin_aprobar_solicitud(request, solicitud_id):
     """Acción directa para aprobar una solicitud de nuevo colegio desde el Super Admin."""
-    if request.method == 'POST':
-        from dashboard.models import SolicitudNuevoColegio
-        solicitud = get_object_or_404(SolicitudNuevoColegio, id=solicitud_id)
-        if solicitud.estado == 'pendiente':
-            colegio = solicitud.aprobar_y_crear_colegio()
-            messages.success(
-                request,
-                f'✅ Solicitud de "{solicitud.nombre_colegio}" aprobada. '
-                f'Colegio creado y listo para configuración (ID #{colegio.id}).'
-            )
-        else:
-            messages.info(request, f'La solicitud ya se encuentra en estado {solicitud.get_estado_display()}.')
+    from dashboard.models import SolicitudNuevoColegio
+    solicitud = get_object_or_404(SolicitudNuevoColegio, id=solicitud_id)
+    if solicitud.estado == 'pendiente':
+        colegio = solicitud.aprobar_y_crear_colegio()
+        messages.success(
+            request,
+            f'✅ Solicitud de "{solicitud.nombre_colegio}" aprobada. '
+            f'Colegio creado y listo para configuración (ID #{colegio.id}).'
+        )
+    else:
+        messages.info(request, f'La solicitud ya se encuentra en estado {solicitud.get_estado_display()}.')
     return redirect('dashboard_superadmin_solicitudes')
 
 
 @superadmin_required
+@require_POST
 def superadmin_rechazar_solicitud(request, solicitud_id):
     """Acción directa para rechazar una solicitud de nuevo colegio desde el Super Admin."""
-    if request.method == 'POST':
-        from dashboard.models import SolicitudNuevoColegio
-        solicitud = get_object_or_404(SolicitudNuevoColegio, id=solicitud_id)
-        motivo = request.POST.get('motivo', '').strip()
-        if solicitud.estado == 'pendiente':
-            solicitud.estado = 'rechazada'
-            if motivo:
-                solicitud.notas_admin = motivo
-            solicitud.save()
-            messages.warning(
-                request,
-                f'❌ Solicitud de "{solicitud.nombre_colegio}" rechazada.'
-            )
-        else:
-            messages.info(request, f'La solicitud ya se encuentra en estado {solicitud.get_estado_display()}.')
+    from dashboard.models import SolicitudNuevoColegio
+    solicitud = get_object_or_404(SolicitudNuevoColegio, id=solicitud_id)
+    motivo = request.POST.get('motivo', '').strip()
+    if solicitud.estado == 'pendiente':
+        solicitud.estado = 'rechazada'
+        if motivo:
+            solicitud.notas_admin = motivo
+        solicitud.save()
+        messages.warning(
+            request,
+            f'❌ Solicitud de "{solicitud.nombre_colegio}" rechazada.'
+        )
+    else:
+        messages.info(request, f'La solicitud ya se encuentra en estado {solicitud.get_estado_display()}.')
     return redirect('dashboard_superadmin_solicitudes')
 
 
@@ -2134,40 +2138,44 @@ def dashboard_superadmin_academico_view(request):
     except Exception:
         anotaciones_total = 0
 
-    # 2. GRÁFICO 1: Tendencia de Asistencia Global (Line Chart - Mes a Mes)
+    # 2. GRÁFICO 1: Tendencia de Asistencia Global (Line Chart - Mes a Mes, Consulta Única Agrupada)
     meses_labels = ['Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
-    asistencia_valores = []
-    detalles_qs = DetalleAsistencia.objects.select_related('registro')
+    
+    # 1 sola query agrupada por mes escolar (marzo a diciembre: 3 a 12)
+    asistencia_meses_qs = DetalleAsistencia.objects.filter(
+        registro__fecha__month__gte=3,
+        registro__fecha__month__lte=12
+    ).values('registro__fecha__month').annotate(
+        total=Count('id'),
+        presentes=Count('id', filter=Q(estado='presente'))
+    )
 
-    if detalles_qs.exists():
-        for i in range(3, 13):
-            detalles_mes = detalles_qs.filter(registro__fecha__month=i)
-            tot = detalles_mes.count()
-            if tot > 0:
-                pres = detalles_mes.filter(estado='presente').count()
-                asistencia_valores.append(round((pres / tot) * 100, 1))
-            else:
-                asistencia_valores.append(0.0)
-    else:
-        asistencia_valores = [0.0] * len(meses_labels)
+    stats_dict = {
+        item['registro__fecha__month']: round((item['presentes'] / item['total']) * 100, 1) if item['total'] > 0 else 0.0
+        for item in asistencia_meses_qs
+    }
+    asistencia_valores = [stats_dict.get(m, 0.0) for m in range(3, 13)]
 
     asistencia_data_json = json.dumps({
         'labels': meses_labels,
         'data': asistencia_valores
     })
 
-    # 3. GRÁFICO 2: Distribución de Calificaciones (Bar Chart - Rangos de notas en Chile 1.0-7.0)
+    # 3. GRÁFICO 2: Distribución de Calificaciones (Bar Chart - 1 Sola Consulta Agregada en BD)
     rangos_labels = ['1.0 - 3.9', '4.0 - 4.9', '5.0 - 5.9', '6.0 - 7.0']
-    notas_qs = Nota.objects.all()
-
-    if notas_qs.exists():
-        rango1 = notas_qs.filter(valor__gte=1.0, valor__lt=4.0).count()
-        rango2 = notas_qs.filter(valor__gte=4.0, valor__lt=5.0).count()
-        rango3 = notas_qs.filter(valor__gte=5.0, valor__lt=6.0).count()
-        rango4 = notas_qs.filter(valor__gte=6.0, valor__lte=7.0).count()
-        calificaciones_valores = [rango1, rango2, rango3, rango4]
-    else:
-        calificaciones_valores = [0, 0, 0, 0]
+    
+    conteos_notas = Nota.objects.aggregate(
+        rango1=Count('id', filter=Q(valor__gte=1.0, valor__lt=4.0)),
+        rango2=Count('id', filter=Q(valor__gte=4.0, valor__lt=5.0)),
+        rango3=Count('id', filter=Q(valor__gte=5.0, valor__lt=6.0)),
+        rango4=Count('id', filter=Q(valor__gte=6.0, valor__lte=7.0)),
+    )
+    calificaciones_valores = [
+        conteos_notas['rango1'] or 0,
+        conteos_notas['rango2'] or 0,
+        conteos_notas['rango3'] or 0,
+        conteos_notas['rango4'] or 0,
+    ]
 
     calificaciones_data_json = json.dumps({
         'labels': rangos_labels,
