@@ -150,6 +150,7 @@
             border: 1px solid var(--border); padding: 1.25rem 1.35rem;
             display: flex; align-items: center; justify-content: space-between; gap: 1rem;
             transition: transform .2s, box-shadow .2s;
+            height: 100%;
         }
         .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.04); }
         .stat-icon {
@@ -236,24 +237,16 @@
 <div class="wrapper">
     {% include '_sidebar_superadmin.html' with active_page='auditoria' %}
 
-    <main class="main-content">
+    <main class="main-content flex-grow-1 min-vw-0">
 
         <!-- TOPBAR -->
         <header class="topbar">
-            <div class="search-bar">
-                <i class="bi bi-search"></i>
-                <input type="text" id="topbarSearch" placeholder="Buscar registros, IPs, usuarios...">
-            </div>
+            <div></div>
 
             <div class="topbar-right">
                 <div class="hidden md:flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
                     <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                     Sistema Auditado 24/7
-                </div>
-
-                <div class="relative cursor-pointer">
-                    <i class="bi bi-bell fs-5 text-slate-600"></i>
-                    <span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white rounded-full text-[10px] flex items-center justify-center font-bold">3</span>
                 </div>
 
                 <div class="user-profile">
@@ -275,89 +268,71 @@
                         </span>
                         Registro de Auditoría del Sistema
                     </h1>
-                    <p class="hero-subtitle">Trazabilidad y monitoreo de acciones críticas en la plataforma eduteka.</p>
+                    <p class="hero-subtitle">Trazabilidad y monitoreo de acciones y modificaciones en la plataforma Eduteka.</p>
                 </div>
                 <div class="flex items-center gap-3">
                     <button type="button" onclick="window.location.reload();" class="btn-outline-custom">
                         <i class="fa-solid fa-rotate-right"></i>
                         <span class="hidden sm:inline">Actualizar</span>
                     </button>
-
-                    <!-- Botón Exportar Log (PDF/CSV) -->
-                    <div class="relative group">
-                        <button type="button" class="btn-primary-custom" id="btnExportLog" onclick="toggleExportMenu()">
-                            <i class="fa-solid fa-file-export"></i>
-                            Exportar Log (PDF/CSV)
-                            <i class="fa-solid fa-chevron-down text-xs ms-1"></i>
-                        </button>
-                        <!-- Export Dropdown -->
-                        <div id="exportDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-50">
-                            <a href="#" onclick="alert('Exportando registro en formato CSV...'); toggleExportMenu(); return false;" class="flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition">
-                                <i class="fa-solid fa-file-csv text-emerald-600 text-sm"></i> Exportar como CSV
-                            </a>
-                            <a href="#" onclick="alert('Generando informe de auditoría en PDF...'); toggleExportMenu(); return false;" class="flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition">
-                                <i class="fa-solid fa-file-pdf text-red-500 text-sm"></i> Exportar como PDF
-                            </a>
-                        </div>
-                    </div>
                 </div>
             </div>
 
             <!-- FILA DE KPIS (4 TARJETAS) -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <!-- KPI 1: Eventos Críticos (24h) -->
+                <!-- KPI 1: Total Eventos -->
                 <div class="stat-card">
                     <div>
-                        <div class="stat-value text-red-600">14</div>
-                        <div class="stat-label">Eventos Críticos (24h)</div>
-                        <div class="mt-2 inline-flex items-center gap-1 text-[11px] font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded-md">
-                            <i class="fa-solid fa-arrow-trend-up"></i> +2 vs ayer
-                        </div>
-                    </div>
-                    <div class="stat-icon rose">
-                        <i class="fa-solid fa-triangle-exclamation"></i>
-                    </div>
-                </div>
-
-                <!-- KPI 2: Inicios de Sesión Fallidos -->
-                <div class="stat-card">
-                    <div>
-                        <div class="stat-value text-amber-600">42</div>
-                        <div class="stat-label">Inicios de Sesión Fallidos</div>
-                        <div class="mt-2 inline-flex items-center gap-1 text-[11px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md">
-                            <i class="fa-solid fa-shield-cat"></i> 3 IPs bloqueadas
-                        </div>
-                    </div>
-                    <div class="stat-icon amber">
-                        <i class="fa-solid fa-user-xmark"></i>
-                    </div>
-                </div>
-
-                <!-- KPI 3: Cambios en Suscripciones -->
-                <div class="stat-card">
-                    <div>
-                        <div class="stat-value text-brand-500">8</div>
-                        <div class="stat-label">Cambios en Suscripciones</div>
+                        <div class="stat-value text-brand-500">{{ total_logs|default:"0" }}</div>
+                        <div class="stat-label">Total de Eventos Auditados</div>
                         <div class="mt-2 inline-flex items-center gap-1 text-[11px] font-bold text-brand-700 bg-purple-50 px-2 py-0.5 rounded-md">
-                            <i class="fa-solid fa-circle-check"></i> 4 upgrades este mes
+                            <i class="fa-solid fa-database"></i> Registro continuo
                         </div>
                     </div>
                     <div class="stat-icon purple">
-                        <i class="fa-solid fa-arrows-rotate"></i>
+                        <i class="fa-solid fa-list-check"></i>
                     </div>
                 </div>
 
-                <!-- KPI 4: Alertas Activas -->
+                <!-- KPI 2: Creaciones -->
                 <div class="stat-card">
                     <div>
-                        <div class="stat-value text-emerald-600">3</div>
-                        <div class="stat-label">Alertas Activas</div>
+                        <div class="stat-value text-emerald-600">{{ creaciones_count|default:"0" }}</div>
+                        <div class="stat-label">Creaciones / Altas</div>
                         <div class="mt-2 inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">
-                            <i class="fa-solid fa-bell"></i> Requiere revisión
+                            <i class="fa-solid fa-plus-circle"></i> Nuevos registros
                         </div>
                     </div>
                     <div class="stat-icon teal">
-                        <i class="fa-solid fa-shield-virus"></i>
+                        <i class="fa-solid fa-circle-plus"></i>
+                    </div>
+                </div>
+
+                <!-- KPI 3: Modificaciones -->
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-value text-blue-600">{{ ediciones_count|default:"0" }}</div>
+                        <div class="stat-label">Ediciones / Cambios</div>
+                        <div class="mt-2 inline-flex items-center gap-1 text-[11px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md">
+                            <i class="fa-solid fa-pen-to-square"></i> Modificaciones
+                        </div>
+                    </div>
+                    <div class="stat-icon purple" style="background:rgba(59,130,246,.1);color:#2563EB;">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </div>
+                </div>
+
+                <!-- KPI 4: Eliminaciones -->
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-value text-red-600">{{ eliminaciones_count|default:"0" }}</div>
+                        <div class="stat-label">Eliminaciones / Bajas</div>
+                        <div class="mt-2 inline-flex items-center gap-1 text-[11px] font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded-md">
+                            <i class="fa-solid fa-trash"></i> Registros eliminados
+                        </div>
+                    </div>
+                    <div class="stat-icon rose">
+                        <i class="fa-solid fa-trash-can"></i>
                     </div>
                 </div>
             </div>
@@ -367,59 +342,36 @@
                 <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
                     <h3 class="font-bold text-sm text-slate-800 flex items-center gap-2">
                         <i class="fa-solid fa-filter text-brand-500"></i>
-                        Filtros de Búsqueda y Monitoreo
+                        Filtros de Búsqueda y Trazabilidad
                     </h3>
                     <button type="button" onclick="resetFilters()" class="text-xs font-semibold text-brand-500 hover:text-brand-700 flex items-center gap-1">
                         <i class="fa-solid fa-rotate-left"></i> Limpiar Filtros
                     </button>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <!-- Rango de Fechas -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Búsqueda por Usuario / Elemento -->
                     <div>
-                        <label for="filterDate" class="form-label-custom">Rango de Fechas</label>
-                        <div class="relative">
-                            <input type="date" id="filterDate" class="form-control-custom pe-3" value="2026-08-16">
-                        </div>
+                        <label for="filterUserIp" class="form-label-custom">Búsqueda Rápida</label>
+                        <input type="text" id="filterUserIp" class="form-control-custom" placeholder="Buscar por usuario, elemento, detalle...">
                     </div>
 
-                    <!-- Búsqueda por IP / Usuario -->
+                    <!-- Select Tipo Acción -->
                     <div>
-                        <label for="filterUserIp" class="form-label-custom">Búsqueda por IP / Usuario</label>
-                        <div class="relative">
-                            <input type="text" id="filterUserIp" class="form-control-custom" placeholder="Ej: 190.160.2.45 o mgonzalez@colegio.cl">
-                        </div>
+                        <label for="filterSeverity" class="form-label-custom">Tipo de Acción</label>
+                        <select id="filterSeverity" class="form-control-custom cursor-pointer" onchange="applyFilters()">
+                            <option value="">Todas las Acciones</option>
+                            <option value="Creación">Creación</option>
+                            <option value="Edición">Edición</option>
+                            <option value="Eliminación">Eliminación</option>
+                        </select>
                     </div>
 
                     <!-- Select Módulo -->
                     <div>
-                        <label for="filterModule" class="form-label-custom">Módulo del Sistema</label>
-                        <select id="filterModule" class="form-control-custom cursor-pointer">
-                            <option value="">Todos los Módulos</option>
-                            <option value="Accesos">Accesos y Autenticación</option>
-                            <option value="Facturacion">Facturación y Suscripciones</option>
-                            <option value="Academico">Académico y Notas</option>
-                            <option value="Onboarding">Onboarding de Colegios</option>
-                            <option value="Configuracion">Configuración Global</option>
-                        </select>
+                        <label for="filterModule" class="form-label-custom">Módulo / Modelo</label>
+                        <input type="text" id="filterModule" class="form-control-custom" placeholder="Filtrar por modelo o módulo..." oninput="applyFilters()">
                     </div>
-
-                    <!-- Select Nivel de Severidad -->
-                    <div>
-                        <label for="filterSeverity" class="form-label-custom">Nivel de Severidad</label>
-                        <select id="filterSeverity" class="form-control-custom cursor-pointer">
-                            <option value="">Todas las Severidades</option>
-                            <option value="Info">Info (Informativo)</option>
-                            <option value="Advertencia">Advertencia (Atención)</option>
-                            <option value="Critico">Crítico (Alerta)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="mt-4 pt-3 border-t border-slate-100 flex justify-end gap-2">
-                    <button type="button" onclick="applyFilters()" class="btn-primary-custom text-xs py-2 px-4">
-                        <i class="fa-solid fa-magnifying-glass me-1"></i> Aplicar Filtros
-                    </button>
                 </div>
             </div>
 
@@ -429,100 +381,73 @@
                     <div>
                         <h2 class="panel-title flex items-center gap-2">
                             <i class="fa-solid fa-list-check text-slate-400"></i>
-                            Registro de Eventos y Trazabilidad
+                            Registro de Eventos y Trazabilidad (Últimos 50)
                         </h2>
-                        <p class="panel-subtitle">Mostrando los eventos más recientes registrados en la plataforma.</p>
+                        <p class="panel-subtitle">Historial en tiempo real de actividad en la plataforma.</p>
                     </div>
                     <div class="flex items-center gap-2 text-xs font-semibold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
                         <i class="fa-solid fa-database text-brand-500"></i>
-                        <span>Total: <strong>1,248</strong> eventos</span>
+                        <span>Mostrando <strong>{{ logs|length }}</strong> eventos</span>
                     </div>
                 </div>
 
                 <div class="overflow-x-auto">
-                    <table class="auditoria-table">
+                    <table class="auditoria-table" id="auditoriaTable">
                         <thead>
                             <tr>
                                 <th>Fecha y Hora</th>
-                                <th>Usuario / IP</th>
-                                <th>Acción Realizada</th>
-                                <th>Módulo</th>
-                                <th>Severidad</th>
+                                <th>Usuario</th>
+                                <th>Tipo de Acción</th>
+                                <th>Módulo / Modelo</th>
+                                <th>Elemento / Detalle Afectado</th>
                                 <th class="text-end">Detalles</th>
                             </tr>
                         </thead>
                         <tbody id="logTableBody">
-
-                            <!-- FILA 1: Advertencia (Director exportando notas masivamente) -->
-                            <tr onclick="openLogModal('LOG-89421', '16/08/2026 14:32:05', 'María González (Directora)', 'mgonzalez@sanjose.cl', '190.160.2.45', 'Exportación masiva de calificaciones finales del 2º Semestre (1,250 registros de alumnos).', 'Académico', 'Advertencia', 'GET /api/v1/calificaciones/export?periodo=2026-2&school_id=104')">
+                            {% for log in logs %}
+                            <tr onclick="openLogModal('LOG-{{ log.id }}', '{{ log.action_time|date:"d/m/Y H:i:s" }}', '{{ log.user.get_full_name|default:log.user.username|escapejs }}', '{{ log.user.email|default:"Sin email registrado"|escapejs }}', '{{ log.object_repr|escapejs }}', '{{ log.change_message|default:"Acción registrada en el sistema de auditoría."|escapejs }}', '{{ log.content_type.name|capfirst|default:"Sistema"|escapejs }}', '{% if log.is_deletion %}Eliminación{% elif log.is_addition %}Creación{% else %}Edición{% endif %}', '{{ log.change_message|escapejs }}')">
                                 <td class="whitespace-nowrap font-medium text-slate-700">
-                                    <div class="font-bold text-slate-800">16/08/2026</div>
-                                    <div class="text-xs text-slate-400 font-mono">14:32:05 hrs</div>
+                                    <div class="font-bold text-slate-800">{{ log.action_time|date:"d/m/Y" }}</div>
+                                    <div class="text-xs text-slate-400 font-mono">{{ log.action_time|date:"H:i:s" }} hrs</div>
                                 </td>
                                 <td>
                                     <div class="font-bold text-slate-800 flex items-center gap-1.5">
-                                        <i class="fa-solid fa-user-tie text-purple-500 text-xs"></i>
-                                        María González
+                                        <i class="fa-solid fa-user text-purple-500 text-xs"></i>
+                                        {{ log.user.get_full_name|default:log.user.username }}
                                     </div>
-                                    <div class="text-xs text-slate-500">Colegio San José</div>
-                                    <span class="inline-block mt-1 font-mono text-[11px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded border border-slate-200">
-                                        IP: 190.160.2.45
-                                    </span>
+                                    <div class="text-xs text-slate-500 font-mono">{{ log.user.email|default:"usuario@eduteka.cl" }}</div>
                                 </td>
-                                <td class="max-w-md">
-                                    <div class="font-semibold text-slate-800">Exportación masiva de calificaciones</div>
-                                    <div class="text-xs text-slate-500 line-clamp-1">Se descargó informe completo del 2º Semestre con 1,250 registros de alumnos en PDF.</div>
+                                <td class="whitespace-nowrap">
+                                    {% if log.is_addition %}
+                                        <!-- Badge Creación: Verde -->
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-sm">
+                                            <i class="fa-solid fa-circle-plus text-emerald-600"></i> Creación
+                                        </span>
+                                    {% elif log.is_change %}
+                                        <!-- Badge Edición: Azul -->
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-300 shadow-sm">
+                                            <i class="fa-solid fa-pen-to-square text-blue-600"></i> Edición
+                                        </span>
+                                    {% elif log.is_deletion %}
+                                        <!-- Badge Eliminación: Rojo -->
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800 border border-red-300 shadow-sm">
+                                            <i class="fa-solid fa-trash text-red-600"></i> Eliminación
+                                        </span>
+                                    {% else %}
+                                        <!-- Badge Registro: Gris -->
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-300 shadow-sm">
+                                            <i class="fa-solid fa-circle-info text-slate-500"></i> Registro
+                                        </span>
+                                    {% endif %}
                                 </td>
                                 <td class="whitespace-nowrap">
                                     <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200">
-                                        <i class="fa-solid fa-graduation-cap"></i> Académico
-                                    </span>
-                                </td>
-                                <td class="whitespace-nowrap">
-                                    <!-- Badge Tailwind Advertencia: Amarillo -->
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300 shadow-sm">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
-                                        <i class="fa-solid fa-triangle-exclamation text-amber-600"></i> Advertencia
-                                    </span>
-                                </td>
-                                <td class="text-end whitespace-nowrap">
-                                    <button type="button" class="btn-outline-custom text-xs py-1 px-2.5">
-                                        <i class="fa-solid fa-eye text-brand-500"></i> Ver
-                                    </button>
-                                </td>
-                            </tr>
-
-                            <!-- FILA 2: Crítico (Intento de login fallido reiterado) -->
-                            <tr onclick="openLogModal('LOG-89420', '16/08/2026 13:15:42', 'Desconocido', 'root@eduteka.cl', '45.142.120.9', '5 intentos fallidos consecutivos de inicio de sesión en cuenta Super Admin.', 'Accesos', 'Crítico', 'POST /auth/login HTTP/1.1 - User-Agent: Mozilla/5.0 Python-Requests/2.28 (Blocked by WAF)')">
-                                <td class="whitespace-nowrap font-medium text-slate-700">
-                                    <div class="font-bold text-slate-800">16/08/2026</div>
-                                    <div class="text-xs text-slate-400 font-mono">13:15:42 hrs</div>
-                                </td>
-                                <td>
-                                    <div class="font-bold text-red-600 flex items-center gap-1.5">
-                                        <i class="fa-solid fa-user-slash text-xs"></i>
-                                        Intento No Autorizado
-                                    </div>
-                                    <div class="text-xs text-slate-500 font-mono">root@eduteka.cl</div>
-                                    <span class="inline-block mt-1 font-mono text-[11px] bg-red-50 text-red-700 px-1.5 py-0.5 rounded border border-red-200">
-                                        IP: 45.142.120.9
+                                        <i class="fa-solid fa-cube"></i> {{ log.content_type.name|capfirst|default:"General" }}
                                     </span>
                                 </td>
                                 <td class="max-w-md">
-                                    <div class="font-semibold text-slate-800">Inicios de sesión fallidos reiterados</div>
-                                    <div class="text-xs text-slate-500 line-clamp-1">5 intentos fallidos en menos de 60 segundos. IP añadida a lista negra temporal.</div>
-                                </td>
-                                <td class="whitespace-nowrap">
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
-                                        <i class="fa-solid fa-key"></i> Accesos
-                                    </span>
-                                </td>
-                                <td class="whitespace-nowrap">
-                                    <!-- Badge Tailwind Crítico: Rojo -->
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800 border border-red-300 shadow-sm">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-red-600 animate-ping"></span>
-                                        <i class="fa-solid fa-circle-exclamation text-red-600"></i> Crítico
-                                    </span>
+                                    <div class="font-semibold text-slate-800">{{ log.object_repr }}</div>
+                                    <div class="text-xs text-slate-500 line-clamp-1">{{ log.change_message|default:"Modificación registrada en el sistema." }}</div>
                                 </td>
                                 <td class="text-end whitespace-nowrap">
                                     <button type="button" class="btn-outline-custom text-xs py-1 px-2.5">
@@ -530,144 +455,21 @@
                                     </button>
                                 </td>
                             </tr>
-
-                            <!-- FILA 3: Info (Super Admin aprobando onboarding) -->
-                            <tr onclick="openLogModal('LOG-89419', '16/08/2026 11:45:10', 'Carlos Silva (Super Admin)', 'csilva@eduteka.cl', '201.238.190.12', 'Aprobación final de Onboarding e inicialización de plataforma para Colegio San Agustín.', 'Onboarding', 'Info', 'POST /superadmin/onboarding/24/approve HTTP/1.1 - Status: 200 OK')">
-                                <td class="whitespace-nowrap font-medium text-slate-700">
-                                    <div class="font-bold text-slate-800">16/08/2026</div>
-                                    <div class="text-xs text-slate-400 font-mono">11:45:10 hrs</div>
-                                </td>
-                                <td>
-                                    <div class="font-bold text-slate-800 flex items-center gap-1.5">
-                                        <i class="fa-solid fa-user-gear text-brand-500 text-xs"></i>
-                                        Carlos Silva
-                                    </div>
-                                    <div class="text-xs text-slate-500">Super Admin Eduteka</div>
-                                    <span class="inline-block mt-1 font-mono text-[11px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded border border-slate-200">
-                                        IP: 201.238.190.12
-                                    </span>
-                                </td>
-                                <td class="max-w-md">
-                                    <div class="font-semibold text-slate-800">Aprobación de Onboarding de Colegio</div>
-                                    <div class="text-xs text-slate-500 line-clamp-1">Se activó el tenant 'Colegio San Agustín', asignando plan Pro con 450 usuarios.</div>
-                                </td>
-                                <td class="whitespace-nowrap">
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                        <i class="fa-solid fa-flag"></i> Onboarding
-                                    </span>
-                                </td>
-                                <td class="whitespace-nowrap">
-                                    <!-- Badge Tailwind Info: Gris -->
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-300 shadow-sm">
-                                        <i class="fa-solid fa-circle-info text-slate-500"></i> Info
-                                    </span>
-                                </td>
-                                <td class="text-end whitespace-nowrap">
-                                    <button type="button" class="btn-outline-custom text-xs py-1 px-2.5">
-                                        <i class="fa-solid fa-eye text-brand-500"></i> Ver
-                                    </button>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5 text-slate-500">
+                                    <i class="fa-solid fa-inbox text-3xl mb-2 text-slate-300 block"></i>
+                                    No se encontraron eventos de auditoría registrados.
                                 </td>
                             </tr>
-
-                            <!-- FILA 4: Info (Cambio de suscripción en Facturación) -->
-                            <tr onclick="openLogModal('LOG-89418', '16/08/2026 09:20:18', 'Patricia Morales (Admin)', 'pmorales@santamaria.cl', '186.105.44.12', 'Actualización de Plan: Cambio de Pro Anual a Enterprise (Modificación suscripción Stripe/Transbank).', 'Facturación', 'Info', 'PUT /api/v1/subscription/upgrade HTTP/1.1 - Plan: Enterprise')">
-                                <td class="whitespace-nowrap font-medium text-slate-700">
-                                    <div class="font-bold text-slate-800">16/08/2026</div>
-                                    <div class="text-xs text-slate-400 font-mono">09:20:18 hrs</div>
-                                </td>
-                                <td>
-                                    <div class="font-bold text-slate-800 flex items-center gap-1.5">
-                                        <i class="fa-solid fa-building text-slate-500 text-xs"></i>
-                                        Patricia Morales
-                                    </div>
-                                    <div class="text-xs text-slate-500">Colegio Santa María</div>
-                                    <span class="inline-block mt-1 font-mono text-[11px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded border border-slate-200">
-                                        IP: 186.105.44.12
-                                    </span>
-                                </td>
-                                <td class="max-w-md">
-                                    <div class="font-semibold text-slate-800">Modificación de Suscripción de Plan</div>
-                                    <div class="text-xs text-slate-500 line-clamp-1">Upgrade exitoso de Plan Pro Anual a Plan Enterprise. Factura emitida #40921.</div>
-                                </td>
-                                <td class="whitespace-nowrap">
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
-                                        <i class="fa-solid fa-credit-card"></i> Facturación
-                                    </span>
-                                </td>
-                                <td class="whitespace-nowrap">
-                                    <!-- Badge Tailwind Info: Gris -->
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-300 shadow-sm">
-                                        <i class="fa-solid fa-circle-info text-slate-500"></i> Info
-                                    </span>
-                                </td>
-                                <td class="text-end whitespace-nowrap">
-                                    <button type="button" class="btn-outline-custom text-xs py-1 px-2.5">
-                                        <i class="fa-solid fa-eye text-brand-500"></i> Ver
-                                    </button>
-                                </td>
-                            </tr>
-
-                            <!-- FILA 5: Crítico (Detección de inyección SQL en WAF) -->
-                            <tr onclick="openLogModal('LOG-89417', '16/08/2026 04:05:00', 'Sistema Automático / Bot', 'bot-scanner@unknown.org', '104.28.15.89', 'Detección de inyección SQL bloqueada en endpoint /api/v1/estudiantes/search.', 'Accesos', 'Crítico', 'GET /api/v1/estudiantes/search?q=%27%20OR%201=1-- HTTP/1.1 - 403 Forbidden')">
-                                <td class="whitespace-nowrap font-medium text-slate-700">
-                                    <div class="font-bold text-slate-800">16/08/2026</div>
-                                    <div class="text-xs text-slate-400 font-mono">04:05:00 hrs</div>
-                                </td>
-                                <td>
-                                    <div class="font-bold text-red-600 flex items-center gap-1.5">
-                                        <i class="fa-solid fa-robot text-xs"></i>
-                                        WAF Security Filter
-                                    </div>
-                                    <div class="text-xs text-slate-500">Bot de Escaneo Externa</div>
-                                    <span class="inline-block mt-1 font-mono text-[11px] bg-red-50 text-red-700 px-1.5 py-0.5 rounded border border-red-200">
-                                        IP: 104.28.15.89
-                                    </span>
-                                </td>
-                                <td class="max-w-md">
-                                    <div class="font-semibold text-slate-800">Bloqueo de Intento SQL Injection</div>
-                                    <div class="text-xs text-slate-500 line-clamp-1">Filtro de seguridad neutralizó payload malicioso en parámetro de búsqueda. HTTP 403.</div>
-                                </td>
-                                <td class="whitespace-nowrap">
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
-                                        <i class="fa-solid fa-shield-virus"></i> Accesos
-                                    </span>
-                                </td>
-                                <td class="whitespace-nowrap">
-                                    <!-- Badge Tailwind Crítico: Rojo -->
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800 border border-red-300 shadow-sm">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-red-600 animate-ping"></span>
-                                        <i class="fa-solid fa-circle-exclamation text-red-600"></i> Crítico
-                                    </span>
-                                </td>
-                                <td class="text-end whitespace-nowrap">
-                                    <button type="button" class="btn-outline-custom text-xs py-1 px-2.5">
-                                        <i class="fa-solid fa-eye text-brand-500"></i> Ver
-                                    </button>
-                                </td>
-                            </tr>
-
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
 
-                <!-- PAGINACIÓN Y PIE DE TABLA -->
-                <div class="p-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-50">
-                    <div class="text-xs text-slate-500 font-medium">
-                        Mostrando <span class="font-bold text-slate-700">1 - 5</span> de <span class="font-bold text-slate-700">1,248</span> registros
-                    </div>
-                    <div class="flex items-center gap-1.5">
-                        <button type="button" class="btn-outline-custom text-xs py-1 px-2.5 disabled:opacity-50" disabled>
-                            <i class="fa-solid fa-chevron-left"></i> Anterior
-                        </button>
-                        <button type="button" class="px-3 py-1 rounded-lg text-xs font-bold bg-brand-500 text-white shadow-sm">1</button>
-                        <button type="button" class="px-3 py-1 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-200">2</button>
-                        <button type="button" class="px-3 py-1 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-200">3</button>
-                        <span class="px-1 text-xs text-slate-400">...</span>
-                        <button type="button" class="px-3 py-1 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-200">250</button>
-                        <button type="button" class="btn-outline-custom text-xs py-1 px-2.5">
-                            Siguiente <i class="fa-solid fa-chevron-right me-0 ms-1"></i>
-                        </button>
-                    </div>
+                <!-- PIE DE TABLA -->
+                <div class="p-4 border-t border-slate-200 flex items-center justify-between bg-slate-50 text-xs text-slate-500 font-medium">
+                    <span>Mostrando los <strong>{{ logs|length }}</strong> eventos más recientes</span>
                 </div>
             </div>
 
@@ -695,27 +497,27 @@
                     <span id="modalDate" class="font-bold text-slate-800"></span>
                 </div>
                 <div>
-                    <span class="text-slate-400 block font-semibold">SEVERIDAD:</span>
+                    <span class="text-slate-400 block font-semibold">TIPO DE ACCIÓN:</span>
                     <span id="modalSeverity" class="font-bold"></span>
                 </div>
                 <div>
-                    <span class="text-slate-400 block font-semibold">USUARIO / EMAIL:</span>
+                    <span class="text-slate-400 block font-semibold">USUARIO:</span>
                     <span id="modalUser" class="font-bold text-slate-800"></span>
                 </div>
                 <div>
-                    <span class="text-slate-400 block font-semibold">DIRECCIÓN IP:</span>
-                    <span id="modalIp" class="font-mono font-bold text-brand-600"></span>
+                    <span class="text-slate-400 block font-semibold">MÓDULO / MODELO:</span>
+                    <span id="modalModule" class="font-bold text-brand-600"></span>
                 </div>
             </div>
 
             <div>
-                <label class="text-xs font-bold text-slate-700 block mb-1">DESCRIPCIÓN DE LA ACCIÓN:</label>
-                <div id="modalAction" class="text-xs text-slate-800 bg-slate-50 p-3 rounded-lg border border-slate-200 leading-relaxed font-medium"></div>
+                <label class="text-xs font-bold text-slate-700 block mb-1">ELEMENTO AFECTADO:</label>
+                <div id="modalObject" class="text-xs text-slate-900 bg-slate-50 p-3 rounded-lg border border-slate-200 font-bold"></div>
             </div>
 
             <div>
-                <label class="text-xs font-bold text-slate-700 block mb-1">PAYLOAD Y TRACE TECNICO (RAW DATA):</label>
-                <pre id="modalRaw" class="text-[11px] font-mono bg-slate-900 text-emerald-400 p-3 rounded-lg overflow-x-auto max-h-36 border border-slate-800 leading-relaxed"></pre>
+                <label class="text-xs font-bold text-slate-700 block mb-1">DETALLE DEL CAMBIO / MENSAJE:</label>
+                <div id="modalAction" class="text-xs text-slate-800 bg-slate-50 p-3 rounded-lg border border-slate-200 leading-relaxed font-medium"></div>
             </div>
         </div>
 
@@ -725,51 +527,38 @@
     </div>
 </div>
 
+<!-- Scripts Bootstrap -->
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 <script>
-    function toggleExportMenu() {
-        const dropdown = document.getElementById('exportDropdown');
-        dropdown.classList.toggle('hidden');
-    }
+    document.addEventListener('DOMContentLoaded', function () {
+        // Búsqueda desde la barra superior
+        document.getElementById('topbarSearch')?.addEventListener('input', function () {
+            const query = this.value.toLowerCase();
+            document.getElementById('filterUserIp').value = query;
+            applyFilters();
+        });
 
-    document.addEventListener('click', function(e) {
-        const btn = document.getElementById('btnExportLog');
-        const dropdown = document.getElementById('exportDropdown');
-        if (btn && dropdown && !btn.contains(e.target) && !dropdown.contains(e.target)) {
-            dropdown.classList.add('hidden');
-        }
+        // Búsqueda en vivo desde el campo filterUserIp
+        document.getElementById('filterUserIp')?.addEventListener('input', applyFilters);
     });
 
-    function openLogModal(logId, date, user, email, ip, action, moduleName, severity, raw) {
+    function openLogModal(logId, date, user, email, objectRepr, action, moduleName, severity, raw) {
         document.getElementById('modalLogId').innerText = logId;
         document.getElementById('modalDate').innerText = date;
         document.getElementById('modalUser').innerText = `${user} (${email})`;
-        document.getElementById('modalIp').innerText = ip;
+        document.getElementById('modalObject').innerText = objectRepr;
         document.getElementById('modalAction').innerText = action;
+        document.getElementById('modalModule').innerText = moduleName;
         document.getElementById('modalSeverity').innerText = severity.toUpperCase();
 
         const sevElem = document.getElementById('modalSeverity');
-        if (severity === 'Crítico') {
+        if (severity === 'Eliminación') {
             sevElem.className = 'font-bold text-red-600';
-        } else if (severity === 'Advertencia') {
-            sevElem.className = 'font-bold text-amber-600';
+        } else if (severity === 'Creación') {
+            sevElem.className = 'font-bold text-emerald-600';
         } else {
-            sevElem.className = 'font-bold text-slate-600';
+            sevElem.className = 'font-bold text-blue-600';
         }
-
-        document.getElementById('modalRaw').innerText = JSON.stringify({
-            event_id: logId,
-            timestamp: date,
-            module: moduleName,
-            client_ip: ip,
-            user_principal: user,
-            email: email,
-            trace: raw,
-            headers: {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Eduteka-Audit/2.4",
-                "X-Forwarded-For": ip,
-                "X-Request-ID": "req-" + Math.floor(Math.random() * 1000000)
-            }
-        }, null, 2);
 
         document.getElementById('logDetailModal').classList.add('active');
     }
@@ -778,14 +567,16 @@
         document.getElementById('logDetailModal').classList.remove('active');
     }
 
+    document.querySelectorAll('.modal-overlay').forEach(el => {
+        el.addEventListener('click', e => { if (e.target === el) closeLogModal(); });
+    });
+
     function applyFilters() {
-        const dateVal = document.getElementById('filterDate').value;
-        const searchVal = document.getElementById('filterUserIp').value.toLowerCase().trim();
-        const modVal = document.getElementById('filterModule').value.toLowerCase();
-        const sevVal = document.getElementById('filterSeverity').value.toLowerCase();
+        const searchVal = document.getElementById('filterUserIp')?.value.toLowerCase().trim() || '';
+        const modVal = document.getElementById('filterModule')?.value.toLowerCase().trim() || '';
+        const sevVal = document.getElementById('filterSeverity')?.value.toLowerCase().trim() || '';
 
         const rows = document.querySelectorAll('#logTableBody tr');
-        let visibleCount = 0;
 
         rows.forEach(row => {
             const text = row.innerText.toLowerCase();
@@ -795,7 +586,6 @@
 
             if (matchesSearch && matchesMod && matchesSev) {
                 row.style.display = '';
-                visibleCount++;
             } else {
                 row.style.display = 'none';
             }
@@ -803,10 +593,10 @@
     }
 
     function resetFilters() {
-        document.getElementById('filterDate').value = '2026-08-16';
-        document.getElementById('filterUserIp').value = '';
-        document.getElementById('filterModule').value = '';
-        document.getElementById('filterSeverity').value = '';
+        if (document.getElementById('filterUserIp')) document.getElementById('filterUserIp').value = '';
+        if (document.getElementById('filterModule')) document.getElementById('filterModule').value = '';
+        if (document.getElementById('filterSeverity')) document.getElementById('filterSeverity').value = '';
+        if (document.getElementById('topbarSearch')) document.getElementById('topbarSearch').value = '';
 
         const rows = document.querySelectorAll('#logTableBody tr');
         rows.forEach(row => row.style.display = '');

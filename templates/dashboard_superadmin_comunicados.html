@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
     <style>
-        /* ══ DESIGN TOKENS (idénticos al resto del Super Admin) ═══════════════ */
+        /* ══ DESIGN TOKENS (Estilo Unificado Super Admin Eduteka) ═══════════════ */
         :root {
             --primary:        #7C5CFC;
             --primary-soft:   rgba(124, 92, 252, 0.08);
@@ -70,7 +70,7 @@
             padding: 0 2rem;
             position: sticky; top: 0; z-index: 98;
         }
-        .search-bar { position: relative; width: 320px; }
+        .search-bar { position: relative; width: 340px; }
         .search-bar i { position: absolute; left: .85rem; top: 50%; transform: translateY(-50%); color: var(--gray-text); }
         .search-bar input {
             width: 100%; padding: .5rem 1rem .5rem 2.4rem;
@@ -95,16 +95,16 @@
         .user-name { font-weight: 600; font-size: .88rem; color: var(--dark); }
 
         /* ── CONTENT AREA */
-        .content-area { padding: 1.75rem 2rem; max-width: 1400px; width: 100%; margin: 0 auto; }
+        .content-area { padding: 1.75rem 2rem; max-width: 1450px; width: 100%; margin: 0 auto; }
 
         /* ── HERO */
-        .hero-title { font-size: 1.45rem; font-weight: 800; color: var(--dark); letter-spacing: -.02em; }
-        .hero-subtitle { font-size: .86rem; color: var(--gray-text); margin-top: .15rem; }
+        .hero-title { font-size: 1.5rem; font-weight: 800; color: var(--dark); letter-spacing: -.02em; }
+        .hero-subtitle { font-size: .88rem; color: var(--gray-text); margin-top: .2rem; }
 
         /* ── BUTTONS */
         .btn-primary-custom {
             background: var(--primary); color: white; border: none;
-            border-radius: var(--radius-md); padding: .55rem 1.25rem;
+            border-radius: var(--radius-md); padding: .6rem 1.25rem;
             font-weight: 600; font-size: .85rem; display: inline-flex;
             align-items: center; gap: .5rem; transition: all .2s; text-decoration: none;
             box-shadow: 0 4px 12px rgba(124, 92, 252, 0.25);
@@ -115,7 +115,7 @@
         .btn-outline-custom {
             background: var(--white); color: var(--dark);
             border: 1px solid var(--border); border-radius: var(--radius-md);
-            padding: .55rem 1.1rem; font-weight: 600; font-size: .85rem;
+            padding: .6rem 1.1rem; font-weight: 600; font-size: .85rem;
             display: inline-flex; align-items: center; gap: .5rem;
             transition: all .2s; text-decoration: none; cursor: pointer;
         }
@@ -124,22 +124,23 @@
         /* ── STAT CARDS */
         .stat-card {
             background: var(--white); border-radius: var(--radius-lg);
-            border: 1px solid var(--border); padding: 1.15rem 1.35rem;
+            border: 1px solid var(--border); padding: 1.25rem 1.35rem;
             display: flex; align-items: center; gap: 1rem;
             transition: transform .2s, box-shadow .2s;
+            height: 100%;
         }
         .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.04); }
         .stat-icon {
-            width: 46px; height: 46px; border-radius: 12px;
+            width: 48px; height: 48px; border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.25rem; flex-shrink: 0;
+            font-size: 1.3rem; flex-shrink: 0;
         }
         .stat-icon.purple { background: rgba(124,92,252,.1); color: var(--primary); }
         .stat-icon.teal   { background: rgba(101,205,191,.12); color: #0D9488; }
         .stat-icon.rose   { background: rgba(239,68,68,.1); color: #EF4444; }
         .stat-icon.amber  { background: rgba(245,158,11,.1); color: #D97706; }
-        .stat-value { font-size: 1.5rem; font-weight: 800; color: var(--dark); line-height: 1.1; }
-        .stat-label { font-size: .78rem; font-weight: 600; color: var(--gray-text); margin-top: .2rem; }
+        .stat-value { font-size: 1.6rem; font-weight: 800; color: var(--dark); line-height: 1.1; }
+        .stat-label { font-size: .78rem; font-weight: 600; color: var(--gray-text); margin-top: .25rem; }
 
         /* ── PANEL CONTAINER */
         .panel {
@@ -149,12 +150,12 @@
             height: 100%;
         }
         .panel-header {
-            padding: 1.15rem 1.5rem; border-bottom: 1px solid var(--border);
+            padding: 1.2rem 1.5rem; border-bottom: 1px solid var(--border);
             display: flex; align-items: center; justify-content: space-between;
             flex-wrap: wrap; gap: .75rem; background: var(--white);
         }
-        .panel-title { font-size: 1rem; font-weight: 800; color: var(--dark); }
-        .panel-subtitle { font-size: .78rem; color: var(--gray-text); margin-top: .1rem; }
+        .panel-title { font-size: 1.05rem; font-weight: 800; color: var(--dark); }
+        .panel-subtitle { font-size: .8rem; color: var(--gray-text); margin-top: .15rem; }
 
         /* ── FORM CONTROL CUSTOM */
         .form-control-custom {
@@ -168,76 +169,72 @@
             box-shadow: 0 0 0 3px rgba(124,92,252,.12);
         }
         .form-label-custom {
-            font-size: .78rem; font-weight: 700; color: var(--dark);
-            margin-bottom: .35rem; display: block;
+            font-size: .76rem; font-weight: 700; color: var(--dark);
+            text-transform: uppercase; letter-spacing: 0.03em;
+            margin-bottom: .4rem; display: block;
         }
 
         /* ── TABLE STYLING */
         .comunicados-table { width: 100%; border-collapse: separate; border-spacing: 0; }
         .comunicados-table th {
-            background: #FAFBFF; padding: .75rem 1rem;
-            font-size: .72rem; font-weight: 700; text-transform: uppercase;
-            letter-spacing: .05em; color: var(--gray-text);
+            background: #FAFBFF; padding: .85rem 1.1rem;
+            font-size: .72rem; font-weight: 800; text-transform: uppercase;
+            letter-spacing: .06em; color: var(--gray-text);
             border-bottom: 1px solid var(--border); white-space: nowrap;
         }
         .comunicados-table td {
-            padding: .9rem 1rem; vertical-align: middle;
-            border-bottom: 1px solid rgba(188,192,207,.3); font-size: .84rem;
+            padding: 1rem 1.1rem; vertical-align: middle;
+            border-bottom: 1px solid rgba(188,192,207,.3); font-size: .85rem;
         }
         .comunicados-table tbody tr { transition: background .15s; }
         .comunicados-table tbody tr:hover { background: rgba(248,249,253,.8); }
 
-        /* ── BADGES & CHIPS */
+        /* ── BADGES */
         .badge-tipo {
             display: inline-flex; align-items: center; gap: .35rem;
-            padding: .25rem .6rem; border-radius: 20px;
-            font-size: .72rem; font-weight: 700;
+            padding: .25rem .65rem; border-radius: 999px; font-size: .72rem; font-weight: 700;
         }
-        .badge-info { background: rgba(59,130,246,.1); color: #2563EB; }
-        .badge-mantenimiento { background: rgba(245,158,11,.1); color: #D97706; }
-        .badge-urgente { background: rgba(239,68,68,.1); color: #DC2626; }
+        .badge-info { background: rgba(124,92,252,.1); color: var(--primary); border: 1px solid rgba(124,92,252,.25); }
+        .badge-mantenimiento { background: rgba(245,158,11,.12); color: #D97706; border: 1px solid rgba(245,158,11,.3); }
+        .badge-urgente { background: rgba(239,68,68,.12); color: #DC2626; border: 1px solid rgba(239,68,68,.3); }
 
         .status-badge {
-            display: inline-flex; align-items: center; gap: .35rem;
-            padding: .25rem .65rem; border-radius: 20px;
-            font-size: .73rem; font-weight: 700;
+            display: inline-flex; align-items: center; gap: .3rem;
+            padding: .2rem .6rem; border-radius: var(--radius-sm); font-size: .72rem; font-weight: 700;
         }
-        .status-enviado    { background: rgba(16,185,129,.1); color: #059669; }
-        .status-programado { background: rgba(245,158,11,.1); color: #D97706; }
-        .status-borrador   { background: rgba(104,112,137,.1); color: var(--gray-text); }
+        .status-enviado   { background: #D1FAE5; color: #065F46; }
+        .status-programado { background: #FEF3C7; color: #92400E; }
+        .status-borrador  { background: #F1F5F9; color: #475569; }
 
         /* ── ACTION BUTTONS */
         .action-btn {
-            width: 30px; height: 30px; border-radius: var(--radius-sm);
-            display: inline-flex; align-items: center; justify-content: justify-center;
-            border: 1px solid var(--border); background: var(--white);
-            color: var(--gray-text); font-size: .85rem; cursor: pointer; transition: all .15s;
+            width: 32px; height: 32px;
+            display: inline-flex; align-items: center; justify-content: center;
+            border-radius: var(--radius-sm); border: 1px solid var(--border);
+            background: var(--white); color: var(--gray-text);
+            font-size: .85rem; text-decoration: none; transition: all .18s; cursor: pointer;
         }
-        .action-btn:hover { background: var(--bg); color: var(--dark); border-color: var(--primary); }
-        .action-btn.view:hover { background: var(--primary-soft); color: var(--primary); }
-        .action-btn.resend:hover { background: rgba(16,185,129,.1); color: #059669; border-color: #10B981; }
-        .action-btn.delete:hover { background: rgba(239,68,68,.1); color: #DC2626; border-color: #EF4444; }
+        .action-btn:hover { color: var(--dark); border-color: var(--dark); background: var(--bg); }
+        .action-btn.view:hover   { color: #2563EB; border-color: #93C5FD; background: #EFF6FF; }
+        .action-btn.resend:hover { color: #0D9488; border-color: #99F6E4; background: #F0FDFA; }
+        .action-btn.delete:hover { color: #DC2626; border-color: #FCA5A5; background: #FEF2F2; }
 
         /* ── MODAL OVERLAY */
         .modal-overlay {
             display: none; position: fixed; inset: 0;
-            background: rgba(21,26,53,.45); backdrop-filter: blur(4px);
+            background: rgba(21,26,53,.55); backdrop-filter: blur(5px);
             z-index: 2000; align-items: center; justify-content: center;
         }
         .modal-overlay.active { display: flex; }
         .modal-box {
             background: var(--white); border-radius: var(--radius-lg); padding: 1.75rem;
             width: 580px; max-width: calc(100vw - 2rem);
-            box-shadow: 0 24px 64px rgba(0,0,0,.15);
+            box-shadow: 0 24px 64px rgba(0,0,0,.18);
             animation: modal-in .25s ease;
         }
         @keyframes modal-in { from { opacity:0; transform:scale(.95) translateY(12px); } to { opacity:1; transform:scale(1) translateY(0); } }
-        .modal-title   { font-size: 1.1rem; font-weight: 800; color: var(--dark); margin-bottom: .25rem; }
-        .modal-subtitle { font-size: .82rem; color: var(--gray-text); margin-bottom: 1.25rem; }
-
-        @media (max-width: 991.98px) {
-            .content-area { padding: 1.25rem 1rem; }
-        }
+        .modal-title { font-size: 1.1rem; font-weight: 800; color: var(--dark); }
+        .modal-subtitle { font-size: .8rem; color: var(--gray-text); margin-top: .15rem; }
     </style>
 </head>
 <body>
@@ -245,28 +242,16 @@
 <div class="wrapper">
     {% include '_sidebar_superadmin.html' with active_page='comunicados' %}
 
-    <main class="main-content">
+    <main class="main-content flex-grow-1 min-vw-0">
 
         <!-- TOPBAR -->
         <header class="topbar">
-            <div class="d-flex align-items-center gap-2">
-                <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn"
-                    style="border:none;background:var(--primary-soft);color:var(--primary);">
-                    <i class="bi bi-list fs-5"></i>
-                </button>
-                <div class="search-bar">
-                    <i class="bi bi-search"></i>
-                    <input type="text" id="globalSearch" placeholder="Buscar comunicado por asunto...">
-                </div>
-            </div>
+            <div></div>
+
             <div class="topbar-right">
-                <button style="background:none;border:none;color:var(--gray-text);font-size:1.1rem;position:relative;cursor:pointer;">
-                    <i class="bi bi-bell"></i>
-                    <span style="position:absolute;top:0;right:0;width:7px;height:7px;background:#F76F7A;border-radius:50%;border:2px solid white;"></span>
-                </button>
                 <div class="user-profile">
-                    <div class="user-avatar">AE</div>
-                    <span class="user-name">Admin Eduteka</span>
+                    <div class="user-avatar">SA</div>
+                    <span class="user-name">Super Admin</span>
                 </div>
             </div>
         </header>
@@ -283,13 +268,13 @@
                         <h1 class="hero-title mb-0">Centro de Comunicados Global</h1>
                     </div>
                     <p class="hero-subtitle ms-1">
-                        Envío de notificaciones masivas, alertas de sistema y novedades a colegios clientes.
+                        Emisión y trazabilidad de notificaciones masivas, avisos de mantención y alertas a todos los colegios clientes.
                     </p>
                 </div>
                 <div class="d-flex gap-2 flex-wrap">
-                    <button class="btn-outline-custom" onclick="exportHistorial(event)">
+                    <a href="{% url 'dashboard_superadmin_comunicados' %}?export=csv" class="btn-outline-custom">
                         <i class="bi bi-download"></i> Exportar Historial
-                    </button>
+                    </a>
                     <button class="btn-primary-custom" onclick="openPlantillasModal()">
                         <i class="bi bi-file-earmark-text"></i> Plantillas Rápidas
                     </button>
@@ -300,9 +285,10 @@
             {% if messages %}
             <div class="mb-3">
                 {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} d-flex align-items-center gap-2" style="border-radius:var(--radius-md);font-size:.85rem;">
+                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show d-flex align-items-center gap-2 rounded-3" role="alert">
                     <i class="bi {% if 'success' in message.tags %}bi-check-circle-fill text-success{% else %}bi-info-circle-fill text-info{% endif %}"></i>
-                    {{ message }}
+                    <span>{{ message }}</span>
+                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
                 {% endfor %}
             </div>
@@ -376,8 +362,8 @@
                                 <thead>
                                     <tr>
                                         <th>Asunto / Tipo</th>
-                                        <th>Público Objetivo</th>
-                                        <th>Fecha</th>
+                                        <th>Destinatario / Alcance</th>
+                                        <th>Fecha / Remitente</th>
                                         <th>Estado</th>
                                         <th style="width:100px;text-align:center;">Acciones</th>
                                     </tr>
@@ -412,7 +398,7 @@
                                         </td>
                                         <td>
                                             <div style="font-size:.8rem;color:var(--dark);">{{ c.fecha_creacion|date:'d M Y, H:i' }}</div>
-                                            <div style="font-size:.72rem;color:var(--gray-text);">{{ c.fecha_creacion|timesince }} atrás</div>
+                                            <div style="font-size:.72rem;color:var(--gray-text);">Por Super Admin Eduteka</div>
                                         </td>
                                         <td>
                                             {% if c.estado == 'enviado' %}
@@ -434,9 +420,9 @@
                                                 <button class="action-btn view" title="Ver detalle"
                                                     onclick="openDetailModal('{{ c.asunto|escapejs }}', '{{ c.get_publico_objetivo_display|escapejs }}', '{{ c.get_tipo_alerta_display|escapejs }}', '{{ c.mensaje|escapejs }}', '{{ c.get_estado_display|escapejs }}', '{{ c.tasa_lectura }}%')"><i class="bi bi-eye"></i></button>
                                                 <button class="action-btn resend" title="Reenviar"
-                                                    onclick="submitReenviar({{ c.id }})"><i class="bi bi-arrow-repeat"></i></button>
+                                                    onclick="confirmAction('reenviar', {{ c.id }}, '{{ c.asunto|escapejs }}')"><i class="bi bi-arrow-repeat"></i></button>
                                                 <button class="action-btn delete" title="Eliminar"
-                                                    onclick="submitEliminar({{ c.id }})"><i class="bi bi-trash"></i></button>
+                                                    onclick="confirmAction('eliminar', {{ c.id }}, '{{ c.asunto|escapejs }}')"><i class="bi bi-trash"></i></button>
                                             </div>
                                         </td>
                                     </tr>
@@ -456,12 +442,8 @@
                         <!-- Footer de la tabla -->
                         <div style="padding:.85rem 1.25rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;">
                             <span style="font-size:.78rem;color:var(--gray-text);" id="tableCount">
-                                Mostrando <strong>{{ total_comunicados }}</strong> comunicado(s)
+                                Mostrando <strong>{{ comunicados|length }}</strong> comunicado(s)
                             </span>
-                            <div class="d-flex gap-1">
-                                <button class="btn-outline-custom" style="font-size:.75rem;padding:.25rem .65rem;" disabled>&laquo; Ant</button>
-                                <button class="btn-outline-custom" style="font-size:.75rem;padding:.25rem .65rem;" disabled>Sig &raquo;</button>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -556,7 +538,7 @@
                                         <i class="bi bi-paperplane-fill"></i> Publicar Comunicado
                                     </button>
                                     <button type="submit" onclick="setAction('borrador')" class="btn-outline-custom">
-                                        <i class="bi bi-bookmark-check"></i> Borrador
+                                        <i class="bi bi-bookmark-check"></i> Guardar Borrador
                                     </button>
                                 </div>
 
@@ -652,7 +634,34 @@
 </div>
 
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- ════ MODAL: CONFIRMAR ACCIÓN (REENVIAR / ELIMINAR) ═══════════════════ -->
+<div class="modal-overlay" id="modalConfirmAction">
+    <div class="modal-box" style="width:460px;text-align:center;">
+        <div id="modalConfirmIcon" style="width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
+            <i id="modalConfirmIconI" class="bi fs-3"></i>
+        </div>
+        <div class="modal-title" id="modalConfirmTitle" style="margin-bottom:.35rem;">Confirmar Acción</div>
+        <p style="font-size:.84rem;color:var(--gray-text);line-height:1.6;" id="modalConfirmText">
+            ¿Deseas continuar con esta acción?
+        </p>
+
+        <form id="actionForm" method="POST" action="{% url 'dashboard_superadmin_comunicados' %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" id="actionFormType" value="">
+            <input type="hidden" name="comunicado_id" id="actionFormId" value="">
+
+            <div class="d-flex gap-2 justify-content-center mt-3">
+                <button type="button" onclick="closeModal('modalConfirmAction')" class="btn-outline-custom">Cancelar</button>
+                <button type="submit" id="btnConfirmSubmit" class="btn-primary-custom">
+                    Confirmar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 <script>
     // ── Mobile sidebar toggle
     document.addEventListener('DOMContentLoaded', () => {
@@ -720,25 +729,35 @@
         document.getElementById('inputAction').value = act;
     }
 
-    function submitReenviar(comunicadoId) {
-        if (confirm('¿Confirmas el reenvío de este comunicado a los destinatarios?')) {
-            document.getElementById('actionFormType').value = 'reenviar';
-            document.getElementById('actionFormId').value   = comunicadoId;
-            document.getElementById('actionForm').submit();
-        }
-    }
+    function confirmAction(act, id, asunto) {
+        document.getElementById('actionFormType').value = act;
+        document.getElementById('actionFormId').value   = id;
 
-    function submitEliminar(comunicadoId) {
-        if (confirm('¿Estás seguro de eliminar este comunicado del sistema?')) {
-            document.getElementById('actionFormType').value = 'eliminar';
-            document.getElementById('actionFormId').value   = comunicadoId;
-            document.getElementById('actionForm').submit();
-        }
-    }
+        const iconDiv = document.getElementById('modalConfirmIcon');
+        const iconI   = document.getElementById('modalConfirmIconI');
+        const title   = document.getElementById('modalConfirmTitle');
+        const text    = document.getElementById('modalConfirmText');
+        const btnSub  = document.getElementById('btnConfirmSubmit');
 
-    function exportHistorial(e) {
-        e.preventDefault();
-        alert('Descargando reporte de historial de comunicados en CSV...');
+        if (act === 'eliminar') {
+            iconDiv.style.background = '#FEF2F2';
+            iconI.className = 'bi bi-trash3 text-danger';
+            title.textContent = 'Eliminar Comunicado';
+            text.innerHTML = '¿Estás seguro de eliminar el comunicado <strong>"' + asunto + '"</strong>? Esta acción no se puede deshacer.';
+            btnSub.className = 'btn-primary-custom';
+            btnSub.style.background = '#DC2626';
+            btnSub.innerHTML = '<i class="bi bi-trash"></i> Sí, eliminar';
+        } else if (act === 'reenviar') {
+            iconDiv.style.background = 'rgba(101,205,191,.15)';
+            iconI.className = 'bi bi-arrow-repeat text-teal';
+            title.textContent = 'Reenviar Comunicado';
+            text.innerHTML = '¿Confirmas reenviar el comunicado <strong>"' + asunto + '"</strong> a todos los destinatarios configurados?';
+            btnSub.className = 'btn-primary-custom';
+            btnSub.style.background = 'var(--primary)';
+            btnSub.innerHTML = '<i class="bi bi-send-fill"></i> Sí, reenviar';
+        }
+
+        openModal('modalConfirmAction');
     }
 
     // ── Filtrado de tabla en vivo
@@ -766,18 +785,11 @@
     }
 
     // Topbar search sync
-    document.getElementById('globalSearch').addEventListener('input', function () {
+    document.getElementById('globalSearch')?.addEventListener('input', function () {
         document.getElementById('tableSearch').value = this.value;
         filterTable();
     });
 </script>
-
-<!-- Hidden Form for Reenviar / Eliminar POST actions -->
-<form id="actionForm" method="POST" action="{% url 'dashboard_superadmin_comunicados' %}" style="display:none;">
-    {% csrf_token %}
-    <input type="hidden" name="action" id="actionFormType" value="">
-    <input type="hidden" name="comunicado_id" id="actionFormId" value="">
-</form>
 
 </body>
 </html>

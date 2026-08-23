@@ -297,16 +297,6 @@
                     <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn" style="border:none; background:var(--primary-soft); color:var(--primary);">
                         <i class="bi bi-list fs-5"></i>
                     </button>
-                    <form method="GET" action="{% url 'dashboard_superadmin_colegios' %}" class="search-bar d-flex align-items-center">
-                        <i class="bi bi-search"></i>
-                        <input type="text" name="q" value="{{ q }}" placeholder="Buscar colegios, RUT, email...">
-                        {% if estado_filtro and estado_filtro != 'todos' %}
-                            <input type="hidden" name="estado" value="{{ estado_filtro }}">
-                        {% endif %}
-                        {% if plan_filtro and plan_filtro != 'todos' %}
-                            <input type="hidden" name="plan" value="{{ plan_filtro }}">
-                        {% endif %}
-                    </form>
                 </div>
 
                 <div class="topbar-right">

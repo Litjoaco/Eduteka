@@ -261,19 +261,12 @@
 
         <!-- TOPBAR -->
         <header class="topbar">
-            <div class="d-flex align-items-center gap-2">
-                <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn"
-                    style="border:none;background:var(--primary-soft);color:var(--primary);">
-                    <i class="bi bi-list fs-5"></i>
-                </button>
-                <form method="GET" action="{% url 'dashboard_superadmin_usuarios' %}" class="search-bar d-flex align-items-center">
-                    <i class="bi bi-search"></i>
-                    <input type="text" name="q" id="globalSearch" value="{{ q }}" placeholder="Buscar por nombre, RUT, correo...">
-                    {% if filtro_colegio %}<input type="hidden" name="colegio" value="{{ filtro_colegio }}">{% endif %}
-                    {% if filtro_rol %}<input type="hidden" name="rol" value="{{ filtro_rol }}">{% endif %}
-                    {% if filtro_estado %}<input type="hidden" name="estado" value="{{ filtro_estado }}">{% endif %}
-                </form>
-            </div>
+                <div class="d-flex align-items-center gap-2">
+                    <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn"
+                        style="border:none;background:var(--primary-soft);color:var(--primary);">
+                        <i class="bi bi-list fs-5"></i>
+                    </button>
+                </div>
             <div class="topbar-right">
                 <div class="user-profile">
                     <div class="user-avatar">AE</div>
