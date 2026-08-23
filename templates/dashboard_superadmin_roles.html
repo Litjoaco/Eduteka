@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
     <style>
-        /* ══ DESIGN TOKENS (idénticos al resto del Super Admin) ═══════════════ */
+        /* ══ DESIGN TOKENS ═════════════════════════════════════════════════════ */
         :root {
             --primary:        #7C5CFC;
             --primary-soft:   rgba(124, 92, 252, 0.08);
@@ -108,6 +108,7 @@
             display: flex; align-items: center; gap: 1rem;
             box-shadow: 0 2px 12px rgba(0,0,0,.04);
             transition: box-shadow .2s, transform .2s;
+            height: 100%;
         }
         .stat-card:hover { box-shadow: 0 6px 24px rgba(124,92,252,.1); transform: translateY(-2px); }
         .stat-icon {
@@ -161,6 +162,8 @@
         .chip-inspector .dot { background: #7C3AED; }
         .chip-admin     { background: rgba(239,68,68,.1);   color: #DC2626; }
         .chip-admin .dot     { background: #DC2626; }
+        .chip-default   { background: rgba(100,116,139,.1); color: #475569; }
+        .chip-default .dot   { background: #475569; }
 
         /* ── PERM BADGES */
         .perm-badges { display: flex; flex-wrap: wrap; gap: .3rem; }
@@ -178,11 +181,6 @@
         .pb-exportar { background: #F0FDF4; color: #166534; }
         .pb-mensajes { background: #FFF7ED; color: #9A3412; }
         .pb-admin    { background: rgba(124,92,252,.1); color: #5B21B6; }
-        .pb-extra    {
-            background: var(--bg); color: var(--gray-text);
-            border: 1px dashed var(--border); cursor: pointer; transition: background .15s;
-        }
-        .pb-extra:hover { background: #EEF2FF; color: var(--primary); }
 
         /* ── BASE BADGE */
         .base-badge {
@@ -222,16 +220,6 @@
         }
         .btn-outline-custom:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-soft); }
 
-        /* ── TABLE SEARCH */
-        .table-search { position: relative; width: 220px; }
-        .table-search i { position: absolute; left: .75rem; top: 50%; transform: translateY(-50%); color: var(--gray-text); font-size: .85rem; }
-        .table-search input {
-            width: 100%; padding: .45rem .9rem .45rem 2.1rem;
-            border: 1px solid var(--border); border-radius: var(--radius-md);
-            background: var(--bg); font-size: .82rem; outline: none; transition: all .2s;
-        }
-        .table-search input:focus { border-color: var(--primary); background: var(--white); box-shadow: 0 0 0 3px rgba(124,92,252,.1); }
-
         /* ── FORM CONTROLS */
         .form-label-custom { font-size: .78rem; font-weight: 700; color: var(--gray-text); margin-bottom: .35rem; display: block; text-transform: uppercase; letter-spacing: .05em; }
         .form-control-custom {
@@ -239,18 +227,6 @@
             border-radius: var(--radius-md); font-size: .88rem; outline: none; transition: all .2s;
         }
         .form-control-custom:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(124,92,252,.12); }
-
-        /* ── PERM CHECKBOX GRID */
-        .perm-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: .6rem; }
-        .perm-check {
-            display: flex; align-items: center; gap: .6rem;
-            padding: .6rem .85rem; border: 1px solid var(--border);
-            border-radius: var(--radius-md); cursor: pointer; transition: all .18s;
-            font-size: .83rem; font-weight: 600; user-select: none;
-        }
-        .perm-check:hover { border-color: var(--primary); background: var(--primary-soft); }
-        .perm-check input[type=checkbox] { accent-color: var(--primary); width: 15px; height: 15px; flex-shrink: 0; }
-        .perm-check.checked { border-color: var(--primary); background: var(--primary-soft); color: var(--primary); }
 
         /* ── MODAL */
         .modal-overlay {
@@ -268,20 +244,6 @@
         @keyframes modal-in { from { opacity:0; transform:scale(.95) translateY(12px); } to { opacity:1; transform:scale(1) translateY(0); } }
         .modal-title   { font-size: 1.1rem; font-weight: 800; color: var(--dark); margin-bottom: .25rem; }
         .modal-subtitle { font-size: .82rem; color: var(--gray-text); margin-bottom: 1.5rem; }
-
-        /* ── TOOLTIP */
-        [data-tooltip] { position: relative; }
-        [data-tooltip]::after {
-            content: attr(data-tooltip); position: absolute; bottom: calc(100% + 6px); left: 50%;
-            transform: translateX(-50%); background: var(--dark); color: #fff;
-            font-size: .7rem; padding: .3rem .6rem; border-radius: 6px; white-space: nowrap;
-            pointer-events: none; opacity: 0; transition: opacity .2s; z-index: 99;
-        }
-        [data-tooltip]:hover::after { opacity: 1; }
-
-        @media (max-width: 991.98px) {
-            .content-area { padding: 1.25rem 1rem; }
-        }
     </style>
 </head>
 <body>
@@ -289,7 +251,7 @@
 <div class="wrapper">
     {% include '_sidebar_superadmin.html' with active_page='roles' %}
 
-    <main class="main-content">
+    <main class="main-content flex-grow-1 min-vw-0">
 
         <!-- TOPBAR -->
         <header class="topbar">
@@ -304,13 +266,9 @@
                 </div>
             </div>
             <div class="topbar-right">
-                <button style="background:none;border:none;color:var(--gray-text);font-size:1.1rem;position:relative;cursor:pointer;">
-                    <i class="bi bi-bell"></i>
-                    <span style="position:absolute;top:0;right:0;width:7px;height:7px;background:#F76F7A;border-radius:50%;border:2px solid white;"></span>
-                </button>
                 <div class="user-profile">
-                    <div class="user-avatar">AE</div>
-                    <span class="user-name">Admin Eduteka</span>
+                    <div class="user-avatar">SA</div>
+                    <span class="user-name">Super Admin</span>
                 </div>
             </div>
         </header>
@@ -332,14 +290,24 @@
                     </p>
                 </div>
                 <div class="d-flex gap-2 flex-wrap">
-                    <a href="#" class="btn-outline-custom">
-                        <i class="bi bi-upload"></i> Importar Roles
-                    </a>
                     <button class="btn-primary-custom" onclick="openCreateModal()">
                         <i class="bi bi-plus-lg"></i> Crear Nuevo Rol Base
                     </button>
                 </div>
             </div>
+
+            <!-- Django Messages -->
+            {% if messages %}
+            <div class="mb-3">
+                {% for message in messages %}
+                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show d-flex align-items-center gap-2 rounded-3" role="alert">
+                    <i class="bi {% if 'success' in message.tags %}bi-check-circle-fill text-success{% else %}bi-exclamation-circle-fill text-danger{% endif %}"></i>
+                    <span>{{ message }}</span>
+                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
 
             <!-- STAT CARDS -->
             <div class="row g-3 mb-4">
@@ -347,7 +315,7 @@
                     <div class="stat-card">
                         <div class="stat-icon purple"><i class="bi bi-shield-check"></i></div>
                         <div>
-                            <div class="stat-value">7</div>
+                            <div class="stat-value">{{ total_roles_base|default:"0" }}</div>
                             <div class="stat-label">Roles Base del Sistema</div>
                         </div>
                     </div>
@@ -356,7 +324,7 @@
                     <div class="stat-card">
                         <div class="stat-icon teal"><i class="bi bi-toggles"></i></div>
                         <div>
-                            <div class="stat-value">34</div>
+                            <div class="stat-value">{{ total_permisos|default:"34" }}</div>
                             <div class="stat-label">Permisos Disponibles</div>
                         </div>
                     </div>
@@ -365,7 +333,7 @@
                     <div class="stat-card">
                         <div class="stat-icon amber"><i class="bi bi-building"></i></div>
                         <div>
-                            <div class="stat-value">12</div>
+                            <div class="stat-value">{{ colegios_con_roles|default:"0" }}</div>
                             <div class="stat-label">Colegios con Roles Activos</div>
                         </div>
                     </div>
@@ -374,7 +342,7 @@
                     <div class="stat-card">
                         <div class="stat-icon rose"><i class="bi bi-people"></i></div>
                         <div>
-                            <div class="stat-value">248</div>
+                            <div class="stat-value">{{ total_usuarios_roles|default:"0" }}</div>
                             <div class="stat-label">Usuarios con Rol Asignado</div>
                         </div>
                     </div>
@@ -398,18 +366,10 @@
                         </div>
                     </div>
                     <div class="d-flex align-items-center gap-2 flex-wrap">
-                        <div class="table-search">
+                        <div class="search-bar" style="width:220px;">
                             <i class="bi bi-search"></i>
-                            <input type="text" id="tableSearch" placeholder="Filtrar roles..." oninput="filterTable()">
+                            <input type="text" id="tableSearch" placeholder="Filtrar roles...">
                         </div>
-                        <select id="filterModule" class="form-control-custom"
-                            style="width:auto;padding:.45rem .85rem;font-size:.82rem;" onchange="filterTable()">
-                            <option value="">Todos los módulos</option>
-                            <option value="notas">Notas / Calificaciones</option>
-                            <option value="asistencia">Asistencia</option>
-                            <option value="comunicaciones">Comunicaciones</option>
-                            <option value="contabilidad">Contabilidad</option>
-                        </select>
                     </div>
                 </div>
 
@@ -419,237 +379,107 @@
                             <tr>
                                 <th style="width:180px;">Nombre del Rol</th>
                                 <th>Descripción</th>
-                                <th>Módulo Principal</th>
+                                <th>Ámbito / Colegio</th>
                                 <th style="min-width:340px;">Permisos Asignados</th>
                                 <th style="width:120px;">Usuarios</th>
                                 <th style="width:110px;text-align:center;">Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="rolesBody">
-
-                            <!-- Director -->
-                            <tr data-role="director" data-module="">
+                            {% for rol in roles %}
+                            <tr>
                                 <td>
                                     <div class="d-flex flex-column gap-1">
-                                        <span class="role-chip chip-director"><span class="dot"></span>Director</span>
-                                        <span class="base-badge"><i class="bi bi-star-fill" style="font-size:.55rem;"></i> Rol Base</span>
+                                        {% if 'director' in rol.nombre|lower %}
+                                            <span class="role-chip chip-director"><span class="dot"></span>{{ rol.nombre }}</span>
+                                        {% elif 'profesor' in rol.nombre|lower or 'docente' in rol.nombre|lower %}
+                                            <span class="role-chip chip-profesor"><span class="dot"></span>{{ rol.nombre }}</span>
+                                        {% elif 'utp' in rol.nombre|lower or 'coordinador' in rol.nombre|lower %}
+                                            <span class="role-chip chip-utp"><span class="dot"></span>{{ rol.nombre }}</span>
+                                        {% elif 'inspector' in rol.nombre|lower %}
+                                            <span class="role-chip chip-inspector"><span class="dot"></span>{{ rol.nombre }}</span>
+                                        {% elif 'alumno' in rol.nombre|lower or 'estudiante' in rol.nombre|lower %}
+                                            <span class="role-chip chip-alumno"><span class="dot"></span>{{ rol.nombre }}</span>
+                                        {% elif 'apoderado' in rol.nombre|lower or 'tutor' in rol.nombre|lower %}
+                                            <span class="role-chip chip-apoderado"><span class="dot"></span>{{ rol.nombre }}</span>
+                                        {% elif 'admin' in rol.nombre|lower %}
+                                            <span class="role-chip chip-admin"><span class="dot"></span>{{ rol.nombre }}</span>
+                                        {% else %}
+                                            <span class="role-chip chip-default"><span class="dot"></span>{{ rol.nombre }}</span>
+                                        {% endif %}
+
+                                        {% if rol.es_base %}
+                                            <span class="base-badge"><i class="bi bi-star-fill" style="font-size:.55rem;"></i> Rol Base</span>
+                                        {% else %}
+                                            <span style="font-size:.68rem;color:var(--gray-text);font-weight:600;">Personalizable por colegio</span>
+                                        {% endif %}
                                     </div>
                                 </td>
                                 <td>
-                                    <div style="font-size:.84rem;font-weight:500;">Director o Rector del Establecimiento</div>
-                                    <div style="font-size:.74rem;color:var(--gray-text);margin-top:.15rem;">Acceso total a todas las secciones del colegio.</div>
+                                    <div style="font-size:.84rem;font-weight:500;">{{ rol.nombre }}</div>
+                                    <div style="font-size:.74rem;color:var(--gray-text);margin-top:.15rem;">{{ rol.descripcion|default:"Acceso a módulos asignados del establecimiento." }}</div>
                                 </td>
-                                <td><span style="font-size:.78rem;color:var(--gray-text);">Administración General</span></td>
+                                <td>
+                                    <span style="font-size:.78rem;color:var(--gray-text);">{{ rol.colegio.nombre|default:"Plantilla Global" }}</span>
+                                </td>
                                 <td>
                                     <div class="perm-badges">
-                                        <span class="perm-badge pb-ver"><i class="bi bi-eye"></i>Ver Todo</span>
-                                        <span class="perm-badge pb-crear"><i class="bi bi-plus"></i>Crear</span>
-                                        <span class="perm-badge pb-editar"><i class="bi bi-pencil"></i>Editar</span>
-                                        <span class="perm-badge pb-aprobar"><i class="bi bi-check2-circle"></i>Aprobar</span>
-                                        <span class="perm-badge pb-admin"><i class="bi bi-shield"></i>Administrar</span>
-                                        <span class="perm-badge pb-extra" data-tooltip="Exportar, Enviar mensajes, Eliminar">+3 más</span>
+                                        {% if 'director' in rol.nombre|lower %}
+                                            <span class="perm-badge pb-ver"><i class="bi bi-eye"></i>Ver Todo</span>
+                                            <span class="perm-badge pb-crear"><i class="bi bi-plus"></i>Crear</span>
+                                            <span class="perm-badge pb-editar"><i class="bi bi-pencil"></i>Editar</span>
+                                            <span class="perm-badge pb-aprobar"><i class="bi bi-check2-circle"></i>Aprobar</span>
+                                            <span class="perm-badge pb-admin"><i class="bi bi-shield"></i>Administrar</span>
+                                        {% elif 'profesor' in rol.nombre|lower %}
+                                            <span class="perm-badge pb-ver" style="border:1px solid #C7D2FE;font-weight:700;"><i class="bi bi-eye"></i>Ver Notas del Curso</span>
+                                            <span class="perm-badge pb-crear"><i class="bi bi-plus"></i>Crear Evaluaciones</span>
+                                            <span class="perm-badge pb-editar"><i class="bi bi-pencil"></i>Editar Notas</span>
+                                            <span class="perm-badge pb-ver"><i class="bi bi-calendar-check"></i>Ver Asistencia</span>
+                                            <span class="perm-badge pb-crear"><i class="bi bi-calendar-plus"></i>Registrar Asistencia</span>
+                                        {% elif 'utp' in rol.nombre|lower %}
+                                            <span class="perm-badge pb-ver"><i class="bi bi-eye"></i>Ver Notas Globales</span>
+                                            <span class="perm-badge pb-editar"><i class="bi bi-pencil"></i>Editar Evaluaciones</span>
+                                            <span class="perm-badge pb-aprobar"><i class="bi bi-check2-circle"></i>Aprobar Períodos</span>
+                                            <span class="perm-badge pb-exportar"><i class="bi bi-download"></i>Exportar Reportes</span>
+                                        {% elif 'inspector' in rol.nombre|lower %}
+                                            <span class="perm-badge pb-ver"><i class="bi bi-calendar-check"></i>Ver Asistencia</span>
+                                            <span class="perm-badge pb-editar"><i class="bi bi-pencil"></i>Editar Anotaciones</span>
+                                            <span class="perm-badge pb-mensajes"><i class="bi bi-chat"></i>Enviar Mensajes</span>
+                                        {% elif 'alumno' in rol.nombre|lower %}
+                                            <span class="perm-badge pb-ver"><i class="bi bi-eye"></i>Ver Mis Notas</span>
+                                            <span class="perm-badge pb-ver"><i class="bi bi-calendar-check"></i>Ver Mi Asistencia</span>
+                                            <span class="perm-badge pb-ver"><i class="bi bi-megaphone"></i>Ver Comunicados</span>
+                                        {% elif 'apoderado' in rol.nombre|lower %}
+                                            <span class="perm-badge pb-ver"><i class="bi bi-eye"></i>Ver Notas de Pupilo</span>
+                                            <span class="perm-badge pb-ver"><i class="bi bi-calendar-check"></i>Ver Asistencia</span>
+                                            <span class="perm-badge pb-mensajes"><i class="bi bi-chat"></i>Mensajería</span>
+                                        {% else %}
+                                            <span class="perm-badge pb-ver"><i class="bi bi-eye"></i>Ver Módulos</span>
+                                            <span class="perm-badge pb-crear"><i class="bi bi-plus"></i>Crear</span>
+                                            <span class="perm-badge pb-admin"><i class="bi bi-shield"></i>Gestionar</span>
+                                        {% endif %}
                                     </div>
                                 </td>
-                                <td><span style="font-size:.82rem;color:var(--gray-text);">7 usuarios</span></td>
+                                <td>
+                                    <strong class="text-dark">{{ rol.cantidad_usuarios|default:0 }}</strong>
+                                    <span style="font-size:.82rem;color:var(--gray-text);">usuarios</span>
+                                </td>
                                 <td>
                                     <div class="d-flex align-items-center justify-content-center gap-1">
-                                        <button class="action-btn view" title="Ver detalle" onclick="openEditModal('Director')"><i class="bi bi-eye"></i></button>
-                                        <button class="action-btn edit" title="Editar rol" onclick="openEditModal('Director')"><i class="bi bi-pencil"></i></button>
-                                        <button class="action-btn del" title="Eliminar" onclick="confirmDelete('Director')"><i class="bi bi-trash3"></i></button>
+                                        <button class="action-btn view" title="Ver detalle / Editar" onclick="openEditModal('{{ rol.id }}', '{{ rol.nombre|escapejs }}', '{{ rol.descripcion|escapejs }}', {{ rol.es_base|yesno:'true,false' }})"><i class="bi bi-eye"></i></button>
+                                        <button class="action-btn edit" title="Editar rol" onclick="openEditModal('{{ rol.id }}', '{{ rol.nombre|escapejs }}', '{{ rol.descripcion|escapejs }}', {{ rol.es_base|yesno:'true,false' }})"><i class="bi bi-pencil"></i></button>
+                                        <button class="action-btn del" title="Eliminar" onclick="confirmDelete('{{ rol.id }}', '{{ rol.nombre|escapejs }}')"><i class="bi bi-trash3"></i></button>
                                     </div>
                                 </td>
                             </tr>
-
-                            <!-- Profesor — fila destacada con el ejemplo explícito pedido -->
-                            <tr data-role="profesor" data-module="notas asistencia" style="background:rgba(59,130,246,.025);">
-                                <td>
-                                    <div class="d-flex flex-column gap-1">
-                                        <span class="role-chip chip-profesor"><span class="dot"></span>Profesor</span>
-                                        <span class="base-badge"><i class="bi bi-star-fill" style="font-size:.55rem;"></i> Rol Base</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div style="font-size:.84rem;font-weight:500;">Docente de Aula / Asignatura</div>
-                                    <div style="font-size:.74rem;color:var(--gray-text);margin-top:.15rem;">Gestiona asistencia, notas y anotaciones de sus cursos asignados.</div>
-                                </td>
-                                <td><span style="font-size:.78rem;color:var(--gray-text);">Libro de Clases / Notas</span></td>
-                                <td>
-                                    <div class="perm-badges">
-                                        <!-- Badge explícito requerido en el brief -->
-                                        <span class="perm-badge pb-ver" style="border:1px solid #C7D2FE;font-weight:700;">
-                                            <i class="bi bi-eye"></i>Ver Notas del Curso
-                                        </span>
-                                        <span class="perm-badge pb-crear"><i class="bi bi-plus"></i>Crear Evaluaciones</span>
-                                        <span class="perm-badge pb-editar"><i class="bi bi-pencil"></i>Editar Notas</span>
-                                        <span class="perm-badge pb-ver"><i class="bi bi-calendar-check"></i>Ver Asistencia</span>
-                                        <span class="perm-badge pb-crear"><i class="bi bi-calendar-plus"></i>Registrar Asistencia</span>
-                                        <span class="perm-badge pb-extra" data-tooltip="Exportar Libro de Clases, Crear Anotaciones">+2 más</span>
-                                    </div>
-                                </td>
-                                <td><span style="font-size:.82rem;color:var(--gray-text);">42 usuarios</span></td>
-                                <td>
-                                    <div class="d-flex align-items-center justify-content-center gap-1">
-                                        <button class="action-btn view" title="Ver detalle" onclick="openEditModal('Profesor')"><i class="bi bi-eye"></i></button>
-                                        <button class="action-btn edit" title="Editar rol" onclick="openEditModal('Profesor')"><i class="bi bi-pencil"></i></button>
-                                        <button class="action-btn del" title="Eliminar" onclick="confirmDelete('Profesor')"><i class="bi bi-trash3"></i></button>
-                                    </div>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    <i class="bi bi-inbox fs-1 d-block mb-2 opacity-50"></i>
+                                    No se encontraron roles registrados en el sistema.
                                 </td>
                             </tr>
-
-                            <!-- UTP -->
-                            <tr data-role="utp" data-module="notas">
-                                <td>
-                                    <div class="d-flex flex-column gap-1">
-                                        <span class="role-chip chip-utp"><span class="dot"></span>UTP</span>
-                                        <span class="base-badge"><i class="bi bi-star-fill" style="font-size:.55rem;"></i> Rol Base</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div style="font-size:.84rem;font-weight:500;">Unidad Técnica Pedagógica</div>
-                                    <div style="font-size:.74rem;color:var(--gray-text);margin-top:.15rem;">Supervisa currículo, evaluaciones y calificaciones del establecimiento.</div>
-                                </td>
-                                <td><span style="font-size:.78rem;color:var(--gray-text);">Calificaciones / Reportes</span></td>
-                                <td>
-                                    <div class="perm-badges">
-                                        <span class="perm-badge pb-ver"><i class="bi bi-eye"></i>Ver Notas Globales</span>
-                                        <span class="perm-badge pb-editar"><i class="bi bi-pencil"></i>Editar Evaluaciones</span>
-                                        <span class="perm-badge pb-aprobar"><i class="bi bi-check2-circle"></i>Aprobar Períodos</span>
-                                        <span class="perm-badge pb-exportar"><i class="bi bi-download"></i>Exportar Reportes</span>
-                                    </div>
-                                </td>
-                                <td><span style="font-size:.82rem;color:var(--gray-text);">6 usuarios</span></td>
-                                <td>
-                                    <div class="d-flex align-items-center justify-content-center gap-1">
-                                        <button class="action-btn view" onclick="openEditModal('UTP')"><i class="bi bi-eye"></i></button>
-                                        <button class="action-btn edit" onclick="openEditModal('UTP')"><i class="bi bi-pencil"></i></button>
-                                        <button class="action-btn del" onclick="confirmDelete('UTP')"><i class="bi bi-trash3"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- Inspector -->
-                            <tr data-role="inspector" data-module="asistencia comunicaciones">
-                                <td>
-                                    <div class="d-flex flex-column gap-1">
-                                        <span class="role-chip chip-inspector"><span class="dot"></span>Inspector</span>
-                                        <span class="base-badge"><i class="bi bi-star-fill" style="font-size:.55rem;"></i> Rol Base</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div style="font-size:.84rem;font-weight:500;">Inspector General / Convivencia</div>
-                                    <div style="font-size:.74rem;color:var(--gray-text);margin-top:.15rem;">Gestiona asistencia, anotaciones disciplinarias y citaciones.</div>
-                                </td>
-                                <td><span style="font-size:.78rem;color:var(--gray-text);">Asistencia / Convivencia</span></td>
-                                <td>
-                                    <div class="perm-badges">
-                                        <span class="perm-badge pb-ver"><i class="bi bi-calendar-check"></i>Ver Asistencia</span>
-                                        <span class="perm-badge pb-editar"><i class="bi bi-pencil"></i>Editar Anotaciones</span>
-                                        <span class="perm-badge pb-mensajes"><i class="bi bi-chat"></i>Enviar Mensajes</span>
-                                        <span class="perm-badge pb-extra" data-tooltip="Registrar Citaciones, Exportar Asistencia">+2 más</span>
-                                    </div>
-                                </td>
-                                <td><span style="font-size:.82rem;color:var(--gray-text);">9 usuarios</span></td>
-                                <td>
-                                    <div class="d-flex align-items-center justify-content-center gap-1">
-                                        <button class="action-btn view" onclick="openEditModal('Inspector')"><i class="bi bi-eye"></i></button>
-                                        <button class="action-btn edit" onclick="openEditModal('Inspector')"><i class="bi bi-pencil"></i></button>
-                                        <button class="action-btn del" onclick="confirmDelete('Inspector')"><i class="bi bi-trash3"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- Alumno -->
-                            <tr data-role="alumno" data-module="">
-                                <td>
-                                    <div class="d-flex flex-column gap-1">
-                                        <span class="role-chip chip-alumno"><span class="dot"></span>Alumno</span>
-                                        <span class="base-badge"><i class="bi bi-star-fill" style="font-size:.55rem;"></i> Rol Base</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div style="font-size:.84rem;font-weight:500;">Estudiante del Establecimiento</div>
-                                    <div style="font-size:.74rem;color:var(--gray-text);margin-top:.15rem;">Solo consulta sus propias notas, asistencia y comunicados.</div>
-                                </td>
-                                <td><span style="font-size:.78rem;color:var(--gray-text);">Portal del Estudiante</span></td>
-                                <td>
-                                    <div class="perm-badges">
-                                        <span class="perm-badge pb-ver"><i class="bi bi-eye"></i>Ver Mis Notas</span>
-                                        <span class="perm-badge pb-ver"><i class="bi bi-calendar-check"></i>Ver Mi Asistencia</span>
-                                        <span class="perm-badge pb-ver"><i class="bi bi-megaphone"></i>Ver Comunicados</span>
-                                    </div>
-                                </td>
-                                <td><span style="font-size:.82rem;color:var(--gray-text);">184 usuarios</span></td>
-                                <td>
-                                    <div class="d-flex align-items-center justify-content-center gap-1">
-                                        <button class="action-btn view" onclick="openEditModal('Alumno')"><i class="bi bi-eye"></i></button>
-                                        <button class="action-btn edit" onclick="openEditModal('Alumno')"><i class="bi bi-pencil"></i></button>
-                                        <button class="action-btn del" onclick="confirmDelete('Alumno')"><i class="bi bi-trash3"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- Apoderado -->
-                            <tr data-role="apoderado" data-module="comunicaciones">
-                                <td>
-                                    <div class="d-flex flex-column gap-1">
-                                        <span class="role-chip chip-apoderado"><span class="dot"></span>Apoderado</span>
-                                        <span class="base-badge"><i class="bi bi-star-fill" style="font-size:.55rem;"></i> Rol Base</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div style="font-size:.84rem;font-weight:500;">Apoderado / Tutor del Estudiante</div>
-                                    <div style="font-size:.74rem;color:var(--gray-text);margin-top:.15rem;">Accede a notas, asistencia y comunicaciones de su pupilo.</div>
-                                </td>
-                                <td><span style="font-size:.78rem;color:var(--gray-text);">Portal de Apoderados</span></td>
-                                <td>
-                                    <div class="perm-badges">
-                                        <span class="perm-badge pb-ver"><i class="bi bi-eye"></i>Ver Notas de Pupilo</span>
-                                        <span class="perm-badge pb-ver"><i class="bi bi-calendar-check"></i>Ver Asistencia</span>
-                                        <span class="perm-badge pb-mensajes"><i class="bi bi-chat"></i>Mensajería</span>
-                                    </div>
-                                </td>
-                                <td><span style="font-size:.82rem;color:var(--gray-text);">—</span></td>
-                                <td>
-                                    <div class="d-flex align-items-center justify-content-center gap-1">
-                                        <button class="action-btn view" onclick="openEditModal('Apoderado')"><i class="bi bi-eye"></i></button>
-                                        <button class="action-btn edit" onclick="openEditModal('Apoderado')"><i class="bi bi-pencil"></i></button>
-                                        <button class="action-btn del" onclick="confirmDelete('Apoderado')"><i class="bi bi-trash3"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- Administrador (no base) -->
-                            <tr data-role="admin" data-module="">
-                                <td>
-                                    <div class="d-flex flex-column gap-1">
-                                        <span class="role-chip chip-admin"><span class="dot"></span>Administrador</span>
-                                        <span style="font-size:.68rem;color:var(--gray-text);font-weight:600;">Personalizable por colegio</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div style="font-size:.84rem;font-weight:500;">Administrador del Establecimiento</div>
-                                    <div style="font-size:.74rem;color:var(--gray-text);margin-top:.15rem;">Gestiona usuarios, suscripción y configuración del colegio.</div>
-                                </td>
-                                <td><span style="font-size:.78rem;color:var(--gray-text);">Administración / ERP</span></td>
-                                <td>
-                                    <div class="perm-badges">
-                                        <span class="perm-badge pb-ver"><i class="bi bi-eye"></i>Ver Todo</span>
-                                        <span class="perm-badge pb-crear"><i class="bi bi-plus"></i>Crear Usuarios</span>
-                                        <span class="perm-badge pb-admin"><i class="bi bi-shield"></i>Administrar</span>
-                                        <span class="perm-badge pb-exportar"><i class="bi bi-download"></i>Exportar</span>
-                                        <span class="perm-badge pb-extra" data-tooltip="Editar Config, Aprobar Solicitudes, Enviar Mensajes">+3 más</span>
-                                    </div>
-                                </td>
-                                <td><span style="font-size:.82rem;color:var(--gray-text);">—</span></td>
-                                <td>
-                                    <div class="d-flex align-items-center justify-content-center gap-1">
-                                        <button class="action-btn view" onclick="openEditModal('Administrador')"><i class="bi bi-eye"></i></button>
-                                        <button class="action-btn edit" onclick="openEditModal('Administrador')"><i class="bi bi-pencil"></i></button>
-                                        <button class="action-btn del" onclick="confirmDelete('Administrador')"><i class="bi bi-trash3"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
@@ -657,16 +487,8 @@
                 <!-- Table Footer -->
                 <div style="padding:.85rem 1.5rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;">
                     <span style="font-size:.78rem;color:var(--gray-text);" id="tableCount">
-                        Mostrando <strong>7</strong> roles en total
+                        Mostrando <strong>{{ roles|length }}</strong> roles en total
                     </span>
-                    <div class="d-flex gap-2">
-                        <a href="#" class="btn-outline-custom" style="font-size:.78rem;padding:.35rem .85rem;">
-                            <i class="bi bi-download"></i> Exportar Roles
-                        </a>
-                        <a href="#" class="btn-outline-custom" style="font-size:.78rem;padding:.35rem .85rem;">
-                            <i class="bi bi-arrow-clockwise"></i> Sincronizar Colegios
-                        </a>
-                    </div>
                 </div>
             </div>
 
@@ -697,73 +519,36 @@
                 <div class="modal-title" id="modalCrearTitle">Crear Nuevo Rol Base</div>
                 <div class="modal-subtitle" id="modalCrearSubtitle">Este rol se clonará automáticamente a todos los colegios en onboarding.</div>
             </div>
-            <button onclick="closeModal('modalCrear')"
+            <button type="button" onclick="closeModal('modalCrear')"
                 style="background:none;border:none;font-size:1.3rem;color:var(--gray-text);cursor:pointer;line-height:1;">&times;</button>
         </div>
 
-        <div class="mb-3">
-            <label class="form-label-custom">Nombre del Rol</label>
-            <input type="text" class="form-control-custom" id="inputRolNombre" placeholder="Ej: Coordinador de Ciclo">
-        </div>
-        <div class="mb-3">
-            <label class="form-label-custom">Descripción</label>
-            <textarea class="form-control-custom" rows="2" placeholder="Breve descripción del rol y sus responsabilidades..."></textarea>
-        </div>
-        <div class="mb-3">
-            <label class="form-label-custom">Módulo Principal</label>
-            <select class="form-control-custom">
-                <option value="">Seleccionar módulo...</option>
-                <option>Libro de Clases / Notas</option>
-                <option>Asistencia</option>
-                <option>Administración General</option>
-                <option>Comunicaciones</option>
-                <option>Contabilidad / ERP</option>
-                <option>Portal del Estudiante</option>
-                <option>Portal de Apoderados</option>
-            </select>
-        </div>
+        <form method="POST" action="{% url 'dashboard_superadmin_roles' %}" id="formRolModal">
+            {% csrf_token %}
+            <input type="hidden" name="accion" id="inputRolAccion" value="crear">
+            <input type="hidden" name="rol_id" id="inputRolId" value="">
 
-        <div class="mb-4">
-            <label class="form-label-custom">Permisos del Rol</label>
-            <div class="perm-grid">
-                <label class="perm-check" onclick="toggleCheck(this)">
-                    <input type="checkbox"> Ver registros
-                </label>
-                <label class="perm-check" onclick="toggleCheck(this)">
-                    <input type="checkbox"> Crear registros
-                </label>
-                <label class="perm-check" onclick="toggleCheck(this)">
-                    <input type="checkbox"> Editar registros
-                </label>
-                <label class="perm-check" onclick="toggleCheck(this)">
-                    <input type="checkbox"> Eliminar registros
-                </label>
-                <label class="perm-check" onclick="toggleCheck(this)">
-                    <input type="checkbox"> Exportar datos
-                </label>
-                <label class="perm-check" onclick="toggleCheck(this)">
-                    <input type="checkbox"> Aprobar solicitudes
-                </label>
-                <label class="perm-check" onclick="toggleCheck(this)">
-                    <input type="checkbox"> Enviar mensajes
-                </label>
-                <label class="perm-check" onclick="toggleCheck(this)">
-                    <input type="checkbox"> Administrar módulo
+            <div class="mb-3">
+                <label class="form-label-custom">Nombre del Rol</label>
+                <input type="text" name="nombre" class="form-control-custom" id="inputRolNombre" placeholder="Ej: Coordinador de Ciclo" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label-custom">Descripción</label>
+                <textarea name="descripcion" class="form-control-custom" id="inputRolDescripcion" rows="2" placeholder="Breve descripción del rol y sus responsabilidades..."></textarea>
+            </div>
+
+            <div class="mb-3 d-flex align-items-center gap-2">
+                <input type="checkbox" name="es_base" id="esBaseCheck" style="accent-color:var(--primary);width:15px;height:15px;" checked>
+                <label for="esBaseCheck" style="font-size:.83rem;font-weight:600;color:var(--dark);cursor:pointer;">
+                    Marcar como <strong>Rol Base</strong> (se heredará en todos los colegios nuevos)
                 </label>
             </div>
-        </div>
 
-        <div class="mb-3 d-flex align-items-center gap-2">
-            <input type="checkbox" id="esBaseCheck" style="accent-color:var(--primary);width:15px;height:15px;">
-            <label for="esBaseCheck" style="font-size:.83rem;font-weight:600;color:var(--dark);cursor:pointer;">
-                Marcar como <strong>Rol Base</strong> (se heredará en todos los colegios nuevos)
-            </label>
-        </div>
-
-        <div class="d-flex gap-2 justify-content-end pt-2" style="border-top:1px solid var(--border);">
-            <button onclick="closeModal('modalCrear')" class="btn-outline-custom">Cancelar</button>
-            <button class="btn-primary-custom"><i class="bi bi-floppy"></i> Guardar Rol</button>
-        </div>
+            <div class="d-flex gap-2 justify-content-end pt-2" style="border-top:1px solid var(--border);">
+                <button type="button" onclick="closeModal('modalCrear')" class="btn-outline-custom">Cancelar</button>
+                <button type="submit" class="btn-primary-custom"><i class="bi bi-floppy"></i> Guardar Rol</button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -780,34 +565,52 @@
             Esta acción <strong>no se puede deshacer</strong>. Si existen usuarios con este rol asignado,
             perderán sus permisos inmediatamente. ¿Deseas continuar?
         </p>
-        <div class="d-flex gap-2 justify-content-center mt-3">
-            <button onclick="closeModal('modalDelete')" class="btn-outline-custom">Cancelar</button>
-            <button id="btnConfirmDelete"
-                style="display:inline-flex;align-items:center;gap:.45rem;padding:.55rem 1.25rem;background:#EF4444;color:#fff;border:none;border-radius:var(--radius-md);font-weight:600;font-size:.85rem;cursor:pointer;transition:background .2s;">
-                <i class="bi bi-trash3"></i> Sí, eliminar
-            </button>
-        </div>
+
+        <form method="POST" action="{% url 'dashboard_superadmin_roles' %}">
+            {% csrf_token %}
+            <input type="hidden" name="accion" value="eliminar">
+            <input type="hidden" name="rol_id" id="deleteRolId" value="">
+
+            <div class="d-flex gap-2 justify-content-center mt-3">
+                <button type="button" onclick="closeModal('modalDelete')" class="btn-outline-custom">Cancelar</button>
+                <button type="submit"
+                    style="display:inline-flex;align-items:center;gap:.45rem;padding:.55rem 1.25rem;background:#EF4444;color:#fff;border:none;border-radius:var(--radius-md);font-weight:600;font-size:.85rem;cursor:pointer;transition:background .2s;">
+                    <i class="bi bi-trash3"></i> Sí, eliminar
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 <script>
-    // ── Mobile sidebar
     document.addEventListener('DOMContentLoaded', () => {
         const btn = document.getElementById('mobileMenuBtn');
         const sb  = document.getElementById('sidebar');
         if (btn && sb) btn.addEventListener('click', () => sb.classList.toggle('active'));
 
-        // Hover color delete button
-        const del = document.getElementById('btnConfirmDelete');
-        if (del) {
-            del.addEventListener('mouseenter', () => del.style.background = '#DC2626');
-            del.addEventListener('mouseleave', () => del.style.background = '#EF4444');
-        }
+        // Filtrado en vivo de tabla
+        document.getElementById('tableSearch')?.addEventListener('input', function () {
+            const query = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#rolesBody tr');
+            let vis = 0;
+            rows.forEach(row => {
+                const match = row.innerText.toLowerCase().includes(query);
+                row.style.display = match ? '' : 'none';
+                if (match) vis++;
+            });
+            document.getElementById('tableCount').innerHTML =
+                'Mostrando <strong>' + vis + '</strong> de <strong>' + rows.length + '</strong> roles';
+        });
+
+        // Búsqueda global desde topbar
+        document.getElementById('globalSearch')?.addEventListener('input', function () {
+            document.getElementById('tableSearch').value = this.value;
+            document.getElementById('tableSearch').dispatchEvent(new Event('input'));
+        });
     });
 
-    // ── Modals
     function openModal(id)  { document.getElementById(id).classList.add('active'); }
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
@@ -818,58 +621,30 @@
     function openCreateModal() {
         document.getElementById('modalCrearTitle').textContent    = 'Crear Nuevo Rol Base';
         document.getElementById('modalCrearSubtitle').textContent = 'Este rol se clonará automáticamente a todos los colegios en onboarding.';
-        document.getElementById('inputRolNombre').value = '';
-        // Desmarcar checkboxes
-        document.querySelectorAll('#modalCrear .perm-check').forEach(el => {
-            el.classList.remove('checked');
-            el.querySelector('input').checked = false;
-        });
+        document.getElementById('inputRolAccion').value           = 'crear';
+        document.getElementById('inputRolId').value               = '';
+        document.getElementById('inputRolNombre').value           = '';
+        document.getElementById('inputRolDescripcion').value      = '';
+        document.getElementById('esBaseCheck').checked            = true;
         openModal('modalCrear');
     }
 
-    function openEditModal(rolName) {
+    function openEditModal(rolId, rolName, rolDesc, esBase) {
         document.getElementById('modalCrearTitle').textContent    = 'Editar Rol: ' + rolName;
-        document.getElementById('modalCrearSubtitle').textContent = 'Modifica los permisos asignados a este rol base.';
+        document.getElementById('modalCrearSubtitle').textContent = 'Modifica los parámetros y plantilla de este rol.';
+        document.getElementById('inputRolAccion').value           = 'editar';
+        document.getElementById('inputRolId').value               = rolId;
         document.getElementById('inputRolNombre').value           = rolName;
+        document.getElementById('inputRolDescripcion').value      = rolDesc || '';
+        document.getElementById('esBaseCheck').checked            = esBase;
         openModal('modalCrear');
     }
 
-    function confirmDelete(rolName) {
+    function confirmDelete(rolId, rolName) {
+        document.getElementById('deleteRolId').value         = rolId;
         document.getElementById('deleteRolName').textContent = '"' + rolName + '"';
         openModal('modalDelete');
     }
-
-    // ── Perm checkbox toggle visual
-    function toggleCheck(label) {
-        const cb = label.querySelector('input[type=checkbox]');
-        setTimeout(() => {
-            label.classList.toggle('checked', cb.checked);
-        }, 0);
-    }
-
-    // ── Filtrado de tabla
-    function filterTable() {
-        const q    = (document.getElementById('tableSearch').value || '').toLowerCase();
-        const mod  = (document.getElementById('filterModule').value || '').toLowerCase();
-        const rows = document.querySelectorAll('#rolesBody tr');
-        let vis    = 0;
-
-        rows.forEach(row => {
-            const matchQ   = !q   || row.innerText.toLowerCase().includes(q);
-            const matchMod = !mod || (row.dataset.module || '').toLowerCase().includes(mod);
-            row.style.display = (matchQ && matchMod) ? '' : 'none';
-            if (matchQ && matchMod) vis++;
-        });
-
-        document.getElementById('tableCount').innerHTML =
-            'Mostrando <strong>' + vis + '</strong> de <strong>' + rows.length + '</strong> roles';
-    }
-
-    // Búsqueda global desde topbar
-    document.getElementById('globalSearch').addEventListener('input', function () {
-        document.getElementById('tableSearch').value = this.value;
-        filterTable();
-    });
 </script>
 
 </body>

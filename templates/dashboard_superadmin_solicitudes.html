@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cola Global de Solicitudes - Super Admin Eduteka</title>
 
-    <!-- Bootstrap CSS -->
+    <!-- Bootstrap CSS local static -->
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
 
     <!-- Fuentes e Iconos -->
@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
     <style>
-        /* ══ DESIGN TOKENS (idénticos al resto del Super Admin) ═══════════════ */
+        /* ══ DESIGN TOKENS (Estilo Unificado SaaS Eduteka) ═══════════════ */
         :root {
             --primary:        #7C5CFC;
             --primary-soft:   rgba(124, 92, 252, 0.08);
@@ -70,7 +70,7 @@
             padding: 0 2rem;
             position: sticky; top: 0; z-index: 98;
         }
-        .search-bar { position: relative; width: 320px; }
+        .search-bar { position: relative; width: 340px; }
         .search-bar i { position: absolute; left: .85rem; top: 50%; transform: translateY(-50%); color: var(--gray-text); }
         .search-bar input {
             width: 100%; padding: .5rem 1rem .5rem 2.4rem;
@@ -106,8 +106,9 @@
             background: var(--white); border: 1px solid var(--border);
             border-radius: var(--radius-lg); padding: 1.25rem 1.5rem;
             display: flex; align-items: center; gap: 1rem;
-            box-shadow: 0 2px 12px rgba(0,0,0,.04);
+            box-shadow: 0 2px 12px rgba(0,0,0,.03);
             transition: box-shadow .2s, transform .2s;
+            height: 100%;
         }
         .stat-card:hover { box-shadow: 0 6px 24px rgba(124,92,252,.1); transform: translateY(-2px); }
         .stat-icon {
@@ -116,11 +117,11 @@
             font-size: 1.3rem; flex-shrink: 0;
         }
         .stat-icon.amber  { background: rgba(245,158,11,.12); color: #D97706; }
-        .stat-icon.teal   { background: rgba(101,205,191,.15); color: #0A9F8C; }
+        .stat-icon.teal   { background: rgba(16,185,129,.12); color: #059669; }
         .stat-icon.rose   { background: rgba(239,68,68,.1); color: #EF4444; }
         .stat-icon.purple { background: rgba(124,92,252,.1); color: var(--primary); }
-        .stat-value { font-size: 1.55rem; font-weight: 800; color: var(--dark); line-height: 1; }
-        .stat-label { font-size: .76rem; color: var(--gray-text); font-weight: 500; margin-top: .2rem; }
+        .stat-value { font-size: 1.55rem; font-weight: 800; color: var(--dark); line-height: 1.1; }
+        .stat-label { font-size: .76rem; color: var(--gray-text); font-weight: 600; margin-top: .2rem; }
 
         /* ── PANEL */
         .panel { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: 0 4px 20px rgba(0,0,0,.03); overflow: hidden; }
@@ -131,54 +132,46 @@
         /* ── TABLE */
         .solicitudes-table { width: 100%; border-collapse: collapse; }
         .solicitudes-table thead th {
-            padding: .75rem 1.5rem;
+            padding: .85rem 1.25rem;
             font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
             color: var(--gray-text); background: #FAFBFF; border-bottom: 1px solid var(--border); white-space: nowrap;
         }
-        .solicitudes-table tbody tr { border-bottom: 1px solid rgba(188,192,207,.4); transition: background .15s; }
+        .solicitudes-table tbody tr { border-bottom: 1px solid rgba(188,192,207,.35); transition: background .15s; }
         .solicitudes-table tbody tr:last-child { border-bottom: none; }
         .solicitudes-table tbody tr:hover { background: rgba(124,92,252,.03); }
-        .solicitudes-table tbody td { padding: 1rem 1.5rem; vertical-align: middle; }
+        .solicitudes-table tbody td { padding: 1rem 1.25rem; vertical-align: middle; }
 
         /* ── USER AVATAR & INFO */
         .user-cell { display: flex; align-items: center; gap: .75rem; }
         .user-avatar-circle {
-            width: 38px; height: 38px; border-radius: 50%;
+            width: 38px; height: 38px; border-radius: 10px;
             display: flex; align-items: center; justify-content: center;
-            font-weight: 700; font-size: .85rem; color: white; flex-shrink: 0;
+            font-weight: 800; font-size: .85rem; color: white; flex-shrink: 0;
         }
         .user-name-text { font-size: .88rem; font-weight: 700; color: var(--dark); line-height: 1.2; }
         .user-subtext { font-size: .75rem; color: var(--gray-text); margin-top: .15rem; }
 
-        /* ── ROLE CHIPS */
+        /* ── ROLE & PLAN CHIPS */
         .role-chip {
             display: inline-flex; align-items: center; gap: .45rem;
             padding: .28rem .7rem; border-radius: 999px;
             font-size: .75rem; font-weight: 700;
         }
         .role-chip .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-        .chip-director  { background: rgba(124,92,252,.1);  color: #6944E0; }
-        .chip-director .dot  { background: #6944E0; }
-        .chip-profesor  { background: rgba(59,130,246,.1);  color: #2563EB; }
-        .chip-profesor .dot  { background: #2563EB; }
-        .chip-utp       { background: rgba(16,185,129,.1);  color: #059669; }
-        .chip-utp .dot       { background: #059669; }
-        .chip-alumno    { background: rgba(245,158,11,.12); color: #B45309; }
-        .chip-alumno .dot    { background: #B45309; }
-        .chip-apoderado { background: rgba(236,72,153,.1);  color: #BE185D; }
-        .chip-apoderado .dot { background: #BE185D; }
-        .chip-inspector { background: rgba(139,92,246,.1);  color: #7C3AED; }
-        .chip-inspector .dot { background: #7C3AED; }
+        .chip-plan  { background: rgba(124,92,252,.1); color: var(--primary); }
+        .chip-plan .dot  { background: var(--primary); }
+        .chip-free  { background: #F3F4F6; color: var(--gray-text); }
+        .chip-free .dot  { background: #9CA3AF; }
 
         /* ── STATUS BADGES */
         .status-badge {
             display: inline-flex; align-items: center; gap: .35rem;
-            padding: .25rem .65rem; border-radius: 999px;
-            font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .03em;
+            padding: .3rem .75rem; border-radius: 999px;
+            font-size: .74rem; font-weight: 700; letter-spacing: .02em;
         }
-        .status-pendiente { background: #FEF3C7; color: #92400E; }
-        .status-aprobada  { background: #D1FAE5; color: #065F46; }
-        .status-rechazada { background: #FEE2E2; color: #991B1B; }
+        .status-pendiente { background: #FEF3C7; color: #B45309; border: 1px solid #FDE68A; }
+        .status-aprobada  { background: #ECFDF5; color: #047857; border: 1px solid #A7F3D0; }
+        .status-rechazada { background: #FEF2F2; color: #B91C1C; border: 1px solid #FECACA; }
 
         /* ── ACTION BUTTONS */
         .action-btn {
@@ -186,12 +179,14 @@
             display: inline-flex; align-items: center; justify-content: center;
             border-radius: var(--radius-sm); border: 1px solid var(--border);
             background: var(--white); color: var(--gray-text);
-            font-size: .85rem; text-decoration: none; transition: all .18s; cursor: pointer;
+            font-size: .88rem; text-decoration: none; transition: all .18s; cursor: pointer;
         }
         .action-btn:hover { color: var(--dark); border-color: var(--dark); background: var(--bg); }
-        .action-btn.approve:hover { color: #059669; border-color: #6EE7B7; background: #D1FAE5; }
-        .action-btn.reject:hover  { color: #DC2626; border-color: #FCA5A5; background: #FEF2F2; }
-        .action-btn.view:hover    { color: #2563EB; border-color: #93C5FD; background: #EFF6FF; }
+        .action-btn.approve { color: #059669; border-color: #A7F3D0; background: #ECFDF5; }
+        .action-btn.approve:hover { color: #fff; background: #059669; border-color: #059669; transform: scale(1.05); }
+        .action-btn.reject { color: #DC2626; border-color: #FECACA; background: #FEF2F2; }
+        .action-btn.reject:hover  { color: #fff; background: #DC2626; border-color: #DC2626; transform: scale(1.05); }
+        .action-btn.view:hover    { color: var(--primary); border-color: var(--primary); background: var(--primary-soft); }
 
         /* ── BUTTONS */
         .btn-primary-custom {
@@ -201,6 +196,7 @@
             cursor: pointer; transition: all .2s; text-decoration: none;
         }
         .btn-primary-custom:hover { background: var(--primary-hover); color: #fff; box-shadow: 0 6px 18px rgba(108,79,240,.3); transform: translateY(-1px); }
+        
         .btn-outline-custom {
             display: inline-flex; align-items: center; gap: .4rem;
             padding: .5rem 1rem; background: var(--white); border: 1px solid var(--border);
@@ -210,7 +206,7 @@
         .btn-outline-custom:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-soft); }
 
         /* ── SEARCH & FILTERS */
-        .table-search { position: relative; min-width: 220px; }
+        .table-search { position: relative; min-width: 240px; }
         .table-search i { position: absolute; left: .75rem; top: 50%; transform: translateY(-50%); color: var(--gray-text); font-size: .85rem; }
         .table-search input {
             width: 100%; padding: .45rem .9rem .45rem 2.1rem;
@@ -240,8 +236,8 @@
             animation: modal-in .25s ease;
         }
         @keyframes modal-in { from { opacity:0; transform:scale(.95) translateY(12px); } to { opacity:1; transform:scale(1) translateY(0); } }
-        .modal-title   { font-size: 1.1rem; font-weight: 800; color: var(--dark); margin-bottom: .25rem; }
-        .modal-subtitle { font-size: .82rem; color: var(--gray-text); margin-bottom: 1.5rem; }
+        .modal-title   { font-size: 1.15rem; font-weight: 800; color: var(--dark); margin-bottom: .25rem; }
+        .modal-subtitle { font-size: .82rem; color: var(--gray-text); margin-bottom: 1.25rem; }
 
         @media (max-width: 991.98px) {
             .content-area { padding: 1.25rem 1rem; }
@@ -251,9 +247,10 @@
 <body>
 
 <div class="wrapper">
+    <!-- Sidebar -->
     {% include '_sidebar_superadmin.html' with active_page='solicitudes_global' %}
 
-    <main class="main-content">
+    <main class="main-content flex-grow-1 min-vw-0">
 
         <!-- TOPBAR -->
         <header class="topbar">
@@ -264,17 +261,13 @@
                 </button>
                 <div class="search-bar">
                     <i class="bi bi-search"></i>
-                    <input type="text" id="globalSearch" placeholder="Buscar por usuario o email...">
+                    <input type="text" id="globalSearch" placeholder="Buscar por colegio, solicitante o RUT...">
                 </div>
             </div>
             <div class="topbar-right">
-                <button style="background:none;border:none;color:var(--gray-text);font-size:1.1rem;position:relative;cursor:pointer;">
-                    <i class="bi bi-bell"></i>
-                    <span style="position:absolute;top:0;right:0;width:7px;height:7px;background:#F76F7A;border-radius:50%;border:2px solid white;"></span>
-                </button>
                 <div class="user-profile">
-                    <div class="user-avatar">AE</div>
-                    <span class="user-name">Admin Eduteka</span>
+                    <div class="user-avatar">SA</div>
+                    <span class="user-name">Super Admin</span>
                 </div>
             </div>
         </header>
@@ -285,44 +278,46 @@
             <div class="d-flex align-items-start justify-content-between mb-4 flex-wrap gap-3">
                 <div>
                     <div class="d-flex align-items-center gap-2 mb-1">
-                        <div style="width:34px;height:34px;background:var(--primary-soft);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;">
-                            <i class="bi bi-clipboard-check-fill" style="color:var(--primary);font-size:1rem;"></i>
+                        <div style="width:36px;height:36px;background:var(--primary-soft);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;">
+                            <i class="bi bi-clipboard-check-fill" style="color:var(--primary);font-size:1.1rem;"></i>
                         </div>
                         <h1 class="hero-title mb-0">Cola Global de Solicitudes</h1>
                     </div>
                     <p class="hero-subtitle ms-1">
-                        Gestión centralizada de peticiones de acceso a instituciones de la plataforma.
+                        Gestión centralizada de peticiones de registro e incorporación de nuevos colegios a la plataforma.
                     </p>
                 </div>
                 <div class="d-flex gap-2 flex-wrap">
-                    <a href="#" class="btn-outline-custom" onclick="exportSolicitudes(event)">
+                    <button class="btn-outline-custom" onclick="exportSolicitudesCSV()">
                         <i class="bi bi-download"></i> Exportar CSV
-                    </a>
-                    <button class="btn-primary-custom" onclick="openBatchModal()">
-                        <i class="bi bi-check-all"></i> Procesar Pendientes
                     </button>
+                    <a href="{% url 'dashboard_superadmin_colegios' %}" class="btn-primary-custom">
+                        <i class="bi bi-building"></i> Ver Colegios Activos
+                    </a>
                 </div>
             </div>
 
-            <!-- STAT CARDS (KPIs) -->
+            <!-- DJANGO MESSAGES -->
             {% if messages %}
             <div class="mb-3">
                 {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} d-flex align-items-center gap-2" style="border-radius:var(--radius-md);font-size:.85rem;">
+                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show d-flex align-items-center gap-2 rounded-3" role="alert">
                     <i class="bi {% if 'success' in message.tags %}bi-check-circle-fill text-success{% else %}bi-exclamation-circle-fill text-danger{% endif %}"></i>
-                    {{ message }}
+                    <span>{{ message }}</span>
+                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
                 {% endfor %}
             </div>
             {% endif %}
 
+            <!-- STAT CARDS (KPIs) -->
             <div class="row g-3 mb-4">
                 <div class="col-6 col-xl-3">
                     <div class="stat-card">
                         <div class="stat-icon amber"><i class="bi bi-hourglass-split"></i></div>
                         <div>
-                            <div class="stat-value">{{ pendientes_total }}</div>
-                            <div class="stat-label">Solicitudes Pendientes</div>
+                            <div class="stat-value">{{ pendientes_total|default:"0" }}</div>
+                            <div class="stat-label">Pendientes de Revisión</div>
                         </div>
                     </div>
                 </div>
@@ -330,8 +325,8 @@
                     <div class="stat-card">
                         <div class="stat-icon teal"><i class="bi bi-check-circle-fill"></i></div>
                         <div>
-                            <div class="stat-value">{{ aprobadas_hoy }}</div>
-                            <div class="stat-label">Aprobadas (Hoy)</div>
+                            <div class="stat-value">{{ aprobadas_total|default:"0" }}</div>
+                            <div class="stat-label">Aprobadas ({{ aprobadas_hoy|default:"0" }} hoy)</div>
                         </div>
                     </div>
                 </div>
@@ -339,17 +334,17 @@
                     <div class="stat-card">
                         <div class="stat-icon rose"><i class="bi bi-x-circle-fill"></i></div>
                         <div>
-                            <div class="stat-value">{{ tasa_rechazo }}%</div>
-                            <div class="stat-label">Tasa de Rechazo</div>
+                            <div class="stat-value">{{ rechazadas_total|default:"0" }}</div>
+                            <div class="stat-label">Rechazadas ({{ tasa_rechazo|default:"0" }}%)</div>
                         </div>
                     </div>
                 </div>
                 <div class="col-6 col-xl-3">
                     <div class="stat-card">
-                        <div class="stat-icon purple"><i class="bi bi-lightning-charge-fill"></i></div>
+                        <div class="stat-icon purple"><i class="bi bi-inbox-fill"></i></div>
                         <div>
-                            <div class="stat-value">{{ solicitudes|length }} <span style="font-size:1rem;font-weight:600;">total</span></div>
-                            <div class="stat-label">Solicitudes (con filtros)</div>
+                            <div class="stat-value">{{ total_solicitudes|default:"0" }}</div>
+                            <div class="stat-label">Total Solicitudes Registradas</div>
                         </div>
                     </div>
                 </div>
@@ -360,23 +355,23 @@
                 <div class="panel-header">
                     <div>
                         <div class="panel-title">
-                            <i class="bi bi-inbox-fill me-1" style="color:var(--primary);"></i>
-                            Peticiones Recientes
+                            <i class="bi bi-list-check me-1" style="color:var(--primary);"></i>
+                            Listado de Solicitudes Recibidas
                         </div>
                         <div class="panel-subtitle">
-                            Solicitudes de nuevos usuarios que requieren validación de asignación a colegios.
+                            Validación de sostenedores, datos de contacto y asignación automática de plan institucional.
                         </div>
                     </div>
                     <form method="GET" action="" class="d-flex align-items-center gap-2 flex-wrap">
                         <div class="table-search">
                             <i class="bi bi-search"></i>
-                            <input type="text" name="q" value="{{ request.GET.q|default:'' }}" id="tableSearch" placeholder="Buscar colegio, email, RUT..." oninput="filterTable()">
+                            <input type="text" name="q" value="{{ request.GET.q|default:'' }}" id="tableSearch" placeholder="Buscar colegio, email, RUT..." oninput="filterTableClient()">
                         </div>
 
                         <!-- Filtro por Estado -->
                         <select name="estado" id="filterEstado" class="form-control-custom"
                             style="width:auto;padding:.45rem .85rem;font-size:.82rem;" onchange="this.form.submit()">
-                            <option value="">Estado</option>
+                            <option value="">Todos los Estados</option>
                             <option value="pendiente" {% if request.GET.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
                             <option value="aprobada"  {% if request.GET.estado == 'aprobada'  %}selected{% endif %}>Aprobada</option>
                             <option value="rechazada" {% if request.GET.estado == 'rechazada' %}selected{% endif %}>Rechazada</option>
@@ -397,125 +392,126 @@
                     <table class="solicitudes-table" id="solicitudesTable">
                         <thead>
                             <tr>
-                                <th>Institución Solicitante</th>
-                                <th>RUT Sostenedor</th>
-                                <th>Contacto</th>
+                                <th>Nombre del Colegio</th>
+                                <th>Solicitante / RUT</th>
+                                <th>Correo & Teléfono</th>
                                 <th>Plan Solicitado</th>
-                                <th>Fecha de Petición</th>
+                                <th>Fecha de Solicitud</th>
                                 <th>Estado</th>
                                 <th style="width:130px;text-align:center;">Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="solicitudesBody">
 
-                            {% for s in solicitudes %}
-                            <tr data-colegio="{{ s.nombre_colegio }}" data-estado="{{ s.get_estado_display }}">
-                                <!-- Institución -->
+                            {% for solicitud in solicitudes %}
+                            <tr data-colegio="{{ solicitud.nombre_colegio }}" data-estado="{{ solicitud.get_estado_display }}">
+                                <!-- Nombre del colegio -->
                                 <td>
                                     <div class="user-cell">
                                         <div class="user-avatar-circle" style="background:linear-gradient(135deg,#7C5CFC,#5B3FD4);">
-                                            {{ s.nombre_colegio|slice:":2"|upper }}
+                                            {{ solicitud.nombre_colegio|slice:":2"|upper }}
                                         </div>
                                         <div>
-                                            <div class="user-name-text">{{ s.nombre_colegio }}</div>
-                                            <div class="user-subtext">{{ s.ciudad_comuna|default:"—" }}</div>
+                                            <div class="user-name-text">{{ solicitud.nombre_colegio }}</div>
+                                            <div class="user-subtext"><i class="bi bi-geo-alt me-1"></i>{{ solicitud.ciudad_comuna|default:"Chile" }}</div>
                                         </div>
                                     </div>
                                 </td>
 
-                                <!-- RUT -->
+                                <!-- Solicitante / RUT -->
                                 <td>
-                                    <div style="font-size:.84rem;font-weight:600;color:var(--dark);">{{ s.rut_sostenedor }}</div>
-                                    <div style="font-size:.74rem;color:var(--gray-text);">{{ s.nombre_administrador|default:"—" }}</div>
+                                    <div style="font-size:.85rem;font-weight:700;color:var(--dark);">{{ solicitud.nombre_administrador|default:"Director / Admin" }}</div>
+                                    <div style="font-size:.75rem;color:var(--gray-text);font-family:monospace;">RUT: {{ solicitud.rut_sostenedor|default:"Sin RUT" }}</div>
                                 </td>
 
-                                <!-- Contacto -->
+                                <!-- Correo / Teléfono -->
                                 <td>
-                                    <div style="font-size:.84rem;font-weight:600;color:var(--dark);">{{ s.email_contacto }}</div>
-                                    <div style="font-size:.74rem;color:var(--gray-text);">{{ s.telefono|default:"Sin teléfono" }}</div>
+                                    <div style="font-size:.84rem;font-weight:600;color:var(--dark);">{{ solicitud.email_contacto }}</div>
+                                    <div style="font-size:.74rem;color:var(--gray-text);"><i class="bi bi-telephone me-1"></i>{{ solicitud.telefono|default:"Sin teléfono" }}</div>
                                 </td>
 
-                                <!-- Plan -->
+                                <!-- Plan Solicitado -->
                                 <td>
-                                    {% if s.plan_solicitado %}
-                                    <span class="role-chip chip-profesor">
-                                        <span class="dot"></span>{{ s.plan_solicitado.nombre }}
+                                    {% if solicitud.plan_solicitado %}
+                                    <span class="role-chip chip-plan">
+                                        <span class="dot"></span>{{ solicitud.plan_solicitado.nombre }}
                                     </span>
                                     {% else %}
-                                    <span style="font-size:.8rem;color:var(--gray-text);">—</span>
+                                    <span class="role-chip chip-free">
+                                        <span class="dot"></span>Estándar
+                                    </span>
                                     {% endif %}
                                 </td>
 
-                                <!-- Fecha -->
+                                <!-- Fecha de Solicitud -->
                                 <td>
-                                    <div style="font-size:.82rem;color:var(--dark);">{{ s.created_at|date:"d M Y, H:i" }}</div>
-                                    <div style="font-size:.72rem;color:var(--gray-text);">{{ s.created_at|timesince }} atrás</div>
+                                    <div style="font-size:.82rem;font-weight:600;color:var(--dark);">{{ solicitud.created_at|date:"d M Y, H:i" }}</div>
+                                    <div style="font-size:.72rem;color:var(--gray-text);">{{ solicitud.created_at|timesince }} atrás</div>
                                 </td>
 
                                 <!-- Estado Badge -->
                                 <td>
-                                    {% if s.estado == 'pendiente' %}
-                                    <span class="status-badge status-pendiente"><i class="bi bi-clock-history" style="font-size:.45rem;"></i> Pendiente</span>
-                                    {% elif s.estado == 'aprobada' %}
-                                    <span class="status-badge status-aprobada"><i class="bi bi-check-circle-fill" style="font-size:.45rem;"></i> Aprobada</span>
+                                    {% if solicitud.estado == 'pendiente' %}
+                                    <span class="status-badge status-pendiente"><i class="bi bi-clock-history"></i> Pendiente</span>
+                                    {% elif solicitud.estado == 'aprobada' %}
+                                    <span class="status-badge status-aprobada"><i class="bi bi-check-circle-fill"></i> Aprobada</span>
                                     {% else %}
-                                    <span class="status-badge status-rechazada"><i class="bi bi-x-circle-fill" style="font-size:.45rem;"></i> Rechazada</span>
+                                    <span class="status-badge status-rechazada"><i class="bi bi-x-circle-fill"></i> Rechazada</span>
                                     {% endif %}
                                 </td>
 
                                 <!-- Acciones -->
                                 <td>
-                                    <div class="d-flex align-items-center justify-content-center gap-1">
-                                        {% if s.estado == 'pendiente' %}
+                                    <div class="d-flex align-items-center justify-content-center gap-1.5">
+                                        {% if solicitud.estado == 'pendiente' %}
                                         <!-- Botón Aprobar -->
-                                        <form method="POST" action="{% url 'dashboard_superadmin_solicitudes' %}" style="display:inline;" onsubmit="return confirm('¿Confirmas aprobar la solicitud de {{ s.nombre_colegio|escapejs }}? Se creará un Colegio automáticamente.');">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="solicitud_id" value="{{ s.id }}">
-                                            <input type="hidden" name="accion" value="aprobar">
-                                            <button type="submit" class="action-btn approve" title="Aprobar y crear colegio">
-                                                <i class="bi bi-check-lg"></i>
-                                            </button>
-                                        </form>
+                                        <button type="button" class="action-btn approve" title="Aprobar Solicitud"
+                                            onclick="confirmApprove('{{ solicitud.nombre_administrador|default:solicitud.nombre_colegio|escapejs }}', '{{ solicitud.nombre_colegio|escapejs }}', '{% if solicitud.plan_solicitado %}{{ solicitud.plan_solicitado.nombre|escapejs }}{% else %}Estándar{% endif %}', '{{ solicitud.id }}')">
+                                            <i class="bi bi-check-lg"></i>
+                                        </button>
                                         <!-- Botón Rechazar -->
-                                        <form method="POST" action="{% url 'dashboard_superadmin_solicitudes' %}" style="display:inline;" onsubmit="return confirm('¿Confirmas rechazar la solicitud de {{ s.nombre_colegio|escapejs }}?');">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="solicitud_id" value="{{ s.id }}">
-                                            <input type="hidden" name="accion" value="rechazar">
-                                            <button type="submit" class="action-btn reject" title="Rechazar solicitud">
-                                                <i class="bi bi-x-lg"></i>
-                                            </button>
-                                        </form>
+                                        <button type="button" class="action-btn reject" title="Rechazar Solicitud"
+                                            onclick="confirmReject('{{ solicitud.nombre_administrador|default:solicitud.nombre_colegio|escapejs }}', '{{ solicitud.nombre_colegio|escapejs }}', '{{ solicitud.id }}')">
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
                                         {% endif %}
-                                        <!-- Ver detalle -->
-                                        <button class="action-btn view" title="Ver detalle"
-                                            onclick="openDetailModal('{{ s.nombre_colegio|escapejs }}', '{{ s.email_contacto|escapejs }}', '{{ s.rut_sostenedor|escapejs }}', '{% if s.plan_solicitado %}{{ s.plan_solicitado.nombre|escapejs }}{% else %}Sin plan{% endif %}', '{{ s.notas_admin|default:'Sin notas adicionales.'|escapejs }}')"
-                                        ><i class="bi bi-eye"></i></button>
+
+                                        <!-- Botón Ver Detalle -->
+                                        <button type="button" class="action-btn view" title="Ver Detalle Completo"
+                                            onclick="openDetailModal('{{ solicitud.nombre_colegio|escapejs }}', '{{ solicitud.nombre_administrador|default:"Sin asignar"|escapejs }}', '{{ solicitud.rut_sostenedor|default:"Sin RUT"|escapejs }}', '{{ solicitud.email_contacto|escapejs }}', '{{ solicitud.telefono|default:"Sin teléfono"|escapejs }}', '{{ solicitud.ciudad_comuna|default:"Chile"|escapejs }}', '{% if solicitud.plan_solicitado %}{{ solicitud.plan_solicitado.nombre|escapejs }}{% else %}Estándar{% endif %}', '{{ solicitud.created_at|date:"d/m/Y H:i" }}', '{{ solicitud.get_estado_display|escapejs }}', '{{ solicitud.notas_admin|default:"Sin observaciones registradas."|escapejs }}')">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+
+                                        {% if solicitud.estado == 'aprobada' and solicitud.colegio_creado %}
+                                        <a href="{% url 'ver_detalle_colegio' solicitud.colegio_creado.id %}" class="action-btn view" title="Ver Ficha de Colegio Creado" style="color:#059669;border-color:#A7F3D0;background:#ECFDF5;">
+                                            <i class="bi bi-building-check"></i>
+                                        </a>
+                                        {% endif %}
                                     </div>
                                 </td>
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="7" style="text-align:center;padding:3rem;color:var(--gray-text);font-size:.9rem;">
-                                    <i class="bi bi-inbox" style="font-size:2.5rem;display:block;margin-bottom:.75rem;opacity:.4;"></i>
-                                    No se encontraron solicitudes con los filtros seleccionados.
+                                <td colspan="7" style="text-align:center;padding:3.5rem;color:var(--gray-text);font-size:.9rem;">
+                                    <i class="bi bi-inbox" style="font-size:2.5rem;display:block;margin-bottom:.75rem;opacity:.35;"></i>
+                                    No se encontraron solicitudes con los criterios de búsqueda seleccionados.
                                 </td>
                             </tr>
                             {% endfor %}
 
                         </tbody>
-
                     </table>
                 </div>
 
                 <!-- Table Footer -->
                 <div style="padding:.85rem 1.5rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;">
                     <span style="font-size:.78rem;color:var(--gray-text);" id="tableCount">
-                        Mostrando <strong>{{ total_solicitudes }}</strong> solicitud(es)
+                        Mostrando <strong>{{ total_solicitudes|default:"0" }}</strong> solicitud(es)
                     </span>
                     <div class="d-flex gap-2">
-                        <a href="#" class="btn-outline-custom" style="font-size:.78rem;padding:.35rem .85rem;" onclick="exportSolicitudes(event)">
-                            <i class="bi bi-download"></i> Exportar Registro
-                        </a>
+                        <button class="btn-outline-custom" style="font-size:.78rem;padding:.35rem .85rem;" onclick="exportSolicitudesCSV()">
+                            <i class="bi bi-download"></i> Exportar CSV
+                        </button>
                     </div>
                 </div>
             </div>
@@ -527,112 +523,130 @@
 
 <!-- ════ MODAL: APROBAR SOLICITUD ═════════════════════════════════════════ -->
 <div class="modal-overlay" id="modalApprove">
-    <div class="modal-box" style="width:460px;text-align:center;">
+    <div class="modal-box" style="width:480px;text-align:center;">
         <div style="width:56px;height:56px;background:#D1FAE5;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
-            <i class="bi bi-check-circle-fill" style="color:#059669;font-size:1.5rem;"></i>
+            <i class="bi bi-check-circle-fill" style="color:#059669;font-size:1.6rem;"></i>
         </div>
-        <div class="modal-title" style="margin-bottom:.35rem;">Aprobar Acceso a la Plataforma</div>
-        <p style="font-size:.84rem;color:var(--gray-text);line-height:1.6;">
-            ¿Confirmas la aprobación para <strong id="approveUserName" style="color:var(--dark);"></strong> en <strong id="approveColegioName" style="color:var(--dark);"></strong> con rol <strong id="approveRolName" style="color:var(--primary);"></strong>?
+        <div class="modal-title" style="margin-bottom:.35rem;">Aprobar Registro de Colegio</div>
+        <p style="font-size:.85rem;color:var(--gray-text);line-height:1.6;margin-bottom:1.5rem;">
+            ¿Confirmas la aprobación para el establecimiento <strong id="approveColegioName" style="color:var(--dark);"></strong> a cargo de <strong id="approveUserName" style="color:var(--dark);"></strong> con el plan <strong id="approveRolName" style="color:var(--primary);"></strong>?
+            <br><small class="text-muted">Se creará automáticamente el registro del colegio en la base de datos.</small>
         </p>
-        <div class="d-flex gap-2 justify-content-center mt-4">
-            <button onclick="closeModal('modalApprove')" class="btn-outline-custom">Cancelar</button>
-            <button class="btn-primary-custom" style="background:#059669;" onclick="executeApprove()">
-                <i class="bi bi-check-lg"></i> Sí, Aprobar Acceso
-            </button>
-        </div>
+        <form id="formApproveDirect" method="POST" action="">
+            {% csrf_token %}
+            <div class="d-flex gap-2 justify-content-center">
+                <button type="button" onclick="closeModal('modalApprove')" class="btn-outline-custom">Cancelar</button>
+                <button type="submit" class="btn-primary-custom" style="background:#059669;">
+                    <i class="bi bi-check-lg"></i> Sí, Aprobar Solicitud
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
 <!-- ════ MODAL: RECHAZAR SOLICITUD ═════════════════════════════════════════ -->
 <div class="modal-overlay" id="modalReject">
-    <div class="modal-box" style="width:480px;">
+    <div class="modal-box" style="width:490px;">
         <div class="d-flex align-items-center justify-content-between mb-3">
             <div>
-                <div class="modal-title">Rechazar Solicitud de Acceso</div>
-                <div class="modal-subtitle">Indica el motivo del rechazo para notificar al solicitante.</div>
+                <div class="modal-title">Rechazar Solicitud</div>
+                <div class="modal-subtitle">Indica el motivo del rechazo para registro interno y notificación.</div>
             </div>
-            <button onclick="closeModal('modalReject')" style="background:none;border:none;font-size:1.3rem;color:var(--gray-text);cursor:pointer;">&times;</button>
+            <button type="button" onclick="closeModal('modalReject')" style="background:none;border:none;font-size:1.4rem;color:var(--gray-text);cursor:pointer;">&times;</button>
         </div>
 
-        <div class="mb-3">
-            <label class="form-label-custom">Solicitante</label>
-            <input type="text" class="form-control-custom" id="rejectUserName" readonly>
-        </div>
+        <form id="formRejectDirect" method="POST" action="">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label-custom">Institución / Solicitante</label>
+                <input type="text" class="form-control-custom" id="rejectUserName" readonly style="background:#F8F9FD;">
+            </div>
 
-        <div class="mb-3">
-            <label class="form-label-custom">Motivo de Rechazo</label>
-            <select class="form-control-custom">
-                <option>Correo no corresponde al dominio institucional</option>
-                <option>RUT no verificado en nómina del establecimiento</option>
-                <option>Rol solicitado no habilitado para el usuario</option>
-                <option>Solicitud duplicada</option>
-                <option>Otro motivo personalizado...</option>
-            </select>
-        </div>
+            <div class="mb-3">
+                <label class="form-label-custom">Motivo de Rechazo</label>
+                <select name="motivo_select" class="form-control-custom" onchange="document.getElementById('rejectMotivo').value = this.value;">
+                    <option value="RUT o documentación institucional no verificada">RUT o documentación institucional no verificada</option>
+                    <option value="Correo no corresponde al dominio institucional oficial">Correo no corresponde al dominio institucional oficial</option>
+                    <option value="Solicitud duplicada para el mismo establecimiento">Solicitud duplicada para el mismo establecimiento</option>
+                    <option value="Falta información de contacto del sostenedor">Falta información de contacto del sostenedor</option>
+                    <option value="Otro motivo">Otro motivo...</option>
+                </select>
+            </div>
 
-        <div class="mb-3">
-            <label class="form-label-custom">Observación Adicional</label>
-            <textarea class="form-control-custom" rows="3" placeholder="Mensaje que recibirá el usuario por correo..."></textarea>
-        </div>
+            <div class="mb-3">
+                <label class="form-label-custom">Observación o Detalle</label>
+                <textarea id="rejectMotivo" name="motivo" class="form-control-custom" rows="3" placeholder="Detalle adicional sobre el motivo del rechazo..."></textarea>
+            </div>
 
-        <div class="d-flex gap-2 justify-content-end pt-2" style="border-top:1px solid var(--border);">
-            <button onclick="closeModal('modalReject')" class="btn-outline-custom">Cancelar</button>
-            <button style="display:inline-flex;align-items:center;gap:.45rem;padding:.55rem 1.25rem;background:#EF4444;color:#fff;border:none;border-radius:var(--radius-md);font-weight:600;font-size:.85rem;cursor:pointer;" onclick="executeReject()">
-                <i class="bi bi-x-lg"></i> Confirmar Rechazo
-            </button>
-        </div>
+            <div class="d-flex gap-2 justify-content-end pt-3" style="border-top:1px solid var(--border);">
+                <button type="button" onclick="closeModal('modalReject')" class="btn-outline-custom">Cancelar</button>
+                <button type="submit" style="display:inline-flex;align-items:center;gap:.45rem;padding:.55rem 1.25rem;background:#DC2626;color:#fff;border:none;border-radius:var(--radius-md);font-weight:600;font-size:.85rem;cursor:pointer;">
+                    <i class="bi bi-x-lg"></i> Confirmar Rechazo
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
 <!-- ════ MODAL: VER DETALLE ═══════════════════════════════════════════════ -->
 <div class="modal-overlay" id="modalDetail">
-    <div class="modal-box">
+    <div class="modal-box" style="width:540px;">
         <div class="d-flex align-items-center justify-content-between mb-3">
             <div>
-                <div class="modal-title">Detalle de Solicitud de Acceso</div>
-                <div class="modal-subtitle">Información completa enviada por el usuario.</div>
+                <div class="modal-title">Detalle de Solicitud de Registro</div>
+                <div class="modal-subtitle">Información completa enviada por la institución.</div>
             </div>
-            <button onclick="closeModal('modalDetail')" style="background:none;border:none;font-size:1.3rem;color:var(--gray-text);cursor:pointer;">&times;</button>
+            <button type="button" onclick="closeModal('modalDetail')" style="background:none;border:none;font-size:1.4rem;color:var(--gray-text);cursor:pointer;">&times;</button>
         </div>
 
-        <div class="p-3 mb-3 rounded" style="background:var(--bg);border:1px solid var(--border);">
-            <div class="row g-2">
+        <div class="p-3 mb-3 rounded-3" style="background:var(--bg);border:1px solid var(--border);">
+            <div class="row g-3">
                 <div class="col-6">
-                    <span class="form-label-custom">Solicitante</span>
-                    <div id="detailNombre" class="fw-bold text-dark"></div>
-                    <div id="detailEmail" class="text-muted small"></div>
+                    <span class="form-label-custom">Colegio</span>
+                    <div id="detailColegio" class="fw-bold text-dark fs-6"></div>
+                    <div id="detailComuna" class="text-muted small"></div>
                 </div>
                 <div class="col-6">
-                    <span class="form-label-custom">Institución</span>
-                    <div id="detailColegio" class="fw-bold text-dark"></div>
-                    <div id="detailRol" class="text-primary small fw-bold"></div>
+                    <span class="form-label-custom">Plan Solicitado</span>
+                    <div id="detailPlan" class="text-primary fw-bold"></div>
+                    <div id="detailFecha" class="text-muted small"></div>
+                </div>
+                <div class="col-6">
+                    <span class="form-label-custom">Director / Sostenedor</span>
+                    <div id="detailAdmin" class="fw-bold text-dark"></div>
+                    <div id="detailRut" class="text-muted small font-monospace"></div>
+                </div>
+                <div class="col-6">
+                    <span class="form-label-custom">Contacto</span>
+                    <div id="detailEmail" class="fw-bold text-dark text-break"></div>
+                    <div id="detailTelefono" class="text-muted small"></div>
                 </div>
             </div>
         </div>
 
         <div class="mb-3">
-            <label class="form-label-custom">Mensaje o Justificación</label>
-            <div id="detailMensaje" class="p-3 rounded" style="background:#FAFBFF;border:1px solid var(--border);font-size:.85rem;color:var(--dark);"></div>
+            <label class="form-label-custom">Notas / Observaciones Administrativas</label>
+            <div id="detailNotas" class="p-3 rounded-3" style="background:#FAFBFF;border:1px solid var(--border);font-size:.85rem;color:var(--dark);min-height:50px;"></div>
         </div>
 
-        <div class="d-flex gap-2 justify-content-end pt-2" style="border-top:1px solid var(--border);">
-            <button onclick="closeModal('modalDetail')" class="btn-outline-custom">Cerrar</button>
+        <div class="d-flex justify-content-end pt-2" style="border-top:1px solid var(--border);">
+            <button type="button" onclick="closeModal('modalDetail')" class="btn-outline-custom">Cerrar</button>
         </div>
     </div>
 </div>
 
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Scripts Bootstrap -->
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 <script>
-    // ── Mobile sidebar
+    // ── Mobile sidebar toggle
     document.addEventListener('DOMContentLoaded', () => {
         const btn = document.getElementById('mobileMenuBtn');
         const sb  = document.getElementById('sidebar');
         if (btn && sb) btn.addEventListener('click', () => sb.classList.toggle('active'));
     });
 
-    // ── Modals
+    // ── Modals logic
     function openModal(id)  { document.getElementById(id).classList.add('active'); }
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
@@ -640,95 +654,104 @@
         el.addEventListener('click', e => { if (e.target === el) closeModal(el.id); });
     });
 
-    let _currentSolicitudId = null;
-
-    function confirmApprove(nombre, colegio, rol, solicitudId) {
-        _currentSolicitudId = solicitudId;
-        document.getElementById('approveUserName').textContent   = nombre;
+    function confirmApprove(solicitante, colegio, plan, solicitudId) {
+        document.getElementById('approveUserName').textContent    = solicitante;
         document.getElementById('approveColegioName').textContent = colegio;
-        document.getElementById('approveRolName').textContent     = rol;
+        document.getElementById('approveRolName').textContent     = plan;
+        
+        const form = document.getElementById('formApproveDirect');
+        form.action = `/dashboard/superadmin/solicitudes/${solicitudId}/aprobar/`;
         openModal('modalApprove');
     }
 
-    function confirmReject(nombre, solicitudId) {
-        _currentSolicitudId = solicitudId;
-        document.getElementById('rejectUserName').value = nombre;
+    function confirmReject(solicitante, colegio, solicitudId) {
+        document.getElementById('rejectUserName').value = `${colegio} (${solicitante})`;
+        document.getElementById('rejectMotivo').value   = 'RUT o documentación institucional no verificada';
+        
+        const form = document.getElementById('formRejectDirect');
+        form.action = `/dashboard/superadmin/solicitudes/${solicitudId}/rechazar/`;
         openModal('modalReject');
     }
 
-    function openDetailModal(nombre, email, colegio, rol, mensaje) {
-        document.getElementById('detailNombre').textContent  = nombre;
-        document.getElementById('detailEmail').textContent   = email;
-        document.getElementById('detailColegio').textContent = colegio;
-        document.getElementById('detailRol').textContent     = 'Rol: ' + rol;
-        document.getElementById('detailMensaje').textContent = mensaje;
+    function openDetailModal(colegio, admin, rut, email, telefono, comuna, plan, fecha, estado, notas) {
+        document.getElementById('detailColegio').textContent  = colegio;
+        document.getElementById('detailComuna').textContent   = comuna;
+        document.getElementById('detailAdmin').textContent    = admin;
+        document.getElementById('detailRut').textContent      = 'RUT: ' + rut;
+        document.getElementById('detailEmail').textContent    = email;
+        document.getElementById('detailTelefono').textContent = telefono;
+        document.getElementById('detailPlan').textContent     = plan;
+        document.getElementById('detailFecha').textContent    = fecha;
+        document.getElementById('detailNotas').textContent    = notas || 'Sin observaciones registradas.';
         openModal('modalDetail');
     }
 
-    function executeApprove() {
-        submitAction('aprobar');
-    }
-
-    function executeReject() {
-        submitAction('rechazar');
-    }
-
-    function submitAction(accion) {
-        if (!_currentSolicitudId) return;
-        const form = document.getElementById('actionForm');
-        form.querySelector('[name="accion"]').value       = accion;
-        form.querySelector('[name="solicitud_id"]').value = _currentSolicitudId;
-        form.submit();
-    }
-
-    function openBatchModal() {
-        alert('Procesando peticiones en lote...');
-    }
-
-    function exportSolicitudes(e) {
-        e.preventDefault();
-        alert('Exportando historial de solicitudes a CSV...');
-    }
-
-    // ── Filtrado de tabla
-    function filterTable() {
-        const q       = (document.getElementById('tableSearch').value || '').toLowerCase();
-        const colegio = (document.getElementById('filterColegio').value || '').toLowerCase();
-        const estado  = (document.getElementById('filterEstado').value || '').toLowerCase();
-
+    // ── Export CSV
+    function exportSolicitudesCSV() {
         const rows = document.querySelectorAll('#solicitudesBody tr');
-        let vis    = 0;
+        let csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "Colegio,Solicitante,RUT,Email,Telefono,Plan,Fecha,Estado\n";
+
+        rows.forEach(row => {
+            const cols = row.querySelectorAll('td');
+            if (cols.length >= 6) {
+                const colegio     = cols[0].querySelector('.user-name-text')?.innerText.replace(/,/g, ' ') || '';
+                const solicitante = cols[1].querySelector('div:first-child')?.innerText.replace(/,/g, ' ') || '';
+                const rut         = cols[1].querySelector('div:last-child')?.innerText.replace(/RUT:\s*/g, '').replace(/,/g, ' ') || '';
+                const email       = cols[2].querySelector('div:first-child')?.innerText.replace(/,/g, ' ') || '';
+                const telefono    = cols[2].querySelector('div:last-child')?.innerText.replace(/,/g, ' ') || '';
+                const plan        = cols[3].innerText.trim().replace(/,/g, ' ');
+                const fecha       = cols[4].querySelector('div:first-child')?.innerText.replace(/,/g, ' ') || '';
+                const estado      = cols[5].innerText.trim().replace(/,/g, ' ');
+
+                csvContent += `"${colegio}","${solicitante}","${rut}","${email}","${telefono}","${plan}","${fecha}","${estado}"\n`;
+            }
+        });
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `solicitudes_eduteka_${new Date().toISOString().slice(0,10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    // ── Instant Client-Side Table Filter
+    function filterTableClient() {
+        const q      = (document.getElementById('tableSearch').value || '').toLowerCase();
+        const estado = (document.getElementById('filterEstado').value || '').toLowerCase();
+        const rows   = document.querySelectorAll('#solicitudesBody tr');
+        let vis      = 0;
 
         rows.forEach(row => {
             const rowColegio = (row.dataset.colegio || '').toLowerCase();
             const rowEstado  = (row.dataset.estado || '').toLowerCase();
             const text       = row.innerText.toLowerCase();
 
-            const matchQ       = !q       || text.includes(q);
-            const matchColegio = !colegio || rowColegio.includes(colegio);
-            const matchEstado  = !estado  || rowEstado.includes(estado);
+            const matchQ      = !q      || text.includes(q) || rowColegio.includes(q);
+            const matchEstado = !estado || rowEstado.includes(estado);
 
-            const show = matchQ && matchColegio && matchEstado;
+            const show = matchQ && matchEstado;
             row.style.display = show ? '' : 'none';
             if (show) vis++;
         });
 
-        document.getElementById('tableCount').innerHTML =
-            'Mostrando <strong>' + vis + '</strong> de <strong>' + rows.length + '</strong> solicitud(es)';
+        const countEl = document.getElementById('tableCount');
+        if (countEl) {
+            countEl.innerHTML = 'Mostrando <strong>' + vis + '</strong> de <strong>' + rows.length + '</strong> solicitud(es)';
+        }
     }
 
-    // Búsqueda global desde topbar
-    document.getElementById('globalSearch').addEventListener('input', function () {
-        document.getElementById('tableSearch').value = this.value;
-        filterTable();
+    // Búsqueda desde la barra superior
+    document.getElementById('globalSearch')?.addEventListener('input', function () {
+        const input = document.getElementById('tableSearch');
+        if (input) {
+            input.value = this.value;
+            filterTableClient();
+        }
     });
 </script>
-<!-- Hidden form for POST approve/reject actions -->
-<form id="actionForm" method="POST" action="{% url 'dashboard_superadmin_solicitudes' %}" style="display:none;">
-    {% csrf_token %}
-    <input type="hidden" name="accion" value="">
-    <input type="hidden" name="solicitud_id" value="">
-</form>
 
 </body>
 </html>

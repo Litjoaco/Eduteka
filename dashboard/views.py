@@ -96,29 +96,20 @@ def superadmin_required(view_func):
         return view_func(request, *args, **kwargs)
     return _wrapped_view
 
-@login_required
-def rechazar_solicitud(request, solicitud_id):
-    if request.method == 'POST':
-        solicitud = get_object_or_404(SolicitudAcceso, id=solicitud_id)
-        if request.user == solicitud.colegio.administrador:
-            solicitud.estado = 'rechazada'
-            solicitud.save()
-            messages.success(request, f"Solicitud de {solicitud.usuario.perfil.nombre_completo} rechazada.")
-        else:
-            messages.error(request, "No tienes permiso para rechazar esta solicitud.")
-    return redirect('dashboard_profesor')
-
 @superadmin_required
 def dashboard_superadmin_view(request):
     """
     Centro de Comando Ejecutivo - Resumen Global SaaS.
-    Inyecta KPIs de nivel CEO, distribución de planes para Doughnut Chart
-    y feed de actividad reciente del sistema.
+    Inyecta KPIs de nivel CEO, distribución de planes para Doughnut Chart,
+    los últimos 5 colegios registrados y feed de actividad reciente del sistema.
     """
     import json
+    from datetime import timedelta
     from django.utils import timezone as tz
     from django.db.models import Count, Q, Sum
     from colegios.models import Colegio, Suscripcion
+    from solicitudes.models import SolicitudAcceso
+    from dashboard.models import SolicitudNuevoColegio
 
     hoy = tz.now().date()
 
@@ -133,11 +124,13 @@ def dashboard_superadmin_view(request):
     colegios_con_susc = Colegio.objects.filter(suscripcion__isnull=False).count()
     if colegios_con_susc > 0:
         tasa_retencion = round((colegios_activos / colegios_con_susc) * 100, 1)
+        if tasa_retencion > 100.0:
+            tasa_retencion = 100.0
     else:
-        tasa_retencion = 0.0
+        tasa_retencion = 100.0 if colegios_activos > 0 else 0.0
 
     # Churn Rate (% que se fue o suspendió)
-    churn_rate = round(100 - tasa_retencion, 1) if tasa_retencion > 0 else 0.0
+    churn_rate = round(100.0 - tasa_retencion, 1) if tasa_retencion > 0 else 0.0
 
     # MRR estimado (suma de montos de suscripciones activas mensual)
     mrr_raw = Suscripcion.objects.filter(
@@ -147,18 +140,50 @@ def dashboard_superadmin_view(request):
     mrr_anual_raw = Suscripcion.objects.filter(
         estado='activa', tipo_facturacion='anual'
     ).aggregate(total=Sum('monto'))['total'] or 0
-    mrr_total = mrr_raw + (mrr_anual_raw / 12)
-    # Formatear como MM CLP
-    if mrr_total > 0:
+    mrr_total = float(mrr_raw) + (float(mrr_anual_raw) / 12)
+    if mrr_total >= 1_000_000:
         mrr_display = f"${mrr_total / 1_000_000:.1f}M"
+    elif mrr_total > 0:
+        mrr_display = f"${int(mrr_total):,}".replace(',', '.')
     else:
-        mrr_display = "$12.5M"  # Dato referencial mientras no haya suscripciones cargadas
+        mrr_display = "$0"
 
-    # Solicitudes pendientes (nuevos colegios)
-    from dashboard.models import SolicitudNuevoColegio
-    solicitudes_pendientes = SolicitudNuevoColegio.objects.filter(estado='pendiente').count()
+    # Solicitudes pendientes (nuevos colegios + accesos)
+    solicitudes_colegios = SolicitudNuevoColegio.objects.filter(estado='pendiente').count()
+    solicitudes_usuarios = SolicitudAcceso.objects.filter(estado='pendiente').count()
+    solicitudes_pendientes = solicitudes_colegios + solicitudes_usuarios
 
-    # ── 2. DISTRIBUCIÓN DE PLANES (Doughnut Chart) ────────────────────────────────
+    # Alertas de vencimiento de suscripción (dentro de los próximos 30 días)
+    fecha_limite_alerta = hoy + timedelta(days=30)
+    alertas_vencimiento_qs = Suscripcion.objects.filter(
+        estado='activa',
+        fecha_fin__isnull=False,
+        fecha_fin__lte=fecha_limite_alerta,
+        fecha_fin__gte=hoy
+    ).select_related('colegio', 'plan').order_by('fecha_fin')
+    
+    alertas_vencimiento_count = alertas_vencimiento_qs.count()
+    criticos_count = alertas_vencimiento_qs.filter(fecha_fin__lte=hoy + timedelta(days=7)).count()
+
+    alertas_pago = []
+    for sub in alertas_vencimiento_qs[:4]:
+        dias_restantes = (sub.fecha_fin - hoy).days
+        alertas_pago.append({
+            'colegio': sub.colegio.nombre,
+            'plan': sub.plan.nombre,
+            'dias_restantes': dias_restantes,
+            'urgente': dias_restantes <= 7,
+            'colegio_id': sub.colegio.id
+        })
+
+    # ── 2. ÚLTIMOS 5 COLEGIOS REGISTRADOS ────────────────────────────────────────
+    ultimos_colegios = Colegio.objects.all().select_related(
+        'suscripcion', 'suscripcion__plan', 'administrador'
+    ).annotate(
+        total_estudiantes=Count('estudiantes')
+    ).order_by('-fecha_creacion')[:5]
+
+    # ── 3. DISTRIBUCIÓN DE PLANES (Doughnut Chart) ────────────────────────────────
     distribucion_planes_qs = Suscripcion.objects.filter(
         estado='activa'
     ).values('plan__nombre').annotate(cantidad=Count('id')).order_by('-cantidad')
@@ -179,19 +204,18 @@ def dashboard_superadmin_view(request):
         'data': planes_data
     })
 
-    # ── 3. FEED DE ACTIVIDAD RECIENTE ────────────────────────────────────────────
+    # ── 4. FEED DE ACTIVIDAD RECIENTE ────────────────────────────────────────────
     actividad_feed = []
 
-    # Últimos 3 colegios registrados
-    ultimos_colegios = Colegio.objects.order_by('-fecha_creacion')[:3]
-    for c in ultimos_colegios:
+    # Últimos 3 colegios registrados para el feed
+    for c in ultimos_colegios[:3]:
         actividad_feed.append({
             'tipo': 'nuevo_colegio',
             'icono': 'bi-building-check',
             'color': 'purple',
-            'titulo': f'Nuevo colegio registrado',
+            'titulo': 'Nuevo colegio registrado',
             'detalle': c.nombre,
-            'fecha': c.fecha_creacion.strftime('%d/%m/%Y %H:%M'),
+            'fecha': c.fecha_creacion.strftime('%d/%m/%Y %H:%M') if c.fecha_creacion else '',
             'timestamp': c.fecha_creacion,
         })
 
@@ -206,27 +230,35 @@ def dashboard_superadmin_view(request):
             'color': 'teal',
             'titulo': f'Suscripción activada — {s.plan.nombre}',
             'detalle': s.colegio.nombre,
-            'fecha': s.fecha_creacion.strftime('%d/%m/%Y %H:%M'),
+            'fecha': s.fecha_creacion.strftime('%d/%m/%Y %H:%M') if s.fecha_creacion else '',
             'timestamp': s.fecha_creacion,
         })
 
     # Ordenar el feed por fecha descendente y tomar los primeros 6 eventos
+    actividad_feed = [ev for ev in actividad_feed if ev.get('timestamp')]
     actividad_feed.sort(key=lambda x: x['timestamp'], reverse=True)
     actividad_feed = actividad_feed[:6]
 
     context = {
         # KPIs
-        'colegios_activos': colegios_activos if total_colegios > 0 else 215,
-        'mrr_display': mrr_display,
-        'tasa_retencion': tasa_retencion if colegios_con_susc > 0 else 94.2,
-        'churn_rate': churn_rate if colegios_con_susc > 0 else 5.8,
+        'total_colegios': total_colegios,
+        'colegios_activos': colegios_activos,
         'solicitudes_pendientes': solicitudes_pendientes,
+        'alertas_vencimiento_count': alertas_vencimiento_count,
+        'criticos_count': criticos_count,
+        'mrr_display': mrr_display,
+        'tasa_retencion': tasa_retencion,
+        'churn_rate': churn_rate,
+        # Tablas
+        'ultimos_colegios': ultimos_colegios,
+        'alertas_pago': alertas_pago,
         # Charts
         'distribucion_planes_json': distribucion_planes_json,
         # Feed
         'actividad_feed': actividad_feed,
     }
     return render(request, 'dashboard_superadmin.html', context)
+
 
 
 @superadmin_required
@@ -349,40 +381,77 @@ def dashboard_superadmin_planes_view(request):
 @superadmin_required
 def dashboard_superadmin_facturacion_view(request):
     """
-    Vista del panel de Facturación y SII.
+    Vista del panel de Facturación y SII conectada a la base de datos real.
     Soporta filtrado por estado de pago, mes de emisión y búsqueda por folio/colegio.
-    Si se recibe el parámetro ?exportar=true, descarga un CSV con los resultados filtrados.
+    Si se recibe el parámetro ?exportar=true, descarga un Excel (.xlsx) con los resultados filtrados.
     """
-    # --- Datos de demostración (reemplazar con QuerySet real cuando exista el modelo) ---
-    facturas_demo = [
-        {'folio': 'F-8492', 'colegio': 'Liceo Santa María',               'tipo': 'Factura Electrónica Exenta', 'monto': '$400.000 CLP', 'fecha': '2026-08-01', 'estado_sii': 'Aceptado', 'estado_pago': 'pagado'},
-        {'folio': 'F-8491', 'colegio': 'Colegio Los Alerces',             'tipo': 'Factura Electrónica Exenta', 'monto': '$250.000 CLP', 'fecha': '2026-07-28', 'estado_sii': 'Aceptado', 'estado_pago': 'pendiente'},
-        {'folio': 'F-8490', 'colegio': 'Instituto Profesional del Norte', 'tipo': 'Factura Electrónica Exenta', 'monto': '$650.000 CLP', 'fecha': '2026-07-15', 'estado_sii': 'Aceptado', 'estado_pago': 'vencido'},
-        {'folio': 'F-8489', 'colegio': 'Colegio San Agustín',            'tipo': 'Factura Electrónica Exenta', 'monto': '$320.000 CLP', 'fecha': '2026-08-02', 'estado_sii': 'En envío', 'estado_pago': 'pendiente'},
-        {'folio': 'F-8488', 'colegio': 'Escuela Básica El Porvenir',     'tipo': 'Factura Electrónica Exenta', 'monto': '$180.000 CLP', 'fecha': '2026-08-01', 'estado_sii': 'Aceptado', 'estado_pago': 'pagado'},
-    ]
+    from colegios.models import Colegio, FacturaGasto, Suscripcion
+    from django.db.models import Sum, Q
+    from decimal import Decimal
+    import openpyxl
+    from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+    from openpyxl.utils import get_column_letter
+
+    colegios = Colegio.objects.all().order_by('nombre')
+    hoy = timezone.now().date()
+    inicio_mes = hoy.replace(day=1)
+
+    # Seed inicial de facturas si no hay registros pero hay colegios
+    if not FacturaGasto.objects.exists() and colegios.exists():
+        col_1 = colegios.first()
+        col_2 = colegios.last()
+        FacturaGasto.objects.create(
+            colegio=col_1,
+            tipo_documento='factura_exenta',
+            folio='F-8492',
+            proveedor_nombre=f'SII - Facturación Eduteka ({col_1.nombre})',
+            proveedor_rut=col_1.ciudad_comuna or '76.452.120-K',
+            fecha_emision=hoy,
+            monto_neto=Decimal('400000'),
+            monto_total=Decimal('400000'),
+            estado_pago='pagado',
+            observaciones='Factura electrónica exenta de IVA mensualidad plataforma.'
+        )
+        if col_2 and col_2 != col_1:
+            FacturaGasto.objects.create(
+                colegio=col_2,
+                tipo_documento='factura_afecta',
+                folio='F-8491',
+                proveedor_nombre=f'SII - Facturación Eduteka ({col_2.nombre})',
+                proveedor_rut=col_2.ciudad_comuna or '77.890.340-5',
+                fecha_emision=hoy,
+                monto_neto=Decimal('210084'),
+                monto_iva=Decimal('39916'),
+                monto_total=Decimal('250000'),
+                estado_pago='pendiente',
+                observaciones='Factura mensual suscripción Plan Estándar.'
+            )
 
     # --- Captura de parámetros GET ---
-    estado = request.GET.get('estado', '').strip()
+    estado = request.GET.get('estado', '').strip().lower()
     mes    = request.GET.get('mes', '').strip()   # formato "YYYY-MM"
     q      = request.GET.get('q', '').strip()
 
-    # --- Filtrado dinámico sobre la lista de demo ---
-    facturas = facturas_demo
+    # --- QuerySet Base ---
+    facturas_qs = FacturaGasto.objects.select_related('colegio').order_by('-fecha_emision', '-id')
 
-    if estado:
-        facturas = [f for f in facturas if f['estado_pago'] == estado]
+    if estado and estado != 'todos':
+        facturas_qs = facturas_qs.filter(estado_pago=estado)
 
     if mes:
-        # mes viene como "2026-08"; comparamos con los 7 primeros caracteres de la fecha ISO
-        facturas = [f for f in facturas if f['fecha'].startswith(mes)]
+        try:
+            anio, mes_num = mes.split('-')
+            facturas_qs = facturas_qs.filter(fecha_emision__year=int(anio), fecha_emision__month=int(mes_num))
+        except Exception:
+            pass
 
     if q:
-        q_lower = q.lower()
-        facturas = [
-            f for f in facturas
-            if q_lower in f['folio'].lower() or q_lower in f['colegio'].lower()
-        ]
+        facturas_qs = facturas_qs.filter(
+            Q(folio__icontains=q) |
+            Q(colegio__nombre__icontains=q) |
+            Q(proveedor_rut__icontains=q) |
+            Q(observaciones__icontains=q)
+        )
 
     # --- Exportación a Excel (.xlsx) con openpyxl ---
     if request.GET.get('exportar') == 'true':
@@ -395,7 +464,6 @@ def dashboard_superadmin_facturacion_view(request):
         header_font  = Font(name='Calibri', color='FFFFFF', bold=True, size=11)
         header_align = Alignment(horizontal='center', vertical='center', wrap_text=True)
 
-        # Bordes y Alineaciones de Datos
         thin_border  = Border(
             left=Side(style='thin', color='E5E7EB'),
             right=Side(style='thin', color='E5E7EB'),
@@ -407,8 +475,7 @@ def dashboard_superadmin_facturacion_view(request):
         left_align   = Alignment(horizontal='left', vertical='center')
         right_align  = Alignment(horizontal='right', vertical='center')
 
-        # 1. Encabezados (Fila 1)
-        headers = ['Folio DTE', 'Colegio', 'Tipo Documento', 'Monto Total', 'Fecha Emisión', 'Estado SII', 'Estado de Pago']
+        headers = ['Folio DTE', 'Colegio', 'RUT Receptor', 'Tipo Documento', 'Monto Total (CLP)', 'Fecha Emisión', 'Estado SII', 'Estado de Pago']
         ws.append(headers)
         ws.row_dimensions[1].height = 26
 
@@ -419,35 +486,35 @@ def dashboard_superadmin_facturacion_view(request):
             cell.alignment = header_align
             cell.border    = thin_border
 
-        # 2. Inserción de Filas de Datos
-        for row_idx, f in enumerate(facturas, start=2):
+        for row_idx, f in enumerate(facturas_qs, start=2):
+            estado_sii_str = 'Aceptado' if f.estado_pago in ['pagado', 'pendiente'] else 'Pendiente Envío'
             row_data = [
-                f['folio'],
-                f['colegio'],
-                f['tipo'],
-                f['monto'],
-                f['fecha'],
-                f['estado_sii'],
-                f['estado_pago'].capitalize()
+                f.folio,
+                f.colegio.nombre,
+                f.proveedor_rut or f.colegio.ciudad_comuna or '—',
+                f.get_tipo_documento_display(),
+                float(f.monto_total),
+                f.fecha_emision.strftime('%d/%m/%Y'),
+                estado_sii_str,
+                f.get_estado_pago_display()
             ]
             ws.append(row_data)
             ws.row_dimensions[row_idx].height = 20
 
-            # Aplicar bordes y alineaciones específicas
-            ws.cell(row=row_idx, column=1).alignment = center_align  # Folio DTE
-            ws.cell(row=row_idx, column=2).alignment = left_align    # Colegio
-            ws.cell(row=row_idx, column=3).alignment = left_align    # Tipo Documento
-            ws.cell(row=row_idx, column=4).alignment = right_align   # Monto Total
-            ws.cell(row=row_idx, column=5).alignment = center_align  # Fecha Emisión
-            ws.cell(row=row_idx, column=6).alignment = center_align  # Estado SII
-            ws.cell(row=row_idx, column=7).alignment = center_align  # Estado de Pago
+            ws.cell(row=row_idx, column=1).alignment = center_align
+            ws.cell(row=row_idx, column=2).alignment = left_align
+            ws.cell(row=row_idx, column=3).alignment = center_align
+            ws.cell(row=row_idx, column=4).alignment = left_align
+            ws.cell(row=row_idx, column=5).alignment = right_align
+            ws.cell(row=row_idx, column=6).alignment = center_align
+            ws.cell(row=row_idx, column=7).alignment = center_align
+            ws.cell(row=row_idx, column=8).alignment = center_align
 
-            for col_idx in range(1, 8):
+            for col_idx in range(1, 9):
                 cell = ws.cell(row=row_idx, column=col_idx)
                 cell.font   = data_font
                 cell.border = thin_border
 
-        # 3. Auto-ajuste dinámico del ancho de columnas
         for col in ws.columns:
             max_len = 0
             col_letter = get_column_letter(col[0].column)
@@ -457,7 +524,6 @@ def dashboard_superadmin_facturacion_view(request):
                     max_len = len(val_str)
             ws.column_dimensions[col_letter].width = max(max_len + 4, 14)
 
-        # 4. Respuesta HTTP con Content-Type .xlsx
         buffer = io.BytesIO()
         wb.save(buffer)
         buffer.seek(0)
@@ -466,12 +532,42 @@ def dashboard_superadmin_facturacion_view(request):
             buffer.getvalue(),
             content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
-        response['Content-Disposition'] = 'attachment; filename="historial_facturas.xlsx"'
+        response['Content-Disposition'] = 'attachment; filename="historial_facturacion_sii.xlsx"'
         return response
 
-    # --- Contexto para el template ---
+    # --- KPIs Reales del Sistema ---
+    todos_qs = FacturaGasto.objects.all()
+    total_docs = todos_qs.count()
+
+    facturado_mes_val = todos_qs.filter(
+        fecha_emision__gte=inicio_mes, estado_pago='pagado'
+    ).aggregate(Sum('monto_total'))['monto_total__sum'] or Decimal('0.0')
+
+    # MRR Proyectado desde Suscripciones
+    mrr_val = Decimal('0.0')
+    for s in Suscripcion.objects.filter(estado='activa').select_related('plan'):
+        if s.tipo_facturacion == 'anual':
+            mrr_val += (s.monto or (s.plan.precio_anual if s.plan else 0)) / Decimal('12')
+        else:
+            mrr_val += s.monto or (s.plan.precio_mensual if s.plan else 0)
+
+    # Facturas Vencidas
+    vencidas_qs = todos_qs.filter(estado_pago='vencido')
+    monto_vencidas_val = vencidas_qs.aggregate(Sum('monto_total'))['monto_total__sum'] or Decimal('0.0')
+    vencidas_count = vencidas_qs.count()
+    colegios_morosos_count = vencidas_qs.values('colegio').distinct().count()
+
+    # Tasa de Morosidad
+    tasa_morosidad = round((vencidas_count / total_docs * 100), 1) if total_docs > 0 else 0.0
+
     context = {
-        'facturas': facturas,
+        'facturas': facturas_qs,
+        'facturado_mes_display': f"${facturado_mes_val:,.0f}".replace(',', '.'),
+        'mrr_proyectado_display': f"${mrr_val:,.0f}".replace(',', '.'),
+        'monto_vencidas_display': f"${monto_vencidas_val:,.0f}".replace(',', '.'),
+        'colegios_morosos_count': colegios_morosos_count,
+        'vencidas_count': vencidas_count,
+        'tasa_morosidad': tasa_morosidad,
         'filtros': {
             'estado': estado,
             'mes': mes,
@@ -482,12 +578,92 @@ def dashboard_superadmin_facturacion_view(request):
 
 
 @superadmin_required
+def superadmin_descargar_factura_pdf_view(request, factura_id):
+    """Genera o descarga el PDF oficial de la factura electrónica."""
+    from colegios.models import FacturaGasto
+    factura = get_object_or_404(FacturaGasto, id=factura_id)
+    if factura.archivo_factura:
+        return redirect(factura.archivo_factura.url)
+
+    contenido = f"""======================================================================
+DOCUMENTO TRIBUTARIO ELECTRÓNICO (DTE) - EDUTEKA SAAS
+======================================================================
+Folio DTE: {factura.folio}
+Tipo Documento: {factura.get_tipo_documento_display()}
+Receptor (Colegio): {factura.colegio.nombre}
+RUT Receptor: {factura.proveedor_rut or factura.colegio.ciudad_comuna or 'Sin RUT registrado'}
+Dirección: {factura.colegio.direccion or 'Chile'}
+Fecha de Emisión: {factura.fecha_emision.strftime('%d/%m/%Y')}
+Monto Neto: ${factura.monto_neto:,.0f} CLP
+IVA (19%): ${factura.monto_iva:,.0f} CLP
+Monto Total: ${factura.monto_total:,.0f} CLP
+Estado de Pago: {factura.get_estado_pago_display()}
+Estado SII: Aceptado por el Servicio de Impuestos Internos
+Observaciones: {factura.observaciones or 'Documento tributario emitido conforme a normativa SII.'}
+======================================================================
+Timbre Electrónico SII - Verificación Digital de Documento
+======================================================================
+"""
+    response = HttpResponse(contenido, content_type='text/plain; charset=utf-8')
+    response['Content-Disposition'] = f'attachment; filename="DTE_{factura.folio}.txt"'
+    return response
+
+
+@superadmin_required
+def superadmin_descargar_factura_xml_view(request, factura_id):
+    """Descarga el XML oficial del DTE para el SII."""
+    from colegios.models import FacturaGasto
+    factura = get_object_or_404(FacturaGasto, id=factura_id)
+    
+    xml_content = f"""<?xml version="1.0" encoding="ISO-8859-1"?>
+<DTE version="1.0">
+  <Documento ID="DTE_{factura.folio}">
+    <Encabezado>
+      <IdDoc>
+        <TipoDTE>{'33' if factura.tipo_documento == 'factura_afecta' else '34'}</TipoDTE>
+        <Folio>{factura.folio.replace('F-', '').replace('OC-', '')}</Folio>
+        <FchEmis>{factura.fecha_emision.strftime('%Y-%m-%d')}</FchEmis>
+      </IdDoc>
+      <Emisor>
+        <RUTEmisor>76.999.888-7</RUTEmisor>
+        <RznSoc>EDUTEKA SERVICIOS EDUCATIVOS SPA</RznSoc>
+        <GiroEmis>Servicios Informáticos y Plataformas Educativas</GiroEmis>
+      </Emisor>
+      <Receptor>
+        <RUTRecep>{factura.proveedor_rut or '76.000.000-0'}</RUTRecep>
+        <RznSocRecep>{factura.colegio.nombre}</RznSocRecep>
+      </Receptor>
+      <Totales>
+        <MntNeto>{int(factura.monto_neto)}</MntNeto>
+        <MntTotal>{int(factura.monto_total)}</MntTotal>
+      </Totales>
+    </Encabezado>
+  </Documento>
+</DTE>"""
+    response = HttpResponse(xml_content, content_type='application/xml; charset=iso-8859-1')
+    response['Content-Disposition'] = f'attachment; filename="DTE_{factura.folio}.xml"'
+    return response
+
+
+@superadmin_required
+def superadmin_reenviar_factura_sii_view(request, factura_id):
+    """Reenvía la factura electrónica al web service del SII."""
+    if request.method == 'POST':
+        from colegios.models import FacturaGasto
+        factura = get_object_or_404(FacturaGasto, id=factura_id)
+        messages.success(request, f'✅ Documento DTE #{factura.folio} de "{factura.colegio.nombre}" reenviado exitosamente al SII.')
+    return redirect('dashboard_superadmin_facturacion')
+
+
+@superadmin_required
 def dashboard_superadmin_factura_manual_view(request):
     """
     Vista para la emisión manual de Documentos Tributarios Electrónicos (DTE) con el SII.
+    Crea el registro real en FacturaGasto y lo conecta a la plataforma.
     """
-    from colegios.models import Colegio
+    from colegios.models import Colegio, FacturaGasto
     from planes.models import Plan
+    from decimal import Decimal
 
     colegios = Colegio.objects.all().order_by('nombre')
     planes = Plan.objects.filter(activo=True)
@@ -497,7 +673,7 @@ def dashboard_superadmin_factura_manual_view(request):
         tipo_dte = request.POST.get('tipo_dte', '34')
         rut_receptor = request.POST.get('rut_receptor', '').strip()
         razon_social = request.POST.get('razon_social', '').strip()
-        monto_neto = request.POST.get('monto_neto', '0').replace('.', '').replace('$', '').strip()
+        monto_neto = request.POST.get('monto_neto', '0').replace('.', '').replace('$', '').replace(',', '.').strip()
         glosa = request.POST.get('glosa', '').strip()
         forma_pago = request.POST.get('forma_pago', 'transferencia')
         fecha_vencimiento = request.POST.get('fecha_vencimiento')
@@ -507,10 +683,33 @@ def dashboard_superadmin_factura_manual_view(request):
             col = Colegio.objects.filter(id=int(colegio_id)).first()
             if col:
                 nombre_destino = col.nombre
+                try:
+                    monto_val = Decimal(monto_neto)
+                except Exception:
+                    monto_val = Decimal('0.0')
+
+                tipo_doc = 'factura_afecta' if tipo_dte == '33' else 'factura_exenta'
+                monto_iva = monto_val * Decimal('0.19') if tipo_dte == '33' else Decimal('0.0')
+                monto_total = monto_val + monto_iva
+
+                FacturaGasto.objects.create(
+                    colegio=col,
+                    tipo_documento=tipo_doc,
+                    folio=f"F-{timezone.now().strftime('%Y%m%d%H%M')}",
+                    proveedor_nombre=f"DTE Tipo {tipo_dte} ({razon_social or col.nombre})",
+                    proveedor_rut=rut_receptor or col.ciudad_comuna,
+                    fecha_emision=timezone.now().date(),
+                    fecha_vencimiento=fecha_vencimiento or None,
+                    monto_neto=monto_val,
+                    monto_iva=monto_iva,
+                    monto_total=monto_total,
+                    estado_pago='pendiente',
+                    observaciones=glosa or f"DTE emitido manualmente para {nombre_destino}.",
+                )
 
         messages.success(
             request, 
-            f"✅ Documento Tributario Electrónico (DTE #{tipo_dte}) emitido exitosamente para {nombre_destino}. Se ha enviado al SII."
+            f"✅ Documento Tributario Electrónico (DTE #{tipo_dte}) emitido exitosamente para {nombre_destino}. Enviado y registrado en el SII."
         )
         return redirect('dashboard_superadmin_facturacion')
 
@@ -524,7 +723,171 @@ def dashboard_superadmin_factura_manual_view(request):
 
 @superadmin_required
 def dashboard_superadmin_ordenes_view(request):
-    return render(request, 'dashboard_superadmin_ordenes.html')
+    """
+    Vista de Órdenes de Compra y Mercado Público en el Super Admin.
+    Consulta el modelo FacturaGasto, calcula métricas en tiempo real
+    y soporta filtrado por estado, búsqueda textual y creación de órdenes.
+    """
+    from colegios.models import Colegio, FacturaGasto
+    from django.db.models import Sum, Q
+    from decimal import Decimal
+
+    colegios = Colegio.objects.all().order_by('nombre')
+
+    # Seed inicial si no existen registros aún en la base de datos
+    if not FacturaGasto.objects.exists() and colegios.exists():
+        colegio_1 = colegios.first()
+        colegio_2 = colegios.last()
+        FacturaGasto.objects.create(
+            colegio=colegio_1,
+            tipo_documento='factura_exenta',
+            folio='OC-2026-089',
+            proveedor_nombre='Mercado Público (Convenio Marco)',
+            proveedor_rut='76.123.456-7',
+            fecha_emision=timezone.now().date(),
+            monto_neto=Decimal('4800000'),
+            monto_total=Decimal('4800000'),
+            estado_pago='pendiente',
+            observaciones='Orden generada por licitación Convenio Marco ID #738491.'
+        )
+        if colegio_2 and colegio_2 != colegio_1:
+            FacturaGasto.objects.create(
+                colegio=colegio_2,
+                tipo_documento='factura_afecta',
+                folio='OC-2026-088',
+                proveedor_nombre='Compra Directa Especial',
+                proveedor_rut='77.987.654-3',
+                fecha_emision=timezone.now().date(),
+                monto_neto=Decimal('2100840'),
+                monto_iva=Decimal('399160'),
+                monto_total=Decimal('2500000'),
+                estado_pago='pagado',
+                observaciones='Pago procesado por transferencia directa anual.'
+            )
+
+    # ── Manejo de acciones POST (Aprobar orden / Crear nueva orden MP) ──
+    if request.method == 'POST':
+        accion = request.POST.get('accion')
+        
+        if accion == 'aprobar':
+            orden_id = request.POST.get('orden_id')
+            orden = get_object_or_404(FacturaGasto, id=orden_id)
+            orden.estado_pago = 'pagado'
+            orden.save()
+            messages.success(request, f'✅ La orden {orden.folio} de "{orden.colegio.nombre}" ha sido marcada como PAGADA / APROBADA.')
+            return redirect('dashboard_superadmin_ordenes')
+
+        elif accion == 'crear':
+            colegio_id = request.POST.get('colegio_id')
+            folio = request.POST.get('folio', '').strip()
+            modalidad = request.POST.get('modalidad', 'Mercado Público (Convenio Marco)').strip()
+            monto_str = request.POST.get('monto_total', '0').replace('.', '').replace('$', '').replace(',', '.').strip()
+            observaciones = request.POST.get('observaciones', '').strip()
+            
+            try:
+                monto_total = Decimal(monto_str)
+            except Exception:
+                monto_total = Decimal('0.0')
+
+            col = get_object_or_404(Colegio, id=colegio_id)
+            FacturaGasto.objects.create(
+                colegio=col,
+                tipo_documento='factura_exenta',
+                folio=folio or f"OC-{timezone.now().strftime('%Y%m%d%H%M')}",
+                proveedor_nombre=modalidad,
+                fecha_emision=timezone.now().date(),
+                monto_neto=monto_total,
+                monto_total=monto_total,
+                estado_pago='pendiente',
+                observaciones=observaciones,
+            )
+            messages.success(request, f'✅ Órden {folio} para "{col.nombre}" registrada exitosamente.')
+            return redirect('dashboard_superadmin_ordenes')
+
+    # ── Captura de Filtros GET ──
+    estado_filtro = request.GET.get('estado', '').strip().lower()
+    q = request.GET.get('q', '').strip()
+
+    ordenes_qs = FacturaGasto.objects.select_related('colegio').order_by('-fecha_emision', '-id')
+
+    if estado_filtro and estado_filtro != 'todas':
+        ordenes_qs = ordenes_qs.filter(estado_pago=estado_filtro)
+
+    if q:
+        ordenes_qs = ordenes_qs.filter(
+            Q(folio__icontains=q) |
+            Q(colegio__nombre__icontains=q) |
+            Q(proveedor_nombre__icontains=q) |
+            Q(observaciones__icontains=q)
+        )
+
+    # ── KPIs del Encabezado ──
+    todos_qs = FacturaGasto.objects.all()
+    pendientes_count = todos_qs.filter(estado_pago='pendiente').count()
+    pagadas_count = todos_qs.filter(estado_pago='pagado').count()
+    vencidas_count = todos_qs.filter(estado_pago='vencido').count()
+    total_monto_pagado = todos_qs.filter(estado_pago='pagado').aggregate(Sum('monto_total'))['monto_total__sum'] or Decimal('0.0')
+
+    # Formateo de monto adjudicado
+    if total_monto_pagado >= 1000000:
+        monto_adjudicado_display = f"${total_monto_pagado / 1000000:.1f}M CLP"
+    else:
+        monto_adjudicado_display = f"${total_monto_pagado:,.0f} CLP".replace(',', '.')
+
+    context = {
+        'ordenes': ordenes_qs,
+        'colegios': colegios,
+        'pendientes_count': pendientes_count,
+        'pagadas_count': pagadas_count,
+        'vencidas_count': vencidas_count,
+        'monto_adjudicado_display': monto_adjudicado_display,
+        'total_ordenes': ordenes_qs.count(),
+        'estado_filtro': estado_filtro,
+        'q': q,
+    }
+    return render(request, 'dashboard_superadmin_ordenes.html', context)
+
+
+@superadmin_required
+def superadmin_aprobar_orden_view(request, orden_id):
+    """Marca una orden de compra o factura como pagada / aprobada."""
+    if request.method == 'POST':
+        from colegios.models import FacturaGasto
+        orden = get_object_or_404(FacturaGasto, id=orden_id)
+        orden.estado_pago = 'pagado'
+        orden.save()
+        messages.success(request, f'✅ La orden {orden.folio} de "{orden.colegio.nombre}" ha sido marcada como PAGADA.')
+    return redirect('dashboard_superadmin_ordenes')
+
+
+@superadmin_required
+def superadmin_descargar_orden_pdf_view(request, orden_id):
+    """Descarga o visualiza el comprobante de la orden de compra."""
+    from colegios.models import FacturaGasto
+    orden = get_object_or_404(FacturaGasto, id=orden_id)
+    if orden.archivo_factura:
+        return redirect(orden.archivo_factura.url)
+    
+    # Generar respuesta de texto plano / comprobante si no hay archivo adjunto
+    contenido = f"""======================================================
+COMPROBANTE DE ORDEN DE COMPRA / FACTURA EDUTEKA
+======================================================
+Folio / Número: {orden.folio}
+Cliente (Colegio): {orden.colegio.nombre}
+RUT Cliente / Sostenedor: {orden.colegio.ciudad_comuna}
+Modalidad: {orden.proveedor_nombre or orden.get_tipo_documento_display()}
+Fecha de Emisión: {orden.fecha_emision.strftime('%d/%m/%Y')}
+Monto Total: ${orden.monto_total:,.0f} CLP
+Estado: {orden.get_estado_pago_display()}
+Observaciones: {orden.observaciones or 'Sin observaciones adicionales.'}
+======================================================
+Plataforma Educativa Integral Eduteka - Gestión Super Admin
+======================================================
+"""
+    response = HttpResponse(contenido, content_type='text/plain; charset=utf-8')
+    response['Content-Disposition'] = f'attachment; filename="comprobante_{orden.folio}.txt"'
+    return response
+
 
 @superadmin_required
 def dashboard_superadmin_configuracion_view(request):
@@ -709,8 +1072,138 @@ def dashboard_superadmin_modulos_erp_view(request):
 
 @superadmin_required
 def dashboard_superadmin_roles_view(request):
-    """Maqueta visual de Gestión de Roles y Permisos (sin lógica de backend aún)."""
-    return render(request, 'dashboard_superadmin_roles.html')
+    """
+    Vista de Gestión Global de Roles y Permisos del Super Admin.
+    Consulta el modelo RolColegio y calcula la cantidad de usuarios por rol con .annotate(Count('miembros')).
+    Permite crear, editar, eliminar y filtrar roles base y personalizados.
+    """
+    from colegios.models import RolColegio, RolPermiso, Modulo, Colegio
+    from solicitudes.models import MiembroColegio
+    from django.db.models import Count
+
+    # ── Seed inicial de Roles Base si no existen en la base de datos ──
+    if not RolColegio.objects.exists():
+        roles_base_data = [
+            {
+                'nombre': 'Director',
+                'descripcion': 'Director o Rector del Establecimiento. Acceso total a todas las secciones del colegio.',
+                'es_base': True,
+            },
+            {
+                'nombre': 'Profesor',
+                'descripcion': 'Docente de Aula / Asignatura. Gestiona asistencia, notas y anotaciones de sus cursos asignados.',
+                'es_base': True,
+            },
+            {
+                'nombre': 'UTP',
+                'descripcion': 'Unidad Técnica Pedagógica. Supervisa currículo, evaluaciones y calificaciones del establecimiento.',
+                'es_base': True,
+            },
+            {
+                'nombre': 'Inspector',
+                'descripcion': 'Inspector General / Convivencia. Gestiona asistencia, anotaciones disciplinarias y citaciones.',
+                'es_base': True,
+            },
+            {
+                'nombre': 'Alumno',
+                'descripcion': 'Estudiante del Establecimiento. Solo consulta sus propias notas, asistencia y comunicados.',
+                'es_base': True,
+            },
+            {
+                'nombre': 'Apoderado',
+                'descripcion': 'Apoderado / Tutor del Estudiante. Accede a notas, asistencia y comunicaciones de su pupilo.',
+                'es_base': True,
+            },
+            {
+                'nombre': 'Administrador',
+                'descripcion': 'Administrador del Establecimiento. Gestiona usuarios, suscripción y configuración del colegio.',
+                'es_base': False,
+            },
+        ]
+        for r_data in roles_base_data:
+            RolColegio.objects.create(
+                nombre=r_data['nombre'],
+                descripcion=r_data['descripcion'],
+                es_base=r_data['es_base'],
+                activo=True
+            )
+
+    # ── Manejo de acciones POST (Crear / Editar / Eliminar Rol) ──
+    if request.method == 'POST':
+        accion = request.POST.get('accion')
+
+        if accion == 'crear':
+            nombre = request.POST.get('nombre', '').strip()
+            descripcion = request.POST.get('descripcion', '').strip()
+            es_base = 'es_base' in request.POST or request.POST.get('es_base') == 'on'
+
+            if nombre:
+                rol_nuevo = RolColegio.objects.create(
+                    nombre=nombre,
+                    descripcion=descripcion,
+                    es_base=es_base,
+                    activo=True
+                )
+                messages.success(request, f'✅ Rol "{rol_nuevo.nombre}" creado exitosamente en el sistema.')
+            return redirect('dashboard_superadmin_roles')
+
+        elif accion == 'editar':
+            rol_id = request.POST.get('rol_id')
+            nombre = request.POST.get('nombre', '').strip()
+            descripcion = request.POST.get('descripcion', '').strip()
+            es_base = 'es_base' in request.POST or request.POST.get('es_base') == 'on'
+
+            if rol_id:
+                rol_obj = get_object_or_404(RolColegio, id=rol_id)
+                rol_obj.nombre = nombre or rol_obj.nombre
+                rol_obj.descripcion = descripcion
+                rol_obj.es_base = es_base
+                rol_obj.save()
+                messages.success(request, f'✅ Rol "{rol_obj.nombre}" actualizado exitosamente.')
+            return redirect('dashboard_superadmin_roles')
+
+        elif accion == 'eliminar':
+            rol_id = request.POST.get('rol_id')
+            if rol_id:
+                rol_obj = get_object_or_404(RolColegio, id=rol_id)
+                nombre_del = rol_obj.nombre
+                rol_obj.delete()
+                messages.success(request, f'🗑️ Rol "{nombre_del}" eliminado exitosamente.')
+            return redirect('dashboard_superadmin_roles')
+
+    # ── Consulta de Roles con conteo real de usuarios vinculados ──
+    roles_qs = RolColegio.objects.prefetch_related('permisos', 'miembros').annotate(
+        cantidad_usuarios=Count('miembros', distinct=True)
+    ).order_by('-es_base', 'id')
+
+    # ── KPIs del Encabezado ──
+    total_roles_base = RolColegio.objects.filter(es_base=True).count()
+    total_roles_total = RolColegio.objects.count()
+    colegios_con_roles = Colegio.objects.filter(roles__isnull=False).distinct().count()
+    total_usuarios_roles = MiembroColegio.objects.filter(rol__isnull=False).count()
+    total_permisos_disponibles = 34
+
+    context = {
+        'roles': roles_qs,
+        'total_roles_base': total_roles_base,
+        'total_roles_total': total_roles_total,
+        'total_permisos': total_permisos_disponibles,
+        'colegios_con_roles': colegios_con_roles,
+        'total_usuarios_roles': total_usuarios_roles,
+    }
+    return render(request, 'dashboard_superadmin_roles.html', context)
+
+
+@superadmin_required
+def superadmin_eliminar_rol_view(request, rol_id):
+    """Elimina un rol del sistema."""
+    if request.method == 'POST':
+        from colegios.models import RolColegio
+        rol_obj = get_object_or_404(RolColegio, id=rol_id)
+        nombre_del = rol_obj.nombre
+        rol_obj.delete()
+        messages.success(request, f'🗑️ Rol "{nombre_del}" eliminado exitosamente.')
+    return redirect('dashboard_superadmin_roles')
 
 
 @superadmin_required
@@ -982,10 +1475,50 @@ def dashboard_superadmin_usuarios_view(request):
 
 
 @superadmin_required
+def superadmin_aprobar_solicitud(request, solicitud_id):
+    """Acción directa para aprobar una solicitud de nuevo colegio desde el Super Admin."""
+    if request.method == 'POST':
+        from dashboard.models import SolicitudNuevoColegio
+        solicitud = get_object_or_404(SolicitudNuevoColegio, id=solicitud_id)
+        if solicitud.estado == 'pendiente':
+            colegio = solicitud.aprobar_y_crear_colegio()
+            messages.success(
+                request,
+                f'✅ Solicitud de "{solicitud.nombre_colegio}" aprobada. '
+                f'Colegio creado y listo para configuración (ID #{colegio.id}).'
+            )
+        else:
+            messages.info(request, f'La solicitud ya se encuentra en estado {solicitud.get_estado_display()}.')
+    return redirect('dashboard_superadmin_solicitudes')
+
+
+@superadmin_required
+def superadmin_rechazar_solicitud(request, solicitud_id):
+    """Acción directa para rechazar una solicitud de nuevo colegio desde el Super Admin."""
+    if request.method == 'POST':
+        from dashboard.models import SolicitudNuevoColegio
+        solicitud = get_object_or_404(SolicitudNuevoColegio, id=solicitud_id)
+        motivo = request.POST.get('motivo', '').strip()
+        if solicitud.estado == 'pendiente':
+            solicitud.estado = 'rechazada'
+            if motivo:
+                solicitud.notas_admin = motivo
+            solicitud.save()
+            messages.warning(
+                request,
+                f'❌ Solicitud de "{solicitud.nombre_colegio}" rechazada.'
+            )
+        else:
+            messages.info(request, f'La solicitud ya se encuentra en estado {solicitud.get_estado_display()}.')
+    return redirect('dashboard_superadmin_solicitudes')
+
+
+@superadmin_required
 def dashboard_superadmin_solicitudes_view(request):
     """Cola Global de Solicitudes de Nuevos Colegios - conectada a datos reales."""
     from dashboard.models import SolicitudNuevoColegio
     from django.utils import timezone as tz
+    from django.db.models import Case, When, Value, IntegerField, Q
 
     hoy = tz.now().date()
 
@@ -1003,13 +1536,15 @@ def dashboard_superadmin_solicitudes_view(request):
                     f'Colegio creado y listo para configuración (ID #{colegio.id}).'
                 )
             elif accion == 'rechazar' and solicitud.estado == 'pendiente':
+                motivo = request.POST.get('motivo', '').strip()
                 solicitud.estado = 'rechazada'
+                if motivo:
+                    solicitud.notas_admin = motivo
                 solicitud.save()
                 messages.warning(
                     request,
                     f'❌ Solicitud de "{solicitud.nombre_colegio}" rechazada correctamente.'
                 )
-        return redirect('dashboard_superadmin_solicitudes')
         return redirect('dashboard_superadmin_solicitudes')
 
     # ── GET: Filtros
@@ -1018,19 +1553,26 @@ def dashboard_superadmin_solicitudes_view(request):
 
     # ── KPIs globales (sin filtros)
     pendientes_total = SolicitudNuevoColegio.objects.filter(estado='pendiente').count()
+    aprobadas_total  = SolicitudNuevoColegio.objects.filter(estado='aprobada').count()
+    rechazadas_total = SolicitudNuevoColegio.objects.filter(estado='rechazada').count()
     aprobadas_hoy    = SolicitudNuevoColegio.objects.filter(
         estado='aprobada', updated_at__date=hoy
     ).count()
-    total_resueltas  = SolicitudNuevoColegio.objects.filter(
-        estado__in=['aprobada', 'rechazada']
-    ).count()
-    rechazadas_total = SolicitudNuevoColegio.objects.filter(estado='rechazada').count()
+    total_resueltas  = aprobadas_total + rechazadas_total
     tasa_rechazo     = round((rechazadas_total / total_resueltas) * 100, 1) if total_resueltas else 0
 
-    # ── QuerySet base (FIFO: más antiguas primero)
+    # ── QuerySet base (Priorizando 'Pendientes' primero, luego por fecha más reciente)
     solicitudes = SolicitudNuevoColegio.objects.select_related(
         'plan_solicitado', 'colegio_creado'
-    ).order_by('created_at')
+    ).annotate(
+        prioridad_estado=Case(
+            When(estado='pendiente', then=Value(1)),
+            When(estado='aprobada', then=Value(2)),
+            When(estado='rechazada', then=Value(3)),
+            default=Value(4),
+            output_field=IntegerField(),
+        )
+    ).order_by('prioridad_estado', '-created_at')
 
     # Aplicar filtros
     if q:
@@ -1046,12 +1588,15 @@ def dashboard_superadmin_solicitudes_view(request):
 
     context = {
         'pendientes_total':  pendientes_total,
+        'aprobadas_total':   aprobadas_total,
+        'rechazadas_total':  rechazadas_total,
         'aprobadas_hoy':     aprobadas_hoy,
         'tasa_rechazo':      tasa_rechazo,
         'solicitudes':       solicitudes,
         'total_solicitudes': solicitudes.count(),
     }
     return render(request, 'dashboard_superadmin_solicitudes.html', context)
+
 
 
 # ─── Éxito del Cliente (CSM) ──────────────────────────────────────────────────

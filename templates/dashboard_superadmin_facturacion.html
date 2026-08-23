@@ -32,6 +32,7 @@
 
         * {
             font-family: 'Plus Jakarta Sans', sans-serif;
+            box-sizing: border-box;
         }
 
         body {
@@ -179,6 +180,10 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.02);
             height: 100%;
         }
+        .kpi-card:hover {
+            box-shadow: 0 8px 24px rgba(124, 92, 252, 0.08);
+            transform: translateY(-2px);
+        }
 
         .kpi-icon {
             width: 48px;
@@ -219,6 +224,7 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
             padding: 0.5rem 1rem;
+            white-space: nowrap;
         }
 
         .table-custom td {
@@ -255,14 +261,18 @@
             padding: 0.5rem 1.25rem;
             border: none;
             transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
         }
         .btn-purple:hover {
             background-color: var(--primary-hover);
             color: white;
             box-shadow: 0 4px 12px rgba(124, 92, 252, 0.3);
+            transform: translateY(-1px);
         }
 
-        /* Estilos de Estado de Pago (Insignias inspiradas en Tailwind) */
+        /* Estilos de Estado de Pago */
         .badge-pagado {
             background-color: #ECFDF5;
             color: #047857;
@@ -299,13 +309,25 @@
             align-items: center;
             gap: 0.35rem;
         }
-        .sii-subtle {
+        .badge-anulado {
+            background-color: #F3F4F6;
+            color: #6B7280;
+            border: 1px solid #E5E7EB;
             font-size: 0.75rem;
-            color: var(--gray-text);
+            font-weight: 600;
+            padding: 0.35rem 0.75rem;
+            border-radius: 9999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .sii-subtle {
+            font-size: 0.78rem;
             display: inline-flex;
             align-items: center;
             gap: 0.25rem;
-            font-weight: 500;
+            font-weight: 600;
         }
         .filter-card {
             background: var(--white);
@@ -332,6 +354,62 @@
         .kpi-card.kpi-warning {
             border-left: 4px solid #EF4444;
         }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(21, 26, 53, 0.45);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-box {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            width: 520px;
+            max-width: calc(100vw - 2rem);
+            box-shadow: 0 24px 64px rgba(0,0,0,0.15);
+            animation: modal-in 0.25s ease;
+        }
+        @keyframes modal-in {
+            from { opacity: 0; transform: scale(0.95) translateY(12px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .form-label-custom {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--gray-text);
+            margin-bottom: 0.35rem;
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .btn-outline-custom {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.45rem 0.9rem;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.82rem;
+            color: var(--dark);
+            text-decoration: none;
+            transition: all 0.18s;
+        }
+        .btn-outline-custom:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-soft);
+        }
     </style>
 </head>
 <body>
@@ -341,23 +419,23 @@
         {% include '_sidebar_superadmin.html' with active_page='facturacion' %}
 
         <!-- Main Content -->
-        <main class="main-content">
+        <main class="main-content flex-grow-1 min-vw-0">
             <!-- Topbar -->
             <header class="topbar">
-                <div class="d-flex items-center gap-2">
+                <div class="d-flex align-items-center gap-2">
                     <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn" style="border:none; background:var(--primary-soft); color:var(--primary);">
                         <i class="bi bi-list fs-5"></i>
                     </button>
                     <div class="search-bar">
                         <i class="bi bi-search"></i>
-                        <input type="text" placeholder="Buscar colegios, órdenes, planes...">
+                        <input type="text" id="globalSearch" placeholder="Buscar folios, RUT, colegios...">
                     </div>
                 </div>
 
                 <div class="topbar-right">
                     <div class="user-profile">
-                        <div class="user-avatar">AE</div>
-                        <span class="user-name">Admin Eduteka</span>
+                        <div class="user-avatar">SA</div>
+                        <span class="user-name">Super Admin</span>
                     </div>
                 </div>
             </header>
@@ -367,13 +445,31 @@
 
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
                     <div>
-                        <h1 class="hero-title">Facturación Electrónica y SII</h1>
-                        <div class="hero-subtitle">Gestión de Documentos Tributarios Electrónicos (DTE) y cobro automático</div>
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <div style="width:36px;height:36px;background:var(--primary-soft);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;">
+                                <i class="bi bi-receipt-cutoff" style="color:var(--primary);font-size:1.1rem;"></i>
+                            </div>
+                            <h1 class="hero-title mb-0">Facturación Electrónica y SII</h1>
+                        </div>
+                        <div class="hero-subtitle ms-1">Gestión de Documentos Tributarios Electrónicos (DTE), estados SII y cobro automático</div>
                     </div>
                     <a href="{% url 'emitir_factura_manual' %}" class="btn btn-purple text-decoration-none">
                         <i class="bi bi-file-earmark-plus me-1"></i> Emitir Factura Manual
                     </a>
                 </div>
+
+                <!-- Django Messages -->
+                {% if messages %}
+                <div class="mb-3">
+                    {% for message in messages %}
+                    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show d-flex align-items-center gap-2 rounded-3" role="alert">
+                        <i class="bi {% if 'success' in message.tags %}bi-check-circle-fill text-success{% else %}bi-exclamation-circle-fill text-danger{% endif %}"></i>
+                        <span>{{ message }}</span>
+                        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
 
                 <!-- Metrics Cards -->
                 <div class="row g-3 mb-4">
@@ -384,7 +480,7 @@
                             </div>
                             <div>
                                 <div class="text-muted small fw-bold text-uppercase">Facturado este mes</div>
-                                <div class="fs-4 fw-bold text-dark">$14.250.000</div>
+                                <div class="fs-4 fw-bold text-dark">{{ facturado_mes_display }} CLP</div>
                                 <div class="text-success small fw-semibold"><i class="bi bi-arrow-up-right"></i> 100% Aceptado SII</div>
                             </div>
                         </div>
@@ -396,8 +492,8 @@
                             </div>
                             <div>
                                 <div class="text-muted small fw-bold text-uppercase">Ingresos Proyectados (MRR)</div>
-                                <div class="fs-4 fw-bold text-dark">$18.500.000</div>
-                                <div class="text-success small fw-semibold"><i class="bi bi-arrow-up-right"></i> +8.4% vs mes anterior</div>
+                                <div class="fs-4 fw-bold text-dark">{{ mrr_proyectado_display }} CLP</div>
+                                <div class="text-success small fw-semibold"><i class="bi bi-shield-check"></i> Suscripciones activas</div>
                             </div>
                         </div>
                     </div>
@@ -408,8 +504,8 @@
                             </div>
                             <div>
                                 <div class="text-muted small fw-bold text-uppercase">Facturas Vencidas</div>
-                                <div class="fs-4 fw-bold text-dark">$1.850.000</div>
-                                <div class="text-danger small fw-semibold">10 Colegios pendientes</div>
+                                <div class="fs-4 fw-bold text-dark">{{ monto_vencidas_display }} CLP</div>
+                                <div class="text-danger small fw-semibold">{{ colegios_morosos_count }} Colegios pendientes</div>
                             </div>
                         </div>
                     </div>
@@ -420,8 +516,8 @@
                             </div>
                             <div>
                                 <div class="text-muted small fw-bold text-uppercase">Tasa de Morosidad</div>
-                                <div class="fs-4 fw-bold text-danger">11.5%</div>
-                                <div class="text-danger small fw-semibold"><i class="bi bi-exclamation-circle-fill"></i> 10 colegios sin pagar</div>
+                                <div class="fs-4 fw-bold text-danger">{{ tasa_morosidad }}%</div>
+                                <div class="text-danger small fw-semibold"><i class="bi bi-exclamation-circle-fill"></i> {{ vencidas_count }} documentos por cobrar</div>
                             </div>
                         </div>
                     </div>
@@ -446,7 +542,7 @@
                         </div>
                         <div class="col-12 col-md-5">
                             <label class="form-label small fw-bold text-uppercase text-muted mb-1"><i class="bi bi-search me-1"></i>Búsqueda Rápida</label>
-                            <input type="text" class="form-control filter-control" id="filterBusqueda" name="q" value="{{ filtros.q }}" placeholder="Buscar por nombre de colegio o folio...">
+                            <input type="text" class="form-control filter-control" id="filterBusqueda" name="q" value="{{ filtros.q }}" placeholder="Buscar por nombre de colegio, RUT o folio...">
                         </div>
                         <div class="col-12 col-md-1 d-flex align-items-end">
                             <button type="submit" class="btn btn-purple w-100" title="Aplicar filtros"><i class="bi bi-search"></i></button>
@@ -456,16 +552,19 @@
 
                 <!-- Table Panel -->
                 <div class="dashboard-panel">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h2 class="fw-bold fs-5 text-dark m-0"><i class="bi bi-journal-text me-2 text-primary"></i>Historial de Documentos Emitidos</h2>
-                        <button type="submit" name="exportar" value="true" form="filtroForm" class="btn btn-sm btn-outline-primary rounded-pill"><i class="bi bi-download me-1"></i> Exportar a Excel</button>
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                        <h2 class="fw-bold fs-5 text-dark m-0"><i class="bi bi-journal-text me-2 text-primary"></i>Historial de Documentos Emitidos (DTE)</h2>
+                        <button type="submit" name="exportar" value="true" form="filtroForm" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                            <i class="bi bi-file-earmark-excel me-1"></i> Exportar a Excel (.xlsx)
+                        </button>
                     </div>
+
                     <div class="table-responsive">
-                        <table class="table-custom">
+                        <table class="table-custom" id="facturasTable">
                             <thead>
                                 <tr>
                                     <th>Folio DTE</th>
-                                    <th>Colegio</th>
+                                    <th>Colegio / Cliente</th>
                                     <th>Tipo Documento</th>
                                     <th>Monto Total</th>
                                     <th>Fecha Emisión</th>
@@ -477,43 +576,78 @@
                             <tbody>
                                 {% for factura in facturas %}
                                 <tr>
-                                    <td><strong class="text-primary">{{ factura.folio }}</strong></td>
-                                    <td><strong>{{ factura.colegio }}</strong></td>
-                                    <td>{{ factura.tipo }}</td>
-                                    <td>{{ factura.monto }}</td>
-                                    <td>{{ factura.fecha }}</td>
                                     <td>
-                                        {% if factura.estado_sii == 'Aceptado' %}
-                                            <span class="sii-subtle"><i class="bi bi-check-circle-fill text-success fs-6"></i> Aceptado</span>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div style="width:28px;height:28px;background:var(--primary-soft);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--primary);font-size:.85rem;font-weight:700;">
+                                                <i class="bi bi-receipt"></i>
+                                            </div>
+                                            <strong class="text-primary">{{ factura.folio }}</strong>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <strong>{{ factura.colegio.nombre }}</strong>
+                                        <div class="text-muted small">RUT: {{ factura.proveedor_rut|default:factura.colegio.ciudad_comuna|default:"Sin RUT" }}</div>
+                                    </td>
+                                    <td>
+                                        <span class="text-dark">{{ factura.get_tipo_documento_display }}</span>
+                                    </td>
+                                    <td>
+                                        <strong class="text-dark">${{ factura.monto_total|floatformat:0 }} CLP</strong>
+                                    </td>
+                                    <td>
+                                        <span class="text-muted">{{ factura.fecha_emision|date:"d/m/Y" }}</span>
+                                    </td>
+                                    <td>
+                                        {% if factura.estado_pago == 'pagado' or factura.estado_pago == 'pendiente' %}
+                                            <span class="sii-subtle text-success">
+                                                <i class="bi bi-check-circle-fill text-success fs-6"></i> Aceptado
+                                            </span>
+                                        {% elif factura.estado_pago == 'vencido' %}
+                                            <span class="sii-subtle text-warning">
+                                                <i class="bi bi-clock-history text-warning fs-6"></i> En Revisión
+                                            </span>
                                         {% else %}
-                                            <span class="sii-subtle"><i class="bi bi-clock text-warning fs-6"></i> {{ factura.estado_sii }}</span>
+                                            <span class="sii-subtle text-muted">
+                                                <i class="bi bi-arrow-repeat text-secondary fs-6"></i> Pendiente
+                                            </span>
                                         {% endif %}
                                     </td>
                                     <td>
-                                        {% if factura.estado_pago == 'pagado' %}
+                                        {% if factura.estado_pago == 'pagado' or factura.estado_pago == 'aprobada' %}
                                             <span class="badge-pagado"><i class="bi bi-check-circle-fill"></i> Pagado</span>
                                         {% elif factura.estado_pago == 'vencido' %}
                                             <span class="badge-vencido"><i class="bi bi-exclamation-triangle-fill"></i> Vencido</span>
-                                        {% else %}
+                                        {% elif factura.estado_pago == 'pendiente' %}
                                             <span class="badge-pendiente"><i class="bi bi-clock-history"></i> Pendiente</span>
+                                        {% else %}
+                                            <span class="badge-anulado"><i class="bi bi-x-circle"></i> {{ factura.get_estado_pago_display|default:factura.estado_pago|capfirst }}</span>
                                         {% endif %}
                                     </td>
                                     <td class="text-end">
-                                        <div class="d-inline-flex align-items-center gap-1">
-                                            <button class="btn btn-sm btn-light border rounded-circle" title="Ver/Descargar PDF"><i class="bi bi-file-earmark-pdf text-secondary"></i></button>
-                                            <button class="btn btn-sm btn-light border rounded-circle" title="Enviar recordatorio de cobro"><i class="bi bi-envelope text-primary"></i></button>
-                                            <div class="dropdown d-inline-block">
-                                                <button class="btn btn-sm btn-light border rounded-circle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Más opciones">
-                                                    <i class="bi bi-three-dots-vertical"></i>
+                                        <div class="d-inline-flex align-items-center gap-1.5">
+                                            <!-- Ver Detalle -->
+                                            <button type="button" class="btn btn-sm btn-light border rounded-circle" title="Ver Detalle"
+                                                onclick="openDetalleFacturaModal('{{ factura.folio|escapejs }}', '{{ factura.colegio.nombre|escapejs }}', '{{ factura.proveedor_rut|default:factura.colegio.ciudad_comuna|default:"Sin RUT"|escapejs }}', '{{ factura.get_tipo_documento_display|escapejs }}', '${{ factura.monto_total|floatformat:0 }} CLP', '{{ factura.fecha_emision|date:"d/m/Y" }}', '{{ factura.get_estado_pago_display|escapejs }}', '{{ factura.observaciones|default:"Sin observaciones registradas."|escapejs }}')">
+                                                <i class="bi bi-eye text-dark"></i>
+                                            </button>
+
+                                            <!-- Descargar PDF -->
+                                            <a href="{% url 'superadmin_descargar_factura_pdf' factura.id %}" class="btn btn-sm btn-light border rounded-circle" title="Descargar PDF">
+                                                <i class="bi bi-file-earmark-pdf text-danger"></i>
+                                            </a>
+
+                                            <!-- Descargar XML DTE -->
+                                            <a href="{% url 'superadmin_descargar_factura_xml' factura.id %}" class="btn btn-sm btn-light border rounded-circle" title="Descargar XML DTE">
+                                                <i class="bi bi-filetype-xml text-primary"></i>
+                                            </a>
+
+                                            <!-- Reenviar al SII -->
+                                            <form method="POST" action="{% url 'superadmin_reenviar_factura_sii' factura.id %}" style="display:inline;" onsubmit="return confirm('¿Reenviar DTE {{ factura.folio|escapejs }} al Web Service del SII?');">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-light border rounded-circle" title="Reenviar al SII">
+                                                    <i class="bi bi-arrow-repeat text-warning"></i>
                                                 </button>
-                                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3 small">
-                                                    <li>
-                                                        <a class="dropdown-item d-flex align-items-center gap-2 py-2 text-danger" href="#">
-                                                            <i class="bi bi-arrow-counterclockwise"></i> Generar Nota de Crédito
-                                                        </a>
-                                                    </li>
-                                                </ul>
-                                            </div>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>
@@ -521,12 +655,17 @@
                                 <tr>
                                     <td colspan="8" class="text-center py-5 text-muted">
                                         <i class="bi bi-inbox fs-1 d-block mb-2 opacity-50"></i>
-                                        No se encontraron documentos con los filtros aplicados.
+                                        No se encontraron documentos tributarios con los filtros aplicados.
                                     </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
+                    </div>
+
+                    <!-- Footer Table -->
+                    <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top text-muted small">
+                        <span>Mostrando <strong>{{ facturas|length }}</strong> documentos tributarios</span>
                     </div>
                 </div>
                 </form>
@@ -535,8 +674,69 @@
         </main>
     </div>
 
+
+    <!-- ════ MODAL: VER DETALLE DE FACTURA DTE ═══════════════════════════════ -->
+    <div class="modal-overlay" id="modalDetalleFactura">
+        <div class="modal-box" style="width:520px;">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <div>
+                    <div class="modal-title fw-bold fs-5 text-dark">Detalle Documento Tributario (DTE)</div>
+                    <div class="modal-subtitle text-muted small">Información registrada en el Servicio de Impuestos Internos.</div>
+                </div>
+                <button type="button" onclick="closeModal('modalDetalleFactura')" style="background:none;border:none;font-size:1.4rem;color:var(--gray-text);cursor:pointer;">&times;</button>
+            </div>
+
+            <div class="p-3 mb-3 rounded-3" style="background:var(--bg);border:1px solid var(--border);">
+                <div class="row g-3">
+                    <div class="col-6">
+                        <span class="form-label-custom">Folio DTE</span>
+                        <div id="detFolioDTE" class="fw-bold text-primary fs-6"></div>
+                    </div>
+                    <div class="col-6">
+                        <span class="form-label-custom">Estado de Pago</span>
+                        <div id="detEstadoPago" class="fw-bold"></div>
+                    </div>
+                    <div class="col-6">
+                        <span class="form-label-custom">Colegio Receptor</span>
+                        <div id="detColegioNombre" class="fw-bold text-dark"></div>
+                    </div>
+                    <div class="col-6">
+                        <span class="form-label-custom">RUT Receptor</span>
+                        <div id="detRUTReceptor" class="text-dark small"></div>
+                    </div>
+                    <div class="col-6">
+                        <span class="form-label-custom">Tipo Documento</span>
+                        <div id="detTipoDoc" class="text-dark small"></div>
+                    </div>
+                    <div class="col-6">
+                        <span class="form-label-custom">Monto Total</span>
+                        <div id="detMontoTotal" class="fw-bold text-dark fs-6"></div>
+                    </div>
+                    <div class="col-6">
+                        <span class="form-label-custom">Fecha de Emisión</span>
+                        <div id="detFechaEmision" class="text-muted small"></div>
+                    </div>
+                    <div class="col-6">
+                        <span class="form-label-custom">Estado en el SII</span>
+                        <div class="text-success small fw-bold"><i class="bi bi-check-circle-fill me-1"></i> Aceptado por SII</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label-custom">Observaciones / Glosa DTE</label>
+                <div id="detGlosa" class="p-3 rounded-3" style="background:#FAFBFF;border:1px solid var(--border);font-size:.85rem;color:var(--dark);min-height:50px;"></div>
+            </div>
+
+            <div class="d-flex justify-content-end pt-2 border-top">
+                <button type="button" onclick="closeModal('modalDetalleFactura')" class="btn-outline-custom">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+
     <!-- Scripts Bootstrap -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const mobileBtn = document.getElementById('mobileMenuBtn');
@@ -547,17 +747,35 @@
                 });
             }
 
-            // Enviar formulario al presionar Enter en el campo de búsqueda
-            const busquedaInput = document.getElementById('filterBusqueda');
-            if (busquedaInput) {
-                busquedaInput.addEventListener('keydown', function (e) {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        document.getElementById('filtroForm').submit();
-                    }
+            // Búsqueda en vivo desde la barra superior
+            document.getElementById('globalSearch')?.addEventListener('input', function () {
+                const query = this.value.toLowerCase();
+                const rows = document.querySelectorAll('#facturasTable tbody tr');
+                rows.forEach(row => {
+                    const text = row.innerText.toLowerCase();
+                    row.style.display = text.includes(query) ? '' : 'none';
                 });
-            }
+            });
         });
+
+        function openModal(id)  { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        document.querySelectorAll('.modal-overlay').forEach(el => {
+            el.addEventListener('click', e => { if (e.target === el) closeModal(el.id); });
+        });
+
+        function openDetalleFacturaModal(folio, colegio, rut, tipo, monto, fecha, estado, glosa) {
+            document.getElementById('detFolioDTE').textContent       = folio;
+            document.getElementById('detColegioNombre').textContent  = colegio;
+            document.getElementById('detRUTReceptor').textContent    = rut;
+            document.getElementById('detTipoDoc').textContent        = tipo;
+            document.getElementById('detMontoTotal').textContent      = monto;
+            document.getElementById('detFechaEmision').textContent   = fecha;
+            document.getElementById('detEstadoPago').textContent     = estado;
+            document.getElementById('detGlosa').textContent          = glosa || 'Sin observaciones registradas.';
+            openModal('modalDetalleFactura');
+        }
     </script>
 </body>
 </html>
