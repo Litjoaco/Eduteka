@@ -239,6 +239,82 @@
             border: none; font-size: .84rem; transition: all .2s; cursor: pointer;
         }
         .btn-purple:hover { background: var(--primary-hover); color: #fff; box-shadow: 0 4px 14px rgba(124,92,252,.3); }
+
+        /* ── Accesos Rápidos Shortcuts ── */
+        .shortcut-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 0.8rem 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--dark);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.22s ease-in-out;
+            height: 100%;
+        }
+        .shortcut-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .shortcut-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+            transition: all 0.22s ease-in-out;
+        }
+        .shortcut-card:hover .shortcut-icon {
+            transform: scale(1.08);
+        }
+        .sc-purple { background: var(--primary-soft); color: var(--primary); }
+        .sc-teal   { background: var(--secondary-soft); color: #0E8A7E; }
+        .sc-emerald{ background: var(--green-soft); color: #10B981; }
+        .sc-amber  { background: var(--amber-soft); color: #D97706; }
+        .sc-rose   { background: var(--red-soft); color: #EF4444; }
+        .sc-blue   { background: #EFF6FF; color: #2563EB; }
+        .sc-indigo { background: #EEF2FF; color: #4F46E5; }
+        .sc-cyan   { background: #ECFEFF; color: #0891B2; }
+
+        .shortcut-title {
+            font-size: 0.83rem;
+            font-weight: 700;
+            line-height: 1.25;
+            color: inherit;
+        }
+        .shortcut-subtitle {
+            font-size: 0.71rem;
+            color: var(--gray-text);
+            font-weight: 500;
+        }
+        .btn-customize-shortcuts {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 0.22rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--gray-text);
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        .btn-customize-shortcuts:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-soft);
+        }
     </style>
 </head>
 
@@ -252,6 +328,18 @@
         {% include '_topbar_superadmin.html' %}
 
         <div class="content-area">
+
+            <!-- Django Messages -->
+            {% if messages %}
+                <div class="mb-3">
+                    {% for message in messages %}
+                        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show rounded-4" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
 
             <!-- ── Hero ────────────────────────────────────────────────────── -->
             <div class="mb-4">
@@ -330,6 +418,108 @@
 
             </div>
 
+            <!-- ── ACCESOS RÁPIDOS PERSONALIZABLES ────────────────────────── -->
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <div class="section-label mb-0" style="flex:1;">
+                    <i class="bi bi-lightning-charge-fill text-warning"></i> Accesos Rápidos
+                </div>
+                <button type="button" id="btnPersonalizarAccesos" class="btn-customize-shortcuts ms-3" data-bs-toggle="modal" data-bs-target="#modalPersonalizarAccesos">
+                    <i class="bi bi-gear-fill"></i> Personalizar Accesos
+                </button>
+            </div>
+
+            <div class="row g-2 mb-4" id="shortcutsContainer">
+
+                <!-- 1. Colegios Clientes -->
+                <div class="col-6 col-md-4 col-xl-3 shortcut-col" data-shortcut-id="colegios">
+                    <a href="{% url 'dashboard_superadmin_colegios' %}" class="shortcut-card">
+                        <div class="shortcut-icon sc-purple"><i class="bi bi-building"></i></div>
+                        <div class="min-w-0">
+                            <div class="shortcut-title text-truncate">Colegios Clientes</div>
+                            <div class="shortcut-subtitle text-truncate">Directorio y fichas</div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- 2. Planes y Suscripciones -->
+                <div class="col-6 col-md-4 col-xl-3 shortcut-col" data-shortcut-id="planes">
+                    <a href="{% url 'dashboard_superadmin_planes' %}" class="shortcut-card">
+                        <div class="shortcut-icon sc-teal"><i class="bi bi-gem"></i></div>
+                        <div class="min-w-0">
+                            <div class="shortcut-title text-truncate">Planes y Precios</div>
+                            <div class="shortcut-subtitle text-truncate">Catálogo y cuotas</div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- 3. Facturación y SII -->
+                <div class="col-6 col-md-4 col-xl-3 shortcut-col" data-shortcut-id="facturacion">
+                    <a href="{% url 'dashboard_superadmin_facturacion' %}" class="shortcut-card">
+                        <div class="shortcut-icon sc-blue"><i class="bi bi-receipt"></i></div>
+                        <div class="min-w-0">
+                            <div class="shortcut-title text-truncate">Facturación y SII</div>
+                            <div class="shortcut-subtitle text-truncate">DTE, XML y Cobros</div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- 4. Órdenes de Compra -->
+                <div class="col-6 col-md-4 col-xl-3 shortcut-col" data-shortcut-id="ordenes">
+                    <a href="{% url 'dashboard_superadmin_ordenes' %}" class="shortcut-card">
+                        <div class="shortcut-icon sc-amber"><i class="bi bi-cart-check"></i></div>
+                        <div class="min-w-0">
+                            <div class="shortcut-title text-truncate">Órdenes de Compra</div>
+                            <div class="shortcut-subtitle text-truncate">Mercado Público</div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- 5. Usuarios Globales -->
+                <div class="col-6 col-md-4 col-xl-3 shortcut-col" data-shortcut-id="usuarios">
+                    <a href="{% url 'dashboard_superadmin_usuarios' %}" class="shortcut-card">
+                        <div class="shortcut-icon sc-indigo"><i class="bi bi-people"></i></div>
+                        <div class="min-w-0">
+                            <div class="shortcut-title text-truncate">Usuarios Globales</div>
+                            <div class="shortcut-subtitle text-truncate">Directores y personal</div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- 6. Solicitudes Pendientes -->
+                <div class="col-6 col-md-4 col-xl-3 shortcut-col" data-shortcut-id="solicitudes">
+                    <a href="{% url 'dashboard_superadmin_solicitudes' %}" class="shortcut-card">
+                        <div class="shortcut-icon sc-rose"><i class="bi bi-inbox"></i></div>
+                        <div class="min-w-0">
+                            <div class="shortcut-title text-truncate">Solicitudes</div>
+                            <div class="shortcut-subtitle text-truncate">Nuevos colegios</div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- 7. Centro de Comunicados -->
+                <div class="col-6 col-md-4 col-xl-3 shortcut-col" data-shortcut-id="comunicados">
+                    <a href="{% url 'dashboard_superadmin_comunicados' %}" class="shortcut-card">
+                        <div class="shortcut-icon sc-cyan"><i class="bi bi-megaphone"></i></div>
+                        <div class="min-w-0">
+                            <div class="shortcut-title text-truncate">Comunicados</div>
+                            <div class="shortcut-subtitle text-truncate">Anuncios masivos</div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- 8. Registro de Auditoría -->
+                <div class="col-6 col-md-4 col-xl-3 shortcut-col" data-shortcut-id="auditoria">
+                    <a href="{% url 'dashboard_superadmin_auditoria' %}" class="shortcut-card">
+                        <div class="shortcut-icon sc-emerald"><i class="bi bi-shield-check"></i></div>
+                        <div class="min-w-0">
+                            <div class="shortcut-title text-truncate">Auditoría y Logs</div>
+                            <div class="shortcut-subtitle text-truncate">Trazabilidad total</div>
+                        </div>
+                    </a>
+                </div>
+
+            </div>
+
             <!-- ── FILA 2: Line Chart (65%) + Tablero Alertas (35%) ──────── -->
             <div class="section-label"><i class="bi bi-graph-up-arrow"></i> Ingresos y Alertas Críticas</div>
             <div class="row g-3 mb-4">
@@ -377,10 +567,18 @@
                                                     <span class="pill p-yellow"><i class="bi bi-exclamation-circle"></i> {{ alerta.dias_restantes }} días</span>
                                                 {% endif %}
                                             </td>
-                                            <td>
-                                                <a href="{% url 'editar_suscripcion_colegio' alerta.colegio_id %}" class="btn btn-sm {% if alerta.urgente %}btn-danger{% else %}btn-warning text-white{% endif %} rounded-pill px-3">
-                                                    Ver
-                                                </a>
+                                            <td class="text-end">
+                                                <div class="d-flex align-items-center justify-content-end gap-1">
+                                                    <a href="{% url 'editar_suscripcion_colegio' alerta.colegio_id %}" class="btn btn-sm {% if alerta.urgente %}btn-danger{% else %}btn-warning text-white{% endif %} rounded-pill px-3" title="Ver Suscripción">
+                                                        Ver
+                                                    </a>
+                                                    <form method="POST" action="{% url 'superadmin_enviar_recordatorio' alerta.id %}" style="display:inline;">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-outline-secondary btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width:30px;height:30px;" title="Enviar Recordatorio de Pago">
+                                                            <i class="bi bi-envelope"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
                                             </td>
                                         </tr>
                                         {% endfor %}
@@ -398,103 +596,7 @@
                 </div>
 
             </div>
-
-            <!-- ── FILA 3: Tabla Clientes Recientes (compacta) ───────────── -->
-            <div class="section-label"><i class="bi bi-people-fill"></i> Clientes Recientes</div>
-            <div class="panel mb-4">
-                <div class="panel-header">
-                    <h2 class="panel-title"><i class="bi bi-people-fill" style="color:var(--primary);"></i> Directorio de Clientes</h2>
-                    <a href="{% url 'dashboard_superadmin_colegios' %}" class="btn-purple">
-                        <i class="bi bi-grid me-1"></i> Ver Directorio Completo
-                    </a>
-                </div>
-                <div class="table-responsive">
-                    <table class="tbl">
-                        <thead>
-                            <tr>
-                                <th>Colegio</th>
-                                <th>Alumnos</th>
-                                <th>Implementación</th>
-                                <th>Plan</th>
-                                <th>Estado</th>
-                                <th class="text-end">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for colegio in ultimos_colegios %}
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center gap-2.5">
-                                        {% if colegio.logo %}
-                                            <img src="{{ colegio.logo.url }}" alt="{{ colegio.nombre }}" class="rounded-2" style="width:34px;height:34px;object-fit:cover;">
-                                        {% else %}
-                                            <div style="width:34px;height:34px;border-radius:8px;background:var(--primary-soft);color:var(--primary);font-weight:800;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;">
-                                                {{ colegio.nombre|slice:":2"|upper }}
-                                            </div>
-                                        {% endif %}
-                                        <div>
-                                            <div style="font-weight:700; color:var(--dark);">{{ colegio.nombre }}</div>
-                                            <div style="font-size:.74rem; color:var(--gray-text);">
-                                                {{ colegio.ciudad_comuna|default:"Chile" }}{% if colegio.region %}, {{ colegio.region }}{% endif %}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    {% if colegio.total_estudiantes %}
-                                        <span class="fw-bold text-dark">{{ colegio.total_estudiantes }}</span>
-                                    {% elif colegio.cantidad_alumnos %}
-                                        <span class="badge bg-light text-dark border">{{ colegio.get_cantidad_alumnos_display|default:colegio.cantidad_alumnos }}</span>
-                                    {% else %}
-                                        <span class="text-muted small">0</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if colegio.configuracion_completa %}
-                                        <span class="pill p-green"><i class="bi bi-check-circle-fill"></i> Completado</span>
-                                    {% else %}
-                                        <span class="pill p-yellow"><i class="bi bi-clock-history"></i> Paso {{ colegio.paso_configuracion_actual|default:"1" }}</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if colegio.suscripcion %}
-                                        <span class="pill p-purple">{{ colegio.suscripcion.plan.nombre }}</span>
-                                    {% else %}
-                                        <span class="pill p-gray">Sin Plan</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if colegio.estado == 'activo' %}
-                                        <span class="pill p-green"><i class="bi bi-circle-fill" style="font-size:.4rem;"></i> Activo</span>
-                                    {% elif colegio.estado == 'inactivo' or colegio.estado == 'suspendido' %}
-                                        <span class="pill p-red"><i class="bi bi-circle-fill" style="font-size:.4rem;"></i> {{ colegio.get_estado_display }}</span>
-                                    {% else %}
-                                        <span class="pill p-yellow"><i class="bi bi-circle-fill" style="font-size:.4rem;"></i> {{ colegio.get_estado_display }}</span>
-                                    {% endif %}
-                                </td>
-                                <td class="text-end">
-                                    <a href="{% url 'ver_detalle_colegio' colegio.id %}" class="btn btn-sm btn-outline-primary rounded-pill me-1 px-2.5" title="Ver Detalles">
-                                        <i class="bi bi-eye me-1"></i> Detalles
-                                    </a>
-                                    <a href="{% url 'editar_colegio' colegio.id %}" class="btn btn-sm btn-light border rounded-pill px-2.5" title="Editar Ficha">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="6" class="text-center py-4 text-muted">
-                                    <i class="bi bi-building-slash fs-4 d-block mb-2 text-muted"></i>
-                                    No hay colegios registrados aún en la plataforma.
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- ── FILA 4: Distribución de Planes (Donut) + Feed de Actividad ── -->
+            <!-- ── FILA 3: Distribución de Planes (Donut) + Feed de Actividad ── -->
             <div class="section-label"><i class="bi bi-pie-chart-fill"></i> Distribución y Actividad del Sistema</div>
             <div class="row g-3 mb-2">
 
@@ -608,12 +710,155 @@
     </main>
 </div>
 
+<!-- ── MODAL: Personalizar Accesos Rápidos ──────────────────────────── -->
+<div class="modal fade" id="modalPersonalizarAccesos" tabindex="-1" aria-labelledby="modalPersonalizarAccesosLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow-lg">
+            <div class="modal-header border-bottom py-3 px-4" style="background:#FAF9FF;">
+                <div class="d-flex align-items-center gap-2">
+                    <div style="width:36px;height:36px;background:var(--primary-soft);color:var(--primary);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;">
+                        <i class="bi bi-sliders"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold text-dark mb-0" id="modalPersonalizarAccesosLabel" style="font-size:1rem;">Personalizar Accesos Rápidos</h5>
+                        <p class="text-muted small mb-0" style="font-size:0.75rem;">Selecciona los módulos visibles en tu Centro de Comando</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="d-flex flex-column gap-3">
+
+                    <div class="d-flex align-items-center justify-content-between p-2.5 rounded-3 border" style="background:#fff;">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="shortcut-icon sc-purple" style="width:34px;height:34px;font-size:1rem;"><i class="bi bi-building"></i></div>
+                            <div>
+                                <div class="fw-bold small text-dark">Colegios Clientes</div>
+                                <div class="text-muted" style="font-size:0.72rem;">Directorio y administración</div>
+                            </div>
+                        </div>
+                        <div class="form-check form-switch m-0">
+                            <input class="form-check-input shortcut-toggle" type="checkbox" role="switch" data-shortcut-id="colegios" checked>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center justify-content-between p-2.5 rounded-3 border" style="background:#fff;">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="shortcut-icon sc-teal" style="width:34px;height:34px;font-size:1rem;"><i class="bi bi-gem"></i></div>
+                            <div>
+                                <div class="fw-bold small text-dark">Planes y Precios</div>
+                                <div class="text-muted" style="font-size:0.72rem;">Catálogo y cuotas</div>
+                            </div>
+                        </div>
+                        <div class="form-check form-switch m-0">
+                            <input class="form-check-input shortcut-toggle" type="checkbox" role="switch" data-shortcut-id="planes" checked>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center justify-content-between p-2.5 rounded-3 border" style="background:#fff;">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="shortcut-icon sc-blue" style="width:34px;height:34px;font-size:1rem;"><i class="bi bi-receipt"></i></div>
+                            <div>
+                                <div class="fw-bold small text-dark">Facturación y SII</div>
+                                <div class="text-muted" style="font-size:0.72rem;">DTE, XML y Cobros</div>
+                            </div>
+                        </div>
+                        <div class="form-check form-switch m-0">
+                            <input class="form-check-input shortcut-toggle" type="checkbox" role="switch" data-shortcut-id="facturacion" checked>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center justify-content-between p-2.5 rounded-3 border" style="background:#fff;">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="shortcut-icon sc-amber" style="width:34px;height:34px;font-size:1rem;"><i class="bi bi-cart-check"></i></div>
+                            <div>
+                                <div class="fw-bold small text-dark">Órdenes de Compra</div>
+                                <div class="text-muted" style="font-size:0.72rem;">Mercado Público</div>
+                            </div>
+                        </div>
+                        <div class="form-check form-switch m-0">
+                            <input class="form-check-input shortcut-toggle" type="checkbox" role="switch" data-shortcut-id="ordenes" checked>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center justify-content-between p-2.5 rounded-3 border" style="background:#fff;">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="shortcut-icon sc-indigo" style="width:34px;height:34px;font-size:1rem;"><i class="bi bi-people"></i></div>
+                            <div>
+                                <div class="fw-bold small text-dark">Usuarios Globales</div>
+                                <div class="text-muted" style="font-size:0.72rem;">Directores y personal</div>
+                            </div>
+                        </div>
+                        <div class="form-check form-switch m-0">
+                            <input class="form-check-input shortcut-toggle" type="checkbox" role="switch" data-shortcut-id="usuarios" checked>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center justify-content-between p-2.5 rounded-3 border" style="background:#fff;">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="shortcut-icon sc-rose" style="width:34px;height:34px;font-size:1rem;"><i class="bi bi-inbox"></i></div>
+                            <div>
+                                <div class="fw-bold small text-dark">Solicitudes Pendientes</div>
+                                <div class="text-muted" style="font-size:0.72rem;">Nuevos colegios y altas</div>
+                            </div>
+                        </div>
+                        <div class="form-check form-switch m-0">
+                            <input class="form-check-input shortcut-toggle" type="checkbox" role="switch" data-shortcut-id="solicitudes" checked>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center justify-content-between p-2.5 rounded-3 border" style="background:#fff;">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="shortcut-icon sc-cyan" style="width:34px;height:34px;font-size:1rem;"><i class="bi bi-megaphone"></i></div>
+                            <div>
+                                <div class="fw-bold small text-dark">Centro de Comunicados</div>
+                                <div class="text-muted" style="font-size:0.72rem;">Anuncios y avisos</div>
+                            </div>
+                        </div>
+                        <div class="form-check form-switch m-0">
+                            <input class="form-check-input shortcut-toggle" type="checkbox" role="switch" data-shortcut-id="comunicados" checked>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center justify-content-between p-2.5 rounded-3 border" style="background:#fff;">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="shortcut-icon sc-emerald" style="width:34px;height:34px;font-size:1rem;"><i class="bi bi-shield-check"></i></div>
+                            <div>
+                                <div class="fw-bold small text-dark">Registro de Auditoría</div>
+                                <div class="text-muted" style="font-size:0.72rem;">Trazabilidad y logs</div>
+                            </div>
+                        </div>
+                        <div class="form-check form-switch m-0">
+                            <input class="form-check-input shortcut-toggle" type="checkbox" role="switch" data-shortcut-id="auditoria" checked>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer border-top bg-light py-2.5 px-4 d-flex justify-content-between">
+                <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3" id="btnResetShortcuts">
+                    <i class="bi bi-arrow-counterclockwise me-1"></i> Restablecer Todo
+                </button>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-sm btn-light border rounded-pill px-3" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-sm btn-purple rounded-pill px-4" id="btnSaveShortcuts">
+                        <i class="bi bi-check2 me-1"></i> Guardar Preferencias
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <style>
     @keyframes pulse {
         0%, 100% { opacity: 1; }
         50%       { opacity: .5; }
     }
 </style>
+
+<!-- Bootstrap 5 JS Bundle -->
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -622,6 +867,85 @@ document.addEventListener('DOMContentLoaded', function () {
     const mobileBtn = document.getElementById('mobileMenuBtn');
     const sidebar   = document.getElementById('sidebar');
     if (mobileBtn && sidebar) mobileBtn.addEventListener('click', () => sidebar.classList.toggle('active'));
+
+    // ── Accesos Rápidos Personalizables (localStorage) ──────────────────────────
+    const SHORTCUTS_STORAGE_KEY = 'eduteka_superadmin_shortcuts';
+    const shortcutCols = document.querySelectorAll('.shortcut-col');
+    const shortcutToggles = document.querySelectorAll('.shortcut-toggle');
+    const btnSaveShortcuts = document.getElementById('btnSaveShortcuts');
+    const btnResetShortcuts = document.getElementById('btnResetShortcuts');
+    const btnPersonalizar = document.getElementById('btnPersonalizarAccesos');
+
+    // Programmatic trigger fallback for modal
+    if (btnPersonalizar) {
+        btnPersonalizar.addEventListener('click', function (e) {
+            e.preventDefault();
+            const modalEl = document.getElementById('modalPersonalizarAccesos');
+            if (modalEl && typeof bootstrap !== 'undefined') {
+                const modalInst = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+                modalInst.show();
+            }
+        });
+    }
+
+    function loadShortcutsPreferences() {
+        let config = {};
+        try {
+            const raw = localStorage.getItem(SHORTCUTS_STORAGE_KEY);
+            if (raw) config = JSON.parse(raw);
+        } catch (e) {
+            config = {};
+        }
+
+        // Apply visibility to columns & sync modal switches
+        shortcutCols.forEach(col => {
+            const id = col.getAttribute('data-shortcut-id');
+            const isVisible = config[id] !== undefined ? config[id] : true;
+            col.style.display = isVisible ? '' : 'none';
+        });
+
+        shortcutToggles.forEach(toggle => {
+            const id = toggle.getAttribute('data-shortcut-id');
+            const isVisible = config[id] !== undefined ? config[id] : true;
+            toggle.checked = isVisible;
+        });
+    }
+
+    function saveShortcutsPreferences() {
+        const config = {};
+        shortcutToggles.forEach(toggle => {
+            const id = toggle.getAttribute('data-shortcut-id');
+            config[id] = toggle.checked;
+        });
+
+        localStorage.setItem(SHORTCUTS_STORAGE_KEY, JSON.stringify(config));
+
+        // Apply directly
+        shortcutCols.forEach(col => {
+            const id = col.getAttribute('data-shortcut-id');
+            const isVisible = config[id] !== undefined ? config[id] : true;
+            col.style.display = isVisible ? '' : 'none';
+        });
+
+        // Hide modal
+        const modalEl = document.getElementById('modalPersonalizarAccesos');
+        if (modalEl && typeof bootstrap !== 'undefined') {
+            const modalInst = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+            modalInst.hide();
+        }
+    }
+
+    function resetShortcutsPreferences() {
+        shortcutToggles.forEach(toggle => {
+            toggle.checked = true;
+        });
+    }
+
+    if (btnSaveShortcuts) btnSaveShortcuts.addEventListener('click', saveShortcutsPreferences);
+    if (btnResetShortcuts) btnResetShortcuts.addEventListener('click', resetShortcutsPreferences);
+
+    // Initial load
+    loadShortcutsPreferences();
 
     // ── Retention Arc Animation ─────────────────────────────────────────────────
     const retVal   = parseFloat("{{ tasa_retencion|default:'94.2' }}");

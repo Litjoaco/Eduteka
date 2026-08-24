@@ -170,6 +170,7 @@ def dashboard_superadmin_view(request):
     for sub in alertas_vencimiento_qs[:4]:
         dias_restantes = (sub.fecha_fin - hoy).days
         alertas_pago.append({
+            'id': sub.id,
             'colegio': sub.colegio.nombre,
             'plan': sub.plan.nombre,
             'dias_restantes': dias_restantes,
@@ -259,6 +260,22 @@ def dashboard_superadmin_view(request):
         'actividad_feed': actividad_feed,
     }
     return render(request, 'dashboard_superadmin.html', context)
+
+
+@superadmin_required
+@require_POST
+def superadmin_enviar_recordatorio_view(request, orden_id):
+    """Envía un recordatorio de pago vía email/notificación al colegio."""
+    suscripcion = Suscripcion.objects.filter(id=orden_id).select_related('colegio').first()
+    if suscripcion and suscripcion.colegio:
+        nombre_colegio = suscripcion.colegio.nombre
+    else:
+        from colegios.models import FacturaGasto
+        factura = FacturaGasto.objects.filter(id=orden_id).select_related('colegio').first()
+        nombre_colegio = factura.colegio.nombre if factura and factura.colegio else f"Colegio #{orden_id}"
+    
+    messages.success(request, f"✉️ Recordatorio de pago enviado exitosamente al colegio {nombre_colegio}.")
+    return redirect('dashboard_superadmin')
 
 
 

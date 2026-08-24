@@ -15,6 +15,7 @@ urlpatterns = [
     path('superadmin/ordenes/', views.dashboard_superadmin_ordenes_view, name='dashboard_superadmin_ordenes'),
     path('superadmin/ordenes/<int:orden_id>/aprobar/', views.superadmin_aprobar_orden_view, name='superadmin_aprobar_orden'),
     path('superadmin/ordenes/<int:orden_id>/descargar/', views.superadmin_descargar_orden_pdf_view, name='superadmin_descargar_orden_pdf'),
+    path('superadmin/recordatorio/<int:orden_id>/', views.superadmin_enviar_recordatorio_view, name='superadmin_enviar_recordatorio'),
     path('superadmin/modulos-erp/', views.dashboard_superadmin_modulos_erp_view, name='dashboard_superadmin_modulos_erp'),
     path('superadmin/configuracion/', views.dashboard_superadmin_configuracion_view, name='dashboard_superadmin_configuracion'),
     path('superadmin/estadisticas/', views.dashboard_superadmin_estadisticas_view, name='dashboard_superadmin_estadisticas'),
