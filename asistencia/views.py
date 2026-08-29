@@ -38,9 +38,11 @@ def obtener_datos_base_asistencia(request):
 
     is_admin = False
     if colegio:
+        rol_nombre_str = (miembro.rol.nombre.lower() if miembro and miembro.rol else '')
         is_admin = (
-            user.colegios_administrados.filter(id=colegio.id).exists()
-            or (miembro and miembro.rol and miembro.rol.nombre in ['Administrador', 'Director'])
+            user.is_superuser
+            or user.colegios_administrados.filter(id=colegio.id).exists()
+            or any(r in rol_nombre_str for r in ['administrador', 'director', 'inspector', 'utp', 'coordinador'])
         )
 
     return colegio, miembro, periodo, is_admin
@@ -192,7 +194,7 @@ def registrar_asistencia_seccion_view(request, seccion_id):
             obs_alumnos[det.estudiante_id] = det.observacion or ''
 
 
-    # Adjuntar estado temporal al objeto estudiante para renderizado fácil en template
+    # Asignar estado actual para renderizado en plantilla
     for est in estudiantes:
         est.estado_actual = estados_alumnos.get(est.id, 'presente')
         est.obs_actual = obs_alumnos.get(est.id, '')
@@ -503,3 +505,181 @@ def exportar_asistencia_excel(request, seccion_id):
     
     wb.save(response)
     return response
+
+
+# ==============================================================================
+# MÓDULO INTELIGENTE DE ASISTENCIA POR CÓDIGOS QR
+# ==============================================================================
+import io
+import base64
+import qrcode
+from datetime import timedelta
+from django.urls import reverse
+
+@login_required
+def asistencia_qr_sala_view(request, seccion_id):
+    """
+    Motor inteligente de escaneo de QR por Sala.
+    Detecta el docente, hora actual, sección y horario para redirigir directamente
+    a la lista de asistencia correspondiente o mostrar selector rápido.
+    """
+    colegio, miembro, periodo, is_admin = obtener_datos_base_asistencia(request)
+    if not colegio:
+        messages.warning(request, "No tienes un colegio asociado para registrar asistencia.")
+        return redirect('solicitar_acceso')
+
+    seccion = get_object_or_404(SeccionCurso, id=seccion_id, curso__colegio=colegio)
+    now = timezone.localtime(timezone.now()) if timezone.is_aware(timezone.now()) else timezone.now()
+    hoy_date = now.date()
+    dia_actual = now.weekday() # 0=Lunes .. 4=Viernes
+    hora_actual = now.time()
+
+    from colegios.models import EventoAgenda
+    
+    # 1. Buscar si el docente actual tiene clase programada para esta sección hoy
+    clases_docente_hoy = EventoAgenda.objects.filter(
+        colegio=colegio,
+        tipo='clase',
+        es_recurrente=True,
+        dia_semana=dia_actual,
+        asignado_a=request.user
+    ).select_related('asignatura', 'curso')
+
+    # Filtrar clase activa en ventana de tiempo (-25 min antes de inicio hasta +20 min después de fin)
+    clase_activa = None
+    for ev in clases_docente_hoy:
+        if ev.fecha_inicio and ev.fecha_fin:
+            ev_ini_t = timezone.localtime(ev.fecha_inicio).time() if timezone.is_aware(ev.fecha_inicio) else ev.fecha_inicio.time()
+            ev_fin_t = timezone.localtime(ev.fecha_fin).time() if timezone.is_aware(ev.fecha_fin) else ev.fecha_fin.time()
+            
+            dt_ini_c = datetime.combine(hoy_date, ev_ini_t) - timedelta(minutes=25)
+            dt_fin_c = datetime.combine(hoy_date, ev_fin_t) + timedelta(minutes=20)
+            
+            dt_actual = datetime.combine(hoy_date, hora_actual)
+            if dt_ini_c <= dt_actual <= dt_fin_c:
+                clase_activa = ev
+                break
+
+    # Si coincide con esta sección o tiene una clase activa
+    if clase_activa and (clase_activa.curso_id == seccion.curso_id):
+        asig_param = f"&asignatura={clase_activa.asignatura_id}" if clase_activa.asignatura_id else ""
+        asig_nom = f" de {clase_activa.asignatura.nombre}" if clase_activa.asignatura else ""
+        messages.success(request, f"⚡ ¡Identificado por QR! Accediendo a clase{asig_nom} con {seccion.nombre}.")
+        return redirect(f"/asistencia/registrar/{seccion.id}/?fecha={hoy_date.strftime('%Y-%m-%d')}{asig_param}&qr_scan=1")
+
+    # Si no hubo redirección directa automática, mostrar selector rápido 1-touch
+    asignaturas_seccion = Asignatura.objects.filter(curso=seccion.curso, activo=True)
+    asignaturas_docente = asignaturas_seccion.filter(docente=request.user)
+
+    context = {
+        'colegio': colegio,
+        'seccion': seccion,
+        'hoy': hoy_date,
+        'hora_actual': hora_actual.strftime('%H:%M'),
+        'clase_activa': clase_activa,
+        'clases_docente_hoy': clases_docente_hoy,
+        'asignaturas_seccion': asignaturas_seccion,
+        'asignaturas_docente': asignaturas_docente,
+        'is_admin': is_admin,
+    }
+    return render(request, 'asistencia/qr_selector.html', context)
+
+
+@login_required
+def asistencia_qr_express_view(request):
+    """
+    Escaneo rápido general / express.
+    Encuentra la clase que le toca al profesor logueado en este minuto y lo lleva a tomar lista.
+    """
+    colegio, miembro, periodo, is_admin = obtener_datos_base_asistencia(request)
+    if not colegio:
+        messages.warning(request, "No tienes un colegio asociado.")
+        return redirect('solicitar_acceso')
+
+    now = timezone.localtime(timezone.now()) if timezone.is_aware(timezone.now()) else timezone.now()
+    hoy_date = now.date()
+    dia_actual = now.weekday()
+    hora_actual = now.time()
+
+    from colegios.models import EventoAgenda
+    clases_docente_hoy = EventoAgenda.objects.filter(
+        colegio=colegio,
+        tipo='clase',
+        es_recurrente=True,
+        dia_semana=dia_actual,
+        asignado_a=request.user
+    ).select_related('asignatura', 'curso')
+
+    clase_activa = None
+    for ev in clases_docente_hoy:
+        if ev.fecha_inicio and ev.fecha_fin:
+            ev_ini_t = timezone.localtime(ev.fecha_inicio).time() if timezone.is_aware(ev.fecha_inicio) else ev.fecha_inicio.time()
+            ev_fin_t = timezone.localtime(ev.fecha_fin).time() if timezone.is_aware(ev.fecha_fin) else ev.fecha_fin.time()
+            
+            dt_ini_c = datetime.combine(hoy_date, ev_ini_t) - timedelta(minutes=25)
+            dt_fin_c = datetime.combine(hoy_date, ev_fin_t) + timedelta(minutes=20)
+            
+            dt_actual = datetime.combine(hoy_date, hora_actual)
+            if dt_ini_c <= dt_actual <= dt_fin_c:
+                clase_activa = ev
+                break
+
+    if clase_activa:
+        seccion = SeccionCurso.objects.filter(curso=clase_activa.curso, activo=True).first()
+        if seccion:
+            asig_param = f"&asignatura={clase_activa.asignatura_id}" if clase_activa.asignatura_id else ""
+            asig_nom = f" de {clase_activa.asignatura.nombre}" if clase_activa.asignatura else ""
+            messages.success(request, f"⚡ ¡Horario detectado! Accediendo a tu clase{asig_nom} ({seccion.nombre}).")
+            return redirect(f"/asistencia/registrar/{seccion.id}/?fecha={hoy_date.strftime('%Y-%m-%d')}{asig_param}&qr_scan=1")
+
+    messages.info(request, "No se detectó un bloque de clase activo en este momento. Selecciona el curso manualmente.")
+    return redirect('registrar_asistencia')
+
+
+@login_required
+def asistencia_qr_carteles_view(request):
+    """
+    Genera carteles imprimibles oficiales en alta resolución con códigos QR
+    para cada una de las salas / secciones del colegio.
+    """
+    colegio, miembro, periodo, is_admin = obtener_datos_base_asistencia(request)
+    if not colegio:
+        messages.warning(request, "No tienes un colegio asociado.")
+        return redirect('solicitar_acceso')
+
+    secciones = SeccionCurso.objects.filter(curso__colegio=colegio, activo=True).select_related('curso').order_by('curso__orden', 'letra')
+
+    carteles = []
+    for sec in secciones:
+        qr_url = request.build_absolute_uri(reverse('asistencia_qr_sala', args=[sec.id]))
+
+        # Generar imagen QR en base64
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_M,
+            box_size=10,
+            border=2,
+        )
+        qr.add_data(qr_url)
+        qr.make(fit=True)
+
+        img = qr.make_image(fill_color="#1E1B4B", back_color="white")
+        buffer = io.BytesIO()
+        img.save(buffer, format="PNG")
+        qr_b64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+
+        carteles.append({
+            'seccion': sec,
+            'nombre_sala': f"Sala {sec.nombre}",
+            'qr_url': qr_url,
+            'qr_b64': qr_b64,
+        })
+
+    context = {
+        'colegio': colegio,
+        'carteles': carteles,
+        'hoy': timezone.now().date(),
+        'is_admin': is_admin,
+    }
+    return render(request, 'asistencia/qr_carteles.html', context)
+

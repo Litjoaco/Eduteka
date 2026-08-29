@@ -1,0 +1,780 @@
+{% load static colegio_tags %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ proceso.codigo }} - {{ proceso.titulo }} - Eduteka</title>
+
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #7C5CFC;
+      --primary-soft: rgba(124, 92, 252, 0.08);
+      --primary-hover: #6747E3;
+      --secondary: #65CDBF;
+      --bg: #F8F9FD;
+      --white: #FFFFFF;
+      --dark: #151A35;
+      --gray-text: #687089;
+      --border: #BCC0CF;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+    }
+
+    * { font-family: 'Plus Jakarta Sans', sans-serif; box-sizing: border-box; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+    }
+
+    .wrapper { display: flex; flex: 1; position: relative; }
+
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      background: var(--bg);
+    }
+
+    .topbar {
+      height: 70px;
+      background: rgba(255, 255, 255, 0.85) !important;
+      backdrop-filter: blur(12px) !important;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; position: sticky; top: 0; z-index: 98;
+    }
+    .content-body { padding: 2rem; flex-grow: 1; max-width: 1440px; margin: 0 auto; width: 100%; }
+
+    /* Hero Banner Detalle */
+    .hero-banner-det {
+      background: linear-gradient(135deg, #7C5CFC 0%, #6344CE 50%, #4F46E5 100%);
+      border-radius: var(--radius-lg);
+      padding: 2.2rem 2.4rem;
+      color: var(--white);
+      margin-bottom: 2rem;
+      box-shadow: 0 12px 30px rgba(124, 92, 252, 0.25);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-banner-det::before {
+      content: '';
+      position: absolute;
+      width: 320px; height: 320px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 70%);
+      top: -80px; right: -60px;
+      border-radius: 50%;
+    }
+
+    .hero-badge-pill {
+      background: rgba(255, 255, 255, 0.2);
+      color: #FFFFFF !important;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 20px;
+      padding: 0.35rem 0.85rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      backdrop-filter: blur(8px);
+    }
+
+    .hero-school-pill {
+      background: rgba(0, 0, 0, 0.2);
+      color: #FFFFFF !important;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 20px;
+      padding: 0.35rem 0.85rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      backdrop-filter: blur(8px);
+    }
+
+    /* KPI CARDS */
+    .kpi-grid-det {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+    .kpi-card-det {
+      background: var(--white);
+      border: 1px solid #E2E8F0;
+      border-radius: var(--radius-lg);
+      padding: 1.35rem 1.5rem;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.02);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.25s ease;
+    }
+    .kpi-card-det:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    }
+    .kpi-card-det::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3.5px;
+      background: var(--acc-color, var(--primary));
+    }
+    .kpi-card-det.purple { --acc-color: #7C5CFC; }
+    .kpi-card-det.amber { --acc-color: #F59E0B; }
+    .kpi-card-det.green { --acc-color: #10B981; }
+    .kpi-card-det.blue { --acc-color: #3B82F6; }
+
+    /* FLOW PROGRESS TRACKER */
+    .flow-card-panel {
+      background: var(--white);
+      border: 1px solid #E2E8F0;
+      border-radius: var(--radius-lg);
+      padding: 1.5rem 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.02);
+    }
+    .flow-steps-tracker {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      padding: 0 1rem;
+    }
+    .flow-steps-tracker::before {
+      content: '';
+      position: absolute;
+      top: 16px; left: 35px; right: 35px;
+      height: 3px;
+      background: #E2E8F0;
+      z-index: 1;
+    }
+    .flow-step-node {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .flow-step-circle {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      border: 3px solid #CBD5E1;
+      color: #94A3B8;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.82rem; font-weight: 800;
+      transition: all 0.2s ease;
+    }
+    .flow-step-node.completed .flow-step-circle {
+      background: #10B981;
+      border-color: #10B981;
+      color: #FFFFFF;
+    }
+    .flow-step-node.active .flow-step-circle {
+      background: #7C5CFC;
+      border-color: #7C5CFC;
+      color: #FFFFFF;
+      box-shadow: 0 0 0 5px rgba(124,92,252,0.18);
+    }
+    .flow-step-label {
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: #64748B;
+      text-align: center;
+    }
+    .flow-step-node.active .flow-step-label { color: #7C5CFC; font-weight: 800; }
+    .flow-step-node.completed .flow-step-label { color: #0F172A; }
+
+    /* CARD PANELS */
+    .panel-card {
+      background: var(--white);
+      border: 1px solid #E2E8F0;
+      border-radius: var(--radius-lg);
+      padding: 1.6rem 1.75rem;
+      margin-bottom: 1.75rem;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.02);
+    }
+
+    /* QUOTE COMPARISON CARD */
+    .quote-compare-card {
+      background: var(--white);
+      border: 2px solid #E2E8F0;
+      border-radius: var(--radius-md);
+      padding: 1.35rem;
+      transition: all 0.25s ease;
+      position: relative;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    .quote-compare-card:hover {
+      border-color: #7C5CFC;
+      box-shadow: 0 8px 24px rgba(124, 92, 252, 0.08);
+      transform: translateY(-3px);
+    }
+    .quote-compare-card.winner {
+      border-color: #10B981;
+      background: #F0FDF4;
+      box-shadow: 0 8px 24px rgba(16, 185, 129, 0.12);
+    }
+
+    .badge-highlight {
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 0.3rem 0.65rem;
+      border-radius: 20px;
+    }
+
+    @media (max-width: 991.98px) {
+      .flow-steps-tracker { display: none; }
+      .main-content { margin-left: 0 !important; width: 100% !important; }
+      .topbar { padding: 0.75rem 1rem; height: auto; flex-wrap: wrap; gap: 0.5rem; }
+      .content-body { padding: 1.25rem 1rem; }
+      .hero-banner-det { padding: 1.5rem 1.25rem; }
+    }
+
+    @media (max-width: 575.98px) {
+      .content-body { padding: 1rem 0.75rem; }
+      .quote-compare-card { padding: 1.25rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="wrapper">
+  {% include 'colegios/_sidebar.html' with active_page='adquisiciones' %}
+
+  <div class="main-content">
+    
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="d-flex align-items-center gap-2">
+        <button class="btn btn-sm d-lg-none" id="mobileMenuBtn" style="border:none; background:var(--primary-soft); color:var(--primary); padding: 0.4rem 0.6rem;">
+          <i class="bi bi-list fs-5"></i>
+        </button>
+        <a href="{% url 'procesos_compra_dashboard' %}" class="btn btn-sm btn-outline-secondary fw-bold px-2.5 py-1.5" style="border-radius:10px;">
+          <i class="bi bi-arrow-left me-1"></i> <span class="d-none d-sm-inline">Volver a Procesos</span><span class="d-inline d-sm-none">Volver</span>
+        </a>
+        <span class="text-muted small d-none d-sm-inline">|</span>
+        <span class="badge bg-light text-dark border px-2.5 py-1 fw-bold">{{ proceso.codigo }}</span>
+      </div>
+
+      <div class="topbar-right d-flex align-items-center gap-2 flex-wrap">
+        {% if proceso.numero_orden_compra %}
+          <a href="{% url 'orden_compra_imprimible' proceso.id %}" target="_blank" class="btn btn-sm btn-outline-success fw-bold px-3 py-1.5" style="border-radius:10px;">
+            <i class="bi bi-printer me-1"></i> Imprimir Orden de Compra
+          </a>
+        {% endif %}
+
+        {% if proceso.estado == 'orden_compra_emitida' %}
+          <button type="button" class="btn btn-sm btn-success fw-bold px-3.5 py-1.5 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalRecepcionar" style="border-radius:10px;">
+            <i class="bi bi-box-arrow-in-down me-1"></i> Recepcionar en Inventario
+          </button>
+        {% endif %}
+
+        {% if proceso.estado in 'en_cotizacion evaluacion' %}
+          <button type="button" class="btn btn-sm btn-primary fw-bold px-3.5 py-1.5 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalNuevaCotizacion" style="border-radius:10px; background:#7C5CFC; border:none;">
+            <i class="bi bi-plus-lg me-1"></i> Registrar Cotización
+          </button>
+        {% endif %}
+      </div>
+    </header>
+
+    <main class="content-body">
+
+      <!-- HERO BANNER DETALLE -->
+      <div class="hero-banner-det">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-4 position-relative" style="z-index: 1;">
+          <div>
+            <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+              <span class="hero-badge-pill">
+                <i class="bi bi-tag-fill"></i> {{ proceso.codigo }}
+              </span>
+              <span class="hero-school-pill">
+                <i class="bi bi-building"></i> {{ colegio.nombre }}
+              </span>
+              <span class="badge px-3 py-1 fw-bold rounded-pill" style="background:rgba(255,255,255,0.25); color:#FFFFFF;">
+                {{ proceso.get_tipo_fondo_display }}
+              </span>
+            </div>
+            <h2 class="fw-extrabold text-white mb-1 fs-3">{{ proceso.titulo }}</h2>
+            <p class="text-white text-opacity-85 small mb-0" style="max-width: 680px;">
+              Creado el {{ proceso.fecha_creacion|date:"d \d\e F \d\e Y" }} por <strong>{{ proceso.creado_por.get_full_name|default:proceso.creado_por.username }}</strong>
+              {% if proceso.centro_costo %} • Centro de Costo: <strong>{{ proceso.centro_costo }}</strong>{% endif %}
+            </p>
+          </div>
+
+          <div class="d-flex gap-2 flex-wrap">
+            {% if proceso.numero_orden_compra %}
+              <a href="{% url 'orden_compra_imprimible' proceso.id %}" target="_blank" class="btn btn-light fw-bold px-4 py-2.5 shadow-sm" style="border-radius:12px; color:#7C5CFC;">
+                <i class="bi bi-printer me-1"></i> Ver Orden de Compra ({{ proceso.numero_orden_compra }})
+              </a>
+            {% elif proceso.cumple_normativa_3_cotizaciones and proceso.estado in 'en_cotizacion evaluacion' %}
+              <button type="button" class="btn btn-light fw-extrabold px-4 py-2.5 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalAdjudicar" style="border-radius:12px; color:#10B981;">
+                <i class="bi bi-award-fill me-1"></i> Adjudicar Compra (3/3 OK)
+              </button>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- 4 KPIS DETALLE -->
+      <div class="kpi-grid-det">
+        <div class="kpi-card-det purple">
+          <span class="text-muted extra-small text-uppercase fw-bold d-block">Ítems a Comprar</span>
+          <span class="fs-3 fw-extrabold text-dark mt-1 d-block">{{ items.count }} ítem{{ items.count|pluralize:"s" }}</span>
+        </div>
+
+        <div class="kpi-card-det amber">
+          <span class="text-muted extra-small text-uppercase fw-bold d-block">Cotizaciones Recibidas</span>
+          <span class="fs-3 fw-extrabold text-warning mt-1 d-block">{{ proceso.total_cotizaciones }} / 3 Mínimo</span>
+        </div>
+
+        <div class="kpi-card-det {% if proceso.cumple_normativa_3_cotizaciones %}green{% else %}amber{% endif %}">
+          <span class="text-muted extra-small text-uppercase fw-bold d-block">Normativa Supereduc</span>
+          <span class="fs-4 fw-extrabold {% if proceso.cumple_normativa_3_cotizaciones %}text-success{% else %}text-warning{% endif %} mt-1 d-block">
+            {% if proceso.cumple_normativa_3_cotizaciones %}
+              <i class="bi bi-shield-check me-1"></i> Cumplido (3/3)
+            {% else %}
+              <i class="bi bi-hourglass-split me-1"></i> Pendiente ({{ proceso.total_cotizaciones }}/3)
+            {% endif %}
+          </span>
+        </div>
+
+        <div class="kpi-card-det blue">
+          <span class="text-muted extra-small text-uppercase fw-bold d-block">Monto {% if proceso.cotizacion_ganadora %}Adjudicado{% else %}Mejor Oferta{% endif %}</span>
+          <span class="fs-3 fw-extrabold text-primary mt-1 d-block">{{ proceso.monto_estimado_o_ganador|formato_pesos }}</span>
+        </div>
+      </div>
+
+      <!-- FLOW PROGRESS TRACKER -->
+      <div class="flow-card-panel">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <span class="fw-extrabold text-dark small text-uppercase"><i class="bi bi-diagram-3-fill text-primary me-2"></i>Progreso del Proceso de Adquisición</span>
+          <span class="badge px-3 py-1 fw-bold rounded-pill" style="background:#F0EDFF; color:#7C5CFC;">
+            Estado: {{ proceso.get_estado_display }}
+          </span>
+        </div>
+
+        <div class="flow-steps-tracker">
+          <div class="flow-step-node completed">
+            <div class="flow-step-circle"><i class="bi bi-check-lg"></i></div>
+            <span class="flow-step-label">1. Requerimiento</span>
+          </div>
+          <div class="flow-step-node {% if proceso.total_cotizaciones > 0 %}completed{% else %}active{% endif %}">
+            <div class="flow-step-circle">{% if proceso.total_cotizaciones > 0 %}<i class="bi bi-check-lg"></i>{% else %}2{% endif %}</div>
+            <span class="flow-step-label">2. Cotizaciones ({{ proceso.total_cotizaciones }}/3)</span>
+          </div>
+          <div class="flow-step-node {% if proceso.estado in 'adjudicado orden_compra_emitida recepcionado' %}completed{% elif proceso.cumple_normativa_3_cotizaciones %}active{% endif %}">
+            <div class="flow-step-circle">{% if proceso.estado in 'adjudicado orden_compra_emitida recepcionado' %}<i class="bi bi-check-lg"></i>{% else %}3{% endif %}</div>
+            <span class="flow-step-label">3. Cuadro Comparativo</span>
+          </div>
+          <div class="flow-step-node {% if proceso.estado in 'orden_compra_emitida recepcionado' %}completed{% elif proceso.estado == 'adjudicado' %}active{% endif %}">
+            <div class="flow-step-circle">{% if proceso.estado in 'orden_compra_emitida recepcionado' %}<i class="bi bi-check-lg"></i>{% else %}4{% endif %}</div>
+            <span class="flow-step-label">4. Orden de Compra</span>
+          </div>
+          <div class="flow-step-node {% if proceso.estado == 'recepcionado' %}completed{% endif %}">
+            <div class="flow-step-circle">{% if proceso.estado == 'recepcionado' %}<i class="bi bi-check-lg"></i>{% else %}5{% endif %}</div>
+            <span class="flow-step-label">5. Recepción Stock</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2 COLUMNS: ITEMS SOLICITADOS & CUADRO COMPARATIVO -->
+      <div class="row g-4 mb-4">
+        
+        <!-- ITEMS SOLICITADOS -->
+        <div class="col-lg-4">
+          <div class="panel-card h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h6 class="fw-extrabold text-dark mb-0"><i class="bi bi-card-checklist text-primary me-2"></i>Ítems Solicitados</h6>
+              <span class="badge bg-light text-dark border px-2 py-0.5 extra-small fw-bold">{{ items.count }}</span>
+            </div>
+
+            <div class="list-group list-group-flush">
+              {% for it in items %}
+              <div class="list-group-item px-0 py-2.5 border-bottom">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div>
+                    <span class="fw-bold text-dark d-block" style="font-size:0.9rem;">{{ it.descripcion }}</span>
+                    {% if it.especificaciones_tecnicas %}
+                      <span class="text-muted extra-small d-block">{{ it.especificaciones_tecnicas }}</span>
+                    {% endif %}
+                    {% if it.item_inventario %}
+                      <span class="badge bg-info-subtle text-info px-2 py-0.5 extra-small mt-1">
+                        <i class="bi bi-box-seam me-1"></i> Stock actual: {{ it.item_inventario.stock_actual }} {{ it.item_inventario.unidad_medida }}
+                      </span>
+                    {% endif %}
+                  </div>
+                  <span class="badge bg-primary-subtle text-primary fw-extrabold px-2.5 py-1" style="border-radius:8px;">
+                    {{ it.cantidad }} {{ it.unidad_medida }}
+                  </span>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+
+        <!-- CUADRO COMPARATIVO DE COTIZACIONES -->
+        <div class="col-lg-8">
+          <div class="panel-card h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+              <div>
+                <h6 class="fw-extrabold text-dark mb-0"><i class="bi bi-table text-primary me-2"></i>Cuadro Comparativo de Ofertas</h6>
+                <span class="text-muted extra-small">Comparación de precios, plazos y condiciones comerciales recibidas</span>
+              </div>
+
+              {% if proceso.estado in 'en_cotizacion evaluacion' %}
+              <button type="button" class="btn btn-sm btn-outline-primary fw-bold" data-bs-toggle="modal" data-bs-target="#modalNuevaCotizacion" style="border-radius:8px;">
+                <i class="bi bi-plus-lg me-1"></i> Agregar Cotización
+              </button>
+              {% endif %}
+            </div>
+
+            {% if cotizaciones.exists %}
+            <div class="row g-3">
+              {% for cot in cotizaciones %}
+              <div class="col-md-6 col-12">
+                <div class="quote-compare-card {% if cot.es_ganadora %}winner{% endif %}">
+                  
+                  <!-- HEADER CARD -->
+                  <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div>
+                      <h6 class="fw-extrabold text-dark mb-0">{{ cot.proveedor.nombre }}</h6>
+                      <span class="text-muted extra-small">RUT: {{ cot.proveedor.rut|default:"-" }}</span>
+                    </div>
+
+                    <div>
+                      {% if cot.es_ganadora %}
+                        <span class="badge bg-success text-white badge-highlight"><i class="bi bi-trophy-fill me-1"></i> Ganadora</span>
+                      {% elif cot.id == mejor_precio_id %}
+                        <span class="badge bg-success-subtle text-success badge-highlight"><i class="bi bi-tag-fill me-1"></i> Menor Precio</span>
+                      {% endif %}
+                    </div>
+                  </div>
+
+                  <!-- PRECIOS -->
+                  <div class="p-2.5 rounded-3 mb-3" style="background:#F8FAFC; border:1px solid #E2E8F0;">
+                    <div class="d-flex justify-content-between text-muted extra-small mb-1">
+                      <span>Monto Neto:</span>
+                      <span class="fw-bold text-dark">{{ cot.monto_neto|formato_pesos }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between text-muted extra-small mb-1">
+                      <span>IVA (19%):</span>
+                      <span>{{ cot.iva|formato_pesos }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center pt-1 border-top">
+                      <span class="fw-extrabold text-dark small">Total Oferta:</span>
+                      <span class="fs-5 fw-extrabold {% if cot.es_ganadora %}text-success{% else %}text-primary{% endif %}">{{ cot.monto_total|formato_pesos }}</span>
+                    </div>
+                  </div>
+
+                  <!-- CONDICIONES -->
+                  <div class="mb-3 extra-small">
+                    <div class="d-flex justify-content-between py-1 border-bottom">
+                      <span class="text-muted"><i class="bi bi-truck me-1"></i>Plazo Entrega:</span>
+                      <span class="fw-bold text-dark">{{ cot.plazo_entrega_dias }} días hábiles</span>
+                    </div>
+                    <div class="d-flex justify-content-between py-1 border-bottom">
+                      <span class="text-muted"><i class="bi bi-credit-card me-1"></i>Condición Pago:</span>
+                      <span class="fw-bold text-dark">{{ cot.condiciones_pago }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between py-1">
+                      <span class="text-muted"><i class="bi bi-file-earmark-text me-1"></i>Cotización N°:</span>
+                      <span class="fw-bold text-dark">{{ cot.numero_cotizacion_proveedor|default:"S/N" }}</span>
+                    </div>
+                  </div>
+
+                  <!-- ACCIONES & ADJUNTO -->
+                  <div class="d-flex align-items-center justify-content-between pt-2 border-top mt-auto gap-2">
+                    {% if cot.archivo_adjunto %}
+                      <a href="{{ cot.archivo_adjunto.url }}" target="_blank" class="btn btn-sm btn-outline-secondary fw-bold extra-small py-1 px-2" style="border-radius:6px;">
+                        <i class="bi bi-file-earmark-pdf text-danger me-1"></i> Ver PDF Cotización
+                      </a>
+                    {% else %}
+                      <span class="text-muted extra-small"><i class="bi bi-file-earmark-x me-1"></i>Sin PDF adjunto</span>
+                    {% endif %}
+
+                    {% if proceso.estado in 'en_cotizacion evaluacion' and not cot.es_ganadora %}
+                      <form method="POST" action="{% url 'adjudicar_proceso_compra' proceso.id %}" class="d-inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="cotizacion_id" value="{{ cot.id }}">
+                        <input type="hidden" name="justificacion" value="Seleccionado por cumplir especificaciones técnicas y menor oferta económica.">
+                        <button type="submit" class="btn btn-sm btn-success fw-bold extra-small py-1 px-2.5" style="border-radius:6px;" onclick="return confirm('¿Adjudicar la compra a {{ cot.proveedor.nombre|escapejs }} por {{ cot.monto_total|formato_pesos }}?');">
+                          <i class="bi bi-check-lg"></i> Adjudicar
+                        </button>
+                      </form>
+                    {% endif %}
+                  </div>
+
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+              <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2" style="width:50px; height:50px; background:#F0EDFF; color:#7C5CFC; font-size:1.5rem;">
+                <i class="bi bi-receipt-cutoff"></i>
+              </div>
+              <h6 class="fw-bold text-dark mb-1">Sin cotizaciones registradas</h6>
+              <p class="text-muted extra-small mb-3">Registra al menos 3 cotizaciones de tus proveedores para habilitar la adjudicación oficial.</p>
+              <button type="button" class="btn btn-sm btn-primary fw-bold" data-bs-toggle="modal" data-bs-target="#modalNuevaCotizacion" style="border-radius:8px; background:#7C5CFC; border:none;">
+                <i class="bi bi-plus-lg me-1"></i> Registrar 1ª Cotización
+              </button>
+            </div>
+            {% endif %}
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SECCIÓN SI YA ESTÁ ADJUDICADO / OC EMITIDA -->
+      {% if proceso.cotizacion_ganadora %}
+      <div class="panel-card" style="border-color:#A7F3D0; background:#F0FDF4;">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+          <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <span class="badge bg-success px-2.5 py-1 fw-extrabold"><i class="bi bi-check2-circle me-1"></i>Adjudicación Oficial Registrada</span>
+              <span class="fw-bold text-dark">OC: {{ proceso.numero_orden_compra }}</span>
+            </div>
+            <h5 class="fw-extrabold text-dark mb-1">Proveedor Adjudicado: {{ proceso.cotizacion_ganadora.proveedor.nombre }}</h5>
+            <p class="text-muted small mb-2">
+              Monto Adjudicado: <strong>{{ proceso.cotizacion_ganadora.monto_total|formato_pesos }}</strong> (Neto: {{ proceso.cotizacion_ganadora.monto_neto|formato_pesos }} + IVA: {{ proceso.cotizacion_ganadora.iva|formato_pesos }})
+            </p>
+            <div class="p-2.5 rounded-3 bg-white border small text-dark">
+              <strong>Justificación de la Compra (Respaldo Supereduc):</strong> {{ proceso.justificacion_adjudicacion }}
+            </div>
+          </div>
+
+          <div class="d-flex gap-2 flex-wrap">
+            <a href="{% url 'orden_compra_imprimible' proceso.id %}" target="_blank" class="btn btn-primary fw-bold px-3 py-2 shadow-sm" style="border-radius:10px; background:#7C5CFC; border:none;">
+              <i class="bi bi-printer me-1"></i> Imprimir Orden de Compra
+            </a>
+            {% if proceso.estado != 'recepcionado' %}
+            <button type="button" class="btn btn-success fw-bold px-3 py-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalRecepcionar" style="border-radius:10px;">
+              <i class="bi bi-box-seam me-1"></i> Recepcionar en Inventario
+            </button>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+    </main>
+  </div>
+</div>
+
+<!-- MODAL: REGISTRAR COTIZACIÓN DE PROVEEDOR -->
+<div class="modal fade" id="modalNuevaCotizacion" tabindex="-1" aria-labelledby="modalCotLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:16px; border:none; box-shadow:0 20px 40px rgba(0,0,0,0.15);">
+      <div class="modal-header" style="background:#FAFAFE; border-bottom:1px solid #F1F5F9; border-radius:16px 16px 0 0; padding:1.25rem 1.5rem;">
+        <div>
+          <h5 class="modal-title fw-extrabold text-dark" id="modalCotLabel">
+            <i class="bi bi-file-earmark-arrow-up text-primary me-2"></i>Registrar Cotización Recibida
+          </h5>
+          <small class="text-muted">Carga los valores y adjunta el PDF formal emitido por el proveedor.</small>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <form method="POST" action="{% url 'registrar_cotizacion' proceso.id %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal-body p-4">
+          
+          <div class="mb-3">
+            <label class="form-label fw-bold small text-dark">Proveedor del Directorio *</label>
+            <select name="proveedor_id" class="form-select" required>
+              <option value="">-- Selecciona un proveedor --</option>
+              {% for p in proveedores_disponibles %}
+                <option value="{{ p.id }}">{{ p.nombre }} (RUT: {{ p.rut|default:"-" }})</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="form-label fw-bold small text-dark">N° Cotización Proveedor</label>
+              <input type="text" name="numero_cotizacion_proveedor" class="form-control" placeholder="Ej: COT-9842">
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-bold small text-dark">Fecha de la Cotización</label>
+              <input type="date" name="fecha_cotizacion" class="form-control" value="{% now 'Y-m-d' %}">
+            </div>
+          </div>
+
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="form-label fw-bold small text-dark">Monto Neto ($ CLP)</label>
+              <input type="number" name="monto_neto" id="inputNeto" class="form-control" placeholder="Ej: 150000" oninput="autoCalcularTotal()">
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-bold small text-dark">Monto Total con IVA ($ CLP) *</label>
+              <input type="number" name="monto_total" id="inputTotal" class="form-control fw-extrabold text-primary" placeholder="Ej: 178500" required>
+            </div>
+          </div>
+
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="form-label fw-bold small text-dark">Plazo de Entrega (Días)</label>
+              <input type="number" name="plazo_entrega_dias" value="5" min="1" class="form-control">
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-bold small text-dark">Forma de Pago</label>
+              <input type="text" name="condiciones_pago" value="Transferencia 30 días" class="form-control">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold small text-dark">Documento PDF Oficial de la Cotización</label>
+            <input type="file" name="archivo_adjunto" accept=".pdf,.png,.jpg,.jpeg" class="form-control">
+            <span class="text-muted extra-small d-block mt-1">Sube la cotización membretada enviada por el proveedor (PDF o imagen).</span>
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label fw-bold small text-dark">Observaciones / Condiciones Especiales</label>
+            <textarea name="observaciones" class="form-control" rows="2" placeholder="Garantía, marcas ofertadas, costo de despacho..."></textarea>
+          </div>
+
+        </div>
+
+        <div class="modal-footer bg-light border-0 p-3">
+          <button type="button" class="btn btn-sm btn-outline-secondary fw-bold" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-sm btn-primary fw-extrabold px-4" style="background:#7C5CFC; border:none; border-radius:10px;">
+            <i class="bi bi-save me-1"></i> Guardar Cotización
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: ADJUDICAR COMPRA CON JUSTIFICACIÓN -->
+<div class="modal fade" id="modalAdjudicar" tabindex="-1" aria-labelledby="modalAdjLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:16px; border:none; box-shadow:0 20px 40px rgba(0,0,0,0.15);">
+      <div class="modal-header" style="background:#FAFAFE; border-bottom:1px solid #F1F5F9; border-radius:16px 16px 0 0; padding:1.25rem 1.5rem;">
+        <div>
+          <h5 class="modal-title fw-extrabold text-dark" id="modalAdjLabel">
+            <i class="bi bi-award text-warning me-2"></i>Adjudicación de la Compra & Emisión de OC
+          </h5>
+          <small class="text-muted">Selecciona el proveedor ganador y registra el fundamento legal.</small>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <form method="POST" action="{% url 'adjudicar_proceso_compra' proceso.id %}">
+        {% csrf_token %}
+        <div class="modal-body p-4">
+          
+          <div class="mb-3">
+            <label class="form-label fw-bold small text-dark">Selecciona la Oferta Ganadora *</label>
+            <select name="cotizacion_id" class="form-select" required>
+              {% for cot in cotizaciones %}
+                <option value="{{ cot.id }}">
+                  {{ cot.proveedor.nombre }} - Total: {{ cot.monto_total|formato_pesos }} (Entrega: {{ cot.plazo_entrega_dias }} días)
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold small text-dark">Criterio / Justificación de Adjudicación *</label>
+            <select class="form-select mb-2" onchange="document.getElementById('txtJustificacion').value = this.value">
+              <option value="Se adjudica por presentar la oferta económica de menor valor y cumplimiento de especificaciones técnicas.">Menor Precio (Económica)</option>
+              <option value="Se adjudica por menor plazo de entrega inmediata y disponibilidad requerida para el calendario escolar.">Plazo de Entrega Inmediato</option>
+              <option value="Se adjudica por mejor calidad técnica, soporte posventa y garantía extendida.">Calidad & Garantía Técnica</option>
+              <option value="Proveedor con convenio marco y condiciones de despacho favorables al establecimiento.">Convenio & Despacho</option>
+            </select>
+            <textarea name="justificacion" id="txtJustificacion" class="form-control" rows="3" required>Se adjudica por presentar la oferta económica de menor valor y cumplimiento de especificaciones técnicas.</textarea>
+            <span class="text-muted extra-small mt-1 d-block">Este texto quedará archivado en el informe de rendición ante la Superintendencia.</span>
+          </div>
+
+        </div>
+
+        <div class="modal-footer bg-light border-0 p-3">
+          <button type="button" class="btn btn-sm btn-outline-secondary fw-bold" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-sm btn-success fw-extrabold px-4" style="border-radius:10px;">
+            <i class="bi bi-receipt me-1"></i> Confirmar & Emitir Orden de Compra
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: RECEPCIONAR EN INVENTARIO -->
+<div class="modal fade" id="modalRecepcionar" tabindex="-1" aria-labelledby="modalRecLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:16px; border:none; box-shadow:0 20px 40px rgba(0,0,0,0.15);">
+      <div class="modal-header" style="background:#FAFAFE; border-bottom:1px solid #F1F5F9; border-radius:16px 16px 0 0; padding:1.25rem 1.5rem;">
+        <div>
+          <h5 class="modal-title fw-extrabold text-dark" id="modalRecLabel">
+            <i class="bi bi-box-seam text-success me-2"></i>Recepción Conforme de Pedido
+          </h5>
+          <small class="text-muted">Ingresa automáticamente las cantidades al stock del inventario escolar.</small>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <form method="POST" action="{% url 'recepcionar_compra_inventario' proceso.id %}">
+        {% csrf_token %}
+        <div class="modal-body p-4">
+          <div class="mb-3">
+            <label class="form-label fw-bold small text-dark">N° Guía de Despacho o Factura</label>
+            <input type="text" name="numero_guia_factura" class="form-control" placeholder="Ej: Factura Electrónica N° 4518" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold small text-dark">Observaciones de Recepción</label>
+            <textarea name="observaciones_recepcion" class="form-control" rows="2" placeholder="Revisado en bodega central, productos conformes en cantidad y estado."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer bg-light border-0 p-3">
+          <button type="button" class="btn btn-sm btn-outline-secondary fw-bold" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-sm btn-success fw-extrabold px-4" style="border-radius:10px;">
+            <i class="bi bi-check-circle-fill me-1"></i> Confirmar Recepción & Aumentar Stock
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+<script>
+  function autoCalcularTotal() {
+    const neto = parseFloat(document.getElementById('inputNeto').value) || 0;
+    if (neto > 0) {
+      const total = Math.round(neto * 1.19);
+      document.getElementById('inputTotal').value = total;
+    }
+  }
+
+  document.getElementById('mobileMenuBtn')?.addEventListener('click', function() {
+    if (typeof window.toggleSidebarMobile === 'function') {
+      window.toggleSidebarMobile();
+    } else {
+      document.getElementById('sidebar')?.classList.toggle('open');
+    }
+  });
+</script>
+
+</body>
+</html>

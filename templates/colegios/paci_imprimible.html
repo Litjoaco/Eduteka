@@ -1,0 +1,240 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expediente PACI Oficial - {{ estudiante.nombre_completo }}</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background: #E2E8F0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: #0F172A;
+      margin: 0;
+      padding: 2rem;
+    }
+    .print-container {
+      max-width: 850px;
+      margin: 0 auto;
+      background: #FFFFFF;
+      padding: 3rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 25px rgba(0,0,0,0.08);
+    }
+    .official-header {
+      border-bottom: 2px solid #0F172A;
+      padding-bottom: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    .section-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: #F1F5F9;
+      padding: 0.45rem 0.75rem;
+      border-left: 4px solid #7C5CFC;
+      margin-top: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .info-table td {
+      padding: 0.45rem 0.5rem;
+      font-size: 0.88rem;
+    }
+    .info-table td.label {
+      font-weight: 700;
+      color: #475569;
+      width: 28%;
+    }
+    .signature-box {
+      border-top: 1px solid #0F172A;
+      margin-top: 4rem;
+      padding-top: 0.5rem;
+      text-align: center;
+      font-size: 0.82rem;
+    }
+
+    @media print {
+      body {
+        background: #FFFFFF;
+        padding: 0;
+      }
+      .print-container {
+        box-shadow: none;
+        padding: 0;
+        max-width: 100%;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
+
+    @media (max-width: 575.98px) {
+      body { padding: 1rem 0.5rem; }
+      .print-container { padding: 1.25rem 1rem; border-radius: 12px; }
+      .official-header { flex-direction: column; gap: 0.75rem; text-align: center; }
+      .official-header .text-end { text-align: center !important; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="text-center mb-3 no-print">
+  <button onclick="window.print();" class="btn btn-primary fw-extrabold px-4 py-2" style="background:#7C5CFC; border:none; border-radius:12px;">
+    🖨️ Imprimir Expediente PACI Oficial (PDF)
+  </button>
+</div>
+
+<div class="print-container">
+  
+  <!-- ENCABEZADO INSTITUCIONAL -->
+  <div class="official-header d-flex justify-content-between align-items-center">
+    <div>
+      <h3 class="fw-extrabold mb-0 fs-5">{{ colegio.nombre }}</h3>
+      <div class="text-muted extra-small">RBD: {{ colegio.rbd|default:'OFICIAL' }} • Programa de Integración Escolar (PIE)</div>
+      <div class="text-muted extra-small">Decreto Supremo N° 170/2009 & Decreto Exento N° 83/2015 MINEDUC</div>
+    </div>
+    <div class="text-end">
+      <span class="badge bg-dark text-white fw-bold px-3 py-1.5" style="font-size:0.8rem;">EXPEDIENTE PACI</span>
+      <div class="text-muted extra-small mt-1">Fecha Emisión: {{ hoy|date:"d/m/Y" }}</div>
+    </div>
+  </div>
+
+  <div class="text-center my-3">
+    <h4 class="fw-extrabold text-uppercase fs-5 mb-1">Plan de Adecuación Curricular Individual (PACI)</h4>
+    <p class="text-muted small mb-0">Instrumento de registro técnico-pedagógico para la inclusión escolar</p>
+  </div>
+
+  <!-- 1. ANTECEDENTES DEL ESTUDIANTE -->
+  <div class="section-title">1. Antecedentes Generales del Estudiante</div>
+  <table class="table table-bordered info-table mb-0">
+    <tr>
+      <td class="label">Nombre Completo:</td>
+      <td class="fw-bold">{{ estudiante.nombre_completo }}</td>
+      <td class="label">RUT:</td>
+      <td>{{ estudiante.rut|default:'Sin registrar' }}</td>
+    </tr>
+    <tr>
+      <td class="label">Curso / Nivel:</td>
+      <td>{{ estudiante.seccion.nombre|default:'Sin curso' }}</td>
+      <td class="label">Fecha Nacimiento:</td>
+      <td>{{ estudiante.fecha_nacimiento|date:"d/m/Y"|default:'-' }}</td>
+    </tr>
+    <tr>
+      <td class="label">Apoderado Titular:</td>
+      <td>{{ estudiante.nombre_apoderado|default:'-' }}</td>
+      <td class="label">Teléfono Contacto:</td>
+      <td>{{ estudiante.telefono_apoderado|default:'-' }}</td>
+    </tr>
+  </table>
+
+  <!-- 2. DIAGNÓSTICO INTEGRAL -->
+  <div class="section-title">2. Diagnóstico Integral & Tipo de NEE</div>
+  <table class="table table-bordered info-table mb-0">
+    <tr>
+      <td class="label">Tipo de NEE:</td>
+      <td class="fw-bold">{{ ficha.get_tipo_nee_display }}</td>
+      <td class="label">Diagnóstico Clínico:</td>
+      <td class="fw-bold text-primary">{{ ficha.get_diagnostico_display }}</td>
+    </tr>
+    <tr>
+      <td class="label">Especificación Médica:</td>
+      <td colspan="3">{{ ficha.diagnostico_personalizado|default:'Diagnóstico validado por equipo multiprofesional PIE.' }}</td>
+    </tr>
+    <tr>
+      <td class="label">Profesional a Cargo:</td>
+      <td>{{ ficha.profesional_a_cargo.get_full_name|default:ficha.profesional_a_cargo.username|default:'Educadora Diferencial' }}</td>
+      <td class="label">Fecha de Ingreso:</td>
+      <td>{{ ficha.fecha_ingreso|date:"d/m/Y" }}</td>
+    </tr>
+  </table>
+
+  <!-- 3. ESTRATEGIAS DE ADECUACIÓN CURRICULAR (DECRETO 83) -->
+  <div class="section-title">3. Estrategias de Adecuación Curricular (Decreto 83)</div>
+  {% for p in pacis %}
+    <div class="p-3 bg-light rounded-2 border mb-3">
+      <div class="fw-bold text-dark mb-2">Año Lectivo: {{ p.anio_lectivo }} • Asignatura: {{ p.asignatura.nombre|default:'General' }}</div>
+      
+      <div class="mb-2">
+        <strong>A. Adecuaciones de Acceso:</strong>
+        <div class="small text-dark mt-0.5">• Tiempo Adicional: {% if p.tiempo_adicional %}Garantizado{% else %}Estándar{% endif %}</div>
+        <div class="small text-dark">• Materiales y Apoyos: {{ p.adaptacion_materiales|default:'Material concreto, apoyo visual y mediación constante.' }}</div>
+        <div class="small text-dark">• Espacio Evaluativo: {{ p.espacio_evaluacion|default:'Ubicación preferencial en sala.' }}</div>
+      </div>
+
+      <div class="mb-2">
+        <strong>B. Adecuación de Objetivos de Aprendizaje (OAs):</strong>
+        <div class="small text-dark mt-0.5">• Graduación de Complejidad: {{ p.graduacion_complejidad|default:'Desglose paso a paso.' }}</div>
+        <div class="small text-dark">• Priorización Curricular: {{ p.priorizacion_objetivos|default:'Foco en OAs basales.' }}</div>
+      </div>
+
+      <div>
+        <strong>C. Evaluación Diferenciada:</strong>
+        <div class="small text-dark mt-0.5">{{ p.estrategias_evaluacion }}</div>
+      </div>
+    </div>
+  {% empty %}
+    <div class="p-3 bg-light rounded-2 border text-muted small">
+      Plan de adecuaciones generales: Tiempo adicional en evaluaciones, lectura guiada y apoyo psicopedagógico en aula de recursos y aula regular.
+    </div>
+  {% endfor %}
+
+  <!-- 4. REGISTRO DE INTERVENCIONES RECIENTES -->
+  <div class="section-title">4. Registro de Apoyos y Atenciones Realizadas</div>
+  <table class="table table-bordered table-sm info-table mb-0">
+    <thead>
+      <tr class="table-light">
+        <th>Fecha</th>
+        <th>Especialista</th>
+        <th>Modalidad</th>
+        <th>Objetivo / Contenido Trabajado</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for at in atenciones_recientes %}
+        <tr>
+          <td>{{ at.fecha|date:"d/m/Y" }}</td>
+          <td>{{ at.get_rol_especialista_display }}</td>
+          <td>{{ at.get_tipo_sesion_display }}</td>
+          <td>{{ at.objetivo_trabajado }}</td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="4" class="text-center text-muted">No se registran atenciones previas archivadas.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- FIRMAS DE RESPONSABILIDAD LEGAL -->
+  <div class="row g-4 mt-5">
+    <div class="col-4">
+      <div class="signature-box">
+        <strong>{{ ficha.profesional_a_cargo.get_full_name|default:'Educadora Diferencial' }}</strong><br>
+        <span class="text-muted">Especialista PIE Responsable</span>
+      </div>
+    </div>
+    <div class="col-4">
+      <div class="signature-box">
+        <strong>Jefatura UTP / Coordinación PIE</strong><br>
+        <span class="text-muted">{{ colegio.nombre }}</span>
+      </div>
+    </div>
+    <div class="col-4">
+      <div class="signature-box">
+        <strong>{{ estudiante.nombre_apoderado|default:'Firma del Apoderado' }}</strong><br>
+        <span class="text-muted">Toma de Conocimiento Familia</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

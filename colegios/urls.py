@@ -15,6 +15,10 @@ urlpatterns = [
     # Gestión de Estudiantes
     path('estudiantes/', views.listar_estudiantes_view, name='listar_estudiantes'),
     path('estudiantes/matricular/', views.matricular_estudiante_view, name='matricular_estudiante'),
+    path('estudiantes/carga-masiva/', views.carga_masiva_estudiantes_view, name='carga_masiva_estudiantes'),
+    path('estudiantes/plantilla-excel/', views.descargar_plantilla_estudiantes_excel_view, name='descargar_plantilla_estudiantes_excel'),
+    path('estudiantes/carga-masiva/analizar/', views.api_analizar_archivo_estudiantes, name='api_analizar_estudiantes'),
+    path('estudiantes/carga-masiva/procesar/', views.api_procesar_carga_masiva_estudiantes, name='api_procesar_carga_estudiantes'),
     path('estudiantes/editar/<int:estudiante_id>/', views.editar_estudiante_view, name='editar_estudiante'),
     path('estudiantes/baja/<int:estudiante_id>/', views.baja_estudiante_view, name='baja_estudiante'),
 
@@ -54,11 +58,22 @@ urlpatterns = [
 
     # Centro de Reportes y Estadísticas
     path('reportes/', views.centro_reportes_view, name='centro_reportes'),
+    path('reportes/certificado-alumno-regular/', views.generar_certificado_alumno_regular_view, name='reporte_certificado_alumno_regular'),
+    path('reportes/certificado-alumno-regular/<int:estudiante_id>/', views.generar_certificado_alumno_regular_view, name='reporte_certificado_alumno_regular_id'),
+    path('reportes/matriz-calificaciones/', views.reporte_consolidado_notas_seccion_view, name='reporte_matriz_calificaciones'),
+    path('reportes/matriz-calificaciones/exportar-excel/<int:seccion_id>/', views.exportar_consolidado_notas_excel_view, name='exportar_matriz_calificaciones_excel'),
+    path('reportes/asistencia-mensual/', views.reporte_mensual_asistencia_seccion_view, name='reporte_asistencia_mensual'),
+    path('reportes/asistencia-mensual/exportar-excel/<int:seccion_id>/', views.exportar_mensual_asistencia_excel_view, name='exportar_asistencia_mensual_excel'),
+    path('reportes/convivencia-escolar/', views.reporte_convivencia_consolidado_view, name='reporte_convivencia_consolidado'),
+    path('reportes/resumen-ejecutivo/', views.reporte_resumen_ejecutivo_institucional_view, name='reporte_resumen_ejecutivo'),
     path('estadisticas/', views.estadisticas_colegio_view, name='estadisticas_colegio'),
     path('estadisticas/exportar-excel/', views.exportar_estadisticas_excel_view, name='exportar_estadisticas_excel'),
 
-    # Módulo de Finanzas, Caja Chica y Facturas
+    # Módulo de Finanzas, Proyectos, Subvenciones y Rendición de Cuentas (Supereduc)
     path('finanzas/', views.finanzas_dashboard_view, name='finanzas_dashboard'),
+    path('finanzas/proyectos/crear/', views.crear_proyecto_escolar_view, name='crear_proyecto_escolar'),
+    path('finanzas/proyectos/editar/<int:proyecto_id>/', views.editar_proyecto_escolar_view, name='editar_proyecto_escolar'),
+    path('finanzas/proyectos/eliminar/<int:proyecto_id>/', views.eliminar_proyecto_escolar_view, name='eliminar_proyecto_escolar'),
     path('finanzas/movimientos/crear/', views.crear_movimiento_financiero_view, name='crear_movimiento_financiero'),
     path('finanzas/movimientos/eliminar/<int:movimiento_id>/', views.eliminar_movimiento_financiero_view, name='eliminar_movimiento_financiero'),
     path('finanzas/facturas/crear/', views.crear_factura_view, name='crear_factura'),
@@ -66,7 +81,12 @@ urlpatterns = [
     path('finanzas/facturas/eliminar/<int:factura_id>/', views.eliminar_factura_view, name='eliminar_factura'),
     path('finanzas/cuentas/crear/', views.crear_cuenta_financiera_view, name='crear_cuenta_financiera'),
     path('finanzas/categorias/crear/', views.crear_categoria_financiera_view, name='crear_categoria_financiera'),
-    path('finanzas/exportar-excel/', views.exportar_finanzas_excel_view, name='exportar_finanzas_excel'),
+    path('finanzas/rendicion/subvencion/<str:tipo_fondo>/', views.rendicion_subvencion_imprimible_view, name='rendicion_subvencion_imprimible'),
+    path('finanzas/rendicion/caja-chica/<int:cuenta_id>/', views.acta_rendicion_cajachica_imprimible_view, name='acta_rendicion_cajachica_imprimible'),
+    # Módulo de Horarios Docentes & Escolares
+    path('horarios/docente/<int:docente_id>/imprimir/', views.horario_docente_imprimible_view, name='horario_docente_imprimible'),
+    path('horarios/guardar-clase/', views.guardar_horario_clase_view, name='guardar_horario_clase'),
+    path('horarios/eliminar-clase/<int:horario_id>/', views.eliminar_horario_clase_view, name='eliminar_horario_clase'),
 
     # Módulo de Inventario & Proveedores
     path('inventario/', views.inventario_dashboard_view, name='inventario_dashboard'),
@@ -79,6 +99,16 @@ urlpatterns = [
     path('proveedores/crear/', views.crear_proveedor_view, name='crear_proveedor'),
     path('proveedores/editar/<int:proveedor_id>/', views.editar_proveedor_view, name='editar_proveedor'),
     path('proveedores/eliminar/<int:proveedor_id>/', views.eliminar_proveedor_view, name='eliminar_proveedor'),
+
+    # Módulo de Adquisiciones & Cumplimiento de 3 Cotizaciones (Supereduc)
+    path('adquisiciones/', views.procesos_compra_dashboard_view, name='procesos_compra_dashboard'),
+    path('adquisiciones/crear/', views.crear_proceso_compra_view, name='crear_proceso_compra'),
+    path('adquisiciones/<int:proceso_id>/', views.detalle_proceso_compra_view, name='detalle_proceso_compra'),
+    path('adquisiciones/<int:proceso_id>/cotizacion/registrar/', views.registrar_cotizacion_view, name='registrar_cotizacion'),
+    path('adquisiciones/<int:proceso_id>/adjudicar/', views.adjudicar_proceso_compra_view, name='adjudicar_proceso_compra'),
+    path('adquisiciones/<int:proceso_id>/orden-compra/', views.orden_compra_imprimible_view, name='orden_compra_imprimible'),
+    path('adquisiciones/<int:proceso_id>/recepcionar/', views.recepcionar_compra_inventario_view, name='recepcionar_compra_inventario'),
+
 
 
 
@@ -125,4 +155,20 @@ urlpatterns = [
     path('simce/historico/eliminar/<int:historico_id>/', views.eliminar_historico_simce_view, name='eliminar_historico_simce'),
     path('simce/exportar-excel/', views.exportar_simce_excel_view, name='exportar_simce_excel'),
     path('simce/exportar-excel/<int:ensayo_id>/', views.exportar_simce_excel_view, name='exportar_ensayo_excel'),
+
+    # Leccionario Digital & Planificaciones Curriculares
+    path('leccionario/', views.leccionario_hub_view, name='leccionario_hub'),
+    path('leccionario/firmar/', views.guardar_firma_leccionario_view, name='guardar_firma_leccionario'),
+    path('planificaciones/', views.planificaciones_hub_view, name='planificaciones_hub'),
+    path('planificaciones/<int:plan_id>/cambiar-estado/', views.cambiar_estado_planificacion_view, name='cambiar_estado_planificacion'),
+
+    # Programa de Integración Escolar (PIE / NEE)
+    path('pie/', views.pie_dashboard_view, name='pie_dashboard'),
+    path('pie/crear-ficha/', views.crear_ficha_pie_view, name='crear_ficha_pie'),
+    path('pie/estudiante/<int:ficha_id>/', views.detalle_estudiante_pie_view, name='detalle_estudiante_pie'),
+    path('pie/estudiante/<int:ficha_id>/registrar-sesion/', views.registrar_sesion_pie_view, name='registrar_sesion_pie'),
+    path('pie/estudiante/<int:ficha_id>/guardar-paci/', views.guardar_paci_view, name='guardar_paci'),
+    path('pie/paci/<int:paci_id>/aprobar/', views.aprobar_paci_view, name='aprobar_paci'),
+    path('pie/estudiante/<int:ficha_id>/imprimir-paci/', views.paci_imprimible_view, name='paci_imprimible'),
 ]
+

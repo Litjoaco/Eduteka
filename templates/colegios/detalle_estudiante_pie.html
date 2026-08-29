@@ -1,0 +1,581 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ficha PIE 360° - {{ ficha.estudiante.nombre_completo }}</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #7C5CFC;
+      --primary-soft: rgba(124, 92, 252, 0.08);
+      --primary-hover: #6747E3;
+      --secondary: #65CDBF;
+      --bg: #F8F9FD;
+      --white: #FFFFFF;
+      --dark: #151A35;
+      --gray-text: #687089;
+      --border: #E2E8F0;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+    }
+    * { font-family: 'Plus Jakarta Sans', sans-serif; box-sizing: border-box; }
+    body { background-color: var(--bg); color: var(--dark); min-height: 100vh; margin: 0; }
+    
+    .wrapper { display: flex; min-height: 100vh; position: relative; }
+    .main-content {
+      flex: 1;
+      margin-left: 248px;
+      transition: margin-left 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    body.sidebar-collapsed .main-content {
+      margin-left: 72px;
+    }
+    @media (max-width: 991.98px) {
+      .main-content {
+        margin-left: 0 !important;
+      }
+    }
+
+    .content-body { padding: 2rem 2.25rem; max-width: 1440px; margin: 0 auto; width: 100%; }
+
+    .topbar {
+      height: 72px;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2.25rem; position: sticky; top: 0; z-index: 90;
+    }
+
+    .student-header-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem 2rem;
+      margin-bottom: 1.75rem;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.025);
+    }
+
+    .custom-nav-tabs .nav-link {
+      color: #64748B;
+      font-weight: 700;
+      font-size: 0.88rem;
+      border: none;
+      padding: 0.85rem 1.4rem;
+      border-radius: 12px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .custom-nav-tabs .nav-link:hover {
+      color: var(--primary);
+    }
+    .custom-nav-tabs .nav-link.active {
+      background: linear-gradient(135deg, #7C5CFC 0%, #4F46E5 100%);
+      color: #FFFFFF !important;
+      box-shadow: 0 4px 14px rgba(124, 92, 252, 0.3);
+    }
+
+    .timeline-item {
+      position: relative;
+      padding-left: 2.25rem;
+      padding-bottom: 1.75rem;
+      border-left: 2px solid #E2E8F0;
+    }
+    .timeline-item:last-child {
+      border-left-color: transparent;
+      padding-bottom: 0;
+    }
+    .timeline-dot {
+      position: absolute;
+      left: -9px;
+      top: 0;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #7C5CFC;
+      border: 3px solid #FFFFFF;
+      box-shadow: 0 0 0 2px #DDD6FE;
+    }
+
+    @media (max-width: 991.98px) {
+      .main-content { margin-left: 0 !important; width: 100% !important; }
+      .topbar { padding: 0.75rem 1rem; height: auto; flex-wrap: wrap; gap: 0.5rem; }
+      .content-body { padding: 1.25rem 1rem; }
+      .hero-pie-student { padding: 1.5rem 1.25rem; }
+    }
+
+    @media (max-width: 575.98px) {
+      .content-body { padding: 1rem 0.75rem; }
+      .card-pie-panel { padding: 1.25rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="wrapper">
+  {% include 'colegios/_sidebar.html' with active_page='pie' %}
+
+  <div class="main-content">
+    <header class="topbar">
+      <div class="d-flex align-items-center gap-2">
+        <button class="btn btn-sm d-lg-none" id="mobileMenuBtn" style="border:none; background:var(--primary-soft); color:var(--primary); padding: 0.4rem 0.6rem;">
+          <i class="bi bi-list fs-5"></i>
+        </button>
+        <a href="{% url 'pie_dashboard' %}" class="btn btn-sm btn-light border fw-bold px-2.5 py-1.5 d-flex align-items-center gap-1.5" style="border-radius:10px;">
+          <i class="bi bi-arrow-left"></i>
+          <span class="d-none d-sm-inline">Volver al PIE</span>
+          <span class="d-inline d-sm-none">Volver</span>
+        </a>
+        <div class="vr mx-1 text-muted opacity-25 d-none d-sm-block"></div>
+        <div>
+          <span class="fw-extrabold text-dark fs-6 d-block lh-1 mb-0.5" style="font-size: 0.95rem !important;">Ficha Clínica & Pedagógica PIE</span>
+          <span class="text-muted extra-small d-none d-sm-inline">{{ ficha.estudiante.nombre_completo }} • {{ ficha.estudiante.seccion.nombre|default:'Sin curso' }}</span>
+        </div>
+      </div>
+
+      <div class="d-flex align-items-center gap-2">
+        <a href="{% url 'paci_imprimible' ficha.id %}" target="_blank" class="btn btn-sm btn-outline-dark fw-bold px-3 py-1.5 d-flex align-items-center gap-1.5" style="border-radius:12px; font-size:0.82rem;">
+          <i class="bi bi-printer-fill text-primary"></i>
+          <span class="d-none d-sm-inline">Imprimir Expediente PACI</span>
+          <span class="d-inline d-sm-none">PACI</span>
+        </a>
+      </div>
+    </header>
+
+    <main class="content-body">
+      
+      <!-- HERO RESUMEN ESTUDIANTE -->
+      <div class="student-header-card">
+        <div class="d-flex justify-content-between align-items-start align-items-lg-center flex-column flex-lg-row gap-3">
+          <div class="d-flex align-items-center gap-3.5">
+            <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-extrabold shadow" style="width:68px; height:68px; background:linear-gradient(135deg, #7C5CFC 0%, #4F46E5 100%); font-size:1.5rem; flex-shrink:0;">
+              {{ ficha.estudiante.nombre_completo|slice:":1"|upper }}
+            </div>
+            <div>
+              <div class="d-flex align-items-center gap-2 mb-1.5 flex-wrap">
+                <h2 class="fw-extrabold text-dark fs-5 mb-0">{{ ficha.estudiante.nombre_completo }}</h2>
+                {% if ficha.tipo_nee == 'permanente' %}
+                  <span class="badge bg-warning-subtle text-warning-emphasis fw-bold px-2.5 py-1" style="border-radius:8px;">NEEP Permanente</span>
+                {% else %}
+                  <span class="badge bg-primary-subtle text-primary fw-bold px-2.5 py-1" style="border-radius:8px;">NEET Transitoria</span>
+                {% endif %}
+              </div>
+              <div class="d-flex flex-wrap align-items-center gap-3 text-muted small">
+                <span><i class="bi bi-card-text text-primary me-1"></i> RUT: <strong class="text-dark">{{ ficha.estudiante.rut|default:'Sin registrar' }}</strong></span>
+                <span>•</span>
+                <span><i class="bi bi-mortarboard text-primary me-1"></i> Curso: <strong class="text-dark">{{ ficha.estudiante.seccion.nombre|default:'Sin curso' }}</strong></span>
+                <span>•</span>
+                <span><i class="bi bi-person-heart text-primary me-1"></i> Especialista: <strong class="text-dark">{{ ficha.profesional_a_cargo.get_full_name|default:'Sin asignar' }}</strong></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex align-items-center gap-2">
+            <button type="button" class="btn btn-primary fw-extrabold px-3.5 py-2.5 d-flex align-items-center gap-1.5 shadow-sm" style="border-radius:12px; background:linear-gradient(135deg, #7C5CFC 0%, #4F46E5 100%); border:none; font-size:0.85rem;" data-bs-toggle="modal" data-bs-target="#modalRegistrarAtencion">
+              <i class="bi bi-plus-circle-fill"></i>
+              <span>Registrar Sesión / Atención</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABS NAVEGACIÓN -->
+      <ul class="nav custom-nav-tabs mb-4 p-1.5 bg-white rounded-4 border d-inline-flex shadow-sm" id="pieTab" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="diag-tab" data-bs-toggle="tab" data-bs-target="#diag-pane" type="button" role="tab">
+            <i class="bi bi-file-medical me-1.5"></i> 1. Diagnóstico & Ficha
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="sesiones-tab" data-bs-toggle="tab" data-bs-target="#sesiones-pane" type="button" role="tab">
+            <i class="bi bi-clock-history me-1.5"></i> 2. Bitácora de Atenciones ({{ atenciones|length }})
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="paci-tab" data-bs-toggle="tab" data-bs-target="#paci-pane" type="button" role="tab">
+            <i class="bi bi-journal-bookmark-fill me-1.5"></i> 3. Plan PACI (Adecuación Curricular)
+          </button>
+        </li>
+      </ul>
+
+      <!-- CONTENIDO DE LOS TABS -->
+      <div class="tab-content" id="pieTabContent">
+        
+        <!-- TAB 1: DIAGNÓSTICO & DATOS MÉDICOS -->
+        <div class="tab-pane fade show active" id="diag-pane" role="tabpanel">
+          <div class="row g-4">
+            <div class="col-lg-8">
+              <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+                <h5 class="fw-extrabold text-dark fs-6 mb-3">Diagnóstico Oficial (Decreto 170 / 83)</h5>
+                
+                <div class="p-3.5 bg-light rounded-3 border mb-3">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="fw-extrabold text-dark fs-6">{{ ficha.get_diagnostico_display }}</span>
+                    <span class="badge bg-purple-subtle text-primary fw-bold" style="background:#EDE9FE; color:#6D28D9; border-radius:6px;">{{ ficha.get_tipo_nee_display }}</span>
+                  </div>
+                  {% if ficha.diagnostico_personalizado %}
+                    <p class="text-dark small mb-0"><strong>Especificación Clínica:</strong> {{ ficha.diagnostico_personalizado }}</p>
+                  {% endif %}
+                </div>
+
+                <div class="row g-3 mb-3">
+                  <div class="col-md-6">
+                    <label class="extra-small fw-extrabold text-muted text-uppercase mb-1">Fecha Ingreso al PIE</label>
+                    <div class="fw-bold text-dark">{{ ficha.fecha_ingreso|date:"d/m/Y" }}</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="extra-small fw-extrabold text-muted text-uppercase mb-1">Próxima Reevaluación Integral</label>
+                    <div class="fw-bold text-dark">{{ ficha.fecha_revaluacion|date:"d/m/Y"|default:'Pendiente de programar' }}</div>
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label class="extra-small fw-extrabold text-muted text-uppercase mb-1">Observaciones & Antecedentes Clínicos</label>
+                  <div class="p-3 bg-light rounded-3 border text-dark small">
+                    {{ ficha.observaciones_ingreso|default:'Sin observaciones adicionales registradas.' }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- APODERADO Y CONTACTO -->
+            <div class="col-lg-4">
+              <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+                <h5 class="fw-extrabold text-dark fs-6 mb-3">Contacto de Emergencia & Familia</h5>
+                <div class="mb-3">
+                  <span class="text-muted extra-small fw-extrabold text-uppercase d-block mb-0.5">Apoderado Titular</span>
+                  <strong class="text-dark">{{ ficha.estudiante.nombre_apoderado|default:'Sin registrar' }}</strong>
+                  <div class="text-muted extra-small">{{ ficha.estudiante.parentesco_apoderado|default:'Apoderado' }}</div>
+                </div>
+                <div class="mb-3">
+                  <span class="text-muted extra-small fw-extrabold text-uppercase d-block mb-0.5">Teléfono</span>
+                  <a href="tel:{{ ficha.estudiante.telefono_apoderado }}" class="text-primary text-decoration-none fw-bold small">
+                    <i class="bi bi-telephone-fill me-1"></i> {{ ficha.estudiante.telefono_apoderado|default:'Sin teléfono registrado' }}
+                  </a>
+                </div>
+                <div class="mb-3">
+                  <span class="text-muted extra-small fw-extrabold text-uppercase d-block mb-1">Condición Médica / Alergias</span>
+                  <div class="p-2.5 bg-danger-subtle rounded-3 text-danger-emphasis extra-small fw-semibold border border-danger-subtle">
+                    {{ ficha.estudiante.alergias_enfermedades|default:'Sin alergias críticas registradas' }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: BITÁCORA DE ATENCIONES DE ESPECIALISTAS -->
+        <div class="tab-pane fade" id="sesiones-pane" role="tabpanel">
+          <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+              <div>
+                <h5 class="fw-extrabold text-dark fs-6 mb-1">Bitácora de Intervenciones & Apoyos</h5>
+                <p class="text-muted extra-small mb-0">Historial cronológico de sesiones realizadas por psicopedagoga, fonoaudióloga, psicólogo y educadora.</p>
+              </div>
+              <button type="button" class="btn btn-sm btn-primary fw-extrabold px-3 py-2" style="border-radius:10px; background:linear-gradient(135deg, #7C5CFC 0%, #4F46E5 100%); border:none;" data-bs-toggle="modal" data-bs-target="#modalRegistrarAtencion">
+                <i class="bi bi-plus-lg me-1"></i> Nueva Atención
+              </button>
+            </div>
+
+            <div class="timeline-container ps-2">
+              {% for at in atenciones %}
+                <div class="timeline-item">
+                  <div class="timeline-dot"></div>
+                  <div class="p-3.5 bg-light rounded-3 border">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                      <div>
+                        <span class="badge bg-purple-subtle text-primary fw-bold me-1.5" style="background:#EDE9FE; color:#6D28D9; border-radius:6px;">
+                          {{ at.get_rol_especialista_display }}
+                        </span>
+                        <span class="badge bg-white text-dark border fw-bold" style="border-radius:6px;">
+                          {{ at.get_tipo_sesion_display }}
+                        </span>
+                      </div>
+                      <span class="text-muted extra-small font-monospace fw-bold">{{ at.fecha|date:"d/m/Y" }}</span>
+                    </div>
+
+                    <h6 class="fw-bold text-dark fs-6 mb-1">{{ at.objetivo_trabajado }}</h6>
+                    <p class="text-dark small mb-2">{{ at.resumen_intervencion }}</p>
+
+                    {% if at.acuerdos_pedagogicos %}
+                      <div class="p-2.5 bg-white rounded-2 border extra-small text-muted">
+                        <strong class="text-dark">Acuerdos / Sugerencias para el Aula:</strong> {{ at.acuerdos_pedagogicos }}
+                      </div>
+                    {% endif %}
+
+                    <div class="text-muted extra-small mt-2.5 pt-2 border-top d-flex justify-content-between">
+                      <span>Registrado por: <strong>{{ at.especialista.get_full_name|default:at.especialista.username }}</strong></span>
+                      <span>{{ at.fecha_registro|date:"d/m/Y H:i" }}</span>
+                    </div>
+                  </div>
+                </div>
+              {% empty %}
+                <div class="text-center py-5 text-muted">
+                  <i class="bi bi-calendar-x fs-2 d-block mb-1"></i>
+                  No hay atenciones de especialistas registradas para este estudiante.
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: PLAN DE ADECUACIÓN CURRICULAR INDIVIDUAL (PACI) -->
+        <div class="tab-pane fade" id="paci-pane" role="tabpanel">
+          <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+              <div>
+                <h5 class="fw-extrabold text-dark fs-6 mb-1">Plan de Adecuación Curricular Individual (PACI)</h5>
+                <p class="text-muted extra-small mb-0">Estrategias de acceso, graduación de objetivos y evaluación diferenciada (Decreto 83).</p>
+              </div>
+              <button type="button" class="btn btn-sm btn-primary fw-extrabold px-3 py-2" style="border-radius:10px; background:linear-gradient(135deg, #7C5CFC 0%, #4F46E5 100%); border:none;" data-bs-toggle="modal" data-bs-target="#modalCrearEditarPACI">
+                <i class="bi bi-pencil-square me-1"></i> Editar / Crear PACI
+              </button>
+            </div>
+
+            {% for p in pacis %}
+              <div class="p-4 rounded-4 border mb-4 {% if p.aprobado_utp %}bg-white border-success-subtle shadow-sm{% else %}bg-light{% endif %}">
+                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                  <div>
+                    <h5 class="fw-extrabold text-dark fs-6 mb-0">PACI Lectivo {{ p.anio_lectivo }}</h5>
+                    <span class="text-muted extra-small">Asignatura: {{ p.asignatura.nombre|default:'General / Todas las asignaturas' }}</span>
+                  </div>
+                  {% if p.aprobado_utp %}
+                    <span class="badge bg-success text-white fw-bold px-3 py-1.5" style="border-radius:8px;">
+                      <i class="bi bi-patch-check-fill me-1"></i> Aprobado Oficialmente por UTP ({{ p.fecha_aprobacion|date:"d/m/Y" }})
+                    </span>
+                  {% else %}
+                    <div class="d-flex align-items-center gap-2">
+                      <span class="badge bg-warning-subtle text-warning-emphasis fw-bold px-2.5 py-1" style="border-radius:8px;">Pendiente de Aprobación UTP</span>
+                      {% if is_admin %}
+                        <a href="{% url 'aprobar_paci' p.id %}" class="btn btn-sm btn-success fw-bold px-2.5 py-1" style="border-radius:8px;">
+                          <i class="bi bi-check-lg me-0.5"></i> Aprobar PACI
+                        </a>
+                      {% endif %}
+                    </div>
+                  {% endif %}
+                </div>
+
+                <div class="row g-3.5 mb-3">
+                  <div class="col-md-4">
+                    <div class="p-3 bg-white rounded-3 border h-100 shadow-sm">
+                      <strong class="text-dark small d-block mb-1.5"><i class="bi bi-clock text-primary me-1"></i> 1. Adecuaciones de Acceso</strong>
+                      <div class="extra-small text-muted mb-1">
+                        Tiempo adicional: <strong>{% if p.tiempo_adicional %}Sí (Garantizado){% else %}No{% endif %}</strong>
+                      </div>
+                      <div class="extra-small text-dark">
+                        <strong>Materiales:</strong> {{ p.adaptacion_materiales|default:'No especificado' }}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-md-4">
+                    <div class="p-3 bg-white rounded-3 border h-100 shadow-sm">
+                      <strong class="text-dark small d-block mb-1.5"><i class="bi bi-bullseye text-warning me-1"></i> 2. Adecuación de Objetivos</strong>
+                      <div class="extra-small text-dark mb-1">
+                        <strong>Graduación:</strong> {{ p.graduacion_complejidad|default:'Nivel estándar' }}
+                      </div>
+                      <div class="extra-small text-dark">
+                        <strong>OAs Priorizados:</strong> {{ p.priorizacion_objetivos|default:'Todos' }}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-md-4">
+                    <div class="p-3 bg-white rounded-3 border h-100 shadow-sm">
+                      <strong class="text-dark small d-block mb-1.5"><i class="bi bi-ui-checks text-success me-1"></i> 3. Evaluación Diferenciada</strong>
+                      <div class="extra-small text-dark">
+                        {{ p.estrategias_evaluacion|default:'Evaluación regular con apoyos' }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% empty %}
+              <div class="text-center py-5 bg-light rounded-4 border">
+                <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width:56px; height:56px; background:#FFFFFF; color:#64748B; font-size:1.5rem; border:1px solid #E2E8F0;">
+                  📝
+                </div>
+                <h6 class="fw-extrabold text-dark mb-1">Aún no se ha diseñado el Plan PACI para este estudiante</h6>
+                <p class="text-muted extra-small mb-3">Crea el Plan de Adecuación Curricular para formalizar las adecuaciones de acceso y evaluación ante el MINEDUC.</p>
+                <button type="button" class="btn btn-sm btn-primary fw-bold px-3 py-2" style="border-radius:10px; background:linear-gradient(135deg, #7C5CFC 0%, #4F46E5 100%); border:none;" data-bs-toggle="modal" data-bs-target="#modalCrearEditarPACI">
+                  <i class="bi bi-plus-lg me-1"></i> Crear PACI
+                </button>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- MODAL REGISTRAR ATENCIÓN / SESIÓN -->
+<div class="modal fade" id="modalRegistrarAtencion" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+      <div class="p-4 text-white" style="background: linear-gradient(135deg, #1E1B4B 0%, #4F46E5 100%);">
+        <h4 class="fw-extrabold mb-1 fs-5 text-white">Registro de Atención PIE</h4>
+        <p class="mb-0 text-white-50 extra-small">{{ ficha.estudiante.nombre_completo }} • Bitácora Profesional</p>
+      </div>
+
+      <form method="POST" action="{% url 'registrar_sesion_pie' ficha.id %}">
+        {% csrf_token %}
+        <div class="modal-body p-4">
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">Rol / Especialidad del Profesional</label>
+              <select name="rol_especialista" class="form-select" style="border-radius:10px;">
+                <option value="educadora_diferencial">Educadora Diferencial</option>
+                <option value="psicologo">Psicólogo / Psicóloga</option>
+                <option value="fonoaudiologo">Fonoaudiólogo / Fonoaudióloga</option>
+                <option value="terapeuta_ocupacional">Terapeuta Ocupacional</option>
+                <option value="psicopedagogo">Psicopedagogo / Psicopedagoga</option>
+                <option value="otro">Otro Profesional</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark small">Modalidad de Atención</label>
+              <select name="tipo_sesion" class="form-select" style="border-radius:10px;">
+                <option value="aula_recursos">Aula de Recursos (Apoyo Específico)</option>
+                <option value="aula_regular">Aula Regular (Co-Docencia)</option>
+                <option value="individual">Sesión Individual Especialista</option>
+                <option value="apoderado">Entrevista con Apoderado</option>
+                <option value="equipo_aula">Reunión Equipo de Aula</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-8">
+              <label class="form-label fw-bold text-dark small">Objetivo Específico Trabajado <span class="text-danger">*</span></label>
+              <input type="text" name="objetivo_trabajado" class="form-control" placeholder="Ej: Conciencia fonológica, resolución de problemas aditivos..." style="border-radius:10px;" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-bold text-dark small">Fecha de la Sesión</label>
+              <input type="date" name="fecha" value="{{ hoy|date:'Y-m-d' }}" class="form-control" style="border-radius:10px;">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold text-dark small">Resumen de Actividades & Desempeño <span class="text-danger">*</span></label>
+            <textarea name="resumen_intervencion" rows="3" class="form-control" placeholder="Detalla el material utilizado, respuesta del alumno y grado de logro..." style="border-radius:10px;" required></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold text-dark small">Acuerdos Pedagógicos / Sugerencias para Sala</label>
+            <textarea name="acuerdos_pedagogicos" rows="2" class="form-control" placeholder="Estrategias recomendadas al profesor jefe o actividades de refuerzo en el hogar..." style="border-radius:10px;"></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer border-top p-3 px-4 bg-white">
+          <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal" style="border-radius:10px;">Cancelar</button>
+          <button type="submit" class="btn btn-primary fw-extrabold px-4" style="border-radius:10px; background:linear-gradient(135deg, #7C5CFC 0%, #4F46E5 100%); border:none;">
+            Guardar en Bitácora
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CREAR / EDITAR PACI -->
+<div class="modal fade" id="modalCrearEditarPACI" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+      <div class="p-4 text-white" style="background: linear-gradient(135deg, #1E1B4B 0%, #4F46E5 100%);">
+        <h4 class="fw-extrabold mb-1 fs-5 text-white">Plan de Adecuación Curricular Individual (PACI)</h4>
+        <p class="mb-0 text-white-50 extra-small">Normativa Decreto 83 / 2015 MINEDUC</p>
+      </div>
+
+      <form method="POST" action="{% url 'guardar_paci' ficha.id %}">
+        {% csrf_token %}
+        <div class="modal-body p-4">
+          <div class="row g-3 mb-3">
+            <div class="col-md-8">
+              <label class="form-label fw-bold text-dark small">Asignatura Específica (Opcional)</label>
+              <select name="asignatura_id" class="form-select" style="border-radius:10px;">
+                <option value="">Plan General (Aplica a todas las asignaturas)</option>
+                {% for a in asignaturas %}
+                  <option value="{{ a.id }}">{{ a.nombre }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-bold text-dark small">Año Lectivo</label>
+              <input type="number" name="anio_lectivo" value="2026" class="form-control" style="border-radius:10px;">
+            </div>
+          </div>
+
+          <!-- 1. Acceso -->
+          <div class="mb-3 p-3 bg-light rounded-3 border">
+            <h6 class="fw-bold text-dark mb-2"><i class="bi bi-clock text-primary me-1"></i> 1. Adecuaciones de Acceso</h6>
+            <div class="form-check form-switch mb-2">
+              <input class="form-check-input" type="checkbox" name="tiempo_adicional" id="checkTiempoExtra" checked>
+              <label class="form-check-label fw-bold text-dark small" for="checkTiempoExtra">Garantizar tiempo adicional en pruebas y tareas</label>
+            </div>
+            <div class="mb-2">
+              <label class="form-label text-muted extra-small fw-extrabold text-uppercase">Adaptación de Materiales</label>
+              <input type="text" name="adaptacion_materiales" class="form-control form-control-sm" placeholder="Ej: Material concreto, letra aumentada 14pt, apoyos pictográficos..." style="border-radius:8px;">
+            </div>
+            <div>
+              <label class="form-label text-muted extra-small fw-extrabold text-uppercase">Espacio & Ubicación</label>
+              <input type="text" name="espacio_evaluacion" class="form-control form-control-sm" placeholder="Ej: Ubicación preferencial cerca del docente, sala silenciosa..." style="border-radius:8px;">
+            </div>
+          </div>
+
+          <!-- 2. Objetivos -->
+          <div class="mb-3 p-3 bg-light rounded-3 border">
+            <h6 class="fw-bold text-dark mb-2"><i class="bi bi-bullseye text-warning me-1"></i> 2. Adecuación de Objetivos de Aprendizaje (OAs)</h6>
+            <div class="mb-2">
+              <label class="form-label text-muted extra-small fw-extrabold text-uppercase">Graduación de Complejidad</label>
+              <input type="text" name="graduacion_complejidad" class="form-control form-control-sm" placeholder="Ej: Desglose de problemas de 2 pasos a 1 paso..." style="border-radius:8px;">
+            </div>
+            <div>
+              <label class="form-label text-muted extra-small fw-extrabold text-uppercase">Priorización de Objetivos</label>
+              <input type="text" name="priorizacion_objetivos" class="form-control form-control-sm" placeholder="Ej: Foco en OA 01, OA 03 y OA 06 de Lenguaje..." style="border-radius:8px;">
+            </div>
+          </div>
+
+          <!-- 3. Evaluación -->
+          <div class="mb-3 p-3 bg-light rounded-3 border">
+            <h6 class="fw-bold text-dark mb-2"><i class="bi bi-ui-checks text-success me-1"></i> 3. Evaluación Diferenciada</h6>
+            <textarea name="estrategias_evaluacion" rows="2" class="form-control form-control-sm" placeholder="Ej: Rúbricas simplificadas, posibilidad de respuesta oral o grabada, ponderación flexible..." style="border-radius:8px;" required>Evaluación diferenciada con apoyo visual y lectura guiada de instrucciones.</textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer border-top p-3 px-4 bg-white">
+          <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal" style="border-radius:10px;">Cancelar</button>
+          <button type="submit" class="btn btn-primary fw-extrabold px-4" style="border-radius:10px; background:linear-gradient(135deg, #7C5CFC 0%, #4F46E5 100%); border:none;">
+            Guardar PACI
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.getElementById('mobileMenuBtn')?.addEventListener('click', function() {
+    if (typeof window.toggleSidebarMobile === 'function') {
+      window.toggleSidebarMobile();
+    } else {
+      document.getElementById('sidebar')?.classList.toggle('open');
+    }
+  });
+</script>
+</body>
+</html>

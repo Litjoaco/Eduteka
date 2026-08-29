@@ -53,14 +53,14 @@
     overflow-x: hidden;
   }
 
-  /* ── LAYOUT ─────────────────────────────────────── */
+  
   .app-shell {
     display: flex;
     min-height: 100vh;
     width: 100%;
   }
 
-  /* ── SIDEBAR ─────────────────────────────────────── */
+  
   .sidebar {
     width: var(--sidebar-w);
     min-width: var(--sidebar-w);
@@ -148,7 +148,7 @@
     margin-top: auto;
   }
 
-  /* ── MAIN WRAPPER ────────────────────────────────── */
+  
   .main-wrapper {
     flex: 1;
     min-width: 0;
@@ -158,7 +158,7 @@
     width: calc(100% - var(--sidebar-w));
   }
 
-  /* ── TOPBAR ──────────────────────────────────────── */
+  
   .topbar {
     height: 60px;
     background: var(--surface);
@@ -263,7 +263,7 @@
   .user-chip-name { font-weight: 600; font-size: .82rem; color: var(--dark); }
   .user-chip-role { font-size: .72rem; color: var(--muted); text-transform: capitalize; }
 
-  /* ── CONTENT ─────────────────────────────────────── */
+  
   .content {
     padding: 1.5rem 1.75rem;
     flex: 1;
@@ -290,7 +290,7 @@
   }
   .hero-sub { color: var(--muted); font-size: .9rem; margin: 0; }
 
-  /* ── 2-COLUMN GRID ───────────────────────────────── */
+  
   .dashboard-grid {
     display: flex;
     flex-direction: row;
@@ -311,7 +311,7 @@
     min-width: 0;
   }
 
-  /* ── PANEL / CARD ────────────────────────────────── */
+  
   .panel {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -335,7 +335,7 @@
     letter-spacing: -.01em;
   }
 
-  /* ── KPI GRID ────────────────────────────────────── */
+  
   .kpi-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -431,7 +431,7 @@
   .kpi-footer-link.amber  { color: #D97706; }
   .kpi-footer-link.red    { color: #EF4444; }
 
-  /* ── QUICK ACTIONS ───────────────────────────────── */
+  
   .quick-actions {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -474,14 +474,14 @@
   .qa-icon.green  { background: #ECFDF5; color: #0FC4A7; }
   .qa-icon.amber  { background: #FFFBEB; color: #D97706; }
 
-  /* ── CHART PANEL ─────────────────────────────────── */
+  
   .chart-wrap {
     position: relative;
     height: 240px;
     width: 100%;
   }
 
-  /* ── AGENDA ──────────────────────────────────────── */
+  
   .agenda-list { list-style: none; padding: 0; margin: 0; }
   .agenda-item {
     display: flex;
@@ -529,7 +529,7 @@
   .btn-pill.primary { background: var(--primary); color: #fff; }
   .btn-pill.ghost   { background: var(--bg); color: var(--body-text); border: 1px solid var(--border); }
 
-  /* ── ALERTS ──────────────────────────────────────── */
+  
   .alert-card {
     display: flex;
     align-items: flex-start;
@@ -560,7 +560,7 @@
   .alert-title { font-size: .85rem; font-weight: 700; color: var(--dark); margin: 0 0 2px; }
   .alert-sub   { font-size: .78rem; color: var(--muted); margin: 0; }
 
-  /* ── TIMELINE ────────────────────────────────────── */
+  
   .timeline { list-style: none; padding: 0; margin: 0; position: relative; }
   .timeline::before {
     content: '';
@@ -589,7 +589,7 @@
   .tl-text { font-size: .83rem; color: var(--body-text); line-height: 1.45; }
   .tl-text strong { color: var(--dark); font-weight: 700; }
 
-  /* ── FORM SELECT ─────────────────────────────────── */
+  
   .mini-select {
     appearance: none;
     background: var(--bg);
@@ -604,7 +604,7 @@
     outline: none;
   }
 
-  /* ── "Ver todo" link ─────────────────────────────── */
+  
   .see-all {
     font-size: .78rem;
     font-weight: 600;
@@ -613,7 +613,7 @@
   }
   .see-all:hover { text-decoration: underline; }
 
-  /* ── RESPONSIVE ──────────────────────────────────── */
+  
   @media (max-width: 1280px) {
     .kpi-grid { grid-template-columns: repeat(2, 1fr); }
     .quick-actions { grid-template-columns: repeat(2, 1fr); }
@@ -642,7 +642,7 @@
     .topbar-search, .topbar-date { display: none; }
   }
 
-  /* ── ELEVATED PREMIUM STYLES ── */
+  
   @keyframes fadeInUp {
     from {
       opacity: 0;
@@ -733,7 +733,7 @@
 
   {% include 'colegios/_sidebar.html' with active_page='inicio' %}
 
-  <!-- ── MAIN WRAPPER ────────────────────────────── -->
+  
   <div class="main-wrapper">
 
     <!-- TOPBAR -->
@@ -785,11 +785,10 @@
       </div>
       
 
-
       <!-- DASHBOARD GRID -->
       <div class="dashboard-grid">
 
-        <!-- ── LEFT COLUMN ── -->
+        
         <div class="left-column">
 
           <!-- KPIs -->
@@ -839,7 +838,6 @@
               Políticas Académicas
             </a>
           </div>
-
 
           <!-- Solicitudes Pendientes -->
           <div class="panel" id="solicitudes" style="margin-bottom: 1.25rem;">
@@ -902,7 +900,7 @@
           </div>
         </div>
 
-        <!-- ── RIGHT COLUMN ── -->
+        
         <div class="right-column">
 
           <!-- Agenda Hoy -->
@@ -1171,6 +1169,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       },
       interaction: { mode: 'index', intersect: false }
+    }
+  document.getElementById('mobileMenuBtn')?.addEventListener('click', function() {
+    if (typeof window.toggleSidebarMobile === 'function') {
+      window.toggleSidebarMobile();
+    } else {
+      document.getElementById('sidebar')?.classList.toggle('open');
     }
   });
 

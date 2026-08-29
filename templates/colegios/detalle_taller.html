@@ -148,6 +148,19 @@
     .table-taller tr:hover td {
       background: #F8FAFC;
     }
+
+    @media (max-width: 991.98px) {
+      .main-content { margin-left: 0 !important; width: 100% !important; }
+      .topbar { padding: 0.75rem 1rem; height: auto; flex-wrap: wrap; gap: 0.5rem; }
+      .content-body { padding: 1.25rem 1rem; }
+      .hero-banner-detalle { padding: 1.5rem 1.25rem; }
+    }
+
+    @media (max-width: 575.98px) {
+      .content-body { padding: 1rem 0.75rem; }
+      .card-panel-taller { padding: 1.25rem 1rem; }
+      .nav-pills-taller .nav-link { padding: 0.5rem 0.85rem; font-size: 0.82rem; }
+    }
   </style>
 </head>
 <body>
@@ -157,11 +170,14 @@
 
   <div class="main-content">
     <header class="topbar">
-      <div class="d-flex align-items-center gap-3">
+      <div class="d-flex align-items-center gap-2">
+        <button class="btn btn-sm d-lg-none" id="mobileMenuBtn" style="border:none; background:var(--primary-soft); color:var(--primary); padding: 0.4rem 0.6rem;">
+          <i class="bi bi-list fs-5"></i>
+        </button>
         <a href="{% url 'talleres_dashboard' %}" class="btn btn-sm btn-light border" style="border-radius:8px;">
-          <i class="bi bi-arrow-left me-1"></i> Volver a Talleres
+          <i class="bi bi-arrow-left me-1"></i> <span class="d-none d-sm-inline">Volver a Talleres</span><span class="d-inline d-sm-none">Volver</span>
         </a>
-        <span class="fw-bold text-dark fs-5"><i class="bi {{ taller.icono|default:'bi-star-fill' }} text-primary me-2"></i>{{ taller.nombre }}</span>
+        <span class="fw-bold text-dark fs-5 text-truncate" style="max-width: 250px;"><i class="bi {{ taller.icono|default:'bi-star-fill' }} text-primary me-2"></i>{{ taller.nombre }}</span>
       </div>
 
       <div class="topbar-right d-flex align-items-center gap-4">
@@ -561,6 +577,14 @@
       }
     });
   }
+
+  document.getElementById('mobileMenuBtn')?.addEventListener('click', function() {
+    if (typeof window.toggleSidebarMobile === 'function') {
+      window.toggleSidebarMobile();
+    } else {
+      document.getElementById('sidebar')?.classList.toggle('open');
+    }
+  });
 </script>
 </body>
 </html>

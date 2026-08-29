@@ -263,10 +263,15 @@
     }
 
     /* RESPONSIVE */
-    @media (max-width: 992px) {
-      .sidebar { transform: translateX(-100%); }
-      .main-content { margin-left: 0; width: 100%; }
-      .sidebar.active { transform: translateX(0); }
+    @media (max-width: 991.98px) {
+      .main-content { margin-left: 0 !important; width: 100% !important; }
+      .topbar { padding: 0.75rem 1rem; height: auto; flex-wrap: wrap; gap: 0.5rem; }
+      .content-body { padding: 1.25rem 1rem; }
+    }
+
+    @media (max-width: 575.98px) {
+      .content-body { padding: 1rem 0.75rem; }
+      .form-panel { padding: 1.5rem 1.2rem; }
     }
   </style>
 </head>
@@ -274,7 +279,6 @@
 
 <div class="wrapper">
   {% include 'colegios/_sidebar.html' with active_page='academico' %}
-
 
   <!-- MAIN CONTENT -->
   <div class="main-content">
@@ -387,11 +391,13 @@
 <script>
   document.addEventListener("DOMContentLoaded", function() {
     const mobileBtn = document.getElementById('mobileMenuBtn');
-    const sidebar = document.getElementById('sidebar');
-    
     if(mobileBtn) {
       mobileBtn.addEventListener('click', () => {
-        sidebar.classList.toggle('active');
+        if (typeof window.toggleSidebarMobile === 'function') {
+          window.toggleSidebarMobile();
+        } else {
+          document.getElementById('sidebar')?.classList.toggle('open');
+        }
       });
     }
   });

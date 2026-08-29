@@ -1,0 +1,193 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Asistencia Mensual SIGE - {{ seccion.nombre }}</title>
+
+  <!-- Bootstrap CSS y Fuentes -->
+  <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+  <style>
+    :root {
+      --primary: #10B981;
+      --dark: #0F172A;
+      --bg-color: #F8FAFC;
+      --border-color: #E2E8F0;
+      --card-bg: #FFFFFF;
+    }
+    body { background: var(--bg-color); font-family: 'Plus Jakarta Sans', sans-serif; }
+    .app-container { display: flex; min-height: 100vh; width: 100vw; }
+    .main-content { margin-left: 248px; flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .topbar { height: 68px; background: var(--card-bg); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 2.2rem; }
+    .content-area { padding: 2rem 2.2rem; max-width: 1350px; margin: 0 auto; width: 100%; }
+    .card-custom { background: white; border: 1px solid var(--border-color); border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+
+    .table-asist th {
+      background: #F8FAFC;
+      font-weight: 700;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      vertical-align: middle;
+      border-bottom: 2px solid var(--border-color);
+    }
+    .table-asist td {
+      vertical-align: middle;
+      font-size: 0.88rem;
+    }
+
+    @media (max-width: 991.98px) {
+      .main-content { margin-left: 0 !important; width: 100% !important; }
+      .topbar { padding: 0.75rem 1rem; height: auto; flex-wrap: wrap; gap: 0.5rem; }
+      .content-area { padding: 1.25rem 1rem; }
+    }
+
+    @media (max-width: 575.98px) {
+      .content-area { padding: 1rem 0.75rem; }
+      .card-custom { padding: 1rem !important; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  {% include 'colegios/_sidebar.html' with active_page='reportes' %}
+
+  <div class="main-content">
+    <header class="topbar">
+      <div class="d-flex align-items-center gap-2">
+        <button class="btn btn-sm d-lg-none" id="mobileMenuBtn" style="border:none; background:var(--primary-soft, #EDE9FE); color:var(--primary, #7C5CFC); padding: 0.4rem 0.6rem;">
+          <i class="bi bi-list fs-5"></i>
+        </button>
+        <a href="{% url 'centro_reportes' %}" class="btn btn-sm btn-light border"><i class="bi bi-arrow-left"></i></a>
+        <div>
+          <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-calendar2-check-fill text-success me-2"></i>Planilla Mensual de Asistencia (SIGE)</h5>
+          <small class="text-muted">{{ seccion.nombre }} &bull; Declaración de Asistencia Mensual</small>
+        </div>
+      </div>
+
+      <div class="d-flex align-items-center gap-2">
+        <a href="{% url 'exportar_asistencia_mensual_excel' seccion.id %}?mes={{ mes }}" class="btn btn-success fw-bold px-3 py-2" style="border-radius:10px;">
+          <i class="bi bi-file-earmark-excel-fill me-1"></i> Descargar Excel (.xlsx)
+        </a>
+      </div>
+    </header>
+
+    <main class="content-area">
+      <!-- SELECTOR DE SECCIÓN Y MES -->
+      <div class="card-custom p-3 mb-4">
+        <form method="GET" class="row g-3 align-items-center">
+          <div class="col-md-4">
+            <label class="form-label fw-bold small text-muted text-uppercase mb-1">Sección:</label>
+            <select name="seccion" class="form-select fw-bold" onchange="this.form.submit();" style="border-radius:10px;">
+              {% for sec in secciones %}
+                <option value="{{ sec.id }}" {% if sec.id == seccion.id %}selected{% endif %}>{{ sec.nombre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-md-3">
+            <label class="form-label fw-bold small text-muted text-uppercase mb-1">Mes:</label>
+            <select name="mes" class="form-select fw-bold" onchange="this.form.submit();" style="border-radius:10px;">
+              {% for num_mes, nom_mes in meses_choices %}
+                <option value="{{ num_mes }}" {% if num_mes == mes %}selected{% endif %}>{{ nom_mes }} {{ anio }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-md-5 d-flex justify-content-md-end gap-3 pt-md-4">
+            <div class="text-center px-3 py-1 bg-light rounded border">
+              <span class="text-muted extra-small text-uppercase fw-bold d-block" style="font-size:0.7rem;">Días Registrados</span>
+              <span class="fs-5 fw-extrabold text-dark">{{ total_dias_habiles }}</span>
+            </div>
+            <div class="text-center px-3 py-1 bg-light rounded border">
+              <span class="text-muted extra-small text-uppercase fw-bold d-block" style="font-size:0.7rem;">% Asistencia Mes</span>
+              <span class="fs-5 fw-extrabold {% if tasa_seccion_mes >= 85 %}text-success{% else %}text-danger{% endif %}">{{ tasa_seccion_mes }}%</span>
+            </div>
+            <div class="text-center px-3 py-1 bg-light rounded border">
+              <span class="text-muted extra-small text-uppercase fw-bold d-block" style="font-size:0.7rem;">Alertas &lt;85%</span>
+              <span class="fs-5 fw-extrabold {% if alertas_desercion_cnt > 0 %}text-danger{% else %}text-muted{% endif %}">{{ alertas_desercion_cnt }}</span>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- TABLA CONSOLIDADA DE ASISTENCIA -->
+      <div class="card-custom p-4 mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h6 class="fw-bold mb-0">Nómina de Asistencia Mensual Consolidada</h6>
+          <span class="text-muted small">Cálculo de presencia para declaración de subvención escolar</span>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-hover table-bordered table-asist align-middle mb-0 text-center">
+            <thead>
+              <tr>
+                <th class="text-start" style="width: 40px;">#</th>
+                <th class="text-start" style="width: 120px;">RUT</th>
+                <th class="text-start">Nombre del Estudiante</th>
+                <th style="width: 120px;">Días Hábiles</th>
+                <th style="width: 120px;" class="text-success">Días Presente</th>
+                <th style="width: 120px;" class="text-danger">Inasistencias</th>
+                <th style="width: 100px;">Atrasos</th>
+                <th style="width: 140px; background:#ECFDF5; color:#10B981;">% Asistencia</th>
+                <th style="width: 140px;">Estado SIGE</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for fila in tabla_alumnos %}
+                <tr>
+                  <td class="text-start text-muted small">{{ forloop.counter }}</td>
+                  <td class="text-start text-muted small">{{ fila.estudiante.rut|default:"-" }}</td>
+                  <td class="text-start fw-bold text-dark">{{ fila.estudiante.nombre_completo }}</td>
+                  <td class="fw-bold text-muted">{{ total_dias_habiles }}</td>
+                  <td class="fw-bold text-success">{{ fila.presentes }}</td>
+                  <td class="fw-bold text-danger">{{ fila.ausentes }}</td>
+                  <td class="text-muted">{{ fila.tardes }}</td>
+                  <td class="fw-extrabold" style="background:#ECFDF5; color:{% if fila.es_critico %}#DC2626{% else %}#10B981{% endif %};">
+                    {{ fila.porcentaje }}%
+                  </td>
+                  <td>
+                    {% if fila.es_critico %}
+                      <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i> RIESGO &lt;85%
+                      </span>
+                    {% else %}
+                      <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+                        <i class="bi bi-check-circle-fill me-1"></i> REGULAR
+                      </span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="9" class="text-center py-5 text-muted">
+                    <i class="bi bi-calendar-x fs-1 d-block mb-2 text-muted"></i>
+                    No hay estudiantes registrados en esta sección.
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+<script>
+  document.getElementById('mobileMenuBtn')?.addEventListener('click', function() {
+    if (typeof window.toggleSidebarMobile === 'function') {
+      window.toggleSidebarMobile();
+    } else {
+      document.getElementById('sidebar')?.classList.toggle('open');
+    }
+  });
+</script>
+</body>
+</html>

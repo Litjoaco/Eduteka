@@ -4,92 +4,159 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Centro de Reportes - Eduteka</title>
+  <title>Centro de Reportes y Analítica Escolar - Eduteka</title>
 
   <!-- Bootstrap CSS y Fuentes -->
   <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
   <style>
     :root {
       --primary: #7C5CFC;
+      --primary-hover: #6846EB;
       --primary-soft: #F0EDFF;
       --secondary: #65CDBF;
-      --dark: #151A35;
-      --gray-text: #687089;
-      --bg-color: #F8F9FC;
+      --success: #10B981;
+      --warning: #F59E0B;
+      --danger: #EF4444;
+      --dark: #0F172A;
+      --gray-text: #64748B;
+      --bg-color: #F8FAFC;
       --border-color: #E2E8F0;
-      --white: #FFFFFF;
+      --card-bg: #FFFFFF;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.06);
+      --shadow-hover: 0 12px 28px rgba(124, 92, 252, 0.12);
     }
-
-    html { font-size: 14px; }
 
     body {
       background: var(--bg-color);
       color: var(--dark);
-      font-family: 'Inter', sans-serif;
+      font-family: 'Plus Jakarta Sans', sans-serif;
       overflow-x: hidden;
     }
 
-    .app-container { display: flex; min-height: 100vh; width: 100vw; overflow-x: hidden; }
+    .app-container { display: flex; min-height: 100vh; width: 100vw; }
     .main-content { margin-left: 248px; flex: 1; display: flex; flex-direction: column; min-width: 0; width: calc(100% - 248px); }
-    .topbar { height: 64px; background: var(--white); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; position: sticky; top: 0; z-index: 1030; }
+    .topbar { height: 68px; background: var(--card-bg); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 2.2rem; position: sticky; top: 0; z-index: 1030; }
 
-    .content-area { padding: 2.25rem 2rem; max-width: 1350px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+    .content-area { padding: 2rem 2.2rem; max-width: 1400px; margin: 0 auto; width: 100%; }
 
-    /* ESTILO CENTRADO INSPIRADO EN LA IMAGEN DE REFERENCIA */
-    .hub-card {
-      background: var(--white);
+    /* HEADER HERO */
+    .hero-banner {
+      background: linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #4338CA 100%);
+      border-radius: var(--radius-lg);
+      padding: 2.2rem;
+      color: white;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 2rem;
+      box-shadow: 0 10px 25px rgba(49, 46, 129, 0.2);
+    }
+    .hero-banner::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(124, 92, 252, 0.25) 0%, rgba(0,0,0,0) 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    /* KPI CARDS */
+    .kpi-stat-card {
+      background: var(--card-bg);
       border: 1px solid var(--border-color);
-      border-radius: 16px;
-      padding: 2.2rem 1.6rem;
-      text-align: center;
-      transition: all .25s ease;
-      cursor: pointer;
-      text-decoration: none;
-      color: inherit;
+      border-radius: var(--radius-md);
+      padding: 1.25rem 1.4rem;
       display: flex;
-      flex-direction: column;
+      align-items: center;
+      gap: 1.1rem;
+      box-shadow: var(--shadow-sm);
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+    .kpi-stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .kpi-icon-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
       align-items: center;
       justify-content: center;
-      height: 100%;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+      font-size: 1.4rem;
+      flex-shrink: 0;
     }
-    .hub-card:hover {
+
+    /* CONSOLA DE GENERACIÓN */
+    .generator-panel {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.8rem;
+      margin-bottom: 2.2rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* SUITE CARDS */
+    .suite-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.8rem;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      transition: all .25s ease;
+      position: relative;
+      text-decoration: none;
+      color: inherit;
+    }
+    .suite-card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 12px 28px rgba(124, 92, 252, 0.12);
+      box-shadow: var(--shadow-hover);
       border-color: var(--primary);
       color: inherit;
     }
-    .hub-card-icon {
-      font-size: 2.5rem;
-      color: var(--primary);
-      margin-bottom: 1.1rem;
-      display: inline-block;
+    .suite-icon-circle {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      margin-bottom: 1.25rem;
       transition: transform .2s ease;
     }
-    .hub-card:hover .hub-card-icon {
+    .suite-card:hover .suite-icon-circle {
       transform: scale(1.08);
     }
-    .hub-card-title {
-      font-weight: 700;
-      font-size: 1.08rem;
-      color: var(--dark);
-      margin-bottom: .6rem;
+
+    .badge-soft-primary { background: #F0EDFF; color: #7C5CFC; }
+    .badge-soft-success { background: #ECFDF5; color: #10B981; }
+    .badge-soft-warning { background: #FFFBEB; color: #D97706; }
+    .badge-soft-danger { background: #FEF2F2; color: #EF4444; }
+    .badge-soft-info { background: #F0F9FF; color: #0284C7; }
+
+    @media (max-width: 991.98px) {
+      .main-content { margin-left: 0 !important; width: 100% !important; }
+      .topbar { padding: 0.75rem 1rem; height: auto; flex-wrap: wrap; gap: 0.5rem; }
+      .content-area { padding: 1.25rem 1rem; }
+      .hero-banner { padding: 1.5rem 1.25rem; }
     }
-    .hub-card-desc {
-      font-size: .86rem;
-      color: var(--gray-text);
-      line-height: 1.45;
-      margin-bottom: 0;
-    }
-    .hub-badge {
-      font-size: .7rem;
-      font-weight: 600;
-      padding: .25rem .6rem;
-      border-radius: 6px;
-      margin-top: .8rem;
+
+    @media (max-width: 575.98px) {
+      .content-area { padding: 1rem 0.75rem; }
+      .suite-card { padding: 1.25rem 1rem; }
+      .generator-panel { padding: 1.25rem 1rem; }
     }
   </style>
 </head>
@@ -105,115 +172,306 @@
         <button class="btn btn-light d-lg-none" id="mobileMenuBtn">
           <i class="bi bi-list fs-5"></i>
         </button>
-        <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-grid text-primary me-2"></i>Centro de Reportes</h5>
+        <div>
+          <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-file-earmark-bar-graph-fill text-primary me-2"></i>Centro de Reportes & Analítica</h5>
+          <small class="text-muted">Generador oficial de informes ministeriales, académicos y de gestión</small>
+        </div>
       </div>
 
-      <div class="d-flex align-items-center gap-3">
-        <span class="badge bg-light text-dark border px-3 py-2" style="font-size:.78rem;">
+      <div class="d-flex align-items-center gap-2">
+        <span class="badge bg-light text-dark border px-3 py-2 fw-semibold" style="font-size:.82rem;">
           <i class="bi bi-building me-1 text-primary"></i> {{ colegio.nombre }}
         </span>
+        <a href="{% url 'reporte_resumen_ejecutivo' %}" class="btn btn-sm btn-primary fw-bold px-3 py-2" style="border-radius:10px;">
+          <i class="bi bi-pie-chart-fill me-1"></i> Ficha 360° Colegio
+        </a>
       </div>
     </header>
 
     <!-- CONTENT AREA -->
     <main class="content-area">
 
-      <!-- GRID EN 3 COLUMNAS CENTRADAS (ESTILO IMAGEN DE REFERENCIA) -->
+      <!-- MENSAJES DJANGO -->
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show border-0 shadow-sm" role="alert" style="border-radius: 12px;">
+            <i class="bi bi-info-circle-fill me-2"></i>{{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <!-- HERO BANNER -->
+      <div class="hero-banner">
+        <div class="row align-items-center">
+          <div class="col-lg-8">
+            <span class="badge bg-white bg-opacity-20 text-white px-3 py-1 mb-2 fw-semibold" style="font-size:0.75rem; letter-spacing:0.5px;">
+              PERÍODO ACADÉMICO {{ anio_actual }}
+            </span>
+            <h2 class="fw-extrabold mb-2">Informes & Planillas Oficiales</h2>
+            <p class="text-white text-opacity-80 mb-0 fs-6">
+              Emite certificados de alumno regular con firma, planillas de asistencia mensual para subvención (SIGE), matrices de calificaciones y reportes de convivencia en formatos <strong>Excel (.xlsx)</strong> y <strong>PDF Imprimible</strong>.
+            </p>
+          </div>
+          <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+            <a href="{% url 'reporte_certificado_alumno_regular' %}" class="btn btn-light text-dark fw-bold px-4 py-2 shadow-sm" style="border-radius:12px;">
+              <i class="bi bi-patch-check-fill text-primary me-2"></i>Emitir Certificado
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPIS INSTITUCIONALES EN TIEMPO REAL -->
+      <div class="row g-3 mb-4">
+        <div class="col-xl-3 col-sm-6">
+          <div class="kpi-stat-card">
+            <div class="kpi-icon-box" style="background:#F0EDFF; color:#7C5CFC;">
+              <i class="bi bi-mortarboard-fill"></i>
+            </div>
+            <div>
+              <span class="text-muted extra-small text-uppercase fw-bold d-block" style="font-size:0.72rem;">Matrícula Activa</span>
+              <span class="fs-4 fw-extrabold text-dark">{{ estudiantes_count }} <small class="fs-6 text-muted fw-normal">alumnos</small></span>
+              <span class="text-muted d-block" style="font-size:0.75rem;">{{ secciones_count }} secciones habilitadas</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xl-3 col-sm-6">
+          <div class="kpi-stat-card">
+            <div class="kpi-icon-box" style="background:#ECFDF5; color:#10B981;">
+              <i class="bi bi-calendar2-check-fill"></i>
+            </div>
+            <div>
+              <span class="text-muted extra-small text-uppercase fw-bold d-block" style="font-size:0.72rem;">Asistencia General</span>
+              <span class="fs-4 fw-extrabold {% if tasa_asistencia_global >= 85 %}text-success{% else %}text-danger{% endif %}">
+                {% if tasa_asistencia_global > 0 %}{{ tasa_asistencia_global }}%{% else %}100%{% endif %}
+              </span>
+              <span class="text-muted d-block" style="font-size:0.75rem;">
+                {% if alumnos_riesgo_asistencia > 0 %}
+                  <span class="text-danger fw-bold">{{ alumnos_riesgo_asistencia }}</span> bajo 85%
+                {% else %}
+                  Sin alertas críticas
+                {% endif %}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xl-3 col-sm-6">
+          <div class="kpi-stat-card">
+            <div class="kpi-icon-box" style="background:#FEF3C7; color:#D97706;">
+              <i class="bi bi-journal-bookmark-fill"></i>
+            </div>
+            <div>
+              <span class="text-muted extra-small text-uppercase fw-bold d-block" style="font-size:0.72rem;">Promedio Colegio</span>
+              <span class="fs-4 fw-extrabold text-dark">
+                {% if promedio_global > 0 %}{{ promedio_global }}{% else %}-{% endif %}
+              </span>
+              <span class="text-muted d-block" style="font-size:0.75rem;">
+                {% if alumnos_riesgo_notas > 0 %}
+                  <span class="text-danger fw-bold">{{ alumnos_riesgo_notas }}</span> con notas rojas
+                {% else %}
+                  Rendimiento al día
+                {% endif %}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xl-3 col-sm-6">
+          <div class="kpi-stat-card">
+            <div class="kpi-icon-box" style="background:#F0F9FF; color:#0284C7;">
+              <i class="bi bi-heart-pulse-fill"></i>
+            </div>
+            <div>
+              <span class="text-muted extra-small text-uppercase fw-bold d-block" style="font-size:0.72rem;">Inclusión & PIE</span>
+              <span class="fs-4 fw-extrabold text-dark">{{ pie_count }} <small class="fs-6 text-muted fw-normal">alumnos</small></span>
+              <span class="text-muted d-block" style="font-size:0.75rem;">Programas NEEP / NEET</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONSOLA DE GENERACIÓN DIRECTA -->
+      <div class="generator-panel">
+        <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-3">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-sliders2-vertical text-primary fs-5"></i>
+            <h6 class="fw-extrabold mb-0 text-dark">Generador Rápido de Informes</h6>
+          </div>
+          <span class="text-muted small">Selecciona los parámetros y obtén el informe en pantalla o Excel</span>
+        </div>
+
+        <form method="GET" id="quickReportForm" class="row g-3 align-items-end">
+          <div class="col-lg-4 col-md-6">
+            <label class="form-label fw-bold text-dark small mb-1">1. Tipo de Informe</label>
+            <select class="form-select" id="reportTypeSelect" style="border-radius:10px;">
+              <option value="matriz_notas">📊 Matriz de Calificaciones por Curso</option>
+              <option value="asistencia_mensual">📅 Planilla Mensual de Asistencia (SIGE)</option>
+              <option value="certificado_regular">📜 Certificado de Alumno Regular</option>
+              <option value="convivencia">🛡️ Consolidado de Convivencia Escolar</option>
+              <option value="resumen_ejecutivo">📈 Resumen Ejecutivo 360° del Colegio</option>
+            </select>
+          </div>
+
+          <div class="col-lg-3 col-md-6" id="seccionGroup">
+            <label class="form-label fw-bold text-dark small mb-1">2. Curso / Sección</label>
+            <select class="form-select" id="seccionSelect" style="border-radius:10px;">
+              {% for sec in secciones %}
+                <option value="{{ sec.id }}">{{ sec.nombre }}</option>
+              {% empty %}
+                <option value="">No hay secciones creadas</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-lg-2 col-md-6" id="mesGroup">
+            <label class="form-label fw-bold text-dark small mb-1">3. Mes a Evaluar</label>
+            <select class="form-select" id="mesSelect" style="border-radius:10px;">
+              {% for num_mes, nom_mes in meses_choices %}
+                <option value="{{ num_mes }}" {% if num_mes == mes_actual %}selected{% endif %}>{{ nom_mes }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-lg-3 col-md-6 d-flex gap-2">
+            <button type="button" class="btn btn-primary fw-bold flex-grow-1" id="btnGenerarPantalla" style="border-radius:10px; padding:0.65rem;">
+              <i class="bi bi-eye-fill me-1"></i> Ver Informe
+            </button>
+            <button type="button" class="btn btn-outline-success fw-bold px-3" id="btnDescargarExcel" style="border-radius:10px;" title="Descargar Excel">
+              <i class="bi bi-file-earmark-excel-fill fs-6"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- SUITES DE REPORTES DISPONIBLES (GRID EN 3 COLUMNAS) -->
+      <h6 class="fw-bold text-dark mb-3"><i class="bi bi-grid-fill text-primary me-2"></i>Catálogo de Reportes Institucionales</h6>
       <div class="row g-4">
         
-        <!-- CARD 1: ASISTENCIA -->
-        <div class="col-md-4 col-sm-6">
-          <a href="{% url 'historial_asistencia' %}" class="hub-card">
-            <div class="hub-card-icon">
-              <i class="bi bi-calendar-check"></i>
+        <!-- CARD 1: MATRIZ DE CALIFICACIONES -->
+        <div class="col-lg-4 col-md-6">
+          <a href="{% url 'reporte_matriz_calificaciones' %}" class="suite-card">
+            <div class="suite-icon-circle" style="background:#F0EDFF; color:#7C5CFC;">
+              <i class="bi bi-journal-bookmark-fill"></i>
             </div>
-            <div class="hub-card-title">Reportes de Asistencia</div>
-            <p class="hub-card-desc">
-              Consulta la asistencia por sección, porcentaje de presencia y alumnos bajo 85%.
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h5 class="fw-bold mb-0 text-dark">Matriz de Calificaciones</h5>
+              <span class="badge badge-soft-primary px-2 py-1">Académico</span>
+            </div>
+            <p class="text-muted small flex-grow-1 mb-3">
+              Consolidado general de promedios por asignatura, notas rojas (<4.0), ranking del curso y tasa de aprobación semestral.
             </p>
-            {% if alumnos_riesgo_asistencia > 0 %}
-              <span class="hub-badge bg-warning-subtle text-warning border border-warning-subtle">
-                {{ alumnos_riesgo_asistencia }} Alumnos bajo 85%
-              </span>
-            {% endif %}
+            <div class="d-flex align-items-center justify-content-between pt-3 border-top mt-auto">
+              <span class="text-primary fw-bold small"><i class="bi bi-arrow-right-circle me-1"></i> Abrir Matriz</span>
+              <span class="text-muted extra-small"><i class="bi bi-filetype-xlsx text-success me-1"></i>Exportable Excel</span>
+            </div>
           </a>
         </div>
 
-        <!-- CARD 2: CALIFICACIONES -->
-        <div class="col-md-4 col-sm-6">
-          <a href="{% url 'libro_calificaciones' %}" class="hub-card">
-            <div class="hub-card-icon">
-              <i class="bi bi-journal-bookmark"></i>
+        <!-- CARD 2: ASISTENCIA MENSUAL SIGE -->
+        <div class="col-lg-4 col-md-6">
+          <a href="{% url 'reporte_asistencia_mensual' %}" class="suite-card">
+            <div class="suite-icon-circle" style="background:#ECFDF5; color:#10B981;">
+              <i class="bi bi-calendar2-check-fill"></i>
             </div>
-            <div class="hub-card-title">Libro de Calificaciones</div>
-            <p class="hub-card-desc">
-              Visualiza promedios, matriz de notas y descarga planillas oficiales en Excel.
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h5 class="fw-bold mb-0 text-dark">Asistencia Mensual SIGE</h5>
+              <span class="badge badge-soft-success px-2 py-1">Subvención</span>
+            </div>
+            <p class="text-muted small flex-grow-1 mb-3">
+              Planilla mensual de asistencia por sección, días hábiles, total presentes/ausentes y detección de deserción escolar (<85%).
             </p>
-            {% if alumnos_riesgo_notas > 0 %}
-              <span class="hub-badge bg-danger-subtle text-danger border border-danger-subtle">
-                {{ alumnos_riesgo_notas }} Alumnos bajo 4.0
-              </span>
-            {% endif %}
+            <div class="d-flex align-items-center justify-content-between pt-3 border-top mt-auto">
+              <span class="text-success fw-bold small"><i class="bi bi-arrow-right-circle me-1"></i> Abrir Planilla</span>
+              <span class="text-muted extra-small"><i class="bi bi-filetype-xlsx text-success me-1"></i>Exportable Excel</span>
+            </div>
           </a>
         </div>
 
-        <!-- CARD 3: ESTUDIANTES -->
-        <div class="col-md-4 col-sm-6">
-          <a href="{% url 'listar_estudiantes' %}" class="hub-card">
-            <div class="hub-card-icon">
-              <i class="bi bi-people"></i>
+        <!-- CARD 3: CERTIFICADO DE ALUMNO REGULAR -->
+        <div class="col-lg-4 col-md-6">
+          <a href="{% url 'reporte_certificado_alumno_regular' %}" class="suite-card">
+            <div class="suite-icon-circle" style="background:#FFFBEB; color:#D97706;">
+              <i class="bi bi-patch-check-fill"></i>
             </div>
-            <div class="hub-card-title">Nómina de Estudiantes</div>
-            <p class="hub-card-desc">
-              Consulta la lista completa de alumnos matriculados por sección y datos de contacto.
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h5 class="fw-bold mb-0 text-dark">Certificado Alumno Regular</h5>
+              <span class="badge badge-soft-warning px-2 py-1">Documento Oficial</span>
+            </div>
+            <p class="text-muted small flex-grow-1 mb-3">
+              Emisión de certificados membretados oficiales con firma del Director, RUT, curso, fecha legal y código de validación para apoderados.
             </p>
+            <div class="d-flex align-items-center justify-content-between pt-3 border-top mt-auto">
+              <span class="text-warning fw-bold small"><i class="bi bi-printer me-1"></i> Emitir e Imprimir PDF</span>
+              <span class="text-muted extra-small"><i class="bi bi-file-earmark-pdf text-danger me-1"></i>Formato Carta</span>
+            </div>
           </a>
         </div>
 
-        <!-- CARD 4: PERSONAL -->
-        <div class="col-md-4 col-sm-6">
-          <a href="{% url 'listar_personal' %}" class="hub-card">
-            <div class="hub-card-icon">
-              <i class="bi bi-person-badge"></i>
-            </div>
-            <div class="hub-card-title">Gestión de Personal</div>
-            <p class="hub-card-desc">
-              Consulta y gestiona los perfiles del equipo docente y directivo del colegio.
-            </p>
-          </a>
-        </div>
-
-        <!-- CARD 5: CONVIVENCIA ESCOLAR -->
-        <div class="col-md-4 col-sm-6">
-          <div class="hub-card opacity-75" style="cursor: default;">
-            <div class="hub-card-icon text-muted">
+        <!-- CARD 4: CONVIVENCIA ESCOLAR -->
+        <div class="col-lg-4 col-md-6">
+          <a href="{% url 'reporte_convivencia_consolidado' %}" class="suite-card">
+            <div class="suite-icon-circle" style="background:#FEF2F2; color:#EF4444;">
               <i class="bi bi-shield-check"></i>
             </div>
-            <div class="hub-card-title text-muted">Convivencia Escolar</div>
-            <p class="hub-card-desc">
-              Registro de anotaciones de mérito, demérito y citaciones a apoderados.
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h5 class="fw-bold mb-0 text-dark">Convivencia Escolar</h5>
+              <span class="badge badge-soft-danger px-2 py-1">Conducta</span>
+            </div>
+            <p class="text-muted small flex-grow-1 mb-3">
+              Informe consolidado de anotaciones positivas, negativas, citaciones a apoderados y semáforo de clima escolar por sección.
             </p>
-            <span class="hub-badge bg-light text-muted border">
-              Próximamente
-            </span>
-          </div>
+            <div class="d-flex align-items-center justify-content-between pt-3 border-top mt-auto">
+              <span class="text-danger fw-bold small"><i class="bi bi-arrow-right-circle me-1"></i> Ver Convivencia</span>
+              <span class="text-muted extra-small">Semáforo Riesgo</span>
+            </div>
+          </a>
         </div>
 
-        <!-- CARD 6: ESTADÍSTICAS SIMCE -->
-        <div class="col-md-4 col-sm-6">
-          <div class="hub-card opacity-75" style="cursor: default;">
-            <div class="hub-card-icon text-muted">
-              <i class="bi bi-bar-chart-line"></i>
+        <!-- CARD 5: ESTADÍSTICAS Y DEMOGRAFÍA -->
+        {% if is_admin or is_utp or 'estadisticas' in permisos_ver %}
+        <div class="col-lg-4 col-md-6">
+          <a href="{% url 'estadisticas_colegio' %}" class="suite-card">
+            <div class="suite-icon-circle" style="background:#F0F9FF; color:#0284C7;">
+              <i class="bi bi-bar-chart-line-fill"></i>
             </div>
-            <div class="hub-card-title text-muted">Estadísticas y SIMCE</div>
-            <p class="hub-card-desc">
-              Métricas de evaluaciones estandarizadas y cobertura curricular del colegio.
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h5 class="fw-bold mb-0 text-dark">Demografía & Rendimiento</h5>
+              <span class="badge badge-soft-info px-2 py-1">Estadística</span>
+            </div>
+            <p class="text-muted small flex-grow-1 mb-3">
+              Desglose demográfico de género, rangos etarios, matrícula PIE, cobertura curricular y distribución de calificaciones.
             </p>
-            <span class="hub-badge bg-light text-muted border">
-              Próximamente
-            </span>
-          </div>
+            <div class="d-flex align-items-center justify-content-between pt-3 border-top mt-auto">
+              <span class="text-info fw-bold small"><i class="bi bi-arrow-right-circle me-1"></i> Ver Métricas</span>
+              <span class="text-muted extra-small"><i class="bi bi-filetype-xlsx text-success me-1"></i>Excel</span>
+            </div>
+          </a>
         </div>
+        {% endif %}
+
+        <!-- CARD 6: RESUMEN EJECUTIVO 360° -->
+        {% if is_admin or is_utp %}
+        <div class="col-lg-4 col-md-6">
+          <a href="{% url 'reporte_resumen_ejecutivo' %}" class="suite-card">
+            <div class="suite-icon-circle" style="background:#FDF2F8; color:#DB2777;">
+              <i class="bi bi-pie-chart-fill"></i>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h5 class="fw-bold mb-0 text-dark">Ficha Ejecutiva 360°</h5>
+              <span class="badge badge-soft-primary px-2 py-1" style="background:#FDF2F8; color:#DB2777;">Directorio</span>
+            </div>
+            <p class="text-muted small flex-grow-1 mb-3">
+              Ficha integral para directores, sostenedores y consejo escolar con resumen de matrícula, dotación docente, ACLE y finanzas.
+            </p>
+            <div class="d-flex align-items-center justify-content-between pt-3 border-top mt-auto">
+              <span class="fw-bold small" style="color:#DB2777;"><i class="bi bi-arrow-right-circle me-1"></i> Ver Ficha 360°</span>
+              <span class="text-muted extra-small">Gestión UTP</span>
+            </div>
+          </a>
+        </div>
+        {% endif %}
 
       </div>
 
@@ -223,8 +481,85 @@
 
 <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 <script>
+  // Mobile sidebar
   document.getElementById('mobileMenuBtn')?.addEventListener('click', function() {
-    document.getElementById('sidebar')?.classList.toggle('active');
+    if (typeof window.toggleSidebarMobile === 'function') {
+      window.toggleSidebarMobile();
+    } else {
+      document.getElementById('sidebar')?.classList.toggle('open');
+    }
+  });
+
+  // Consola de Generación Dinámica
+  const reportTypeSelect = document.getElementById('reportTypeSelect');
+  const seccionGroup = document.getElementById('seccionGroup');
+  const mesGroup = document.getElementById('mesGroup');
+  const seccionSelect = document.getElementById('seccionSelect');
+  const mesSelect = document.getElementById('mesSelect');
+  const btnGenerarPantalla = document.getElementById('btnGenerarPantalla');
+  const btnDescargarExcel = document.getElementById('btnDescargarExcel');
+
+  function updateFormFields() {
+    const val = reportTypeSelect.value;
+    if (val === 'matriz_notas') {
+      seccionGroup.style.display = 'block';
+      mesGroup.style.display = 'none';
+      btnDescargarExcel.style.display = 'inline-block';
+    } else if (val === 'asistencia_mensual') {
+      seccionGroup.style.display = 'block';
+      mesGroup.style.display = 'block';
+      btnDescargarExcel.style.display = 'inline-block';
+    } else if (val === 'certificado_regular') {
+      seccionGroup.style.display = 'none';
+      mesGroup.style.display = 'none';
+      btnDescargarExcel.style.display = 'none';
+    } else if (val === 'convivencia') {
+      seccionGroup.style.display = 'block';
+      mesGroup.style.display = 'none';
+      btnDescargarExcel.style.display = 'none';
+    } else if (val === 'resumen_ejecutivo') {
+      seccionGroup.style.display = 'none';
+      mesGroup.style.display = 'none';
+      btnDescargarExcel.style.display = 'none';
+    }
+  }
+
+  reportTypeSelect.addEventListener('change', updateFormFields);
+  updateFormFields();
+
+  btnGenerarPantalla.addEventListener('click', function() {
+    const val = reportTypeSelect.value;
+    const secId = seccionSelect.value;
+    const mes = mesSelect.value;
+
+    if (val === 'matriz_notas') {
+      window.location.href = `{% url 'reporte_matriz_calificaciones' %}?seccion=${secId}`;
+    } else if (val === 'asistencia_mensual') {
+      window.location.href = `{% url 'reporte_asistencia_mensual' %}?seccion=${secId}&mes=${mes}`;
+    } else if (val === 'certificado_regular') {
+      window.location.href = `{% url 'reporte_certificado_alumno_regular' %}`;
+    } else if (val === 'convivencia') {
+      window.location.href = `{% url 'reporte_convivencia_consolidado' %}?seccion=${secId}`;
+    } else if (val === 'resumen_ejecutivo') {
+      window.location.href = `{% url 'reporte_resumen_ejecutivo' %}`;
+    }
+  });
+
+  btnDescargarExcel.addEventListener('click', function() {
+    const val = reportTypeSelect.value;
+    const secId = seccionSelect.value;
+    const mes = mesSelect.value;
+
+    if (!secId) {
+      alert("Por favor selecciona una sección para descargar el archivo Excel.");
+      return;
+    }
+
+    if (val === 'matriz_notas') {
+      window.location.href = `/colegios/reportes/matriz-calificaciones/exportar-excel/${secId}/`;
+    } else if (val === 'asistencia_mensual') {
+      window.location.href = `/colegios/reportes/asistencia-mensual/exportar-excel/${secId}/?mes=${mes}`;
+    }
   });
 </script>
 

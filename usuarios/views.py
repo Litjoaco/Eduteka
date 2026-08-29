@@ -125,6 +125,108 @@ def dashboard_usuarios_view(request):
     if not roles_colegio.exists():
         roles_colegio = RolColegio.objects.filter(es_base=True).order_by('nombre')
 
+    # ── Módulo de Horario Docente & Clases de Hoy ──────────────────────────────
+    from colegios.horario_utils import obtener_datos_horario_docente
+    from colegios.models import Asignatura, SeccionCurso, BloqueHorario
+    from django.db.models import Q
+
+    # Lista de profesores del colegio para el selector de directores/admins
+    profesores_colegio = User.objects.filter(
+        Q(solicitudes_acceso__colegio=colegio, solicitudes_acceso__estado='aprobada') |
+        Q(asignaturas_dictadas__colegio=colegio) |
+        Q(colegios_administrados=colegio)
+    ).distinct().order_by('first_name', 'last_name', 'username')
+
+    # Determinar qué docente mostrar
+    profesor_param = request.GET.get('profesor_id')
+    docente_mostrar = request.user
+    if is_admin and profesor_param and profesor_param.isdigit():
+        docente_encontrado = User.objects.filter(id=int(profesor_param)).first()
+        if docente_encontrado:
+            docente_mostrar = docente_encontrado
+    elif not request.user.clases_horario.filter(colegio=colegio).exists() and is_admin:
+        # Si el admin no tiene clases pero hay otros profesores con horario, podemos sugerir el primero
+        primer_profe_con_horario = User.objects.filter(clases_horario__colegio=colegio).first()
+        if primer_profe_con_horario and not profesor_param:
+            docente_mostrar = primer_profe_con_horario
+
+    horario_docente_data = obtener_datos_horario_docente(colegio, docente_mostrar)
+    secciones_colegio = SeccionCurso.objects.filter(curso__colegio=colegio, activo=True).select_related('curso').order_by('curso__orden', 'letra')
+    asignaturas_colegio = Asignatura.objects.filter(colegio=colegio, activo=True).select_related('curso').order_by('curso__orden', 'nombre')
+    bloques_colegio = BloqueHorario.objects.filter(colegio=colegio, activo=True).order_by('orden', 'hora_inicio')
+
+    # ── Notificaciones del Sistema ─────────────────────────────────────────────
+    notificaciones_sistema = []
+    
+    # 1. Solicitudes de acceso (para administradores)
+    if is_admin:
+        for sol in solicitudes_pendientes[:4]:
+            nombre_sol = sol.usuario.get_full_name() or sol.usuario.username
+            notificaciones_sistema.append({
+                'id': f'sol_{sol.id}',
+                'tipo': 'solicitud',
+                'titulo': f'Solicitud de {sol.rol_solicitado.title()}',
+                'descripcion': f'{nombre_sol} solicita incorporarse al colegio.',
+                'tiempo': sol.fecha_solicitud.strftime('%d/%m %H:%M') if sol.fecha_solicitud else 'Reciente',
+                'icono': 'bi-person-plus-fill',
+                'icono_bg': '#EDE9FE',
+                'icono_color': '#7C5CFC',
+                'url': '#',
+                'is_modal_solicitudes': True,
+                'solicitud_id': sol.id,
+            })
+
+    # 2. Alumnos en riesgo crítico
+    if alumnos_en_riesgo_count > 0:
+        primer_riesgo = alumnos_en_riesgo[0] if alumnos_en_riesgo else None
+        desc_riesgo = f"{primer_riesgo['estudiante'].nombre_completo} ({primer_riesgo['tasa']}%) y {alumnos_en_riesgo_count - 1} más con asistencia crítica." if alumnos_en_riesgo_count > 1 and primer_riesgo else f"{primer_riesgo['estudiante'].nombre_completo} presenta {primer_riesgo['tasa']}% de asistencia." if primer_riesgo else "Estudiantes con asistencia crítica registrada."
+        notificaciones_sistema.append({
+            'id': 'notif_riesgo_asistencia',
+            'tipo': 'riesgo',
+            'titulo': f'Alerta: {alumnos_en_riesgo_count} Alumno{"s" if alumnos_en_riesgo_count > 1 else ""} en Riesgo',
+            'descripcion': desc_riesgo,
+            'tiempo': 'Atención',
+            'icono': 'bi-exclamation-triangle-fill',
+            'icono_bg': '#FFF1F2',
+            'icono_color': '#EF4444',
+            'url': '/colegios/convivencia/',
+            'is_modal_solicitudes': False,
+        })
+
+    # 3. Clases de Hoy (para el docente)
+    if horario_docente_data.get('clases_hoy_count', 0) > 0:
+        c_count = horario_docente_data['clases_hoy_count']
+        notificaciones_sistema.append({
+            'id': 'notif_clases_hoy',
+            'tipo': 'clases',
+            'titulo': f'{c_count} Clase{"s" if c_count > 1 else ""} Programada{"s" if c_count > 1 else ""} Hoy',
+            'descripcion': f"Tienes {c_count} bloque{'s' if c_count > 1 else ''} pedagógico{'s' if c_count > 1 else ''} agendado{'s' if c_count > 1 else ''} para la jornada de hoy.",
+            'tiempo': 'Hoy',
+            'icono': 'bi-calendar2-week-fill',
+            'icono_bg': '#EFF6FF',
+            'icono_color': '#3B82F6',
+            'url': '#',
+            'is_modal_solicitudes': False,
+        })
+
+    # 4. Anotaciones recientes de convivencia
+    if ultimas_anotaciones.exists():
+        ult_anot = ultimas_anotaciones.first()
+        notificaciones_sistema.append({
+            'id': f'notif_anot_{ult_anot.id}',
+            'tipo': 'anotacion',
+            'titulo': f'Anotación: {ult_anot.titulo}' if ult_anot.titulo else f'Anotación en {ult_anot.estudiante.seccion.nombre if ult_anot.estudiante.seccion else "Curso"}',
+            'descripcion': f'{ult_anot.estudiante.nombre_completo}: "{ult_anot.descripcion[:50]}..."' if ult_anot.descripcion else f'Nueva anotación registrada para {ult_anot.estudiante.nombre_completo}',
+            'tiempo': ult_anot.fecha.strftime('%d/%m') if ult_anot.fecha else 'Reciente',
+            'icono': 'bi-chat-left-quote-fill',
+            'icono_bg': '#FEF3C7',
+            'icono_color': '#D97706',
+            'url': '/colegios/convivencia/',
+            'is_modal_solicitudes': False,
+        })
+
+    notificaciones_count = len(notificaciones_sistema)
+
     context = {
         'colegio': colegio,
         'miembro': miembro,
@@ -144,6 +246,16 @@ def dashboard_usuarios_view(request):
         'is_admin': is_admin,
         'active_page': 'inicio',
         'hoy': timezone.now(),
+        # Horario Escolar & Docente
+        'horario_docente_data': horario_docente_data,
+        'docente_mostrar': docente_mostrar,
+        'profesores_colegio': profesores_colegio,
+        'secciones_colegio': secciones_colegio,
+        'asignaturas_colegio': asignaturas_colegio,
+        'bloques_colegio': bloques_colegio,
+        # Notificaciones del Sistema
+        'notificaciones_sistema': notificaciones_sistema,
+        'notificaciones_count': notificaciones_count,
     }
     return render(request, 'dashboard_usuarios.html', context)
 

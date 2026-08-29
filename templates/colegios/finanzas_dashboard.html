@@ -1,12 +1,12 @@
-{% load static %}
+{% load static colegio_tags %}
 
 <!DOCTYPE html>
-
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Finanzas y Tesorería - Eduteka</title>
+  <title>Finanzas, Proyectos & Rendición de Cuentas - Eduteka</title>
+  
   <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -22,7 +22,7 @@
       --white: #FFFFFF;
       --dark: #151A35;
       --gray-text: #687089;
-      --border: #BCC0CF;
+      --border: #E2E8F0;
       --radius-lg: 16px;
       --radius-md: 12px;
       --radius-sm: 8px;
@@ -41,6 +41,31 @@
 
     .wrapper { display: flex; flex: 1; position: relative; }
 
+    .main-content {
+      flex: 1;
+      margin-left: 248px;
+      transition: margin-left 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      background: var(--bg);
+    }
+    body.sidebar-collapsed .main-content {
+      margin-left: 72px;
+    }
+    @media (max-width: 991.98px) {
+      .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+      }
+      .topbar {
+        padding: 0 1.25rem !important;
+      }
+      .content-body {
+        padding: 1.25rem 1rem !important;
+      }
+    }
+
     .topbar {
       height: 70px;
       background: rgba(255, 255, 255, 0.85) !important;
@@ -51,7 +76,7 @@
     }
     .content-body { padding: 2rem; flex-grow: 1; max-width: 1440px; margin: 0 auto; width: 100%; }
 
-    /* Hero Banner Finanzas (Armonizado con estética Eduteka) */
+    /* Hero Banner Finanzas Escolares */
     .hero-banner-finance {
       background: linear-gradient(135deg, #7C5CFC 0%, #6344CE 50%, #4F46E5 100%);
       border-radius: var(--radius-lg);
@@ -99,17 +124,15 @@
       backdrop-filter: blur(8px);
     }
 
-
-
-    /* KPI Cards */
-    .kpi-grid-finance {
+    /* KPI Subvenciones Grid */
+    .subvenciones-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
       gap: 1.25rem;
       margin-bottom: 2rem;
     }
 
-    .kpi-card-finance {
+    .subvencion-card {
       background: var(--white);
       border: 1px solid #E2E8F0;
       border-radius: var(--radius-lg);
@@ -119,22 +142,21 @@
       overflow: hidden;
       transition: all 0.25s ease;
     }
-    .kpi-card-finance:hover {
+    .subvencion-card:hover {
       transform: translateY(-3px);
       box-shadow: 0 8px 24px rgba(0,0,0,0.06);
     }
-    .kpi-card-finance::before {
+    .subvencion-card::before {
       content: '';
       position: absolute;
       top: 0; left: 0; right: 0;
-      height: 3.5px;
+      height: 4px;
       background: var(--acc-color, var(--primary));
     }
-    .kpi-card-finance.green { --acc-color: #10B981; }
-    .kpi-card-finance.blue { --acc-color: #3B82F6; }
-    .kpi-card-finance.red { --acc-color: #EF4444; }
-    .kpi-card-finance.amber { --acc-color: #F59E0B; }
-    .kpi-card-finance.purple { --acc-color: #8B5CF6; }
+    .subvencion-card.sep { --acc-color: #8B5CF6; }
+    .subvencion-card.pie { --acc-color: #3B82F6; }
+    .subvencion-card.general { --acc-color: #10B981; }
+    .subvencion-card.mantenimiento { --acc-color: #F59E0B; }
 
     /* Nav Pills */
     .nav-pills-fin .nav-link {
@@ -144,10 +166,13 @@
       padding: 0.65rem 1.3rem;
       border-radius: 12px;
       transition: all 0.2s ease;
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
     }
     .nav-pills-fin .nav-link.active {
       background: var(--primary);
       color: var(--white);
+      border-color: var(--primary);
       box-shadow: 0 4px 14px rgba(124, 92, 252, 0.25);
     }
 
@@ -159,6 +184,24 @@
       padding: 1.6rem 1.75rem;
       box-shadow: 0 4px 18px rgba(0,0,0,0.02);
       margin-bottom: 1.5rem;
+    }
+
+    /* Project Card */
+    .project-card {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+    }
+    .project-card:hover {
+      border-color: var(--primary);
+      box-shadow: 0 8px 24px rgba(124, 92, 252, 0.08);
+      transform: translateY(-2px);
     }
 
     /* Tables */
@@ -206,24 +249,10 @@
       font-size: 0.75rem;
     }
 
-    .badge-fac-pagada {
-      background: #ECFDF5;
-      color: #059669;
-      border: 1px solid #A7F3D0;
-      font-weight: 800;
-      border-radius: 6px;
-      padding: 0.25rem 0.6rem;
-      font-size: 0.75rem;
-    }
-    .badge-fac-pendiente {
-      background: #FEF3C7;
-      color: #D97706;
-      border: 1px solid #FDE68A;
-      font-weight: 800;
-      border-radius: 6px;
-      padding: 0.25rem 0.6rem;
-      font-size: 0.75rem;
-    }
+    .badge-fondo-sep { background: #F5F3FF; color: #7C5CFC; border: 1px solid #DDD6FE; }
+    .badge-fondo-pie { background: #EFF6FF; color: #2563EB; border: 1px solid #BFDBFE; }
+    .badge-fondo-gen { background: #ECFDF5; color: #059669; border: 1px solid #A7F3D0; }
+    .badge-fondo-mnt { background: #FFFBEB; color: #D97706; border: 1px solid #FDE68A; }
   </style>
 </head>
 <body>
@@ -237,7 +266,7 @@
         <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn" style="border:none; background:var(--primary-soft); color:var(--primary);">
           <i class="bi bi-list fs-5"></i>
         </button>
-        <span class="fw-bold text-dark fs-5"><i class="bi bi-wallet2 text-success me-2"></i>Finanzas & Tesorería Escolar</span>
+        <span class="fw-bold text-dark fs-5"><i class="bi bi-wallet2 text-success me-2"></i>Finanzas, Subvenciones & Proyectos</span>
       </div>
 
       <div class="topbar-right d-flex align-items-center gap-4">
@@ -255,71 +284,92 @@
           <div>
             <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
               <span class="hero-badge-pill">
-                <i class="bi bi-cash-stack"></i> Módulo de Finanzas & Caja Chica
+                <i class="bi bi-cash-stack"></i> Módulo de Finanzas & Rendición Supereduc
               </span>
               <span class="hero-school-pill">
-                <i class="bi bi-building"></i> {{ colegio.nombre }} • Período {{ periodo.anio_lectivo|default:2026 }}
+                <i class="bi bi-building"></i> {{ colegio.nombre }} • Período {{ periodo.anio_lectivo|default:hoy.year }}
               </span>
             </div>
-            <h2 class="fw-extrabold text-white mb-1 fs-3">Control Financiero & Rendiciones</h2>
-            <p class="text-white text-opacity-85 small mb-0">
-              Administración de caja chica, cuentas bancarias, ingresos, facturas con respaldo tributario y reportes en Excel.
+            <h2 class="fw-extrabold text-white mb-1 fs-3">Gestión Presupuestaria Escolar</h2>
+            <p class="text-white text-opacity-85 small mb-0" style="max-width: 650px;">
+              Control de subvenciones con destinación exclusiva (SEP, PIE, Mantenimiento), cajas chicas de útiles, proyectos escolares e informes de fiscalización.
             </p>
           </div>
 
           <div class="d-flex gap-2 flex-wrap">
-            <button type="button" class="btn btn-success fw-bold px-3 py-2 shadow-sm" style="border-radius:12px; background:#10B981; border:none;" data-bs-toggle="modal" data-bs-target="#modalRegistrarMovimiento" onclick="setTipoMovimiento('ingreso')">
-              <i class="bi bi-plus-circle me-1"></i> Ingreso
+            <button type="button" class="btn btn-light fw-extrabold px-3.5 py-2 shadow-sm" style="border-radius:12px; color:#7C5CFC;" data-bs-toggle="modal" data-bs-target="#modalCrearProyecto">
+              <i class="bi bi-folder-plus me-1 text-primary"></i> Nuevo Proyecto
             </button>
 
             <button type="button" class="btn btn-danger fw-bold px-3 py-2 shadow-sm" style="border-radius:12px; background:#EF4444; border:none;" data-bs-toggle="modal" data-bs-target="#modalRegistrarMovimiento" onclick="setTipoMovimiento('egreso')">
-              <i class="bi bi-dash-circle me-1"></i> Gasto / Egreso
+              <i class="bi bi-dash-circle me-1"></i> Rendir Gasto
             </button>
 
-            <button type="button" class="btn btn-light fw-bold px-3 py-2 shadow-sm" style="border-radius:12px; color:#7C5CFC;" data-bs-toggle="modal" data-bs-target="#modalRegistrarFactura">
-              <i class="bi bi-receipt me-1 text-primary"></i> Factura
+            <button type="button" class="btn btn-success fw-bold px-3 py-2 shadow-sm" style="border-radius:12px; background:#10B981; border:none;" data-bs-toggle="modal" data-bs-target="#modalRegistrarMovimiento" onclick="setTipoMovimiento('ingreso')">
+              <i class="bi bi-plus-circle me-1"></i> Ingreso / Carga
             </button>
 
             <a href="{% url 'exportar_finanzas_excel' %}" class="btn btn-outline-light fw-bold px-3 py-2" style="border-radius:12px;">
-              <i class="bi bi-file-earmark-excel me-1"></i> Excel
+              <i class="bi bi-file-earmark-excel me-1"></i> Excel Supereduc
             </a>
           </div>
         </div>
       </div>
 
-
-      <!-- 4 KPIS FINANCIEROS -->
-      <div class="kpi-grid-finance">
-        <div class="kpi-card-finance green">
-          <span class="text-muted extra-small text-uppercase fw-bold d-block">Saldo Total Disponible</span>
-          <span class="fs-3 fw-extrabold text-dark mt-1 d-block">${{ saldo_total_disponible|floatformat:0 }}</span>
-          <span class="text-muted extra-small mt-1 d-block">Suma de todas las cuentas y cajas</span>
+      <!-- 4 BOLSAS DE SUBVENCIÓN ESTATAL (DESTINACIÓN EXCLUSIVA) -->
+      <div class="subvenciones-grid">
+        <div class="subvencion-card sep">
+          <div class="d-flex justify-content-between align-items-start mb-1">
+            <span class="text-muted extra-small text-uppercase fw-bold">Subvención Preferencial (SEP)</span>
+            <span class="badge badge-fondo-sep fw-bold extra-small">PME & Útiles</span>
+          </div>
+          <span class="fs-3 fw-extrabold text-dark mt-1 d-block">{{ saldo_sep|formato_pesos }}</span>
+          <span class="text-muted extra-small mt-1 d-block">Destinado a recursos pedagógicos y alumnos prioritarios</span>
         </div>
 
-        <div class="kpi-card-finance purple">
-          <span class="text-muted extra-small text-uppercase fw-bold d-block">Caja Chica Dirección</span>
-          <span class="fs-3 fw-extrabold text-primary mt-1 d-block">${{ saldo_caja_chica|floatformat:0 }}</span>
-          <span class="text-muted extra-small mt-1 d-block">Gastos menores y rendiciones</span>
+        <div class="subvencion-card pie">
+          <div class="d-flex justify-content-between align-items-start mb-1">
+            <span class="text-muted extra-small text-uppercase fw-bold">Integración Escolar (PIE)</span>
+            <span class="badge badge-fondo-pie fw-bold extra-small">Inclusión</span>
+          </div>
+          <span class="fs-3 fw-extrabold text-primary mt-1 d-block">{{ saldo_pie|formato_pesos }}</span>
+          <span class="text-muted extra-small mt-1 d-block">Destinado a especialistas, aula de recursos y materiales</span>
         </div>
 
-        <div class="kpi-card-finance blue">
-          <span class="text-muted extra-small text-uppercase fw-bold d-block">Ingresos Este Mes</span>
-          <span class="fs-3 fw-extrabold text-success mt-1 d-block">+${{ ingresos_mes|floatformat:0 }}</span>
-          <span class="text-muted extra-small mt-1 d-block">Egresos: <strong>${{ egresos_mes|floatformat:0 }}</strong></span>
+        <div class="subvencion-card general">
+          <div class="d-flex justify-content-between align-items-start mb-1">
+            <span class="text-muted extra-small text-uppercase fw-bold">Subvención General / Regular</span>
+            <span class="badge badge-fondo-gen fw-bold extra-small">Operación</span>
+          </div>
+          <span class="fs-3 fw-extrabold text-success mt-1 d-block">{{ saldo_general|formato_pesos }}</span>
+          <span class="text-muted extra-small mt-1 d-block">Operación general, sueldos y servicios básicos</span>
         </div>
 
-        <div class="kpi-card-finance amber">
-          <span class="text-muted extra-small text-uppercase fw-bold d-block">Facturas Por Pagar</span>
-          <span class="fs-3 fw-extrabold text-warning mt-1 d-block">${{ facturas_pendientes_monto|floatformat:0 }}</span>
-          <span class="text-muted extra-small mt-1 d-block">{{ facturas_pendientes_count }} documentos pendientes</span>
+        <div class="subvencion-card mantenimiento">
+          <div class="d-flex justify-content-between align-items-start mb-1">
+            <span class="text-muted extra-small text-uppercase fw-bold">Fondo Mantenimiento</span>
+            <span class="badge badge-fondo-mnt fw-bold extra-small">Obras</span>
+          </div>
+          <span class="fs-3 fw-extrabold text-warning mt-1 d-block">{{ saldo_mantenimiento|formato_pesos }}</span>
+          <span class="text-muted extra-small mt-1 d-block">Reparaciones, pintura e infraestructura escolar</span>
         </div>
       </div>
 
-      <!-- TABS -->
-      <ul class="nav nav-pills nav-pills-fin mb-4 gap-2" id="finTabs" role="tablist">
+      <!-- PESTAÑAS PRINCIPALES -->
+      <ul class="nav nav-pills nav-pills-fin mb-4 gap-2 flex-wrap" id="finTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link {% if tab_activa == 'fondos' %}active{% endif %}" id="tab-fondos-btn" data-bs-toggle="pill" data-bs-target="#tab-fondos" type="button" role="tab">
+            <i class="bi bi-wallet2 me-1.5"></i> Cajas Chicas & Cuentas
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link {% if tab_activa == 'proyectos' %}active{% endif %}" id="tab-proyectos-btn" data-bs-toggle="pill" data-bs-target="#tab-proyectos" type="button" role="tab">
+            <i class="bi bi-folder-check me-1.5"></i> Proyectos & Centros de Costo ({{ proyectos.count }})
+          </button>
+        </li>
         <li class="nav-item" role="presentation">
           <button class="nav-link {% if tab_activa == 'movimientos' %}active{% endif %}" id="tab-mov-btn" data-bs-toggle="pill" data-bs-target="#tab-mov" type="button" role="tab">
-            <i class="bi bi-arrow-left-right me-1.5"></i> Libro de Ingresos y Egresos
+            <i class="bi bi-arrow-left-right me-1.5"></i> Libro de Movimientos
           </button>
         </li>
         <li class="nav-item" role="presentation">
@@ -328,20 +378,146 @@
           </button>
         </li>
         <li class="nav-item" role="presentation">
-          <button class="nav-link {% if tab_activa == 'flujo' %}active{% endif %}" id="tab-flujo-btn" data-bs-toggle="pill" data-bs-target="#tab-flujo" type="button" role="tab">
-            <i class="bi bi-graph-up me-1.5"></i> Flujo & Analítica
-          </button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link {% if tab_activa == 'cuentas' %}active{% endif %}" id="tab-cue-btn" data-bs-toggle="pill" data-bs-target="#tab-cue" type="button" role="tab">
-            <i class="bi bi-bank me-1.5"></i> Cuentas & Cajas Chicas
+          <button class="nav-link {% if tab_activa == 'rendicion' %}active{% endif %}" id="tab-ren-btn" data-bs-toggle="pill" data-bs-target="#tab-ren" type="button" role="tab">
+            <i class="bi bi-file-earmark-check-fill me-1.5 text-success"></i> Rendición Supereduc & Informes
           </button>
         </li>
       </ul>
 
       <div class="tab-content" id="finTabsContent">
         
-        <!-- PESTAÑA 1: LIBRO DE MOVIMIENTOS -->
+        <!-- PESTAÑA 1: CAJAS CHICAS & CUENTAS ACTIVAS -->
+        <div class="tab-pane fade {% if tab_activa == 'fondos' %}show active{% endif %}" id="tab-fondos" role="tabpanel">
+          <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+            <div>
+              <h5 class="fw-extrabold text-dark mb-0">Cajas Chicas Especializadas & Cuentas Bancarias</h5>
+              <span class="text-muted small">Fondo rotatorio delegado a departamentos (Útiles, Dirección, Convivencia, Ciencias).</span>
+            </div>
+            <button type="button" class="btn btn-primary fw-bold px-3 py-2" style="border-radius:12px; background:linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%); border:none;" data-bs-toggle="modal" data-bs-target="#modalCrearCuenta">
+              <i class="bi bi-plus-lg me-1"></i> Nueva Caja Chica / Cuenta
+            </button>
+          </div>
+
+          <div class="row g-4 mb-4">
+            {% for c in cuentas %}
+              <div class="col-md-6 col-lg-4">
+                <div class="card-panel-fin h-100 d-flex flex-column justify-content-between">
+                  <div>
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                      <div>
+                        <span class="badge {% if c.tipo == 'caja_chica_utiles' %}badge-fondo-sep{% elif c.tipo == 'caja_chica_convivencia' %}badge-fondo-gen{% elif c.tipo == 'caja_chica_ciencias' %}badge-fondo-pie{% else %}bg-light text-dark border{% endif %} px-2.5 py-1 fw-bold mb-1" style="font-size:0.75rem;">
+                          {{ c.get_tipo_display }}
+                        </span>
+                        <h5 class="fw-extrabold text-dark mb-0 fs-6 mt-1">{{ c.nombre }}</h5>
+                      </div>
+                      <div class="rounded-3 p-2 text-center" style="background:#F1F5F9; color:#475569; width:42px; height:42px;">
+                        <i class="bi {% if 'caja_chica' in c.tipo %}bi-wallet2{% else %}bi-bank{% endif %} fs-5"></i>
+                      </div>
+                    </div>
+
+                    <div class="text-muted extra-small mb-2">
+                      <span>Fondo: <strong>{{ c.get_fondo_asociado_display }}</strong></span>
+                      {% if c.numero_cuenta %}<span class="ms-2">• N° {{ c.numero_cuenta }}</span>{% endif %}
+                    </div>
+
+                    <div class="p-3 bg-light rounded-3 border">
+                      <span class="text-muted extra-small text-uppercase fw-bold d-block">Saldo Disponible en Caja</span>
+                      <span class="fs-4 fw-extrabold text-dark">{{ c.saldo_actual|formato_pesos }}</span>
+                    </div>
+                  </div>
+
+                  <div class="d-flex gap-2 mt-3 pt-3 border-top flex-wrap">
+                    <button type="button" class="btn btn-sm btn-outline-success fw-bold flex-grow-1" data-bs-toggle="modal" data-bs-target="#modalRegistrarMovimiento" onclick="setCuentaYTipo('{{ c.id }}', 'ingreso')">
+                      <i class="bi bi-plus-lg me-1"></i> Cargar
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-danger fw-bold flex-grow-1" data-bs-toggle="modal" data-bs-target="#modalRegistrarMovimiento" onclick="setCuentaYTipo('{{ c.id }}', 'egreso')">
+                      <i class="bi bi-dash-lg me-1"></i> Rendir
+                    </button>
+                    {% if 'caja_chica' in c.tipo %}
+                      <a href="{% url 'acta_rendicion_cajachica_imprimible' c.id %}" target="_blank" class="btn btn-sm btn-outline-secondary fw-bold px-2" title="Descargar Acta de Rendición Imprimible">
+                        <i class="bi bi-printer"></i> Acta
+                      </a>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- PESTAÑA 2: PROYECTOS ESCOLARES & CENTROS DE COSTO -->
+        <div class="tab-pane fade {% if tab_activa == 'proyectos' %}show active{% endif %}" id="tab-proyectos" role="tabpanel">
+          <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+            <div>
+              <h5 class="fw-extrabold text-dark mb-0">Control Presupuestario de Proyectos & Centros de Costo</h5>
+              <span class="text-muted small">Asigna presupuestos por iniciativa escolar y supervisa la ejecución en tiempo real.</span>
+            </div>
+            <button type="button" class="btn btn-primary fw-bold px-3.5 py-2" style="border-radius:12px; background:linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%); border:none;" data-bs-toggle="modal" data-bs-target="#modalCrearProyecto">
+              <i class="bi bi-plus-lg me-1"></i> Crear Proyecto Escolar
+            </button>
+          </div>
+
+          <div class="row g-4 mb-4">
+            {% for pry in proyectos %}
+              <div class="col-md-6 col-lg-4">
+                <div class="project-card">
+                  <div>
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                      <span class="badge bg-light text-dark border px-2.5 py-1 fw-extrabold extra-small">
+                        {{ pry.codigo }}
+                      </span>
+                      <span class="badge {% if pry.tipo_fondo == 'sep' %}badge-fondo-sep{% elif pry.tipo_fondo == 'pie' %}badge-fondo-pie{% elif pry.tipo_fondo == 'subvencion_general' %}badge-fondo-gen{% else %}badge-fondo-mnt{% endif %} fw-bold extra-small">
+                        {{ pry.get_tipo_fondo_display }}
+                      </span>
+                    </div>
+
+                    <h5 class="fw-extrabold text-dark mb-1 fs-6">{{ pry.nombre }}</h5>
+                    {% if pry.descripcion %}
+                      <p class="text-muted extra-small mb-3" style="line-height:1.4;">{{ pry.descripcion|truncatechars:90 }}</p>
+                    {% endif %}
+
+                    <!-- BARRA DE EJECUCIÓN -->
+                    <div class="p-3 bg-light rounded-3 border mb-3">
+                      <div class="d-flex justify-content-between text-muted extra-small mb-1">
+                        <span>Presupuesto Inicial:</span>
+                        <strong class="text-dark">{{ pry.presupuesto_asignado|formato_pesos }}</strong>
+                      </div>
+                      <div class="d-flex justify-content-between text-muted extra-small mb-1">
+                        <span>Gastado / Rendido:</span>
+                        <strong class="text-danger">-{{ pry.total_gastado|formato_pesos }}</strong>
+                      </div>
+                      <div class="d-flex justify-content-between align-items-center pt-1 border-top">
+                        <span class="fw-extrabold text-dark small">Saldo Disponible:</span>
+                        <strong class="fs-6 fw-extrabold text-success">{{ pry.saldo_disponible|formato_pesos }}</strong>
+                      </div>
+
+                      <div class="progress mt-2" style="height: 6px; border-radius: 10px; background:#E2E8F0;">
+                        <div class="progress-bar {% if pry.porcentaje_ejecucion > 90 %}bg-danger{% elif pry.porcentaje_ejecucion > 70 %}bg-warning{% else %}bg-primary{% endif %}" style="width: {{ pry.porcentaje_ejecucion }}%;"></div>
+                      </div>
+                      <span class="text-muted extra-small d-block text-end mt-1">{{ pry.porcentaje_ejecucion }}% ejecutado</span>
+                    </div>
+                  </div>
+
+                  <div class="d-flex gap-2 pt-2 border-top">
+                    <button type="button" class="btn btn-sm btn-outline-danger fw-bold flex-grow-1" data-bs-toggle="modal" data-bs-target="#modalRegistrarMovimiento" onclick="setProyectoYTipo('{{ pry.id }}', 'egreso')">
+                      <i class="bi bi-dash-circle me-1"></i> Imputar Gasto
+                    </button>
+                    <a href="{% url 'finanzas_dashboard' %}?tab=movimientos&proyecto={{ pry.id }}" class="btn btn-sm btn-outline-secondary fw-bold px-2.5" title="Ver movimientos">
+                      <i class="bi bi-eye"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            {% empty %}
+              <div class="col-12 text-center py-5 text-muted">
+                <i class="bi bi-folder-x fs-1 d-block mb-2 text-muted"></i>
+                No hay proyectos escolares creados aún. ¡Crea el primer proyecto presupuestario!
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- PESTAÑA 3: LIBRO DE MOVIMIENTOS -->
         <div class="tab-pane fade {% if tab_activa == 'movimientos' %}show active{% endif %}" id="tab-mov" role="tabpanel">
           
           <!-- FILTROS -->
@@ -351,27 +527,29 @@
               <div class="col-md-3">
                 <input type="text" name="q" class="form-control form-control-sm" placeholder="Buscar concepto o comprobante..." value="{{ busqueda }}">
               </div>
-              <div class="col-md-3">
+              <div class="col-md-2">
                 <select name="cuenta" class="form-select form-select-sm" onchange="this.form.submit();">
-                  <option value="">-- Todas las Cuentas / Cajas --</option>
+                  <option value="">-- Cuentas / Cajas --</option>
                   {% for c in cuentas %}
-                    <option value="{{ c.id }}" {% if cuenta_filtro == c.id %}selected{% endif %}>{{ c.nombre }} (${{ c.saldo_actual|floatformat:0 }})</option>
+                    <option value="{{ c.id }}" {% if cuenta_filtro == c.id %}selected{% endif %}>{{ c.nombre }} ({{ c.saldo_actual|formato_pesos }})</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-3">
+                <select name="proyecto" class="form-select form-select-sm" onchange="this.form.submit();">
+                  <option value="">-- Todos los Proyectos --</option>
+                  {% for p in proyectos %}
+                    <option value="{{ p.id }}" {% if proyecto_filtro == p.id %}selected{% endif %}>{{ p.codigo }} - {{ p.nombre }}</option>
                   {% endfor %}
                 </select>
               </div>
               <div class="col-md-2">
-                <select name="tipo" class="form-select form-select-sm" onchange="this.form.submit();">
-                  <option value="">-- Tipo --</option>
-                  <option value="ingreso" {% if tipo_filtro == 'ingreso' %}selected{% endif %}>Solo Ingresos (+)</option>
-                  <option value="egreso" {% if tipo_filtro == 'egreso' %}selected{% endif %}>Solo Egresos (-)</option>
-                </select>
-              </div>
-              <div class="col-md-2">
-                <select name="categoria" class="form-select form-select-sm" onchange="this.form.submit();">
-                  <option value="">-- Categoría --</option>
-                  {% for cat in todas_categorias %}
-                    <option value="{{ cat.id }}" {% if categoria_filtro == cat.id %}selected{% endif %}>{{ cat.nombre }} ({{ cat.get_tipo_display }})</option>
-                  {% endfor %}
+                <select name="fondo" class="form-select form-select-sm" onchange="this.form.submit();">
+                  <option value="">-- Subvención --</option>
+                  <option value="sep" {% if fondo_filtro == 'sep' %}selected{% endif %}>Fondos SEP</option>
+                  <option value="pie" {% if fondo_filtro == 'pie' %}selected{% endif %}>Fondos PIE</option>
+                  <option value="subvencion_general" {% if fondo_filtro == 'subvencion_general' %}selected{% endif %}>Subvención General</option>
+                  <option value="mantenimiento" {% if fondo_filtro == 'mantenimiento' %}selected{% endif %}>Mantenimiento</option>
                 </select>
               </div>
               <div class="col-md-2 d-flex gap-1">
@@ -389,11 +567,11 @@
                   <tr>
                     <th>Fecha</th>
                     <th>Tipo</th>
+                    <th>Subvención / Fondo</th>
+                    <th>Proyecto Asignado</th>
                     <th>Cuenta / Caja</th>
-                    <th>Categoría</th>
                     <th>Concepto & Detalle</th>
-                    <th>Método Pago</th>
-                    <th>N° Doc.</th>
+                    <th>N° Comprobante</th>
                     <th class="text-end">Monto</th>
                     <th class="text-center">Respaldo</th>
                     <th class="text-center">Acciones</th>
@@ -410,26 +588,29 @@
                           <span class="badge-mov-egreso"><i class="bi bi-arrow-up-right me-1"></i>Gasto</span>
                         {% endif %}
                       </td>
-                      <td class="fw-bold text-dark">{{ m.cuenta.nombre }}</td>
                       <td>
-                        {% if m.categoria %}
-                          <span class="badge px-2 py-1" style="background:rgba(124,92,252,0.08); color:#7C5CFC; border-radius:6px; font-size:0.75rem;">
-                            {{ m.categoria.nombre }}
-                          </span>
+                        <span class="badge {% if m.tipo_fondo == 'sep' %}badge-fondo-sep{% elif m.tipo_fondo == 'pie' %}badge-fondo-pie{% elif m.tipo_fondo == 'subvencion_general' %}badge-fondo-gen{% else %}badge-fondo-mnt{% endif %} fw-bold extra-small">
+                          {{ m.get_tipo_fondo_display }}
+                        </span>
+                      </td>
+                      <td>
+                        {% if m.proyecto %}
+                          <span class="badge bg-light text-dark border extra-small fw-bold">{{ m.proyecto.codigo }}</span>
+                          <span class="text-muted extra-small d-block">{{ m.proyecto.nombre|truncatechars:25 }}</span>
                         {% else %}
-                          <span class="text-muted small">-</span>
+                          <span class="text-muted extra-small">Operación Base</span>
                         {% endif %}
                       </td>
+                      <td class="fw-bold text-dark small">{{ m.cuenta.nombre }}</td>
                       <td>
                         <div class="fw-bold text-dark">{{ m.concepto }}</div>
                         {% if m.descripcion %}
                           <span class="text-muted extra-small d-block">{{ m.descripcion|truncatechars:45 }}</span>
                         {% endif %}
                       </td>
-                      <td class="text-muted small">{{ m.get_metodo_pago_display }}</td>
                       <td class="fw-bold text-muted small">{{ m.numero_comprobante|default:"-" }}</td>
                       <td class="text-end fw-extrabold {% if m.tipo == 'ingreso' %}text-success{% else %}text-danger{% endif %} fs-6">
-                        {% if m.tipo == 'ingreso' %}+{% else %}-{% endif %}${{ m.monto|floatformat:0 }}
+                        {% if m.tipo == 'ingreso' %}+{% else %}-{% endif %}{{ m.monto|formato_pesos }}
                       </td>
                       <td class="text-center">
                         {% if m.comprobante_adjunto %}
@@ -476,12 +657,12 @@
           </div>
         </div>
 
-        <!-- PESTAÑA 2: FACTURAS & PROVEEDORES -->
+        <!-- PESTAÑA 4: FACTURAS & PROVEEDORES -->
         <div class="tab-pane fade {% if tab_activa == 'facturas' %}show active{% endif %}" id="tab-fac" role="tabpanel">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <div>
               <h5 class="fw-extrabold text-dark mb-0">Control de Facturas y Documentos Tributarios</h5>
-              <span class="text-muted small">Registra facturas de proveedores, controla vencimientos y emite pagos.</span>
+              <span class="text-muted small">Registra facturas de proveedores, controla vencimientos e imputa a proyectos.</span>
             </div>
             <button type="button" class="btn btn-primary fw-bold px-3 py-2" style="border-radius:12px; background:linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%); border:none;" data-bs-toggle="modal" data-bs-target="#modalRegistrarFactura">
               <i class="bi bi-plus-lg me-1"></i> Nueva Factura / Boleta
@@ -496,9 +677,9 @@
                     <th>Folio</th>
                     <th>Tipo Documento</th>
                     <th>Proveedor</th>
-                    <th>RUT</th>
+                    <th>Subvención / Fondo</th>
+                    <th>Proyecto</th>
                     <th>Emisión</th>
-                    <th>Vencimiento</th>
                     <th class="text-end">Monto Total</th>
                     <th class="text-center">Estado</th>
                     <th class="text-center">Acciones</th>
@@ -510,15 +691,21 @@
                       <td class="fw-extrabold text-primary">#{{ f.folio }}</td>
                       <td class="text-muted small">{{ f.get_tipo_documento_display }}</td>
                       <td class="fw-bold text-dark">{{ f.proveedor_nombre }}</td>
-                      <td class="text-muted small">{{ f.proveedor_rut|default:"-" }}</td>
+                      <td>
+                        <span class="badge {% if f.tipo_fondo == 'sep' %}badge-fondo-sep{% elif f.tipo_fondo == 'pie' %}badge-fondo-pie{% elif f.tipo_fondo == 'subvencion_general' %}badge-fondo-gen{% else %}badge-fondo-mnt{% endif %} fw-bold extra-small">
+                          {{ f.get_tipo_fondo_display }}
+                        </span>
+                      </td>
+                      <td>
+                        <span class="badge bg-light text-dark border extra-small">{{ f.proyecto.codigo|default:"Operación" }}</span>
+                      </td>
                       <td class="text-muted small">{{ f.fecha_emision|date:"d/m/Y" }}</td>
-                      <td class="text-muted small">{{ f.fecha_vencimiento|date:"d/m/Y"|default:"-" }}</td>
-                      <td class="text-end fw-extrabold text-dark fs-6">${{ f.monto_total|floatformat:0 }}</td>
+                      <td class="text-end fw-extrabold text-dark fs-6">{{ f.monto_total|formato_pesos }}</td>
                       <td class="text-center">
                         {% if f.estado_pago == 'pagado' %}
-                          <span class="badge-fac-pagada"><i class="bi bi-check-circle-fill me-1"></i>Pagado</span>
+                          <span class="badge bg-success-subtle text-success fw-bold px-2 py-1" style="border-radius:6px; font-size:0.75rem;"><i class="bi bi-check-circle-fill me-1"></i>Pagado</span>
                         {% elif f.estado_pago == 'pendiente' %}
-                          <span class="badge-fac-pendiente"><i class="bi bi-clock-history me-1"></i>Pendiente</span>
+                          <span class="badge bg-warning-subtle text-warning fw-bold px-2 py-1" style="border-radius:6px; font-size:0.75rem;"><i class="bi bi-clock-history me-1"></i>Pendiente</span>
                         {% else %}
                           <span class="badge bg-danger-subtle text-danger">{{ f.get_estado_pago_display }}</span>
                         {% endif %}
@@ -543,57 +730,6 @@
                         </div>
                       </td>
                     </tr>
-
-                    <!-- MODAL PAGAR FACTURA -->
-                    <div class="modal fade" id="modalPagarFactura{{ f.id }}" tabindex="-1" aria-hidden="true">
-                      <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content border-0 shadow-lg" style="border-radius:16px;">
-                          <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
-                            <h5 class="modal-title fw-extrabold text-dark"><i class="bi bi-credit-card-2-front text-success me-2"></i>Pagar Factura #{{ f.folio }}</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                          </div>
-                          <form method="POST" action="{% url 'pagar_factura' f.id %}">
-                            {% csrf_token %}
-                            <div class="modal-body p-4">
-                              <div class="p-3 bg-light rounded-3 mb-3 border">
-                                <div class="d-flex justify-content-between mb-1">
-                                  <span class="text-muted small">Proveedor:</span>
-                                  <span class="fw-bold text-dark">{{ f.proveedor_nombre }}</span>
-                                </div>
-                                <div class="d-flex justify-content-between">
-                                  <span class="text-muted small">Monto Total a Pagar:</span>
-                                  <span class="fs-5 fw-extrabold text-danger">${{ f.monto_total|floatformat:0 }}</span>
-                                </div>
-                              </div>
-
-                              <div class="mb-3">
-                                <label class="form-label fw-bold text-dark small">Pagar con Cargo a la Cuenta / Caja:</label>
-                                <select name="cuenta_pago_id" class="form-select fw-bold" style="border-radius:10px;" required>
-                                  {% for c in cuentas %}
-                                    <option value="{{ c.id }}">{{ c.nombre }} (Saldo: ${{ c.saldo_actual|floatformat:0 }})</option>
-                                  {% endfor %}
-                                </select>
-                              </div>
-
-                              <div class="mb-3">
-                                <label class="form-label fw-bold text-dark small">Método de Pago</label>
-                                <select name="metodo_pago" class="form-select" style="border-radius:10px;">
-                                  <option value="transferencia">Transferencia Bancaria</option>
-                                  <option value="efectivo">Efectivo / Caja Chica</option>
-                                  <option value="cheque">Cheque</option>
-                                  <option value="tarjeta_debito">Tarjeta de Débito</option>
-                                </select>
-                              </div>
-                            </div>
-                            <div class="modal-footer border-top-0 p-4 pt-0">
-                              <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Cancelar</button>
-                              <button type="submit" class="btn btn-success fw-extrabold px-4" style="border-radius:10px;">Confirmar Pago</button>
-                            </div>
-                          </form>
-                        </div>
-                      </div>
-                    </div>
-
                   {% empty %}
                     <tr>
                       <td colspan="9" class="text-center py-5 text-muted">
@@ -608,95 +744,82 @@
           </div>
         </div>
 
-        <!-- PESTAÑA 3: FLUJO Y ANALÍTICA -->
-        <div class="tab-pane fade {% if tab_activa == 'flujo' %}show active{% endif %}" id="tab-flujo" role="tabpanel">
-          <div class="row g-4 mb-4">
-            
-            <!-- GRAFICO 1: FLUJO DE CAJA MENSUAL -->
-            <div class="col-lg-7">
-              <div class="card-panel-fin h-100">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                  <div>
-                    <h5 class="fw-extrabold text-dark mb-0">Flujo de Caja (Últimos 6 Meses)</h5>
-                    <span class="text-muted small">Ingresos vs Egresos mensuales</span>
-                  </div>
-                  <span class="badge bg-light text-dark border px-2.5 py-1 fw-bold">Balance ${{ balance_mes|floatformat:0 }}</span>
-                </div>
-                <div style="height: 280px; position: relative;">
-                  <canvas id="flujoCajaChart"></canvas>
-                </div>
-              </div>
-            </div>
-
-            <!-- GRAFICO 2: GASTOS POR CATEGORIA -->
-            <div class="col-lg-5">
-              <div class="card-panel-fin h-100">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                  <div>
-                    <h5 class="fw-extrabold text-dark mb-0">Gastos por Categoría</h5>
-                    <span class="text-muted small">Distribución del presupuesto {{ anio_actual }}</span>
-                  </div>
-                  <span class="badge bg-purple-subtle text-primary border border-primary-subtle px-2 py-1 fw-bold">Presupuesto</span>
-                </div>
-                <div style="height: 280px; position: relative;">
-                  <canvas id="gastosCatChart"></canvas>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- PESTAÑA 4: CUENTAS Y CAJAS CHICAS -->
-        <div class="tab-pane fade {% if tab_activa == 'cuentas' %}show active{% endif %}" id="tab-cue" role="tabpanel">
+        <!-- PESTAÑA 5: RENDICIÓN SUPEREDUC & INFORMES -->
+        <div class="tab-pane fade {% if tab_activa == 'rendicion' %}show active{% endif %}" id="tab-ren" role="tabpanel">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <div>
-              <h5 class="fw-extrabold text-dark mb-0">Cuentas Bancarias & Cajas Chicas Activas</h5>
-              <span class="text-muted small">Administra los fondos monetarios del establecimiento.</span>
+              <h5 class="fw-extrabold text-dark mb-0">Centro de Rendición de Cuentas (Supereduc)</h5>
+              <span class="text-muted small">Genera informes ejecutivos e imprimibles por cada fondo y subvención estatal.</span>
             </div>
-            <button type="button" class="btn btn-primary fw-bold px-3 py-2" style="border-radius:12px; background:linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%); border:none;" data-bs-toggle="modal" data-bs-target="#modalCrearCuenta">
-              <i class="bi bi-plus-lg me-1"></i> Nueva Cuenta / Caja
-            </button>
+            <a href="{% url 'exportar_finanzas_excel' %}" class="btn btn-success fw-bold px-3.5 py-2 shadow-sm" style="border-radius:12px; background:#10B981; border:none;">
+              <i class="bi bi-file-earmark-excel me-1"></i> Descargar Excel Supereduc
+            </a>
           </div>
 
-          <div class="row g-4">
-            {% for c in cuentas %}
-              <div class="col-md-6 col-lg-4">
-                <div class="card-panel-fin h-100 d-flex flex-column justify-content-between">
-                  <div>
-                    <div class="d-flex justify-content-between align-items-start mb-3">
-                      <div>
-                        <span class="badge {% if c.tipo == 'caja_chica' %}bg-warning-subtle text-warning border border-warning-subtle{% else %}bg-primary-subtle text-primary border border-primary-subtle{% endif %} px-2.5 py-1 fw-bold mb-1" style="font-size:0.75rem;">
-                          {{ c.get_tipo_display }}
-                        </span>
-                        <h5 class="fw-extrabold text-dark mb-0">{{ c.nombre }}</h5>
-                      </div>
-                      <div class="rounded-3 p-2 text-center" style="background:#F1F5F9; color:#475569; width:42px; height:42px;">
-                        <i class="bi {% if c.tipo == 'caja_chica' %}bi-wallet2{% else %}bi-bank{% endif %} fs-5"></i>
-                      </div>
-                    </div>
-
-                    {% if c.banco %}
-                      <div class="text-muted small mb-1"><i class="bi bi-building me-1"></i> {{ c.banco }} &bull; N° {{ c.numero_cuenta|default:"-" }}</div>
-                    {% endif %}
-
-                    <div class="p-3 bg-light rounded-3 mt-3 border">
-                      <span class="text-muted extra-small text-uppercase fw-bold d-block">Saldo Disponible</span>
-                      <span class="fs-4 fw-extrabold text-dark">${{ c.saldo_actual|floatformat:0 }}</span>
-                    </div>
+          <div class="row g-4 mb-4">
+            <!-- 1. SEP -->
+            <div class="col-md-6 col-lg-3">
+              <div class="card-panel-fin h-100 text-center d-flex flex-column justify-content-between">
+                <div>
+                  <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2" style="width:50px; height:50px; background:#F5F3FF; color:#7C5CFC; font-size:1.4rem;">
+                    <i class="bi bi-award-fill"></i>
                   </div>
-
-                  <div class="d-flex gap-2 mt-3 pt-3 border-top">
-                    <button type="button" class="btn btn-sm btn-outline-success fw-bold flex-grow-1" data-bs-toggle="modal" data-bs-target="#modalRegistrarMovimiento" onclick="setCuentaYTipo('{{ c.id }}', 'ingreso')">
-                      <i class="bi bi-plus-lg me-1"></i> Cargar Saldo
-                    </button>
-                    <button type="button" class="btn btn-sm btn-outline-danger fw-bold flex-grow-1" data-bs-toggle="modal" data-bs-target="#modalRegistrarMovimiento" onclick="setCuentaYTipo('{{ c.id }}', 'egreso')">
-                      <i class="bi bi-dash-lg me-1"></i> Rendir Gasto
-                    </button>
-                  </div>
+                  <h6 class="fw-extrabold text-dark mb-1">Rendición SEP</h6>
+                  <span class="text-muted extra-small d-block mb-3">Recursos Pedagógicos, Útiles y Apoyo Alumnos Prioritarios</span>
                 </div>
+                <a href="{% url 'rendicion_subvencion_imprimible' 'sep' %}" target="_blank" class="btn btn-sm btn-outline-primary fw-bold w-100" style="border-radius:10px;">
+                  <i class="bi bi-printer me-1"></i> Informe SEP PDF
+                </a>
               </div>
-            {% endfor %}
+            </div>
+
+            <!-- 2. PIE -->
+            <div class="col-md-6 col-lg-3">
+              <div class="card-panel-fin h-100 text-center d-flex flex-column justify-content-between">
+                <div>
+                  <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2" style="width:50px; height:50px; background:#EFF6FF; color:#2563EB; font-size:1.4rem;">
+                    <i class="bi bi-person-hearts"></i>
+                  </div>
+                  <h6 class="fw-extrabold text-dark mb-1">Rendición PIE</h6>
+                  <span class="text-muted extra-small d-block mb-3">Especialistas, Aula de Recursos y Adecuación Curricular</span>
+                </div>
+                <a href="{% url 'rendicion_subvencion_imprimible' 'pie' %}" target="_blank" class="btn btn-sm btn-outline-primary fw-bold w-100" style="border-radius:10px;">
+                  <i class="bi bi-printer me-1"></i> Informe PIE PDF
+                </a>
+              </div>
+            </div>
+
+            <!-- 3. GENERAL -->
+            <div class="col-md-6 col-lg-3">
+              <div class="card-panel-fin h-100 text-center d-flex flex-column justify-content-between">
+                <div>
+                  <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2" style="width:50px; height:50px; background:#ECFDF5; color:#059669; font-size:1.4rem;">
+                    <i class="bi bi-bank"></i>
+                  </div>
+                  <h6 class="fw-extrabold text-dark mb-1">Subvención General</h6>
+                  <span class="text-muted extra-small d-block mb-3">Gastos Operacionales, Remuneraciones y Servicios Básicos</span>
+                </div>
+                <a href="{% url 'rendicion_subvencion_imprimible' 'subvencion_general' %}" target="_blank" class="btn btn-sm btn-outline-primary fw-bold w-100" style="border-radius:10px;">
+                  <i class="bi bi-printer me-1"></i> Informe General PDF
+                </a>
+              </div>
+            </div>
+
+            <!-- 4. MANTENIMIENTO -->
+            <div class="col-md-6 col-lg-3">
+              <div class="card-panel-fin h-100 text-center d-flex flex-column justify-content-between">
+                <div>
+                  <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2" style="width:50px; height:50px; background:#FFFBEB; color:#D97706; font-size:1.4rem;">
+                    <i class="bi bi-tools"></i>
+                  </div>
+                  <h6 class="fw-extrabold text-dark mb-1">Mantenimiento</h6>
+                  <span class="text-muted extra-small d-block mb-3">Infraestructura, Sanitización, Gasfitería y Obras Menores</span>
+                </div>
+                <a href="{% url 'rendicion_subvencion_imprimible' 'mantenimiento' %}" target="_blank" class="btn btn-sm btn-outline-primary fw-bold w-100" style="border-radius:10px;">
+                  <i class="bi bi-printer me-1"></i> Informe Obras PDF
+                </a>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -706,12 +829,79 @@
   </div>
 </div>
 
-<!-- MODAL REGISTRAR MOVIMIENTO (INGRESO / EGRESO) -->
+<!-- MODAL: CREAR PROYECTO ESCOLAR -->
+<div class="modal fade" id="modalCrearProyecto" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg" style="border-radius:16px;">
+      <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+        <h5 class="modal-title fw-extrabold text-dark"><i class="bi bi-folder-plus text-primary me-2"></i>Crear Proyecto / Centro de Costo</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="POST" action="{% url 'crear_proyecto_escolar' %}">
+        {% csrf_token %}
+        <div class="modal-body p-4">
+          
+          <div class="row g-2 mb-3">
+            <div class="col-5">
+              <label class="form-label fw-bold text-dark small">Código Proyecto</label>
+              <input type="text" name="codigo" class="form-control fw-bold" placeholder="Ej: PRY-SEP-04" style="border-radius:10px;">
+            </div>
+            <div class="col-7">
+              <label class="form-label fw-bold text-dark small">Subvención / Fondo *</label>
+              <select name="tipo_fondo" class="form-select fw-bold" style="border-radius:10px;" required>
+                {% for f_cod, f_nom in tipos_fondo_opciones %}
+                  <option value="{{ f_cod }}">{{ f_nom }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold text-dark small">Nombre del Proyecto / Acción *</label>
+            <input type="text" name="nombre" class="form-control fw-bold" placeholder="Ej: Campaña de Útiles Escolares 2026..." required style="border-radius:10px;">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold text-dark small">Partida / Categoría Supereduc *</label>
+            <select name="categoria_supereduc" class="form-select" style="border-radius:10px;">
+              {% for c_cod, c_nom in categorias_supereduc_opciones %}
+                <option value="{{ c_cod }}">{{ c_nom }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="form-label fw-bold text-dark small">Presupuesto Asignado ($ CLP) *</label>
+              <input type="number" name="presupuesto_asignado" class="form-control fw-extrabold text-primary" placeholder="Ej: 1500000" min="0" required style="border-radius:10px;">
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-bold text-dark small">Fecha Inicio</label>
+              <input type="date" name="fecha_inicio" class="form-control" value="{{ hoy|date:'Y-m-d' }}" style="border-radius:10px;">
+            </div>
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label fw-bold text-dark small">Descripción & Justificación Educativa</label>
+            <textarea name="descripcion" class="form-control" rows="2" placeholder="Detalla el objetivo y población beneficiada..." style="border-radius:10px;"></textarea>
+          </div>
+
+        </div>
+        <div class="modal-footer border-top-0 p-4 pt-0">
+          <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary fw-extrabold px-4" style="border-radius:10px; background:linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%); border:none;">Crear Proyecto</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL REGISTRAR MOVIMIENTO (INGRESO / EGRESO / CAJA CHICA) -->
 <div class="modal fade" id="modalRegistrarMovimiento" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content border-0 shadow-lg" style="border-radius:16px;">
       <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
-        <h5 class="modal-title fw-extrabold text-dark" id="movModalTitle">Registrar Movimiento</h5>
+        <h5 class="modal-title fw-extrabold text-dark" id="movModalTitle">Registrar Movimiento / Boleta</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <form method="POST" action="{% url 'crear_movimiento_financiero' %}" enctype="multipart/form-data">
@@ -722,26 +912,36 @@
             <label class="form-label fw-bold text-dark small">Tipo de Movimiento</label>
             <div class="d-flex gap-2">
               <input type="radio" class="btn-check" name="tipo" id="tipoIngreso" value="ingreso" autocomplete="off">
-              <label class="btn btn-outline-success fw-bold flex-grow-1" for="tipoIngreso"><i class="bi bi-arrow-down-left me-1"></i> Ingreso (+)</label>
+              <label class="btn btn-outline-success fw-bold flex-grow-1" for="tipoIngreso"><i class="bi bi-arrow-down-left me-1"></i> Ingreso / Carga (+)</label>
 
               <input type="radio" class="btn-check" name="tipo" id="tipoEgreso" value="egreso" autocomplete="off" checked>
-              <label class="btn btn-outline-danger fw-bold flex-grow-1" for="tipoEgreso"><i class="bi bi-arrow-up-right me-1"></i> Gasto / Egreso (-)</label>
+              <label class="btn btn-outline-danger fw-bold flex-grow-1" for="tipoEgreso"><i class="bi bi-arrow-up-right me-1"></i> Gasto / Boleta (-)</label>
             </div>
           </div>
 
           <div class="mb-3">
-            <label class="form-label fw-bold text-dark small">Cuenta / Caja Chica</label>
+            <label class="form-label fw-bold text-dark small">Cuenta o Caja Chica *</label>
             <select name="cuenta_id" id="movCuentaSelect" class="form-select fw-bold" style="border-radius:10px;" required>
               {% for c in cuentas %}
-                <option value="{{ c.id }}">{{ c.nombre }} (Saldo: ${{ c.saldo_actual|floatformat:0 }})</option>
+                <option value="{{ c.id }}">{{ c.nombre }} (Saldo: {{ c.saldo_actual|formato_pesos }})</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold text-dark small">Imputar a Proyecto Escolar (Opcional)</label>
+            <select name="proyecto_id" id="movProyectoSelect" class="form-select" style="border-radius:10px;">
+              <option value="">-- Sin Proyecto (Operación Base) --</option>
+              {% for p in proyectos %}
+                <option value="{{ p.id }}">{{ p.codigo }} - {{ p.nombre }}</option>
               {% endfor %}
             </select>
           </div>
 
           <div class="row g-2 mb-3">
             <div class="col-6">
-              <label class="form-label fw-bold text-dark small">Monto ($)</label>
-              <input type="number" name="monto" class="form-control fw-extrabold" placeholder="Ej: 25000" min="1" required style="border-radius:10px;">
+              <label class="form-label fw-bold text-dark small">Monto ($ CLP) *</label>
+              <input type="number" name="monto" class="form-control fw-extrabold fs-5" placeholder="Ej: 25000" min="1" required style="border-radius:10px;">
             </div>
             <div class="col-6">
               <label class="form-label fw-bold text-dark small">Fecha</label>
@@ -750,19 +950,14 @@
           </div>
 
           <div class="mb-3">
-            <label class="form-label fw-bold text-dark small">Concepto o Motivo</label>
-            <input type="text" name="concepto" class="form-control fw-bold" placeholder="Ej: Compra de cartulinas y pegamento..." required style="border-radius:10px;">
+            <label class="form-label fw-bold text-dark small">Concepto o Detalle *</label>
+            <input type="text" name="concepto" class="form-control fw-bold" placeholder="Ej: Compra de 10 resmas de papel y cartulinas..." required style="border-radius:10px;">
           </div>
 
           <div class="row g-2 mb-3">
             <div class="col-6">
-              <label class="form-label fw-bold text-dark small">Categoría</label>
-              <select name="categoria_id" class="form-select" style="border-radius:10px;">
-                <option value="">-- Sin Categoría --</option>
-                {% for cat in todas_categorias %}
-                  <option value="{{ cat.id }}">{{ cat.nombre }}</option>
-                {% endfor %}
-              </select>
+              <label class="form-label fw-bold text-dark small">N° Boleta / Voucher</label>
+              <input type="text" name="numero_comprobante" class="form-control" placeholder="Ej: BOL-87214" style="border-radius:10px;">
             </div>
             <div class="col-6">
               <label class="form-label fw-bold text-dark small">Método de Pago</label>
@@ -770,15 +965,9 @@
                 <option value="efectivo">Efectivo / Caja</option>
                 <option value="transferencia">Transferencia</option>
                 <option value="tarjeta_debito">Tarjeta Débito</option>
-                <option value="tarjeta_credito">Tarjeta Crédito</option>
                 <option value="cheque">Cheque</option>
               </select>
             </div>
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label fw-bold text-dark small">N° Boleta / Comprobante / Voucher</label>
-            <input type="text" name="numero_comprobante" class="form-control" placeholder="Ej: BOL-98234" style="border-radius:10px;">
           </div>
 
           <div class="mb-3">
@@ -796,152 +985,75 @@
   </div>
 </div>
 
-<!-- MODAL REGISTRAR FACTURA -->
-<div class="modal fade" id="modalRegistrarFactura" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content border-0 shadow-lg" style="border-radius:16px;">
-      <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
-        <h5 class="modal-title fw-extrabold text-dark"><i class="bi bi-receipt text-primary me-2"></i>Registrar Factura / Documento Tributario</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <form method="POST" action="{% url 'crear_factura' %}" enctype="multipart/form-data">
-        {% csrf_token %}
-        <div class="modal-body p-4">
-          
-          <div class="row g-2 mb-3">
-            <div class="col-6">
-              <label class="form-label fw-bold text-dark small">Tipo Documento</label>
-              <select name="tipo_documento" class="form-select" style="border-radius:10px;">
-                <option value="factura_afecta">Factura Electrónica (Afecta)</option>
-                <option value="factura_exenta">Factura Exenta de IVA</option>
-                <option value="boleta_honorarios">Boleta de Honorarios</option>
-                <option value="boleta_compra">Boleta de Compra</option>
-                <option value="nota_credito">Nota de Crédito</option>
-              </select>
-            </div>
-            <div class="col-6">
-              <label class="form-label fw-bold text-dark small">Folio / Número</label>
-              <input type="text" name="folio" class="form-control fw-bold" placeholder="Ej: 14820" required style="border-radius:10px;">
-            </div>
-          </div>
-
-          <div class="row g-2 mb-3">
-            <div class="col-7">
-              <label class="form-label fw-bold text-dark small">Razón Social / Proveedor</label>
-              <input type="text" name="proveedor_nombre" class="form-control fw-bold" placeholder="Ej: Editorial Santillana SpA" required style="border-radius:10px;">
-            </div>
-            <div class="col-5">
-              <label class="form-label fw-bold text-dark small">RUT Proveedor</label>
-              <input type="text" name="proveedor_rut" class="form-control" placeholder="Ej: 76.123.456-7" style="border-radius:10px;">
-            </div>
-          </div>
-
-          <div class="row g-2 mb-3">
-            <div class="col-6">
-              <label class="form-label fw-bold text-dark small">Fecha Emisión</label>
-              <input type="date" name="fecha_emision" class="form-control" value="{{ hoy|date:'Y-m-d' }}" required style="border-radius:10px;">
-            </div>
-            <div class="col-6">
-              <label class="form-label fw-bold text-dark small">Fecha Vencimiento</label>
-              <input type="date" name="fecha_vencimiento" class="form-control" style="border-radius:10px;">
-            </div>
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label fw-bold text-dark small">Monto Total ($)</label>
-            <input type="number" name="monto_total" class="form-control fw-extrabold fs-5" placeholder="Ej: 150000" min="1" required style="border-radius:10px;">
-            <span class="text-muted extra-small">El IVA y monto neto se calcularán automáticamente según el tipo de factura.</span>
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label fw-bold text-dark small"><i class="bi bi-file-earmark-pdf me-1"></i>Adjuntar Archivo de la Factura (PDF / Imagen)</label>
-            <input type="file" name="archivo_factura" class="form-control" accept="image/*,.pdf,.xml" style="border-radius:10px;">
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label fw-bold text-dark small">Observaciones / Detalle</label>
-            <textarea name="observaciones" class="form-control" rows="2" placeholder="Detalles adicionales sobre los productos o servicios adquiridos..." style="border-radius:10px;"></textarea>
-          </div>
-
-        </div>
-        <div class="modal-footer border-top-0 p-4 pt-0">
-          <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Cancelar</button>
-          <button type="submit" class="btn btn-primary fw-extrabold px-4" style="border-radius:10px; background:linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%); border:none;">Guardar Factura</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL CREAR CUENTA / CAJA -->
+<!-- MODAL CREAR CUENTA / CAJA CHICA -->
 <div class="modal fade" id="modalCrearCuenta" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content border-0 shadow-lg" style="border-radius:16px;">
       <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
-        <h5 class="modal-title fw-extrabold text-dark"><i class="bi bi-bank text-primary me-2"></i>Agregar Nueva Cuenta o Caja Chica</h5>
+        <h5 class="modal-title fw-extrabold text-dark"><i class="bi bi-bank text-primary me-2"></i>Agregar Nueva Caja Chica o Cuenta</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <form method="POST" action="{% url 'crear_cuenta_financiera' %}">
         {% csrf_token %}
         <div class="modal-body p-4">
           <div class="mb-3">
-            <label class="form-label fw-bold text-dark small">Nombre de la Cuenta / Caja</label>
-            <input type="text" name="nombre" class="form-control fw-bold" placeholder="Ej: Caja Chica Inspectoría, Banco Estado Cta Vista..." required style="border-radius:10px;">
+            <label class="form-label fw-bold text-dark small">Nombre de la Cuenta / Caja *</label>
+            <input type="text" name="nombre" class="form-control fw-bold" placeholder="Ej: Caja Chica Departamento de Artes..." required style="border-radius:10px;">
           </div>
 
           <div class="row g-2 mb-3">
             <div class="col-6">
-              <label class="form-label fw-bold text-dark small">Tipo</label>
+              <label class="form-label fw-bold text-dark small">Tipo de Cuenta</label>
               <select name="tipo" class="form-select" style="border-radius:10px;">
-                <option value="caja_chica">Caja Chica</option>
+                <option value="caja_chica_utiles">Caja Útiles Escolares</option>
+                <option value="caja_chica_convivencia">Caja Convivencia Escolar</option>
+                <option value="caja_chica_ciencias">Caja Ciencias / Laboratorios</option>
+                <option value="caja_chica_rectoria">Caja Dirección / Rectoría</option>
+                <option value="caja_chica">Caja Chica General</option>
                 <option value="cuenta_bancaria">Cuenta Bancaria</option>
-                <option value="caja_general">Caja General</option>
-                <option value="otro">Otro</option>
               </select>
             </div>
+            <div class="col-6">
+              <label class="form-label fw-bold text-dark small">Subvención Asociada</label>
+              <select name="fondo_asociado" class="form-select" style="border-radius:10px;">
+                <option value="sep">Fondos SEP</option>
+                <option value="pie">Fondos PIE</option>
+                <option value="subvencion_general">Subvención General</option>
+                <option value="mantenimiento">Fondo Mantenimiento</option>
+                <option value="fondos_propios">Fondos Propios</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row g-2 mb-3">
             <div class="col-6">
               <label class="form-label fw-bold text-dark small">Saldo Inicial ($)</label>
               <input type="number" name="saldo_inicial" class="form-control fw-bold" value="0" style="border-radius:10px;">
             </div>
-          </div>
-
-          <div class="row g-2 mb-3">
             <div class="col-6">
-              <label class="form-label fw-bold text-dark small">Banco / Institución</label>
+              <label class="form-label fw-bold text-dark small">Banco / Ref.</label>
               <input type="text" name="banco" class="form-control" placeholder="Ej: Banco Estado" style="border-radius:10px;">
-            </div>
-            <div class="col-6">
-              <label class="form-label fw-bold text-dark small">N° de Cuenta</label>
-              <input type="text" name="numero_cuenta" class="form-control" placeholder="Ej: 12345678" style="border-radius:10px;">
             </div>
           </div>
         </div>
         <div class="modal-footer border-top-0 p-4 pt-0">
           <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Cancelar</button>
-          <button type="submit" class="btn btn-primary fw-extrabold px-4" style="border-radius:10px; background:linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%); border:none;">Crear Cuenta</button>
+          <button type="submit" class="btn btn-primary fw-extrabold px-4" style="border-radius:10px; background:linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%); border:none;">Crear Caja</button>
         </div>
       </form>
     </div>
   </div>
 </div>
 
-<!-- JSON DATA FOR CHARTS -->
-{{ flujo_labels|json_script:"flujo-labels-data" }}
-{{ flujo_ingresos|json_script:"flujo-ingresos-data" }}
-{{ flujo_egresos|json_script:"flujo-egresos-data" }}
-{{ cat_labels|json_script:"cat-labels-data" }}
-{{ cat_valores|json_script:"cat-valores-data" }}
-
 <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 <script>
-
   function setTipoMovimiento(tipo) {
     if (tipo === 'ingreso') {
       document.getElementById('tipoIngreso').checked = true;
-      document.getElementById('movModalTitle').innerHTML = '<i class="bi bi-arrow-down-left text-success me-2"></i>Registrar Ingreso de Fondos';
+      document.getElementById('movModalTitle').innerHTML = '<i class="bi bi-arrow-down-left text-success me-2"></i>Registrar Ingreso / Carga';
     } else {
       document.getElementById('tipoEgreso').checked = true;
-      document.getElementById('movModalTitle').innerHTML = '<i class="bi bi-arrow-up-right text-danger me-2"></i>Registrar Gasto / Egreso';
+      document.getElementById('movModalTitle').innerHTML = '<i class="bi bi-arrow-up-right text-danger me-2"></i>Rendir Gasto / Boleta';
     }
   }
 
@@ -951,109 +1063,19 @@
     if (select) select.value = cuentaId;
   }
 
+  function setProyectoYTipo(proyectoId, tipo) {
+    setTipoMovimiento(tipo);
+    const selectPry = document.getElementById('movProyectoSelect');
+    if (selectPry) selectPry.value = proyectoId;
+  }
+
   document.addEventListener("DOMContentLoaded", function() {
     const mobileBtn = document.getElementById('mobileMenuBtn');
     const sidebar = document.getElementById('sidebar');
     if (mobileBtn) {
       mobileBtn.addEventListener('click', () => sidebar.classList.toggle('active'));
     }
-
-    // 1. Gráfico Flujo de Caja (Barras dobles Ingresos vs Egresos)
-    const ctxFlujo = document.getElementById('flujoCajaChart');
-    if (ctxFlujo) {
-      const elLabels = document.getElementById('flujo-labels-data');
-      const elIngresos = document.getElementById('flujo-ingresos-data');
-      const elEgresos = document.getElementById('flujo-egresos-data');
-
-      const flujoLabels = elLabels ? JSON.parse(elLabels.textContent) : [];
-      const flujoIngresos = elIngresos ? JSON.parse(elIngresos.textContent) : [];
-      const flujoEgresos = elEgresos ? JSON.parse(elEgresos.textContent) : [];
-
-      new Chart(ctxFlujo, {
-        type: 'bar',
-        data: {
-          labels: flujoLabels,
-          datasets: [
-            {
-              label: 'Ingresos ($)',
-              data: flujoIngresos,
-              backgroundColor: '#10B981',
-              borderRadius: 6
-            },
-            {
-              label: 'Egresos ($)',
-              data: flujoEgresos,
-              backgroundColor: '#EF4444',
-              borderRadius: 6
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { position: 'bottom' },
-            tooltip: {
-              callbacks: {
-                label: function(context) {
-                  return context.dataset.label + ': $' + context.raw.toLocaleString('es-CL');
-                }
-              }
-            }
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              grid: { color: '#F1F5F9' },
-              ticks: {
-                callback: function(val) { return '$' + val.toLocaleString('es-CL'); }
-              }
-            }
-          }
-        }
-      });
-    }
-
-    // 2. Gráfico Gastos por Categoría (Doughnut)
-    const ctxGastos = document.getElementById('gastosCatChart');
-    if (ctxGastos) {
-      const elCatLabels = document.getElementById('cat-labels-data');
-      const elCatValores = document.getElementById('cat-valores-data');
-
-      const catLabels = elCatLabels ? JSON.parse(elCatLabels.textContent) : [];
-      const catValores = elCatValores ? JSON.parse(elCatValores.textContent) : [];
-
-      new Chart(ctxGastos, {
-        type: 'doughnut',
-        data: {
-          labels: catLabels,
-          datasets: [{
-            data: catValores,
-            backgroundColor: ['#7C5CFC', '#F59E0B', '#EF4444', '#3B82F6', '#10B981', '#6366F1'],
-            borderWidth: 2,
-            borderColor: '#FFFFFF'
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { position: 'bottom' },
-            tooltip: {
-              callbacks: {
-                label: function(context) {
-                  return context.label + ': $' + context.raw.toLocaleString('es-CL');
-                }
-              }
-            }
-          },
-          cutout: '65%'
-        }
-      });
-    }
-
   });
 </script>
 </body>
 </html>
-

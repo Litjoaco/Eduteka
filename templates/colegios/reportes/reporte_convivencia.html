@@ -1,0 +1,167 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Consolidado de Convivencia Escolar - Eduteka</title>
+
+  <!-- Bootstrap CSS y Fuentes -->
+  <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+  <style>
+    :root {
+      --primary: #EF4444;
+      --dark: #0F172A;
+      --bg-color: #F8FAFC;
+      --border-color: #E2E8F0;
+      --card-bg: #FFFFFF;
+    }
+    body { background: var(--bg-color); font-family: 'Plus Jakarta Sans', sans-serif; }
+    .app-container { display: flex; min-height: 100vh; width: 100vw; }
+    .main-content { margin-left: 248px; flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .topbar { height: 68px; background: var(--card-bg); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 2.2rem; }
+    @media (max-width: 991.98px) {
+      .main-content { margin-left: 0 !important; width: 100% !important; }
+      .topbar { padding: 0.75rem 1rem; height: auto; flex-wrap: wrap; gap: 0.5rem; }
+      .content-area { padding: 1.25rem 1rem; }
+    }
+
+    @media (max-width: 575.98px) {
+      .content-area { padding: 1rem 0.75rem; }
+      .card-custom { padding: 1rem !important; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  {% include 'colegios/_sidebar.html' with active_page='reportes' %}
+
+  <div class="main-content">
+    <header class="topbar">
+      <div class="d-flex align-items-center gap-2">
+        <button class="btn btn-sm d-lg-none" id="mobileMenuBtn" style="border:none; background:var(--primary-soft, #EDE9FE); color:var(--primary, #7C5CFC); padding: 0.4rem 0.6rem;">
+          <i class="bi bi-list fs-5"></i>
+        </button>
+        <a href="{% url 'centro_reportes' %}" class="btn btn-sm btn-light border"><i class="bi bi-arrow-left"></i></a>
+        <div>
+          <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-shield-check text-danger me-2"></i>Informe de Convivencia Escolar & Conducta</h5>
+          <small class="text-muted">Consolidado de Anotaciones, Méritos y Citaciones</small>
+        </div>
+      </div>
+    </header>
+
+    <main class="content-area">
+      <!-- KPIS DE CONVIVENCIA -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-3 col-6">
+          <div class="card-custom p-3 text-center">
+            <span class="text-muted extra-small text-uppercase fw-bold d-block mb-1">Anotaciones Positivas</span>
+            <span class="fs-4 fw-extrabold text-success"><i class="bi bi-hand-thumbs-up-fill me-1"></i>{{ total_positivas }}</span>
+          </div>
+        </div>
+        <div class="col-md-3 col-6">
+          <div class="card-custom p-3 text-center">
+            <span class="text-muted extra-small text-uppercase fw-bold d-block mb-1">Anotaciones Negativas</span>
+            <span class="fs-4 fw-extrabold text-danger"><i class="bi bi-hand-thumbs-down-fill me-1"></i>{{ total_negativas }}</span>
+          </div>
+        </div>
+        <div class="col-md-3 col-6">
+          <div class="card-custom p-3 text-center">
+            <span class="text-muted extra-small text-uppercase fw-bold d-block mb-1">Citaciones Apoderados</span>
+            <span class="fs-4 fw-extrabold text-warning"><i class="bi bi-envelope-exclamation-fill me-1"></i>{{ total_citaciones }}</span>
+          </div>
+        </div>
+        <div class="col-md-3 col-6">
+          <div class="card-custom p-3 text-center">
+            <span class="text-muted extra-small text-uppercase fw-bold d-block mb-1">Observaciones Neutras</span>
+            <span class="fs-4 fw-extrabold text-muted"><i class="bi bi-chat-left-text-fill me-1"></i>{{ total_neutras }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- FILTRO POR SECCIÓN -->
+      <div class="card-custom p-3 mb-4">
+        <form method="GET" class="row g-3 align-items-center">
+          <div class="col-md-6">
+            <label class="form-label fw-bold small text-muted text-uppercase mb-1">Filtrar por Sección:</label>
+            <select name="seccion" class="form-select fw-bold" onchange="this.form.submit();" style="border-radius:10px;">
+              <option value="">-- Todo el Colegio --</option>
+              {% for sec in secciones %}
+                <option value="{{ sec.id }}" {% if sec.id == seccion_seleccionada %}selected{% endif %}>{{ sec.nombre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </form>
+      </div>
+
+      <!-- LISTA DE ANOTACIONES -->
+      <div class="card-custom p-4 mb-4">
+        <h6 class="fw-bold mb-3">Historial de Registros de Convivencia</h6>
+
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr class="small text-muted text-uppercase">
+                <th>Fecha</th>
+                <th>Estudiante</th>
+                <th>Curso</th>
+                <th>Tipo / Gravedad</th>
+                <th>Título / Detalle</th>
+                <th>Docente</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for an in anotaciones %}
+                <tr>
+                  <td class="text-muted small" style="white-space:nowrap;">{{ an.fecha|date:"d/m/Y" }}</td>
+                  <td class="fw-bold text-dark">{{ an.estudiante.nombre_completo }}</td>
+                  <td><span class="badge bg-light text-dark border">{{ an.estudiante.seccion.nombre|default:"-" }}</span></td>
+                  <td>
+                    {% if an.tipo == 'positiva' %}
+                      <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">Positiva / Mérito</span>
+                    {% elif an.tipo == 'negativa' %}
+                      <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">Negativa ({{ an.gravedad|title }})</span>
+                    {% elif an.tipo == 'citacion' %}
+                      <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1">Citación Apoderado</span>
+                    {% else %}
+                      <span class="badge bg-light text-muted border px-2 py-1">Neutra</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <strong>{{ an.titulo }}</strong>
+                    <div class="text-muted extra-small">{{ an.descripcion|truncatechars:70 }}</div>
+                  </td>
+                  <td class="text-muted small">{{ an.docente.get_full_name|default:an.docente.username }}</td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="6" class="text-center py-5 text-muted">
+                    <i class="bi bi-shield-check fs-1 d-block mb-2 text-muted"></i>
+                    No hay anotaciones registradas en el período seleccionado.
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+<script>
+  document.getElementById('mobileMenuBtn')?.addEventListener('click', function() {
+    if (typeof window.toggleSidebarMobile === 'function') {
+      window.toggleSidebarMobile();
+    } else {
+      document.getElementById('sidebar')?.classList.toggle('open');
+    }
+  });
+</script>
+</body>
+</html>

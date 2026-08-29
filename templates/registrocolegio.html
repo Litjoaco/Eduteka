@@ -370,9 +370,7 @@
     </div>
   </div>
 
-  <!-- ==========================================================================
-       MODAL DE TÉRMINOS Y CONDICIONES Y PROTECCIÓN DE DATOS (LEGAL & SEGURO)
-       ========================================================================== -->
+  
   <div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content modal-content-terms">
@@ -390,28 +388,47 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
 
-        <div class="modal-body terms-scroll-body">
-          <p class="mb-3">Bienvenido a <strong>Eduteka</strong>. Al crear una cuenta para tu establecimiento educacional, aceptas los siguientes acuerdos de servicio y tratamiento de información conforme a la legislación chilena vigente:</p>
-
-          <div class="terms-section-title">
-            <i class="bi bi-patch-check-fill text-primary"></i> 1. Cumplimiento Normativo MINEDUC
+        <div class="modal-body terms-scroll-body" style="font-size: 0.88rem; line-height: 1.6; color: #334155;">
+          <div class="p-3 mb-3 rounded-3" style="background:#F8FAFC; border:1px solid #E2E8F0;">
+            <p class="mb-0 text-dark fw-medium">
+              Bienvenido a <strong>Eduteka</strong>. Al crear la cuenta de tu establecimiento educacional, aceptas los siguientes acuerdos de privacidad, confidencialidad y tratamiento de datos conforme a la <strong>Ley N° 19.628</strong> y la normativa educacional chilena:
+            </p>
           </div>
-          <p>La plataforma Eduteka opera en estricto cumplimiento de la <strong>Circular N° 30 de la Superintendencia de Educación</strong> para el Libro de Clases Digital, garantizando la inviolabilidad de registros, sellado cronológico y firma electrónica de planillas pedagógicas y de asistencia.</p>
 
-          <div class="terms-section-title">
-            <i class="bi bi-lock-fill text-success"></i> 2. Protección de Datos Personales de Menores
+          <div class="terms-section-title fw-extrabold text-dark d-flex align-items-center gap-1.5 mb-1 mt-3">
+            <i class="bi bi-patch-check-fill text-primary"></i> 1. Cumplimiento Normativo MINEDUC & Circular N° 30
           </div>
-          <p>Conforme a la <strong>Ley N° 19.628 sobre Protección de la Vida Privada</strong>, Eduteka no comercializa ni comparte datos de estudiantes, apoderados ni funcionarios. Toda la información acumulativa (notas, hojas de vida, fichas médicas) es propiedad exclusiva del establecimiento educacional.</p>
+          <p class="text-muted small">
+            La plataforma Eduteka opera en estricto cumplimiento de la <strong>Circular N° 30 de la Superintendencia de Educación</strong> para el Libro de Clases Digital, garantizando la inviolabilidad de registros, sellado cronológico y firma electrónica simple de notas, asistencia y leccionarios.
+          </p>
 
-          <div class="terms-section-title">
-            <i class="bi bi-cloud-arrow-up-fill text-info"></i> 3. Seguridad, Cifrado Bancario y Respaldo
+          <div class="terms-section-title fw-extrabold text-dark d-flex align-items-center gap-1.5 mb-1 mt-3">
+            <i class="bi bi-person-heart text-danger"></i> 2. Protección de Datos de Menores de Edad (NNA)
           </div>
-          <p>Los datos son transferidos mediante conexiones cifradas SSL/TLS de 256 bits y almacenados en servidores de alta disponibilidad con copias de seguridad automáticas diarias.</p>
+          <p class="text-muted small">
+            En conformidad con la <strong>Ley N° 19.628</strong>, los datos de estudiantes, apoderados y docentes son propiedad exclusiva del colegio. Queda estrictamente prohibida su comercialización o cesión a terceros para fines publicitarios. Los datos sensibles (salud, PIE) cuentan con cifrado reforzado.
+          </p>
 
-          <div class="terms-section-title">
-            <i class="bi bi-person-gear text-warning"></i> 4. Custodia de Roles y Accesos
+          <div class="terms-section-title fw-extrabold text-dark d-flex align-items-center gap-1.5 mb-1 mt-3">
+            <i class="bi bi-shield-check text-success"></i> 3. Derechos ARCO (Acceso, Rectificación, Cancelación y Oposición)
           </div>
-          <p>El administrador designado por el colegio es responsable de asignar los permisos y verificar el cese de funciones de los miembros de la comunidad educativa.</p>
+          <p class="text-muted small">
+            El colegio y los titulares tienen derecho a solicitar el acceso a su información, la corrección de datos inexactos y la supresión de registros cuando cese la vinculación escolar, resguardando los plazos legales fijados por la Superintendencia.
+          </p>
+
+          <div class="terms-section-title fw-extrabold text-dark d-flex align-items-center gap-1.5 mb-1 mt-3">
+            <i class="bi bi-cloud-arrow-up-fill text-info"></i> 4. Seguridad, Cifrado Bancario y Respaldo Continuo
+          </div>
+          <p class="text-muted small">
+            Los datos se transfieren mediante conexiones cifradas SSL/TLS de 256 bits y se almacenan en servidores de alta disponibilidad con copias de seguridad automáticas diarias y sellos criptográficos SHA-256.
+          </p>
+
+          <div class="terms-section-title fw-extrabold text-dark d-flex align-items-center gap-1.5 mb-1 mt-3">
+            <i class="bi bi-person-gear text-warning"></i> 5. Custodia de Roles y Accesos
+          </div>
+          <p class="text-muted small mb-0">
+            El sostenedor o administrador designado por el colegio es responsable de la administración de roles, verificación de identidad y revocación de permisos ante el cese de funciones del personal.
+          </p>
         </div>
 
         <div class="modal-footer bg-light border-top p-3 px-4 d-flex justify-content-between">
@@ -488,9 +505,9 @@
 
       if (preselectedRegion) updateComunas();
 
-      // ==========================================
+      
       // Validador de RUT Chileno (Módulo 11)
-      // ==========================================
+      
       const rutInput = document.getElementById('adminRutInput');
       const rutBadge = document.getElementById('rutStatusBadge');
 
@@ -610,9 +627,9 @@
       });
     });
 
-    // ==========================================
+    
     // Medidor de Contraseña y Checklist
-    // ==========================================
+    
     function evaluarContrasena(pass) {
       const fill = document.getElementById('passMeterFill');
       const text = document.getElementById('passMeterText');

@@ -41,7 +41,7 @@
     <div class="solicitud-container">
         <div class="row w-100 align-items-center justify-content-center g-4 g-lg-5">
 
-            <!-- ── Columna Izquierda: Branding & Beneficios ── -->
+            
             <div class="col-lg-5 d-none d-lg-flex flex-column justify-content-center welcome-section">
                 
                 <div class="mb-3">
@@ -89,7 +89,7 @@
                 </div>
             </div>
 
-            <!-- ── Columna Derecha: Tarjeta de Solicitud ── -->
+            
             <div class="col-12 col-lg-7 col-xl-7">
                 <div class="solicitud-card">
 
@@ -223,6 +223,14 @@
                             <div class="char-counter"><span id="charCount">0</span>/250 caracteres</div>
                         </div>
 
+                        <!-- Checkbox Términos y Condiciones Ley 19.628 -->
+                        <div class="form-check d-flex align-items-start gap-2 mb-3 p-0">
+                            <input class="form-check-input ms-0 mt-1" type="checkbox" id="termsCheck" required style="cursor:pointer; width:18px; height:18px; border-color:#7C5CFC; flex-shrink:0;">
+                            <label class="form-check-label extra-small text-muted" for="termsCheck" style="line-height:1.45; cursor:pointer;">
+                                Declaro que la información proporcionada es verídica y acepto los <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#termsModal" class="fw-bold text-decoration-underline" style="color:#7C5CFC;">Términos de Servicio</a> y la <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#termsModal" class="fw-bold text-decoration-underline" style="color:#7C5CFC;">Política de Protección de Datos Personales (Ley 19.628)</a> de Eduteka.
+                            </label>
+                        </div>
+
                         <!-- Aviso Informativo -->
                         <div class="notice-box mb-4">
                             <i class="bi bi-shield-check"></i>
@@ -246,8 +254,80 @@
         </div>
     </div>
 
+    
+    <div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+                
+                <div class="modal-header bg-light border-bottom p-3 px-4">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="rounded-3 d-flex align-items-center justify-content-center" style="width:36px; height:36px; background:#EDE9FE; color:#7C5CFC;">
+                            <i class="bi bi-shield-lock-fill fs-5"></i>
+                        </div>
+                        <div>
+                            <h5 class="modal-title fw-extrabold text-dark mb-0" id="termsModalLabel" style="font-size:1.05rem;">Términos de Servicio & Protección de Datos</h5>
+                            <span class="extra-small text-muted">Conforme a la Ley N° 19.628, Circular N° 30 y Estándares de la Agencia de Protección de Datos — Chile</span>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+
+                <div class="modal-body p-4" style="max-height: 480px; overflow-y: auto; font-size: 0.88rem; line-height: 1.6; color: #334155;">
+                    <div class="p-3 mb-3 rounded-3" style="background:#F8FAFC; border:1px solid #E2E8F0;">
+                        <p class="mb-0 text-dark fw-medium">
+                            En <strong>Eduteka</strong> nos comprometemos con la privacidad, integridad y seguridad de la comunidad escolar. Al solicitar acceso o registrarte en la plataforma, declaras conocer y aceptar los siguientes términos:
+                        </p>
+                    </div>
+
+                    <h6 class="fw-extrabold text-dark d-flex align-items-center gap-1.5 mb-1 mt-3">
+                        <i class="bi bi-patch-check-fill text-primary"></i> 1. Finalidad Estrictamente Educativa y Formativa
+                    </h6>
+                    <p class="text-muted small">
+                        Los datos personales recopilados (académicos, asistencia, calificaciones, observaciones y roles) serán tratados con el único fin de permitir la gestión pedagógica, administrativa y de convivencia escolar del establecimiento educacional. Queda expresamente prohibida su comercialización, cesión a terceros o uso para fines publicitarios.
+                    </p>
+
+                    <h6 class="fw-extrabold text-dark d-flex align-items-center gap-1.5 mb-1 mt-3">
+                        <i class="bi bi-person-heart text-danger"></i> 2. Protección Especial de Datos de Menores de Edad (NNA)
+                    </h6>
+                    <p class="text-muted small">
+                        El tratamiento de la información de niños, niñas y adolescentes se realiza bajo el estándar de interés superior del menor y en conformidad con las directrices del Ministerio de Educación (MINEDUC) y la Superintendencia de Educación. Los datos sensibles (salud, PIE o psicológicos) cuentan con niveles reforzados de cifrado y acceso restringido exclusivamente a profesionales autorizados.
+                    </p>
+
+                    <h6 class="fw-extrabold text-dark d-flex align-items-center gap-1.5 mb-1 mt-3">
+                        <i class="bi bi-shield-check text-success"></i> 3. Derechos ARCO (Acceso, Rectificación, Cancelación y Oposición)
+                    </h6>
+                    <p class="text-muted small">
+                        Los titulares de los datos y sus apoderados legales tienen derecho a solicitar el acceso a su información, la corrección de datos erróneos o desactualizados, y la eliminación de registros cuando cese la vinculación institucional, salvo aquellos que deban conservarse por mandato legal de la normativa educacional chilena.
+                    </p>
+
+                    <h6 class="fw-extrabold text-dark d-flex align-items-center gap-1.5 mb-1 mt-3">
+                        <i class="bi bi-lock-fill text-info"></i> 4. Seguridad, Trazabilidad y Confidencialidad
+                    </h6>
+                    <p class="text-muted small">
+                        Toda la comunicación en la plataforma se realiza mediante cifrado SSL/TLS de 256 bits. El sistema implementa firmas electrónicas simples, sellos criptográficos SHA-256 y bitácoras de auditoría para garantizar la inalterabilidad y el no-repudio de las actas de notas y leccionarios.
+                    </p>
+
+                    <h6 class="fw-extrabold text-dark d-flex align-items-center gap-1.5 mb-1 mt-3">
+                        <i class="bi bi-person-badge text-warning"></i> 5. Responsabilidad en el Uso de Credenciales
+                    </h6>
+                    <p class="text-muted small mb-0">
+                        Cada usuario es responsable exclusivo de mantener la confidencialidad de su contraseña y PIN de firma. Cualquier registro, nota o asistencia realizada con sus credenciales se entenderá válidamente ejecutada por el titular de la cuenta.
+                    </p>
+                </div>
+
+                <div class="modal-footer bg-light border-top p-3 px-4 d-flex justify-content-between">
+                    <button type="button" class="btn btn-outline-secondary rounded-3 px-3 py-2 fw-bold" data-bs-dismiss="modal" style="font-size:0.85rem;">Cerrar</button>
+                    <button type="button" class="btn btn-primary rounded-3 px-4 py-2 fw-extrabold" onclick="acceptTermsModal()" style="background:linear-gradient(135deg, #7C5CFC 0%, #4F46E5 100%); border:none; font-size:0.85rem;">
+                        <i class="bi bi-check-circle-fill me-1"></i> Aceptar y Continuar
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap JS Bundle -->
     <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
-    <script src="{% static 'js/solicitar_acceso.js' %}?v=8"></script>
+    <script src="{% static 'js/solicitar_acceso.js' %}?v=9"></script>
 </body>
 </html>

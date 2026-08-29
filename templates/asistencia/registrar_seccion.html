@@ -81,7 +81,7 @@
     .main-content { margin-left: 0; width: 100%; }
   }
 
-  /* ── ELEVATED PREMIUM STYLES ── */
+  
   @keyframes fadeInUp {
     from {
       opacity: 0;
@@ -97,7 +97,6 @@
   .dashboard-panel, .table-responsive {
     animation: fadeInUp 0.4s ease-out both;
   }
-
 
   /* Body background glowing gradients */
   body {
@@ -122,11 +121,16 @@
     pointer-events: none;
   }
 
-  /* Smooth dynamic transitions */
-  .nav-item, .menu-item, .user-profile, .btn, .form-control {
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+  @media (max-width: 991.98px) {
+    .main-content { margin-left: 0 !important; width: 100% !important; }
+    .topbar { padding: 0.75rem 1rem; height: auto; flex-wrap: wrap; gap: 0.5rem; }
+    .content-area { padding: 1.25rem 1rem; }
   }
 
+  @media (max-width: 575.98px) {
+    .content-area { padding: 1rem 0.75rem; }
+    .dashboard-panel { padding: 1.25rem 1rem; }
+  }
 </style>
 </head>
 <body>
@@ -194,7 +198,6 @@
                     </button>
                 </div>
             </div>
-
 
             <!-- Attendance Sheet -->
             <form id="attendanceSheetForm" method="POST">
@@ -363,8 +366,15 @@
             onCambioEstadoPrincipal(estId, 'presente');
         });
     }
-</script>
 
+    document.getElementById('mobileMenuBtn')?.addEventListener('click', function() {
+        if (typeof window.toggleSidebarMobile === 'function') {
+            window.toggleSidebarMobile();
+        } else {
+            document.getElementById('sidebar')?.classList.toggle('open');
+        }
+    });
+</script>
 
 </body>
 </html>

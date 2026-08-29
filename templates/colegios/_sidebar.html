@@ -16,7 +16,7 @@
 </script>
 
 <style>
-  /* ═══ SIDEBAR RETRÁCTIL EDUTEKA ═════════════════════════════ */
+  
   html {
     font-size: 14px !important;
   }
@@ -49,8 +49,37 @@
   }
 
   @media (max-width: 991.98px) {
-    .sidebar { transform: translateX(-100%); }
-    .sidebar.open, .sidebar.active { transform: translateX(0); }
+    .sidebar { 
+      transform: translateX(-100%); 
+      box-shadow: none;
+    }
+    .sidebar.open, .sidebar.active { 
+      transform: translateX(0); 
+      box-shadow: 8px 0 32px rgba(15, 23, 42, 0.18);
+    }
+    body.sidebar-mobile-open {
+      overflow: hidden;
+    }
+  }
+
+  .sidebar-backdrop {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    z-index: 1035;
+    opacity: 0;
+    transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  @media (max-width: 991.98px) {
+    .sidebar.open ~ .sidebar-backdrop,
+    .sidebar.active ~ .sidebar-backdrop,
+    body.sidebar-mobile-open .sidebar-backdrop {
+      display: block;
+      opacity: 1;
+    }
   }
 
   /* Header & Logo */
@@ -167,12 +196,17 @@
     transition: margin-left 0.28s var(--ease-subtle), width 0.28s var(--ease-subtle);
   }
   @media (max-width: 991.98px) {
-    .main-content, .main-wrapper { margin-left: 0 !important; width: 100% !important; }
+    .main-content, .main-wrapper,
+    .sidebar-collapsed .main-content,
+    .sidebar-collapsed .main-wrapper,
+    body.sidebar-collapsed .main-content,
+    body.sidebar-collapsed .main-wrapper {
+      margin-left: 0 !important;
+      width: 100% !important;
+    }
   }
 
-  /* ═══════════════════════════════════════════════════════════
-     MODO COLAPSADO / RETRAÍDO (.sidebar-collapsed)
-     ═══════════════════════════════════════════════════════════ */
+  
   .sidebar-collapsed .sidebar {
     width: var(--sw-collapsed) !important;
     min-width: var(--sw-collapsed) !important;
@@ -236,66 +270,57 @@
     margin: 0;
   }
 
-  /* Animación Moderna y Fluida del Recuadro / Tooltip al pasar el mouse en modo retraído */
-  @media (min-width: 992px) {
-    .sidebar-collapsed .nav-item[data-label] {
-      position: relative;
-    }
-    
-    .sidebar-collapsed .nav-item[data-label]::after {
-      content: attr(data-label);
-      position: absolute;
-      left: calc(100% + 14px);
-      top: 50%;
-      transform: translateY(-50%) translateX(-12px) scale(0.92);
-      background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
-      color: #FFFFFF;
-      padding: 0.52rem 0.95rem;
-      border-radius: 10px;
-      font-size: 0.82rem;
-      font-weight: 700;
-      letter-spacing: 0.2px;
-      white-space: nowrap;
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-      transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1),
-                  transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
-                  visibility 0.22s;
-      z-index: 1060;
-      box-shadow: 0 10px 28px rgba(15, 23, 42, 0.35), 0 0 0 1px rgba(124, 92, 252, 0.3);
-      backdrop-filter: blur(10px);
-    }
+  
+  .sidebar-collapsed .nav-item {
+    transition: background 0.18s ease, transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .sidebar-collapsed .nav-item:hover {
+    background: rgba(124, 92, 252, 0.12);
+    color: var(--primary);
+    transform: scale(1.08);
+  }
+  .sidebar-collapsed .nav-item.active:hover {
+    background: var(--primary);
+    color: #FFFFFF;
+    transform: scale(1.08);
+  }
 
-    /* Flecha indicadora estilizada hacia la izquierda */
-    .sidebar-collapsed .nav-item[data-label]::before {
-      content: '';
-      position: absolute;
-      left: calc(100% + 6px);
-      top: 50%;
-      transform: translateY(-50%) translateX(-8px);
-      border-width: 6px 7px 6px 0;
-      border-style: solid;
-      border-color: transparent #0F172A transparent transparent;
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-      transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1),
-                  transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
-                  visibility 0.22s;
-      z-index: 1061;
-    }
+  #edutekaFloatingTooltip {
+    position: fixed;
+    z-index: 999999;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    background: rgba(21, 26, 53, 0.94);
+    color: #FFFFFF;
+    padding: 0.38rem 0.85rem;
+    border-radius: 9px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.35), 0 0 12px rgba(124, 92, 252, 0.2);
+    backdrop-filter: blur(16px);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-50%) translateX(-6px) scale(0.95);
+    transition: opacity 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
+                transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
+                visibility 0.18s;
+  }
 
-    .sidebar-collapsed .nav-item[data-label]:hover::after {
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(-50%) translateX(0) scale(1);
-    }
-    .sidebar-collapsed .nav-item[data-label]:hover::before {
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(-50%) translateX(0);
-    }
+  #edutekaFloatingTooltip.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(-50%) translateX(0) scale(1);
+  }
+
+  #edutekaFloatingTooltip.is-active {
+    background: linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%);
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(124, 92, 252, 0.4);
   }
 
   .sidebar-collapsed .sidebar-footer {
@@ -321,10 +346,16 @@
     <div class="sidebar-role-badge {% if is_admin %}admin{% endif %}" title="{{ rol_nombre|default:'Usuario' }}">
       {% if is_admin %}
         <i class="bi bi-shield-check"></i>
+      {% elif is_utp %}
+        <i class="bi bi-journal-bookmark-fill"></i>
       {% elif is_profesor %}
         <i class="bi bi-mortarboard"></i>
       {% elif is_inspector %}
         <i class="bi bi-eye"></i>
+      {% elif is_convivencia %}
+        <i class="bi bi-heart-pulse-fill"></i>
+      {% elif is_secretario %}
+        <i class="bi bi-file-earmark-person"></i>
       {% else %}
         <i class="bi bi-person-badge"></i>
       {% endif %}
@@ -340,7 +371,7 @@
       <i class="bi bi-house-door-fill"></i> <span>Inicio</span>
     </a>
 
-    {% if is_admin or is_profesor or 'academico' in permisos_ver or 'asignaturas' in permisos_ver or 'cursos' in permisos_ver %}
+    {% if is_admin or is_utp or is_profesor or 'academico' in permisos_ver or 'asignaturas' in permisos_ver or 'cursos' in permisos_ver %}
     <a href="{% url 'mis_cursos_docente' %}" class="nav-item {% if active_page == 'mis_cursos' %}active{% endif %}" data-label="Mis Cursos & Materias">
       <i class="bi bi-mortarboard-fill"></i> <span>Mis Cursos & Materias</span>
     </a>
@@ -349,49 +380,61 @@
     <!-- 2. GESTIÓN DE AULA & ALUMNOS (MÓDULOS BASE ESCOLARES) -->
     <div class="nav-section-label">Gestión de Aula & Alumnos</div>
 
-    {% if is_admin or is_inspector or is_secretario or 'perfil del estudiante' in permisos_ver or 'perfil del alumno' in permisos_ver or 'estudiantes' in permisos_ver %}
+    {% if is_admin or is_utp or is_inspector or is_secretario or is_convivencia or 'perfil del estudiante' in permisos_ver or 'perfil del alumno' in permisos_ver or 'estudiantes' in permisos_ver %}
     <a href="{% url 'listar_estudiantes' %}" class="nav-item {% if active_page == 'estudiantes' %}active{% endif %}" data-label="Estudiantes">
       <i class="bi bi-people-fill"></i> <span>Estudiantes</span>
     </a>
     {% endif %}
 
-    {% if is_admin or 'cursos' in permisos_ver %}
+    {% if is_admin or is_utp or 'cursos' in permisos_ver %}
     <a href="{% url 'listar_cursos' %}" class="nav-item {% if active_page == 'cursos' %}active{% endif %}" data-label="Cursos & Niveles">
       <i class="bi bi-diagram-3-fill"></i> <span>Cursos & Niveles</span>
     </a>
     {% endif %}
 
-    {% if is_admin or 'academico' in permisos_ver or 'asignaturas' in permisos_ver %}
+    {% if is_admin or is_utp or 'academico' in permisos_ver or 'asignaturas' in permisos_ver %}
     <a href="{% url 'listar_asignaturas' %}" class="nav-item {% if active_page == 'academico' %}active{% endif %}" data-label="Asignaturas & Plan">
       <i class="bi bi-book-half"></i> <span>Asignaturas</span>
     </a>
     {% endif %}
 
-    {% if is_admin or is_profesor or is_inspector or 'asistencia' in permisos_ver %}
+    {% if is_admin or is_utp or is_profesor or is_inspector or 'asistencia' in permisos_ver %}
     <a href="{% url 'registrar_asistencia' %}" class="nav-item {% if active_page == 'asistencia' %}active{% endif %}" data-label="Asistencia">
       <i class="bi bi-calendar-check-fill"></i> <span>Asistencia</span>
     </a>
     {% endif %}
 
-    {% if is_admin or is_profesor or 'libro de clases' in permisos_ver or 'evaluaciones' in permisos_ver or 'calificaciones' in permisos_ver %}
+    {% if is_admin or is_utp or is_profesor or 'libro de clases' in permisos_ver or 'evaluaciones' in permisos_ver or 'calificaciones' in permisos_ver %}
     <a href="{% url 'libro_calificaciones' %}" class="nav-item {% if active_page == 'notas' %}active{% endif %}" data-label="Libro de Calificaciones">
       <i class="bi bi-journal-bookmark-fill"></i> <span>Calificaciones</span>
     </a>
     {% endif %}
 
-    {% if is_admin or is_profesor or is_inspector or 'comportamiento' in permisos_ver or 'convivencia' in permisos_ver %}
+    {% if is_admin or is_utp or is_profesor or 'libro de clases' in permisos_ver or 'leccionario' in permisos_ver %}
+    <a href="{% url 'leccionario_hub' %}" class="nav-item {% if active_page == 'leccionario' %}active{% endif %}" data-label="Leccionario Digital">
+      <i class="bi bi-journal-check"></i> <span>Leccionario Digital</span>
+    </a>
+    {% endif %}
+
+    {% if is_admin or is_utp or is_profesor or is_inspector or is_convivencia or 'pie' in permisos_ver or 'estudiantes' in permisos_ver %}
+    <a href="{% url 'pie_dashboard' %}" class="nav-item {% if active_page == 'pie' %}active{% endif %}" data-label="Programa PIE / NEE">
+      <i class="bi bi-puzzle-fill"></i> <span>Programa PIE (NEE)</span>
+    </a>
+    {% endif %}
+
+    {% if is_admin or is_utp or is_profesor or is_inspector or is_convivencia or 'comportamiento' in permisos_ver or 'convivencia' in permisos_ver %}
     <a href="{% url 'convivencia_hub' %}" class="nav-item {% if active_page == 'convivencia' %}active{% endif %}" data-label="Convivencia Escolar">
       <i class="bi bi-shield-check"></i> <span>Convivencia Escolar</span>
     </a>
     {% endif %}
 
-    {% if is_admin or is_profesor or 'simce' in permisos_ver or 'reportes' in permisos_ver %}
+    {% if is_admin or is_utp or is_profesor or 'simce' in permisos_ver or 'reportes' in permisos_ver %}
     <a href="{% url 'simce_dashboard' %}" class="nav-item {% if active_page == 'simce' %}active{% endif %}" data-label="Evaluación SIMCE & DIA">
       <i class="bi bi-award-fill"></i> <span>SIMCE & DIA</span>
     </a>
     {% endif %}
 
-    {% if is_admin or 'talleres' in permisos_ver or 'cursos' in permisos_ver %}
+    {% if is_admin or is_utp or 'talleres' in permisos_ver or 'cursos' in permisos_ver %}
     <a href="{% url 'talleres_dashboard' %}" class="nav-item {% if active_page == 'talleres' %}active{% endif %}" data-label="Talleres Extracurriculares">
       <i class="bi bi-star-fill"></i> <span>Talleres (ACLES)</span>
     </a>
@@ -400,7 +443,13 @@
     <!-- 3. PLANIFICACIÓN & ANÁLISIS INSTITUCIONAL -->
     <div class="nav-section-label">Planificación & Análisis</div>
 
-    {% if is_admin or is_profesor or is_inspector or 'calendario' in permisos_ver %}
+    {% if is_admin or is_utp or is_profesor or 'planificaciones' in permisos_ver or 'academico' in permisos_ver %}
+    <a href="{% url 'planificaciones_hub' %}" class="nav-item {% if active_page == 'planificaciones' %}active{% endif %}" data-label="Planificaciones Curriculares">
+      <i class="bi bi-card-checklist"></i> <span>Planificaciones</span>
+    </a>
+    {% endif %}
+
+    {% if is_admin or is_utp or is_profesor or is_inspector or is_convivencia or is_secretario or 'calendario' in permisos_ver %}
     <a href="{% url 'calendario_escolar' %}" class="nav-item {% if active_page == 'calendario' %}active{% endif %}" data-label="Calendario Escolar">
       <i class="bi bi-calendar3"></i> <span>Calendario Escolar</span>
     </a>
@@ -412,13 +461,13 @@
     </a>
     {% endif %}
 
-    {% if is_admin or 'reportes' in permisos_ver or 'estadisticas' in permisos_ver %}
+    {% if is_admin or is_utp or 'reportes' in permisos_ver or 'estadisticas' in permisos_ver %}
     <a href="{% url 'estadisticas_colegio' %}" class="nav-item {% if active_page == 'estadisticas' %}active{% endif %}" data-label="Métricas & Estadísticas">
       <i class="bi bi-pie-chart-fill"></i> <span>Estadísticas</span>
     </a>
     {% endif %}
 
-    {% if is_admin or 'reportes' in permisos_ver or 'reportes y analíticas' in permisos_ver %}
+    {% if is_admin or is_utp or is_profesor or is_inspector or is_secretario or 'reportes' in permisos_ver or 'reportes y analíticas' in permisos_ver %}
     <a href="{% url 'centro_reportes' %}" class="nav-item {% if active_page == 'reportes' %}active{% endif %}" data-label="Centro de Reportes">
       <i class="bi bi-bar-chart-line-fill"></i> <span>Centro de Reportes</span>
     </a>
@@ -440,6 +489,12 @@
     </a>
     {% endif %}
 
+    {% if is_admin or 'proveedores' in permisos_ver or 'inventario' in permisos_ver %}
+    <a href="{% url 'procesos_compra_dashboard' %}" class="nav-item {% if active_page == 'adquisiciones' %}active{% endif %}" data-label="Adquisiciones (3 Cotizaciones)">
+      <i class="bi bi-receipt-cutoff"></i> <span>Cotizaciones & Compras</span>
+    </a>
+    {% endif %}
+
     {% if is_admin or 'proveedores' in permisos_ver %}
     <a href="{% url 'proveedores_directorio' %}" class="nav-item {% if active_page == 'proveedores' %}active{% endif %}" data-label="Proveedores & Contactos">
       <i class="bi bi-truck-front-fill"></i> <span>Proveedores</span>
@@ -448,7 +503,6 @@
     {% endif %}
 
   </nav>
-
 
   <div class="sidebar-footer">
     <a href="{% url 'perfil_usuario' %}" class="nav-item {% if active_page == 'perfil' %}active{% endif %}" data-label="Mi Perfil">
@@ -464,6 +518,7 @@
     </a>
   </div>
 </aside>
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
 {% if messages %}
   <div id="django-system-messages" style="display:none;" aria-hidden="true">
@@ -477,7 +532,33 @@
 <script src="{% static 'js/eduteka-alerts.js' %}"></script>
 
 <script>
-  // Control de colapso de Sidebar persistente
+  // Funciones de control de Sidebar Móvil
+  function openSidebarMobile() {
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) {
+      sidebar.classList.add('open', 'active');
+      document.body.classList.add('sidebar-mobile-open');
+    }
+  }
+
+  function closeSidebarMobile() {
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) {
+      sidebar.classList.remove('open', 'active');
+      document.body.classList.remove('sidebar-mobile-open');
+    }
+  }
+
+  function toggleSidebarMobile() {
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar && (sidebar.classList.contains('open') || sidebar.classList.contains('active'))) {
+      closeSidebarMobile();
+    } else {
+      openSidebarMobile();
+    }
+  }
+
+  // Control de colapso de Sidebar y Retención de Scroll
   document.addEventListener("DOMContentLoaded", function() {
     const toggleBtn = document.getElementById('sidebarCollapseToggle');
     const isCollapsed = localStorage.getItem('eduteka_sidebar_collapsed') === 'true';
@@ -496,14 +577,50 @@
       });
     }
 
-    // Soporte para botón móvil
-    const mobileBtn = document.getElementById('mobileMenuBtn') || document.querySelector('[data-bs-toggle="sidebar"]');
-    const sidebar = document.getElementById('sidebar');
-    if (mobileBtn && sidebar) {
-      mobileBtn.addEventListener('click', function(e) {
+    // Retención Inteligente de Posición de Scroll en el Sidebar
+    const sidebarNav = document.querySelector('.sidebar-nav');
+    if (sidebarNav) {
+      const savedScroll = sessionStorage.getItem('eduteka_sidebar_scroll');
+      if (savedScroll !== null) {
+        sidebarNav.scrollTop = parseInt(savedScroll, 10);
+      } else {
+        // Si no había scroll guardado, enfocar suavemente el módulo activo
+        const activeItem = sidebarNav.querySelector('.nav-item.active');
+        if (activeItem) {
+          activeItem.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+        }
+      }
+
+      // Guardar posición al hacer scroll
+      sidebarNav.addEventListener('scroll', function() {
+        sessionStorage.setItem('eduteka_sidebar_scroll', sidebarNav.scrollTop);
+      }, { passive: true });
+
+      // Guardar posición inmediatamente al hacer clic en cualquier enlace
+      sidebarNav.querySelectorAll('.nav-item').forEach(function(link) {
+        link.addEventListener('click', function() {
+          sessionStorage.setItem('eduteka_sidebar_scroll', sidebarNav.scrollTop);
+          if (window.innerWidth < 992) {
+            closeSidebarMobile();
+          }
+        });
+      });
+    }
+
+    // Soporte para botón móvil y backdrop
+    document.querySelectorAll('#mobileMenuBtn, [data-bs-toggle="sidebar"], .mobile-menu-btn').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
         e.preventDefault();
-        sidebar.classList.toggle('open');
-        sidebar.classList.toggle('active');
+        e.stopPropagation();
+        toggleSidebarMobile();
+      });
+    });
+
+    const backdrop = document.getElementById('sidebarBackdrop');
+    if (backdrop) {
+      backdrop.addEventListener('click', function(e) {
+        e.preventDefault();
+        closeSidebarMobile();
       });
     }
 
@@ -514,7 +631,52 @@
         showEdutekaToast(el.getAttribute('data-tags') || 'success', el.getAttribute('data-text') || '');
       });
     }
+
+    // Pastilla Flotante Animada para el Modo Colapsado
+    let tooltipEl = document.getElementById('edutekaFloatingTooltip');
+    if (!tooltipEl) {
+      tooltipEl = document.createElement('div');
+      tooltipEl.id = 'edutekaFloatingTooltip';
+      document.body.appendChild(tooltipEl);
+    }
+
+    const allNavItems = document.querySelectorAll('.sidebar .nav-item[data-label]');
+    allNavItems.forEach(function(item) {
+      item.addEventListener('mouseenter', function() {
+        if (!document.body.classList.contains('sidebar-collapsed') && !document.documentElement.classList.contains('sidebar-collapsed')) {
+          tooltipEl.classList.remove('show');
+          return;
+        }
+
+        const label = item.getAttribute('data-label');
+        if (!label) return;
+
+        const iconEl = item.querySelector('i');
+        const iconHtml = iconEl ? iconEl.outerHTML : '<i class="bi bi-circle"></i>';
+        const isActive = item.classList.contains('active');
+
+        tooltipEl.innerHTML = `${iconHtml} <span>${label}</span> ${isActive ? '<span class="badge bg-light text-dark px-1.5 py-0.5" style="font-size:0.65rem; border-radius:6px; margin-left:4px;">Activo</span>' : ''}`;
+        
+        if (isActive) {
+          tooltipEl.classList.add('is-active');
+        } else {
+          tooltipEl.classList.remove('is-active');
+        }
+
+        const rect = item.getBoundingClientRect();
+        tooltipEl.style.top = (rect.top + rect.height / 2) + 'px';
+        tooltipEl.style.left = (rect.right + 4) + 'px';
+        
+        // Trigger smooth show
+        requestAnimationFrame(function() {
+          tooltipEl.classList.add('show');
+        });
+      });
+
+      item.addEventListener('mouseleave', function() {
+        tooltipEl.classList.remove('show');
+      });
+    });
   });
 </script>
-
 

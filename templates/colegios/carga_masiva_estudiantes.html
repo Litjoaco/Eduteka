@@ -1,0 +1,984 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carga Masiva de Estudiantes - Eduteka</title>
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
+  <style>
+    :root {
+      --primary: #7C5CFC;
+      --primary-soft: rgba(124, 92, 252, 0.08);
+      --primary-hover: #6747E3;
+      --secondary: #65CDBF;
+      --bg: #F8F9FD;
+      --white: #FFFFFF;
+      --dark: #0F172A;
+      --gray-text: #64748B;
+      --border: #E2E8F0;
+      --radius-xl: 20px;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+    }
+
+    * { font-family: 'Plus Jakarta Sans', sans-serif; box-sizing: border-box; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+    }
+
+    .wrapper { display: flex; flex: 1; position: relative; }
+
+    .topbar {
+      height: 70px;
+      background: rgba(255, 255, 255, 0.85) !important;
+      backdrop-filter: blur(12px) !important;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; position: sticky; top: 0; z-index: 98;
+    }
+    .content-body { padding: 2rem; flex-grow: 1; max-width: 1380px; margin: 0 auto; width: 100%; }
+
+    /* Steps Indicator */
+    .stepper-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: #94A3B8;
+      font-weight: 700;
+      font-size: 0.9rem;
+      transition: all 0.25s ease;
+    }
+    .step-item.active {
+      color: var(--primary);
+    }
+    .step-item.completed {
+      color: #10B981;
+    }
+    .step-number {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: #E2E8F0;
+      color: #64748B;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem; font-weight: 800;
+      transition: all 0.25s ease;
+    }
+    .step-item.active .step-number {
+      background: var(--primary);
+      color: #FFFFFF;
+      box-shadow: 0 4px 14px rgba(124, 92, 252, 0.4);
+    }
+    .step-item.completed .step-number {
+      background: #10B981;
+      color: #FFFFFF;
+    }
+    .step-divider {
+      width: 45px; height: 2px;
+      background: #E2E8F0;
+    }
+    .step-divider.active {
+      background: var(--primary);
+    }
+
+    /* Cards */
+    .card-wizard {
+      background: #FFFFFF;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-xl);
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+      padding: 2.2rem;
+      margin-bottom: 2rem;
+    }
+
+    /* Drag & Drop Zone */
+    .dropzone-box {
+      border: 2.5px dashed #CBD5E1;
+      border-radius: var(--radius-lg);
+      background: #F8FAFC;
+      padding: 3.5rem 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+    .dropzone-box:hover, .dropzone-box.dragover {
+      border-color: var(--primary);
+      background: #FAF5FF;
+      transform: scale(1.01);
+      box-shadow: 0 12px 30px rgba(124, 92, 252, 0.08);
+    }
+    .dropzone-icon {
+      width: 72px; height: 72px;
+      border-radius: 20px;
+      background: #EDE9FE;
+      color: var(--primary);
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 2.2rem;
+      margin-bottom: 1.25rem;
+      transition: transform 0.25s ease;
+    }
+    .dropzone-box:hover .dropzone-icon {
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    /* Template download card */
+    .card-template-box {
+      background: linear-gradient(135deg, #FAF5FF 0%, #F5F3FF 100%);
+      border: 1.5px solid #DDD6FE;
+      border-radius: var(--radius-lg);
+      padding: 1.5rem 1.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1.25rem;
+      margin-top: 1.5rem;
+    }
+
+    /* Filter tabs */
+    .filter-pill-btn {
+      border: 1.5px solid #E2E8F0;
+      background: #FFFFFF;
+      color: #64748B;
+      font-weight: 700;
+      font-size: 0.84rem;
+      padding: 0.5rem 1rem;
+      border-radius: 50px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      display: inline-flex; align-items: center; gap: 0.4rem;
+    }
+    .filter-pill-btn:hover {
+      border-color: #CBD5E1;
+      color: var(--dark);
+    }
+    .filter-pill-btn.active {
+      background: var(--dark);
+      color: #FFFFFF;
+      border-color: var(--dark);
+    }
+    .filter-pill-btn.active.filter-errors {
+      background: #DC2626;
+      border-color: #DC2626;
+      color: #FFFFFF;
+    }
+    .filter-pill-btn.active.filter-warnings {
+      background: #D97706;
+      border-color: #D97706;
+      color: #FFFFFF;
+    }
+    .filter-pill-btn.active.filter-valid {
+      background: #059669;
+      border-color: #059669;
+      color: #FFFFFF;
+    }
+
+    /* Table styles */
+    .table-preview {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 0.86rem;
+    }
+    .table-preview th {
+      background: #F1F5F9;
+      color: #475569;
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 800;
+      padding: 0.85rem 0.95rem;
+      border-bottom: 1.5px solid #E2E8F0;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .table-preview td {
+      padding: 0.75rem 0.95rem;
+      vertical-align: middle;
+      border-bottom: 1px solid #F1F5F9;
+      background: #FFFFFF;
+    }
+    .table-preview tr:hover td {
+      background: #F8FAFC;
+    }
+    .table-preview tr.row-has-error td {
+      background: #FFF1F2 !important;
+    }
+    .table-preview tr.row-has-warning td {
+      background: #FFFBEB !important;
+    }
+
+    .table-input-cell {
+      border: 1px solid #CBD5E1;
+      border-radius: 8px;
+      padding: 0.35rem 0.65rem;
+      font-size: 0.85rem;
+      width: 100%;
+      background: #FFFFFF;
+      transition: all 0.2s ease;
+    }
+    .table-input-cell:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(124, 92, 252, 0.15);
+      outline: none;
+    }
+    .table-input-cell.is-invalid-cell {
+      border-color: #EF4444 !important;
+      background-color: #FEF2F2 !important;
+    }
+
+    /* Badges */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-weight: 800;
+      font-size: 0.72rem;
+      padding: 0.3rem 0.7rem;
+      border-radius: 50px;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+    .status-badge.valido { background: #ECFDF5; color: #059669; border: 1px solid #A7F3D0; }
+    .status-badge.advertencia { background: #FEF3C7; color: #D97706; border: 1px solid #FDE68A; }
+    .status-badge.error { background: #FEE2E2; color: #DC2626; border: 1px solid #FECACA; }
+
+    /* Policy Radio Pills */
+    .policy-pill-radio {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .policy-pill-label {
+      flex: 1;
+      min-width: 260px;
+      border: 1.5px solid #E2E8F0;
+      border-radius: var(--radius-md);
+      padding: 1rem 1.25rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.85rem;
+      background: #FFFFFF;
+    }
+    .policy-pill-label:hover {
+      border-color: #CBD5E1;
+      background: #F8FAFC;
+    }
+    .policy-pill-label input[type="radio"]:checked + .policy-content {
+      color: var(--primary);
+    }
+    .policy-pill-label:has(input[type="radio"]:checked) {
+      border-color: var(--primary);
+      background: #FAF5FF;
+      box-shadow: 0 4px 14px rgba(124, 92, 252, 0.08);
+    }
+
+    @media (max-width: 991.98px) {
+      .main-content { margin-left: 0 !important; width: 100% !important; }
+      .topbar { padding: 0.85rem 1rem; flex-wrap: wrap; height: auto; gap: 0.75rem; }
+      .content-body { padding: 1.25rem 1rem; }
+      .stepper-nav { gap: 0.75rem; overflow-x: auto; padding-bottom: 0.5rem; justify-content: flex-start; }
+      .card-wizard { padding: 1.5rem 1.2rem; }
+    }
+
+    @media (max-width: 575.98px) {
+      .content-body { padding: 1rem 0.75rem; }
+      .card-wizard { padding: 1.25rem 0.85rem; }
+      .dropzone-box { padding: 2rem 1rem; }
+      .step-item span.fw-bold { font-size: 0.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="wrapper">
+    {% include 'colegios/_sidebar.html' %}
+
+    <div class="main-content flex-grow-1 d-flex flex-column" style="min-width: 0;">
+      
+      <!-- TOPBAR -->
+      <header class="topbar">
+        <div class="d-flex align-items-center gap-2">
+          <button class="btn btn-sm d-lg-none" id="mobileMenuBtn" style="border:none; background:var(--primary-soft); color:var(--primary); padding: 0.4rem 0.6rem;">
+            <i class="bi bi-list fs-5"></i>
+          </button>
+          <a href="{% url 'listar_estudiantes' %}" class="btn btn-sm btn-outline-secondary fw-bold px-2.5 py-1.5" style="border-radius:10px;">
+            <i class="bi bi-arrow-left me-1"></i> <span class="d-none d-sm-inline">Volver a Nómina</span><span class="d-inline d-sm-none">Volver</span>
+          </a>
+          <div class="vr mx-1 d-none d-md-block"></div>
+          <div>
+            <h1 class="fs-5 fw-extrabold mb-0 d-flex align-items-center gap-2" style="font-size: 1.1rem !important;">
+              <i class="bi bi-file-earmark-spreadsheet-fill text-primary"></i> <span class="d-none d-sm-inline">Carga Masiva de Estudiantes</span><span class="d-inline d-sm-none">Carga Masiva</span>
+            </h1>
+            <span class="text-muted extra-small d-none d-sm-inline">{{ colegio.nombre }} • Asistente de Importación Inteligente</span>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+          <a href="{% url 'descargar_plantilla_estudiantes_excel' %}" class="btn btn-sm fw-bold px-3 py-1.5 shadow-sm d-flex align-items-center gap-1.5" style="background:#EDE9FE; color:#6D28D9; border:1px solid #DDD6FE; border-radius:10px; font-size: 0.82rem;">
+            <i class="bi bi-download"></i>
+            <span class="d-none d-sm-inline">Descargar Plantilla (.xlsx)</span>
+            <span class="d-inline d-sm-none">Plantilla</span>
+          </a>
+        </div>
+      </header>
+
+      <!-- CONTENT BODY -->
+      <main class="content-body">
+
+        <!-- STEPPER NAV -->
+        <div class="stepper-nav">
+          <div class="step-item active" id="stepIndicator1">
+            <span class="step-number">1</span>
+            <span>Subir Archivo</span>
+          </div>
+          <div class="step-divider" id="stepDivider1"></div>
+          <div class="step-item" id="stepIndicator2">
+            <span class="step-number">2</span>
+            <span>Vista Previa & Corrección</span>
+          </div>
+          <div class="step-divider" id="stepDivider2"></div>
+          <div class="step-item" id="stepIndicator3">
+            <span class="step-number">3</span>
+            <span>Resultado Final</span>
+          </div>
+        </div>
+
+        
+        <div id="step1Container">
+          <div class="card-wizard">
+            
+            <div class="text-center max-w-xl mx-auto mb-4">
+              <h2 class="fw-extrabold fs-4 mb-2">Importar Nómina de Alumnos</h2>
+              <p class="text-muted small mb-0">
+                Sube tu archivo Excel (<strong>.xlsx</strong>) o <strong>CSV</strong>. El sistema verificará los RUTs, cursos y datos automáticamente antes de matricular.
+              </p>
+            </div>
+
+            <!-- DROPZONE -->
+            <form id="formDropzone" enctype="multipart/form-data">
+              {% csrf_token %}
+              <input type="file" id="fileInput" name="archivo" accept=".xlsx, .xls, .csv" class="d-none">
+              
+              <div class="dropzone-box" id="dropzoneBox" onclick="document.getElementById('fileInput').click()">
+                <div class="dropzone-icon">
+                  <i class="bi bi-cloud-arrow-up-fill"></i>
+                </div>
+                <h4 class="fw-bold fs-5 mb-1 text-dark">Haz clic aquí o arrastra tu archivo Excel</h4>
+                <p class="text-muted small mb-3">Formatos compatibles: <strong>Microsoft Excel (.xlsx, .xls)</strong> y <strong>CSV (.csv)</strong></p>
+                <div class="d-inline-flex align-items-center gap-2 px-3 py-1.5 rounded-3 bg-white border shadow-sm">
+                  <i class="bi bi-file-earmark-excel-fill text-success"></i>
+                  <span class="fw-bold extra-small text-dark" id="fileNameSelected">Ningún archivo seleccionado</span>
+                </div>
+              </div>
+            </form>
+
+            <!-- POLÍTICA ANTE DUPLICADOS -->
+            <div class="mt-4 pt-3 border-top">
+              <label class="form-label fw-bold text-dark small mb-2 d-flex align-items-center gap-1.5">
+                <i class="bi bi-gear-fill text-primary"></i> Política ante RUTs ya registrados en el colegio:
+              </label>
+              
+              <div class="policy-pill-radio">
+                <label class="policy-pill-label">
+                  <input type="radio" name="politica_duplicados" value="actualizar" checked class="form-check-input mt-1">
+                  <div class="policy-content">
+                    <strong class="d-block text-dark small">Actualizar Ficha de Estudiante</strong>
+                    <span class="text-muted extra-small">Si el RUT ya existe en el colegio, actualiza su curso, contacto y datos personales.</span>
+                  </div>
+                </label>
+
+                <label class="policy-pill-label">
+                  <input type="radio" name="politica_duplicados" value="omitir" class="form-check-input mt-1">
+                  <div class="policy-content">
+                    <strong class="d-block text-dark small">Omitir Duplicados</strong>
+                    <span class="text-muted extra-small">Si el RUT ya existe, se mantiene la ficha actual sin realizar cambios.</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <!-- DESCARGA DE PLANTILLA INTELIGENTE -->
+            <div class="card-template-box">
+              <div class="d-flex align-items-center gap-3">
+                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width:48px; height:48px; background:#7C5CFC; color:#FFFFFF; font-size:1.4rem;">
+                  <i class="bi bi-file-earmark-check-fill"></i>
+                </div>
+                <div>
+                  <h5 class="fw-extrabold text-dark mb-0 fs-6">¿Aún no tienes la plantilla oficial?</h5>
+                  <p class="text-muted extra-small mb-0">
+                    Descarga nuestra plantilla Excel inteligente que ya incluye los <strong>{{ secciones_count }} cursos de tu colegio</strong> en listas desplegables.
+                  </p>
+                </div>
+              </div>
+
+              <a href="{% url 'descargar_plantilla_estudiantes_excel' %}" class="btn btn-sm fw-bold px-4 py-2.5 shadow-sm d-flex align-items-center gap-2" style="background:#7C5CFC; color:#FFFFFF; border:none; border-radius:12px;">
+                <i class="bi bi-download"></i>
+                <span>Descargar Plantilla (.xlsx)</span>
+              </a>
+            </div>
+
+            <!-- BOTÓN SIGUIENTE / ANALIZAR -->
+            <div class="mt-4 text-end">
+              <button type="button" id="btnAnalizarArchivo" class="btn fw-bold px-5 py-2.5 shadow-sm d-inline-flex align-items-center gap-2" style="background:linear-gradient(135deg, #7C5CFC 0%, #4F46E5 100%); color:#FFFFFF; border:none; border-radius:12px; font-size:0.95rem;" disabled>
+                <span>Analizar y Pre-validar Archivo</span>
+                <i class="bi bi-arrow-right"></i>
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        
+        <div id="step2Container" class="d-none">
+          
+          <!-- KPI RESUMEN DE VALIDACIÓN -->
+          <div class="row g-3 mb-4">
+            <div class="col-md-3 col-6">
+              <div class="p-3 bg-white border rounded-4 shadow-sm d-flex align-items-center gap-3">
+                <div class="rounded-3 d-flex align-items-center justify-content-center" style="width:44px; height:44px; background:#F1F5F9; color:#475569; font-size:1.3rem;">
+                  <i class="bi bi-people-fill"></i>
+                </div>
+                <div>
+                  <span class="text-muted extra-small fw-bold text-uppercase d-block">Total Filas</span>
+                  <span class="fs-4 fw-extrabold text-dark" id="statTotalRows">0</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-3 col-6">
+              <div class="p-3 bg-white border rounded-4 shadow-sm d-flex align-items-center gap-3" style="border-left: 4px solid #10B981 !important;">
+                <div class="rounded-3 d-flex align-items-center justify-content-center" style="width:44px; height:44px; background:#ECFDF5; color:#059669; font-size:1.3rem;">
+                  <i class="bi bi-check-circle-fill"></i>
+                </div>
+                <div>
+                  <span class="text-muted extra-small fw-bold text-uppercase d-block text-success">Válidos</span>
+                  <span class="fs-4 fw-extrabold text-success" id="statValidRows">0</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-3 col-6">
+              <div class="p-3 bg-white border rounded-4 shadow-sm d-flex align-items-center gap-3" style="border-left: 4px solid #F59E0B !important;">
+                <div class="rounded-3 d-flex align-items-center justify-content-center" style="width:44px; height:44px; background:#FEF3C7; color:#D97706; font-size:1.3rem;">
+                  <i class="bi bi-exclamation-triangle-fill"></i>
+                </div>
+                <div>
+                  <span class="text-muted extra-small fw-bold text-uppercase d-block text-warning">Advertencias</span>
+                  <span class="fs-4 fw-extrabold text-warning" id="statWarningRows">0</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-3 col-6">
+              <div class="p-3 bg-white border rounded-4 shadow-sm d-flex align-items-center gap-3" style="border-left: 4px solid #EF4444 !important;">
+                <div class="rounded-3 d-flex align-items-center justify-content-center" style="width:44px; height:44px; background:#FEE2E2; color:#DC2626; font-size:1.3rem;">
+                  <i class="bi bi-x-circle-fill"></i>
+                </div>
+                <div>
+                  <span class="text-muted extra-small fw-bold text-uppercase d-block text-danger">Errores Críticos</span>
+                  <span class="fs-4 fw-extrabold text-danger" id="statErrorRows">0</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TABLA DE VISTA PREVIA -->
+          <div class="card-wizard p-0 overflow-hidden">
+            
+            <!-- HEADER DE LA TABLA Y FILTROS -->
+            <div class="p-3.5 px-4 bg-light border-bottom d-flex align-items-center justify-content-between flex-wrap gap-3">
+              <div class="d-flex align-items-center gap-2 flex-wrap" id="filterPillsContainer">
+                <button type="button" class="filter-pill-btn active" data-filter="all">
+                  <i class="bi bi-list-ul"></i> Todos (<span id="countFilterAll">0</span>)
+                </button>
+                <button type="button" class="filter-pill-btn filter-errors" data-filter="error">
+                  <i class="bi bi-x-circle-fill"></i> Con Errores (<span id="countFilterError">0</span>)
+                </button>
+                <button type="button" class="filter-pill-btn filter-warnings" data-filter="advertencia">
+                  <i class="bi bi-exclamation-triangle-fill"></i> Advertencias (<span id="countFilterWarn">0</span>)
+                </button>
+                <button type="button" class="filter-pill-btn filter-valid" data-filter="valido">
+                  <i class="bi bi-check-circle-fill"></i> 100% Válidos (<span id="countFilterValid">0</span>)
+                </button>
+              </div>
+
+              <span class="text-muted extra-small d-flex align-items-center gap-1">
+                <i class="bi bi-info-circle-fill text-primary"></i> Puedes editar cualquier celda con error directamente en la tabla antes de guardar.
+              </span>
+            </div>
+
+            <!-- CONTENEDOR CON SCROLL HORIZONTAL Y VERTICAL -->
+            <div class="table-responsive" style="max-height: 520px; overflow-y: auto;">
+              <table class="table-preview" id="tablaPrevisualizacion">
+                <thead>
+                  <tr>
+                    <th style="width: 50px; text-align: center;">#</th>
+                    <th style="width: 120px;">Estado</th>
+                    <th style="min-width: 140px;">* RUT Estudiante</th>
+                    <th style="min-width: 220px;">* Nombre Completo</th>
+                    <th style="min-width: 200px;">* Curso y Sección</th>
+                    <th style="min-width: 130px;">F. Nacimiento</th>
+                    <th style="min-width: 130px;">Género</th>
+                    <th style="min-width: 180px;">Apoderado</th>
+                    <th style="min-width: 140px;">Teléfono Apod.</th>
+                    <th style="width: 80px; text-align: center;">PIE</th>
+                    <th style="min-width: 220px;">Detalle / Observaciones</th>
+                    <th style="width: 60px; text-align: center;">Quitar</th>
+                  </tr>
+                </thead>
+                <tbody id="tbodyPrevisualizacion">
+                  <!-- Inyectado dinámicamente con JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- FOOTER DE ACCIONES -->
+            <div class="p-3.5 px-4 bg-white border-top d-flex align-items-center justify-content-between flex-wrap gap-3">
+              <button type="button" id="btnVolverPaso1" class="btn btn-outline-secondary fw-bold px-4 py-2.5" style="border-radius:12px; font-size:0.9rem;">
+                <i class="bi bi-arrow-left me-1"></i> Subir otro archivo
+              </button>
+
+              <div class="d-flex align-items-center gap-3">
+                <span class="text-danger small fw-bold d-none" id="msgBloqueoErrores">
+                  <i class="bi bi-exclamation-octagon-fill me-1"></i> Corrige los errores en rojo para continuar.
+                </span>
+
+                <button type="button" id="btnConfirmarImportacion" class="btn fw-bold px-5 py-2.5 shadow-sm d-inline-flex align-items-center gap-2" style="background:linear-gradient(135deg, #10B981 0%, #059669 100%); color:#FFFFFF; border:none; border-radius:12px; font-size:0.95rem;">
+                  <i class="bi bi-cloud-arrow-up-fill"></i>
+                  <span>Confirmar e Importar Estudiantes</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        
+        <div id="step3Container" class="d-none">
+          <div class="card-wizard text-center py-5">
+            
+            <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3 shadow-lg" style="width:84px; height:84px; background:linear-gradient(135deg, #10B981 0%, #059669 100%); color:#FFFFFF; font-size:2.8rem;">
+              <i class="bi bi-check-lg"></i>
+            </div>
+
+            <h2 class="fw-extrabold fs-3 mb-2 text-dark">¡Importación Completada con Éxito!</h2>
+            <p class="text-muted small mb-4" id="txtSubtituloExito">
+              Los estudiantes han sido matriculados y asignados a sus respectivos cursos en el sistema.
+            </p>
+
+            <!-- RESUMEN EN TARJETAS -->
+            <div class="row g-3 justify-content-center max-w-lg mx-auto mb-5" style="max-width: 600px;">
+              <div class="col-4">
+                <div class="p-3 bg-light border rounded-4">
+                  <span class="text-muted extra-small fw-bold text-uppercase d-block">Nuevos Creados</span>
+                  <span class="fs-3 fw-extrabold text-success" id="resCreados">0</span>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="p-3 bg-light border rounded-4">
+                  <span class="text-muted extra-small fw-bold text-uppercase d-block">Actualizados</span>
+                  <span class="fs-3 fw-extrabold text-primary" id="resActualizados">0</span>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="p-3 bg-light border rounded-4">
+                  <span class="text-muted extra-small fw-bold text-uppercase d-block">Omitidos</span>
+                  <span class="fs-3 fw-extrabold text-muted" id="resOmitidos">0</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- BOTONES DE ACCIÓN -->
+            <div class="d-flex justify-content-center gap-3 flex-wrap">
+              <a href="{% url 'listar_estudiantes' %}" class="btn fw-bold px-4 py-2.5 shadow-sm d-flex align-items-center gap-2" style="background:#7C5CFC; color:#FFFFFF; border:none; border-radius:12px; font-size:0.95rem;">
+                <i class="bi bi-people-fill"></i>
+                <span>Ir a la Nómina de Estudiantes</span>
+              </a>
+
+              <button type="button" class="btn btn-outline-secondary fw-bold px-4 py-2.5" style="border-radius:12px; font-size:0.95rem;" onclick="location.reload()">
+                <i class="bi bi-arrow-repeat me-1"></i> Realizar Otra Carga
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT DEL ASISTENTE DE CARGA -->
+  <script>
+    let parsedRows = [];
+    let seccionesDisponibles = [];
+    let currentFilter = 'all';
+
+    const dropzoneBox = document.getElementById('dropzoneBox');
+    const fileInput = document.getElementById('fileInput');
+    const fileNameSelected = document.getElementById('fileNameSelected');
+    const btnAnalizarArchivo = document.getElementById('btnAnalizarArchivo');
+
+    // Drag & Drop events
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropzoneBox.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropzoneBox.classList.add('dragover');
+      }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropzoneBox.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropzoneBox.classList.remove('dragover');
+      }, false);
+    });
+
+    dropzoneBox.addEventListener('drop', (e) => {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      if (files.length) {
+        fileInput.files = files;
+        handleFileSelected(files[0]);
+      }
+    });
+
+    fileInput.addEventListener('change', function() {
+      if (this.files.length) {
+        handleFileSelected(this.files[0]);
+      }
+    });
+
+    function handleFileSelected(file) {
+      fileNameSelected.textContent = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+      btnAnalizarArchivo.disabled = false;
+    }
+
+    // PASO 1 -> PASO 2: ANALIZAR ARCHIVO
+    btnAnalizarArchivo.addEventListener('click', function() {
+      if (!fileInput.files.length) return;
+
+      const formData = new FormData();
+      formData.append('archivo', fileInput.files[0]);
+      formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+      Swal.fire({
+        title: 'Analizando archivo...',
+        text: 'Validando formato, RUTs y cursos asignados...',
+        allowOutsideClick: false,
+        didOpen: () => { Swal.showLoading(); }
+      });
+
+      fetch("{% url 'api_analizar_estudiantes' %}", {
+        method: 'POST',
+        body: formData
+      })
+      .then(r => r.json())
+      .then(data => {
+        Swal.close();
+        if (data.error) {
+          Swal.fire('Error al procesar', data.error, 'error');
+          return;
+        }
+
+        parsedRows = data.filas || [];
+        seccionesDisponibles = data.secciones_disponibles || [];
+        
+        mostrarPaso2(data);
+      })
+      .catch(err => {
+        Swal.close();
+        Swal.fire('Error de conexión', 'No se pudo conectar con el servidor: ' + err, 'error');
+      });
+    });
+
+    function mostrarPaso2(data) {
+      document.getElementById('step1Container').classList.add('d-none');
+      document.getElementById('step2Container').classList.remove('d-none');
+
+      document.getElementById('stepIndicator1').classList.remove('active');
+      document.getElementById('stepIndicator1').classList.add('completed');
+      document.getElementById('stepDivider1').classList.add('active');
+      document.getElementById('stepIndicator2').classList.add('active');
+
+      renderizarTabla();
+    }
+
+    function renderizarTabla() {
+      const tbody = document.getElementById('tbodyPrevisualizacion');
+      tbody.innerHTML = '';
+
+      let total = parsedRows.length;
+      let validos = 0;
+      let advertencias = 0;
+      let errores = 0;
+
+      parsedRows.forEach((row, idx) => {
+        // Recalcular estado por si el usuario editó celdas
+        row.errores = [];
+        row.advertencias = [];
+
+        if (!row.nombre_completo.trim()) {
+          row.errores.push("El nombre es obligatorio.");
+        }
+        if (!row.seccion_id) {
+          row.errores.push("Falta asignar curso/sección.");
+        }
+        if (!row.rut.trim()) {
+          row.advertencias.push("Sin RUT.");
+        }
+
+        if (row.errores.length > 0) {
+          row.estado = 'error';
+          errores++;
+        } else if (row.advertencias.length > 0) {
+          row.estado = 'advertencia';
+          advertencias++;
+        } else {
+          row.estado = 'valido';
+          validos++;
+        }
+
+        // Filtrado
+        if (currentFilter !== 'all' && row.estado !== currentFilter) {
+          return;
+        }
+
+        const tr = document.createElement('tr');
+        if (row.estado === 'error') tr.classList.add('row-has-error');
+        if (row.estado === 'advertencia') tr.classList.add('row-has-warning');
+
+        // Construir opciones de secciones
+        let secOptions = `<option value="">-- Seleccionar Curso --</option>`;
+        seccionesDisponibles.forEach(s => {
+          const sel = (String(s.id) === String(row.seccion_id)) ? 'selected' : '';
+          secOptions += `<option value="${s.id}" ${sel}>${s.nombre}</option>`;
+        });
+
+        // Observaciones / badges
+        let detalleHtml = '';
+        if (row.errores.length > 0) {
+          detalleHtml = `<div class="text-danger extra-small fw-bold"><i class="bi bi-x-circle-fill me-1"></i>${row.errores.join('<br>')}</div>`;
+        } else if (row.advertencias.length > 0) {
+          detalleHtml = `<div class="text-warning extra-small fw-bold"><i class="bi bi-exclamation-triangle-fill me-1"></i>${row.advertencias.join('<br>')}</div>`;
+        } else {
+          detalleHtml = `<span class="text-success extra-small fw-bold"><i class="bi bi-check-circle-fill me-1"></i>Listo para matricular</span>`;
+        }
+
+        tr.innerHTML = `
+          <td class="text-center font-monospace text-muted extra-small">${row.index}</td>
+          <td>
+            <span class="status-badge ${row.estado}">
+              ${row.estado === 'valido' ? '🟢 Válido' : row.estado === 'advertencia' ? '🟡 Alerta' : '🔴 Error'}
+            </span>
+          </td>
+          <td>
+            <input type="text" class="table-input-cell font-monospace" value="${row.rut || ''}" onchange="actualizarCampo(${idx}, 'rut', this.value)" placeholder="RUT">
+          </td>
+          <td>
+            <input type="text" class="table-input-cell fw-bold ${!row.nombre_completo ? 'is-invalid-cell' : ''}" value="${row.nombre_completo || ''}" onchange="actualizarCampo(${idx}, 'nombre_completo', this.value)" placeholder="Nombres y Apellidos">
+          </td>
+          <td>
+            <select class="table-input-cell fw-bold ${!row.seccion_id ? 'is-invalid-cell' : ''}" onchange="actualizarCampo(${idx}, 'seccion_id', this.value)">
+              ${secOptions}
+            </select>
+          </td>
+          <td>
+            <input type="date" class="table-input-cell" value="${row.fecha_nacimiento || ''}" onchange="actualizarCampo(${idx}, 'fecha_nacimiento', this.value)">
+          </td>
+          <td>
+            <select class="table-input-cell" onchange="actualizarCampo(${idx}, 'genero', this.value)">
+              <option value="no_informa" ${row.genero === 'no_informa' ? 'selected' : ''}>No informa</option>
+              <option value="masculino" ${row.genero === 'masculino' ? 'selected' : ''}>Masculino</option>
+              <option value="femenino" ${row.genero === 'femenino' ? 'selected' : ''}>Femenino</option>
+              <option value="otro" ${row.genero === 'otro' ? 'selected' : ''}>Otro</option>
+            </select>
+          </td>
+          <td>
+            <input type="text" class="table-input-cell" value="${row.nombre_apoderado || ''}" onchange="actualizarCampo(${idx}, 'nombre_apoderado', this.value)" placeholder="Apoderado">
+          </td>
+          <td>
+            <input type="text" class="table-input-cell" value="${row.telefono_apoderado || ''}" onchange="actualizarCampo(${idx}, 'telefono_apoderado', this.value)" placeholder="+56 9...">
+          </td>
+          <td class="text-center">
+            <input type="checkbox" class="form-check-input" ${row.es_pie ? 'checked' : ''} onchange="actualizarCampo(${idx}, 'es_pie', this.checked)">
+          </td>
+          <td>
+            ${detalleHtml}
+          </td>
+          <td class="text-center">
+            <button type="button" class="btn btn-sm btn-link text-danger p-0" title="Descartar fila" onclick="eliminarFila(${idx})">
+              <i class="bi bi-trash3-fill"></i>
+            </button>
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+
+      // Actualizar contadores
+      document.getElementById('statTotalRows').textContent = total;
+      document.getElementById('statValidRows').textContent = validos;
+      document.getElementById('statWarningRows').textContent = advertencias;
+      document.getElementById('statErrorRows').textContent = errores;
+
+      document.getElementById('countFilterAll').textContent = total;
+      document.getElementById('countFilterError').textContent = errores;
+      document.getElementById('countFilterWarn').textContent = advertencias;
+      document.getElementById('countFilterValid').textContent = validos;
+
+      // Validar botón de guardar
+      const btnConfirmar = document.getElementById('btnConfirmarImportacion');
+      const msgBloqueo = document.getElementById('msgBloqueoErrores');
+      if (errores > 0) {
+        btnConfirmar.disabled = true;
+        btnConfirmar.classList.add('opacity-50');
+        msgBloqueo.classList.remove('d-none');
+      } else {
+        btnConfirmar.disabled = false;
+        btnConfirmar.classList.remove('opacity-50');
+        msgBloqueo.classList.add('d-none');
+      }
+    }
+
+    function actualizarCampo(idx, campo, valor) {
+      if (parsedRows[idx]) {
+        parsedRows[idx][campo] = valor;
+        renderizarTabla();
+      }
+    }
+
+    function eliminarFila(idx) {
+      parsedRows.splice(idx, 1);
+      renderizarTabla();
+    }
+
+    // Filtros de píldoras
+    document.querySelectorAll('.filter-pill-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.filter-pill-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        currentFilter = this.dataset.filter;
+        renderizarTabla();
+      });
+    });
+
+    // Volver a Paso 1
+    document.getElementById('btnVolverPaso1').addEventListener('click', function() {
+      document.getElementById('step2Container').classList.add('d-none');
+      document.getElementById('step1Container').classList.remove('d-none');
+
+      document.getElementById('stepIndicator2').classList.remove('active');
+      document.getElementById('stepDivider1').classList.remove('active');
+      document.getElementById('stepIndicator1').classList.add('active');
+      document.getElementById('stepIndicator1').classList.remove('completed');
+    });
+
+    // PASO 2 -> PASO 3: CONFIRMAR E IMPORTAR
+    document.getElementById('btnConfirmarImportacion').addEventListener('click', function() {
+      if (!parsedRows.length) {
+        Swal.fire('Atención', 'No hay estudiantes para importar.', 'info');
+        return;
+      }
+
+      const politica = document.querySelector('input[name="politica_duplicados"]:checked')?.value || 'actualizar';
+
+      Swal.fire({
+        title: `¿Confirmar importación de ${parsedRows.length} estudiantes?`,
+        text: 'Se matricularán en sus respectivos cursos y quedarán disponibles de inmediato en la plataforma.',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#10B981',
+        cancelButtonColor: '#64748B',
+        confirmButtonText: '<i class="bi bi-cloud-arrow-up-fill me-1"></i> Sí, Importar Nómina',
+        cancelButtonText: 'Revisar'
+      }).then(result => {
+        if (result.isConfirmed) {
+          Swal.fire({
+            title: 'Importando estudiantes...',
+            text: 'Guardando nómina en la base de datos...',
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); }
+          });
+
+          fetch("{% url 'api_procesar_carga_estudiantes' %}", {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+              filas: parsedRows,
+              politica_duplicados: politica
+            })
+          })
+          .then(r => r.json())
+          .then(data => {
+            Swal.close();
+            if (data.error) {
+              Swal.fire('Error al guardar', data.error, 'error');
+              return;
+            }
+
+            // Mostrar Paso 3
+            document.getElementById('step2Container').classList.add('d-none');
+            document.getElementById('step3Container').classList.remove('d-none');
+
+            document.getElementById('stepIndicator2').classList.remove('active');
+            document.getElementById('stepIndicator2').classList.add('completed');
+            document.getElementById('stepDivider2').classList.add('active');
+            document.getElementById('stepIndicator3').classList.add('active');
+            document.getElementById('stepIndicator3').classList.add('completed');
+
+            document.getElementById('resCreados').textContent = data.creados;
+            document.getElementById('resActualizados').textContent = data.actualizados;
+            document.getElementById('resOmitidos').textContent = data.omitidos;
+
+            document.getElementById('txtSubtituloExito').textContent = `Se procesaron exitosamente ${data.total_procesados} registros de estudiantes para el colegio {{ colegio.nombre }}.`;
+          })
+          .catch(err => {
+            Swal.close();
+            Swal.fire('Error', 'Hubo un fallo en la conexión: ' + err, 'error');
+          });
+        }
+      });
+    });
+
+    const mobileBtn = document.getElementById('mobileMenuBtn');
+    if (mobileBtn) {
+      mobileBtn.addEventListener('click', () => {
+        if (typeof window.toggleSidebarMobile === 'function') {
+          window.toggleSidebarMobile();
+        } else {
+          document.getElementById('sidebar')?.classList.toggle('open');
+        }
+      });
+    }
+  </script>
+
+</body>
+</html>

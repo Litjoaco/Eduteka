@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
     <style>
-        /* ══ DESIGN TOKENS (idénticos al resto del Super Admin) ═══════════════ */
+        
         :root {
             --primary:        #7C5CFC;
             --primary-soft:   rgba(124, 92, 252, 0.08);
@@ -60,7 +60,7 @@
 
         .wrapper { display: flex; width: 100%; align-items: stretch; }
 
-        /* ── TOPBAR */
+        
         .topbar {
             height: 70px;
             background: rgba(255, 255, 255, 0.85) !important;
@@ -94,14 +94,14 @@
         }
         .user-name { font-weight: 600; font-size: .88rem; color: var(--dark); }
 
-        /* ── CONTENT AREA */
+        
         .content-area { padding: 1.75rem 2rem; max-width: 1400px; width: 100%; margin: 0 auto; }
 
-        /* ── HERO */
+        
         .hero-title   { font-size: 1.6rem; font-weight: 800; color: var(--dark); margin-bottom: .25rem; }
         .hero-subtitle { color: var(--gray-text); font-size: .9rem; }
 
-        /* ── STAT CARDS */
+        
         .stat-card {
             background: var(--white); border: 1px solid var(--border);
             border-radius: var(--radius-lg); padding: 1.25rem 1.5rem;
@@ -122,13 +122,13 @@
         .stat-value { font-size: 1.55rem; font-weight: 800; color: var(--dark); line-height: 1; }
         .stat-label { font-size: .76rem; color: var(--gray-text); font-weight: 500; margin-top: .2rem; }
 
-        /* ── PANEL */
+        
         .panel { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: 0 4px 20px rgba(0,0,0,.03); overflow: hidden; }
         .panel-header { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 1rem; }
         .panel-title { font-size: 1rem; font-weight: 700; color: var(--dark); }
         .panel-subtitle { font-size: .78rem; color: var(--gray-text); margin-top: .1rem; }
 
-        /* ── TABLE */
+        
         .onboarding-table { width: 100%; border-collapse: collapse; }
         .onboarding-table thead th {
             padding: .75rem 1.5rem;
@@ -140,7 +140,7 @@
         .onboarding-table tbody tr:hover { background: rgba(124,92,252,.03); }
         .onboarding-table tbody td { padding: 1rem 1.5rem; vertical-align: middle; }
 
-        /* ── PROGRESS BAR STYLES */
+        
         .progress-container { width: 100%; max-width: 260px; }
         .progress-track {
             height: 8px; width: 100%; background: #E5E7EB; border-radius: 999px; overflow: hidden;
@@ -157,7 +157,7 @@
         .step-tag { font-weight: 700; color: var(--dark); }
         .pct-tag  { font-weight: 800; color: var(--gray-text); }
 
-        /* ── STATUS BADGES */
+        
         .status-badge {
             display: inline-flex; align-items: center; gap: .35rem;
             padding: .25rem .65rem; border-radius: 999px;
@@ -168,7 +168,7 @@
         .status-critico    { background: #FEE2E2; color: #991B1B; }
         .status-completado { background: rgba(16,185,129,.12); color: #047857; }
 
-        /* ── ACTION BUTTONS */
+        
         .action-btn {
             width: 32px; height: 32px;
             display: inline-flex; align-items: center; justify-content: center;
@@ -181,7 +181,7 @@
         .action-btn.mail:hover  { color: #7C5CFC; border-color: #C7D2FE; background: #EEF2FF; }
         .action-btn.help:hover  { color: #D97706; border-color: #FCD34D; background: #FEF3C7; }
 
-        /* ── BUTTONS */
+        
         .btn-primary-custom {
             display: inline-flex; align-items: center; gap: .45rem;
             padding: .55rem 1.25rem; background: var(--primary); color: #fff;
@@ -197,7 +197,7 @@
         }
         .btn-outline-custom:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-soft); }
 
-        /* ── SEARCH & FILTERS */
+        
         .table-search { position: relative; min-width: 220px; }
         .table-search i { position: absolute; left: .75rem; top: 50%; transform: translateY(-50%); color: var(--gray-text); font-size: .85rem; }
         .table-search input {
@@ -214,7 +214,7 @@
         }
         .form-control-custom:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(124,92,252,.12); }
 
-        /* ── FUNNEL WIDGET */
+        
         .funnel-card {
             background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-md);
             padding: .9rem 1.1rem; text-align: center; flex: 1; min-width: 130px;
@@ -223,7 +223,7 @@
         .funnel-step-name { font-size: .8rem; font-weight: 700; color: var(--dark); margin: .15rem 0 .3rem; }
         .funnel-count { font-size: 1.25rem; font-weight: 800; color: var(--dark); }
 
-        /* ── MODAL */
+        
         .modal-overlay {
             display: none; position: fixed; inset: 0;
             background: rgba(21,26,53,.45); backdrop-filter: blur(4px);
@@ -590,8 +590,6 @@
     </main>
 </div><!-- /wrapper -->
 
-
-<!-- ════ MODAL: CONTACTAR / ENVIAR ASISTENCIA ═════════════════════════════ -->
 <div class="modal-overlay" id="modalContact">
     <div class="modal-box">
         <div class="d-flex align-items-center justify-content-between mb-3">
@@ -623,7 +621,6 @@
     </div>
 </div>
 
-<!-- ════ MODAL: DETALLE DEL PASO ══════════════════════════════════════════ -->
 <div class="modal-overlay" id="modalDetail">
     <div class="modal-box">
         <div class="d-flex align-items-center justify-content-between mb-3">
@@ -645,17 +642,16 @@
     </div>
 </div>
 
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // ── Mobile sidebar
+    
     document.addEventListener('DOMContentLoaded', () => {
         const btn = document.getElementById('mobileMenuBtn');
         const sb  = document.getElementById('sidebar');
         if (btn && sb) btn.addEventListener('click', () => sb.classList.toggle('active'));
     });
 
-    // ── Modals
+    
     function openModal(id)  { document.getElementById(id).classList.add('active'); }
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
@@ -707,7 +703,7 @@
         alert('Descargando reporte de onboarding e métricas CSM...');
     }
 
-    // ── Filtrado de tabla
+    
     function filterTable() {
         const q      = (document.getElementById('tableSearch').value || '').toLowerCase();
         const paso   = (document.getElementById('filterPaso').value || '').toLowerCase();

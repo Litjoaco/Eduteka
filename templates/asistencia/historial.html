@@ -88,6 +88,17 @@
       border-color: #7C5CFC;
       transform: translateY(-1px);
     }
+
+    @media (max-width: 991.98px) {
+      .main-content { margin-left: 0 !important; width: 100% !important; }
+      .topbar { padding: 0.75rem 1rem; height: auto; flex-wrap: wrap; gap: 0.5rem; }
+      .content-body { padding: 1.25rem 1rem; }
+    }
+
+    @media (max-width: 575.98px) {
+      .content-body { padding: 1rem 0.75rem; }
+      .course-history-card { padding: 1.25rem 1rem; }
+    }
   </style>
 </head>
 <body>
@@ -179,9 +190,14 @@
 <script>
   document.addEventListener("DOMContentLoaded", function() {
     const mobileBtn = document.getElementById('mobileMenuBtn');
-    const sidebar = document.getElementById('sidebar');
     if (mobileBtn) {
-      mobileBtn.addEventListener('click', () => sidebar.classList.toggle('active'));
+      mobileBtn.addEventListener('click', () => {
+        if (typeof window.toggleSidebarMobile === 'function') {
+          window.toggleSidebarMobile();
+        } else {
+          document.getElementById('sidebar')?.classList.toggle('open');
+        }
+      });
     }
   });
 </script>

@@ -40,7 +40,7 @@
     </script>
 
     <style>
-        /* ══ DESIGN TOKENS (Estilo Unificado SaaS Eduteka) ══════════════════ */
+        
         :root {
             --primary:        #7C5CFC;
             --primary-soft:   rgba(124, 92, 252, 0.08);
@@ -86,7 +86,7 @@
 
         .wrapper { display: flex; width: 100%; align-items: stretch; }
 
-        /* ── TOPBAR */
+        
         .topbar {
             height: 70px;
             background: rgba(255, 255, 255, 0.85) !important;
@@ -120,14 +120,14 @@
         }
         .user-name { font-weight: 600; font-size: .88rem; color: var(--dark); }
 
-        /* ── CONTENT AREA */
+        
         .content-area { padding: 1.75rem 2rem; max-width: 1450px; width: 100%; margin: 0 auto; }
 
-        /* ── HERO */
+        
         .hero-title { font-size: 1.5rem; font-weight: 800; color: var(--dark); letter-spacing: -.02em; }
         .hero-subtitle { font-size: .88rem; color: var(--gray-text); margin-top: .2rem; }
 
-        /* ── BUTTONS */
+        
         .btn-primary-custom {
             background: var(--primary); color: white; border: none;
             border-radius: var(--radius-md); padding: .6rem 1.25rem;
@@ -147,7 +147,7 @@
         }
         .btn-outline-custom:hover { background: var(--bg); border-color: var(--primary); color: var(--primary); }
 
-        /* ── STAT CARDS */
+        
         .stat-card {
             background: var(--white); border-radius: var(--radius-lg);
             border: 1px solid var(--border); padding: 1.25rem 1.35rem;
@@ -167,7 +167,7 @@
         .stat-value { font-size: 1.6rem; font-weight: 800; color: var(--dark); line-height: 1.1; }
         .stat-label { font-size: .78rem; font-weight: 600; color: var(--gray-text); margin-top: .25rem; }
 
-        /* ── PANEL CONTAINER */
+        
         .panel {
             background: var(--white); border-radius: var(--radius-lg);
             border: 1px solid var(--border); overflow: hidden;
@@ -182,7 +182,7 @@
         .panel-title { font-size: 1.05rem; font-weight: 800; color: var(--dark); }
         .panel-subtitle { font-size: .8rem; color: var(--gray-text); margin-top: .15rem; }
 
-        /* ── CHART PLACEHOLDER / SKELETON */
+        
         .chart-placeholder-box {
             background: linear-gradient(180deg, rgba(248,249,253,0.7) 0%, rgba(255,255,255,1) 100%);
             border: 2px dashed rgba(188, 192, 207, 0.45);
@@ -191,7 +191,7 @@
             overflow: hidden;
         }
 
-        /* ── TABLE STYLING */
+        
         .academico-table { width: 100%; border-collapse: separate; border-spacing: 0; }
         .academico-table th {
             background: #FAFBFF; padding: .85rem 1.1rem;
@@ -206,7 +206,7 @@
         .academico-table tbody tr { transition: background .15s; }
         .academico-table tbody tr:hover { background: rgba(248,249,253,1); }
 
-        /* ── MODAL OVERLAY */
+        
         .modal-overlay {
             display: none; position: fixed; inset: 0;
             background: rgba(21,26,53,.55); backdrop-filter: blur(5px);
@@ -632,7 +632,7 @@ Equipo de Éxito del Cliente (CSM) - Eduteka</textarea>
         const asistenciaData = JSON.parse('{{ asistencia_data_json|escapejs }}');
         const calificacionesData = JSON.parse('{{ calificaciones_data_json|escapejs }}');
 
-        // ── GRÁFICO 1: Tendencia de Asistencia Global (Line Chart)
+        
         const ctxAsistencia = document.getElementById('asistenciaChart').getContext('2d');
         const asistenciaChart = new Chart(ctxAsistencia, {
             type: 'line',
@@ -696,7 +696,7 @@ Equipo de Éxito del Cliente (CSM) - Eduteka</textarea>
             }
         });
 
-        // ── GRÁFICO 2: Distribución de Calificaciones (Bar Chart)
+        
         const ctxCalificaciones = document.getElementById('calificacionesChart').getContext('2d');
         const calificacionesChart = new Chart(ctxCalificaciones, {
             type: 'bar',

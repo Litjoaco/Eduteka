@@ -181,6 +181,19 @@
       transform: translateY(-2px);
       box-shadow: 0 8px 22px rgba(30, 27, 75, 0.35);
     }
+
+    @media (max-width: 991.98px) {
+      .main-content { margin-left: 0 !important; width: 100% !important; }
+      .topbar { padding: 0.75rem 1rem; height: auto; flex-wrap: wrap; gap: 0.5rem; }
+      .content-body { padding: 1.25rem 1rem; }
+      .hero-profile { padding: 1.5rem 1.25rem; }
+    }
+
+    @media (max-width: 575.98px) {
+      .content-body { padding: 1rem 0.75rem; }
+      .profile-card { padding: 1.25rem 1rem; }
+      .avatar-preview-box { width: 72px; height: 72px; font-size: 1.5rem; }
+    }
   </style>
 </head>
 <body>
@@ -426,5 +439,14 @@
 {% include 'colegios/_modal_pin_firma.html' %}
 
 <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+<script>
+  document.getElementById('mobileMenuBtn')?.addEventListener('click', function() {
+    if (typeof window.toggleSidebarMobile === 'function') {
+      window.toggleSidebarMobile();
+    } else {
+      document.getElementById('sidebar')?.classList.toggle('open');
+    }
+  });
+</script>
 </body>
 </html>

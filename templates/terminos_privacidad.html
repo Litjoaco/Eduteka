@@ -1,0 +1,186 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Términos de Servicio & Política de Protección de Datos - Eduteka</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #7C5CFC;
+      --primary-soft: rgba(124, 92, 252, 0.08);
+      --primary-hover: #6747E3;
+      --bg: #F8F9FD;
+      --dark: #0F172A;
+      --border: #E2E8F0;
+      --radius-lg: 20px;
+    }
+    * { font-family: 'Plus Jakarta Sans', sans-serif; box-sizing: border-box; }
+    body { background-color: var(--bg); color: var(--dark); min-height: 100vh; margin: 0; }
+
+    .legal-navbar {
+      height: 76px;
+      background: #FFFFFF;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2.5rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .legal-container {
+      max-width: 960px;
+      margin: 2.5rem auto 4rem;
+      padding: 0 1.5rem;
+    }
+
+    .legal-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 3rem;
+      box-shadow: 0 4px 25px rgba(0,0,0,0.03);
+    }
+
+    .legal-section-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--dark);
+      margin-top: 2rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .legal-card p, .legal-card li {
+      color: #475569;
+      line-height: 1.7;
+      font-size: 0.95rem;
+    }
+
+    .badge-legal {
+      background: #EDE9FE;
+      color: #6D28D9;
+      font-weight: 700;
+      font-size: 0.78rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="legal-navbar">
+    <a href="{% url 'landing_page' %}" class="d-flex align-items-center gap-2 text-decoration-none">
+      <img src="{% static 'img/logo.png' %}" alt="Eduteka Logo" style="height: 44px; width: auto; object-fit: contain;">
+    </a>
+
+    <a href="{% url 'landing_page' %}" class="btn btn-sm btn-light border fw-bold px-3 py-1.5" style="border-radius:10px;">
+      <i class="bi bi-arrow-left me-1"></i> Volver al Inicio
+    </a>
+  </header>
+
+  <main class="legal-container">
+    <div class="legal-card">
+      
+      <div class="border-bottom pb-4 mb-4">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <span class="badge-legal">Marco Legal Chile 2026</span>
+          <span class="text-muted extra-small">Última actualización: Agosto 2026</span>
+        </div>
+        <h1 class="fw-extrabold text-dark fs-3 mb-2">Términos de Servicio & Política de Protección de Datos Personales</h1>
+        <p class="text-muted mb-0">
+          En cumplimiento de la <strong>Ley N° 19.628</strong> sobre Protección de la Vida Privada, sus reformas integrales, los estándares de la <strong>Agencia de Protección de Datos Personales de Chile</strong> y la <strong>Circular N° 30 de la Superintendencia de Educación</strong>.
+        </p>
+      </div>
+
+      <div class="p-3.5 bg-light rounded-3 border mb-4">
+        <div class="d-flex align-items-start gap-2.5">
+          <i class="bi bi-shield-lock-fill text-primary fs-4 mt-0.5"></i>
+          <div>
+            <strong class="text-dark d-block mb-1">Compromiso Institucional de Privacidad</strong>
+            <span class="extra-small text-muted">
+              Eduteka es un software ERP educativo diseñado para resguardar la privacidad de estudiantes, apoderados y docentes. Los datos nunca serán comercializados, transferidos ni utilizados para fines comerciales.
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <h2 class="legal-section-title">
+        <i class="bi bi-patch-check-fill text-primary"></i> 1. Consentimiento Expreso y Finalidad Educativa
+      </h2>
+      <p>
+        Al registrarse, crear un colegio o solicitar acceso a un establecimiento educacional en Eduteka, el usuario otorga su consentimiento expreso para el tratamiento de sus datos personales. Dicho tratamiento tiene como <strong>finalidad única y exclusiva</strong>:
+      </p>
+      <ul>
+        <li>La gestión académica, curricular, de calificaciones y asistencia escolar.</li>
+        <li>La operación del Libro de Clases Digital conforme a la Circular N° 30 de la Superintendencia de Educación.</li>
+        <li>La administración del Programa de Integración Escolar (PIE), bitácoras de convivencia y comunicaciones institucionales.</li>
+        <li>La emisión de informes, certificados oficiales y reportes pedagógicos requeridos por el MINEDUC.</li>
+      </ul>
+
+      <h2 class="legal-section-title">
+        <i class="bi bi-person-heart text-danger"></i> 2. Protección Reforzada de Datos de Menores de Edad (NNA)
+      </h2>
+      <p>
+        Reconociendo el interés superior de los niños, niñas y adolescentes (NNA), el tratamiento de sus datos personales se realiza bajo estrictos protocolos de seguridad:
+      </p>
+      <ul>
+        <li>El apoderado o tutor legal autoriza el tratamiento de los datos del estudiante al formalizar su matrícula en el establecimiento.</li>
+        <li>Los datos sensibles (diagnósticos médicos, NEE, informes psicológicos y fichas PIE) cuentan con control de acceso por roles estrictamente autorizados.</li>
+        <li>Queda terminantemente prohibida la elaboración de perfiles comerciales, conductuales con fines publicitarios o la venta de bases de datos.</li>
+      </ul>
+
+      <h2 class="legal-section-title">
+        <i class="bi bi-shield-check text-success"></i> 3. Ejercicio de Derechos ARCO
+      </h2>
+      <p>
+        En conformidad con la legislación chilena y los estándares internacionales, todo titular de datos (o su representante legal) tiene derecho a:
+      </p>
+      <ul>
+        <li><strong>Acceso:</strong> Conocer qué información personal se encuentra registrada en la plataforma.</li>
+        <li><strong>Rectificación:</strong> Solicitar la actualización o corrección de datos inexactos o incompletos.</li>
+        <li><strong>Cancelación / Supresión:</strong> Solicitar la eliminación de sus datos personales una vez concluida la relación con el establecimiento, resguardando los plazos legales de conservación exigidos por la Superintendencia de Educación y el MINEDUC.</li>
+        <li><strong>Oposición y Portabilidad:</strong> Oponerse a tratamientos no autorizados y solicitar copias estructuradas de su información académica.</li>
+      </ul>
+
+      <h2 class="legal-section-title">
+        <i class="bi bi-lock-fill text-info"></i> 4. Seguridad de la Información & Firmas Criptográficas
+      </h2>
+      <p>
+        Eduteka implementa medidas técnicas y organizativas de nivel bancario para resguardar la confidencialidad, integridad y disponibilidad de la información:
+      </p>
+      <ul>
+        <li>Cifrado en tránsito mediante protocolos seguros <strong>SSL/TLS de 256 bits</strong>.</li>
+        <li>Cifrado en reposo de contraseñas, PINs de firma y diagnósticos clínicos sensibles.</li>
+        <li>Sellado criptográfico <strong>SHA-256</strong> en registros de calificaciones, firmas de leccionario y actas de evaluación escolar para garantizar su inalterabilidad (no-repudio).</li>
+        <li>Respaldos automáticos continuos en servidores de alta disponibilidad con redundancia geográfica.</li>
+      </ul>
+
+      <h2 class="legal-section-title">
+        <i class="bi bi-person-badge text-warning"></i> 5. Responsabilidad en el Uso de Credenciales
+      </h2>
+      <p>
+        Cada usuario institucional (director, docente, inspector, apoderado) es responsable exclusivo de la confidencialidad de su contraseña y PIN de firma electrónica. Todo acto o registro realizado bajo sus credenciales se presumirá legalmente ejecutado por el titular de la cuenta.
+      </p>
+
+      <div class="mt-5 pt-4 border-top text-center text-muted extra-small">
+        <p class="mb-0">Eduteka SpA — Sistema de Gestión Escolar Integral para Establecimientos Educacionales de Chile.</p>
+      </div>
+
+    </div>
+  </main>
+
+</body>
+</html>

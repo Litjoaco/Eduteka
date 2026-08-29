@@ -25,7 +25,7 @@
       --radius-sm: 8px;
     }
 
-    * { font-family: 'Plus Jakarta Sans', sans-serif; }
+    * { font-family: 'Plus Jakarta Sans', sans-serif; box-sizing: border-box; }
 
     body {
       background-color: var(--bg);
@@ -38,6 +38,31 @@
 
     .wrapper { display: flex; flex: 1; position: relative; }
 
+    .main-content {
+      flex: 1;
+      margin-left: 248px;
+      transition: margin-left 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      background: var(--bg);
+    }
+    body.sidebar-collapsed .main-content {
+      margin-left: 72px;
+    }
+    @media (max-width: 991.98px) {
+      .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+      }
+      .topbar {
+        padding: 0 1.25rem !important;
+      }
+      .content-body {
+        padding: 1.25rem 1rem !important;
+      }
+    }
+
     .topbar {
       height: 70px;
       background: rgba(255, 255, 255, 0.85) !important;
@@ -46,7 +71,55 @@
       display: flex; align-items: center; justify-content: space-between;
       padding: 0 2rem; position: sticky; top: 0; z-index: 98;
     }
-    .content-body { padding: 2rem; flex-grow: 1; max-width: 1320px; margin: 0 auto; width: 100%; }
+    .content-body { padding: 2rem; flex-grow: 1; max-width: 1440px; margin: 0 auto; width: 100%; }
+
+    /* HERO BANNER ESTUDIANTES */
+    .hero-banner-student {
+      background: linear-gradient(135deg, #7C5CFC 0%, #6344CE 50%, #4F46E5 100%);
+      border-radius: var(--radius-lg);
+      padding: 2rem 2.2rem;
+      color: var(--white);
+      margin-bottom: 2rem;
+      box-shadow: 0 10px 25px rgba(124, 92, 252, 0.22);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-banner-student::before {
+      content: '';
+      position: absolute;
+      width: 320px; height: 320px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 70%);
+      top: -80px; right: -60px;
+      border-radius: 50%;
+    }
+
+    .hero-badge-pill {
+      background: rgba(255, 255, 255, 0.2);
+      color: #FFFFFF !important;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 20px;
+      padding: 0.35rem 0.85rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      backdrop-filter: blur(8px);
+    }
+
+    .hero-school-pill {
+      background: rgba(0, 0, 0, 0.2);
+      color: #FFFFFF !important;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 20px;
+      padding: 0.35rem 0.85rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      backdrop-filter: blur(8px);
+    }
 
     /* KPI Cards */
     .kpi-grid-students {
@@ -57,17 +130,33 @@
     }
 
     .kpi-card-student {
-      background: #FFFFFF;
+      background: var(--white);
       border: 1px solid #E2E8F0;
       border-radius: var(--radius-lg);
-      padding: 1.25rem 1.5rem;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.02);
+      padding: 1.35rem 1.5rem;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.02);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.25s ease;
       display: flex;
       align-items: center;
       gap: 1.2rem;
-      transition: all 0.2s ease;
     }
-    .kpi-card-student:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.05); }
+    .kpi-card-student:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    }
+    .kpi-card-student::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3.5px;
+      background: var(--acc-color, var(--primary));
+    }
+    .kpi-card-student.purple { --acc-color: #7C5CFC; }
+    .kpi-card-student.green { --acc-color: #10B981; }
+    .kpi-card-student.amber { --acc-color: #F59E0B; }
+    .kpi-card-student.red { --acc-color: #EF4444; }
 
     .kpi-icon-student {
       width: 48px; height: 48px;
@@ -142,6 +231,7 @@
 
   <!-- MAIN CONTENT -->
   <div class="main-content">
+    
     <!-- TOPBAR -->
     <header class="topbar">
       <div>
@@ -161,20 +251,44 @@
     <!-- CONTENT BODY -->
     <main class="content-body">
       
-      <!-- HERO & ACTIONS -->
-      <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-        <div>
-          <h2 class="fw-extrabold text-dark mb-1" style="font-size: 1.6rem;">Matrícula y Fichas de Estudiantes</h2>
-          <p class="text-muted small mb-0">Gestiona expedientes académicos, datos clínicos, apoderados y adecuaciones del Programa PIE.</p>
+      <!-- HERO BANNER ESTUDIANTES -->
+      <div class="hero-banner-student">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-4 position-relative" style="z-index: 1;">
+          <div>
+            <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+              <span class="hero-badge-pill">
+                <i class="bi bi-mortarboard-fill"></i> Matrícula Escolar Activa
+              </span>
+              <span class="hero-school-pill">
+                <i class="bi bi-building"></i> {{ colegio.nombre }}
+              </span>
+            </div>
+            <h2 class="fw-extrabold text-white mb-1 fs-3">Gestión de Matrícula & Fichas del Estudiante</h2>
+            <p class="text-white text-opacity-85 small mb-0" style="max-width: 680px;">
+              Consulta la nómina de estudiantes, administra programas de inclusión <strong>PIE</strong>, hojas de vida y carga masiva institucional.
+            </p>
+          </div>
+
+          <div class="d-flex gap-2 flex-wrap">
+            {% if is_admin %}
+            <a href="{% url 'carga_masiva_estudiantes' %}" class="btn btn-light fw-bold px-3.5 py-2.5 shadow-sm d-flex align-items-center gap-2" style="border-radius: 12px; color: #7C5CFC;">
+              <i class="bi bi-file-earmark-spreadsheet-fill fs-5"></i>
+              <span>Carga Masiva Excel</span>
+            </a>
+            {% endif %}
+            {% if is_admin or is_secretario %}
+            <a href="{% url 'matricular_estudiante' %}" class="btn btn-light fw-extrabold px-3.5 py-2.5 shadow-sm d-flex align-items-center gap-2" style="border-radius: 12px; color: #10B981;">
+              <i class="bi bi-person-plus-fill fs-5"></i>
+              <span>Matricular Estudiante</span>
+            </a>
+            {% endif %}
+          </div>
         </div>
-        <a href="{% url 'matricular_estudiante' %}" class="btn btn-primary fw-extrabold px-4 py-2 shadow-sm" style="border-radius: 12px; background: linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%); border:none;">
-          <i class="bi bi-person-plus-fill me-1.5"></i> Matricular Estudiante
-        </a>
       </div>
 
       <!-- KPI METRICS ROW -->
       <div class="kpi-grid-students">
-        <div class="kpi-card-student">
+        <div class="kpi-card-student purple">
           <div class="kpi-icon-student" style="background:#F0EDFF; color:#7C5CFC;"><i class="bi bi-people-fill"></i></div>
           <div>
             <span class="text-muted extra-small text-uppercase fw-bold d-block">Total Matriculados</span>
@@ -182,7 +296,7 @@
           </div>
         </div>
 
-        <div class="kpi-card-student">
+        <div class="kpi-card-student green">
           <div class="kpi-icon-student" style="background:#ECFDF5; color:#10B981;"><i class="bi bi-person-check-fill"></i></div>
           <div>
             <span class="text-muted extra-small text-uppercase fw-bold d-block">Alumnos Activos</span>
@@ -190,7 +304,7 @@
           </div>
         </div>
 
-        <div class="kpi-card-student">
+        <div class="kpi-card-student amber">
           <div class="kpi-icon-student" style="background:#FEF3C7; color:#D97706;"><i class="bi bi-puzzle-fill"></i></div>
           <div>
             <span class="text-muted extra-small text-uppercase fw-bold d-block">Programa PIE</span>
@@ -198,7 +312,7 @@
           </div>
         </div>
 
-        <div class="kpi-card-student">
+        <div class="kpi-card-student red">
           <div class="kpi-icon-student" style="background:#FFF1F2; color:#E11D48;"><i class="bi bi-person-x-fill"></i></div>
           <div>
             <span class="text-muted extra-small text-uppercase fw-bold d-block">Alumnos de Baja</span>
@@ -227,7 +341,7 @@
               <input type="text" name="q" value="{{ busqueda }}" class="form-control border-start-0 ps-0 shadow-none" placeholder="Buscar por nombre o RUT...">
             </div>
 
-            <button type="submit" class="btn btn-sm btn-primary fw-bold px-3 py-1.5" style="border-radius: 10px;">Buscar</button>
+            <button type="submit" class="btn btn-sm btn-primary fw-bold px-3 py-1.5" style="border-radius: 10px; background:#7C5CFC; border:none;">Buscar</button>
 
             {% if busqueda or seccion_seleccionada %}
               <a href="{% url 'listar_estudiantes' %}" class="btn btn-sm btn-outline-secondary fw-bold px-3 py-1.5" style="border-radius: 10px;">Limpiar</a>
@@ -289,34 +403,32 @@
                                   </div>
                                   <div>
                                     <h5 class="modal-title fw-extrabold text-dark mb-0">Programa PIE — {{ est.nombre_completo }}</h5>
-                                    <span class="text-muted small">{{ est.seccion.curso.nombre }} - {{ est.seccion.nombre }}</span>
+                                    <span class="text-muted extra-small">Ficha de Inclusión y Necesidades Educativas Especiales</span>
                                   </div>
                                 </div>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                               </div>
-                              <div class="modal-body p-4 text-start">
-                                <div class="p-3 rounded-3 mb-3" style="background:#F8FAFC; border: 1px solid #E2E8F0;">
-                                  <div class="row g-2">
-                                    <div class="col-6">
-                                      <span class="text-muted small d-block">Clasificación NEE</span>
-                                      <span class="fw-bold text-dark">{{ est.get_tipo_pie_display|default:"Sin Clasificar" }}</span>
-                                    </div>
-                                    <div class="col-6">
-                                      <span class="text-muted small d-block">Diagnóstico</span>
-                                      <span class="fw-bold text-primary">{{ est.diagnostico_pie|default:"No especificado" }}</span>
-                                    </div>
-                                  </div>
+                              <div class="modal-body p-4">
+                                <div class="p-3 mb-3" style="background:#F8F9FE; border-radius:12px; border: 1px solid #EBEBFA;">
+                                  <span class="text-muted extra-small text-uppercase fw-bold d-block mb-1">Diagnóstico / Condición Registrada</span>
+                                  <p class="fw-bold text-dark mb-0" style="font-size:0.95rem;">
+                                    {{ est.diagnostico_pie|default:"Diagnóstico en proceso de evaluación por equipo multidisciplinario." }}
+                                  </p>
                                 </div>
-
-                                <div class="p-3 rounded-3" style="background:#FFF9F2; border: 1px solid #FFE4C4;">
-                                  <h6 class="fw-bold text-dark mb-2"><i class="bi bi-chat-heart-fill me-1.5 text-danger"></i>Recomendaciones y Adecuaciones para Docentes</h6>
-                                  <p class="text-dark mb-0" style="font-size:0.9rem; line-height:1.5;">
-                                    {{ est.observaciones_pie|default:"No se han registrado observaciones pedagógicas específicas aún." }}
+                                <div class="p-3" style="background:#FFFFFF; border-radius:12px; border: 1px solid #E2E8F0;">
+                                  <span class="text-muted extra-small text-uppercase fw-bold d-block mb-1"><i class="bi bi-card-checklist text-primary me-1"></i>Adecuaciones Curriculares Sugeridas</span>
+                                  <p class="text-secondary small mb-0" style="line-height:1.5;">
+                                    {{ est.observaciones_pie|default:"No se han registrado adecuaciones curriculares específicas aún."|linebreaksbr }}
                                   </p>
                                 </div>
                               </div>
-                              <div class="modal-footer border-top-0 p-4 pt-0">
-                                <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Cerrar</button>
+                              <div class="modal-footer border-top-0 pt-0 pb-4 px-4">
+                                <button type="button" class="btn btn-light fw-bold px-4" data-bs-dismiss="modal" style="border-radius:10px;">Cerrar</button>
+                                {% if is_admin or is_utp or is_convivencia %}
+                                  <a href="{% url 'editar_estudiante' est.id %}" class="btn btn-primary fw-bold px-4" style="border-radius:10px; background:#7C5CFC; border:none;">
+                                    Editar Ficha PIE
+                                  </a>
+                                {% endif %}
                               </div>
                             </div>
                           </div>
@@ -324,97 +436,66 @@
                       {% endif %}
                     </td>
 
-                    <td class="text-muted fw-semibold">{{ est.rut|default:"-" }}</td>
+                    <td>
+                      <span class="fw-semibold text-dark">{{ est.rut|default:"-" }}</span>
+                    </td>
 
                     <td>
-                      {% if est.seccion %}
-                        <span class="badge bg-light text-dark border px-2.5 py-1.5 fw-bold" style="border-radius:6px; font-size:0.8rem;">
-                          {{ est.seccion.curso.nombre }} - {{ est.seccion.nombre }}
+                      {% if est.seccion_actual %}
+                        <span class="badge bg-light text-dark border px-2.5 py-1 fw-bold" style="border-radius:6px; font-size:0.8rem;">
+                          {{ est.seccion_actual.curso.nombre }} - {{ est.seccion_actual.nombre }}
                         </span>
                       {% else %}
-                        <span class="badge bg-light text-danger border px-2 py-1 small">Sin Sección</span>
+                        <span class="text-muted extra-small">Sin Curso Asignado</span>
                       {% endif %}
                     </td>
 
                     <td>
-                      <div class="small fw-semibold text-dark">
-                        {{ est.nombre_apoderado|default:"No registrado" }}
+                      <div>
+                        <span class="fw-medium text-dark d-block">{{ est.nombre_apoderado|default:"-" }}</span>
+                        {% if est.telefono_apoderado %}
+                          <span class="text-muted extra-small"><i class="bi bi-telephone me-1"></i>{{ est.telefono_apoderado }}</span>
+                        {% endif %}
                       </div>
-                      <span class="text-muted extra-small">
-                        <i class="bi bi-telephone me-1"></i>{{ est.telefono_apoderado|default:est.contacto_emergencia_telefono|default:"-" }}
-                      </span>
                     </td>
 
                     <td>
                       {% if est.activo %}
-                        <span class="badge px-2.5 py-1 fw-bold" style="background:#ECFDF5; color:#059669; border:1px solid #A7F3D0; border-radius:6px; font-size:0.75rem;">
+                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 fw-bold" style="border-radius:6px; font-size:0.75rem;">
                           <i class="bi bi-check-circle-fill me-1"></i> Activo
                         </span>
                       {% else %}
-                        <span class="badge px-2.5 py-1 fw-bold" style="background:#FFF1F2; color:#E11D48; border:1px solid #FDA4AF; border-radius:6px; font-size:0.75rem;">
-                          <i class="bi bi-slash-circle-fill me-1"></i> Baja
+                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 fw-bold" style="border-radius:6px; font-size:0.75rem;">
+                          <i class="bi bi-x-circle-fill me-1"></i> Baja
                         </span>
                       {% endif %}
                     </td>
 
                     <td class="text-end">
                       <div class="btn-group gap-1">
-                        <a href="{% url 'hoja_vida_estudiante' est.id %}" 
-                           class="btn btn-sm btn-light border fw-bold text-dark px-2.5 py-1" 
-                           style="border-radius:8px; font-size:0.8rem;" 
-                           data-bs-toggle="tooltip" 
-                           data-bs-placement="top" 
-                           title="Ver Hoja de Vida y Anotaciones">
-                          <i class="bi bi-shield-check text-warning me-1"></i> Hoja Vida
+                        <a href="{% url 'editar_estudiante' est.id %}" class="btn-action-student text-primary" style="background:#F0EDFF;" title="Ver Ficha Completa / Editar">
+                          <i class="bi bi-person-vcard-fill me-1"></i> Ficha
                         </a>
-                        <a href="{% url 'boletin_estudiante' est.id %}" 
-                           target="_blank" 
-                           class="btn btn-sm btn-light border fw-bold text-dark px-2 py-1" 
-                           style="border-radius:8px; font-size:0.8rem;" 
-                           data-bs-toggle="tooltip" 
-                           data-bs-placement="top" 
-                           title="Ver Boletín Oficial de Calificaciones">
-                          <i class="bi bi-file-earmark-text text-info"></i>
+                        <a href="{% url 'reporte_certificado_alumno_regular_id' est.id %}" target="_blank" class="btn-action-student text-dark" style="background:#F1F5F9;" title="Descargar Certificado de Alumno Regular">
+                          <i class="bi bi-file-earmark-pdf"></i>
                         </a>
-                        <a href="{% url 'editar_estudiante' est.id %}" 
-                           class="btn btn-sm btn-outline-primary fw-bold px-2 py-1" 
-                           style="border-radius:8px; font-size:0.8rem;" 
-                           data-bs-toggle="tooltip" 
-                           data-bs-placement="top" 
-                           title="Editar Ficha del Estudiante">
-                          <i class="bi bi-pencil-square"></i>
-                        </a>
-                        {% if est.activo %}
-                          <a href="{% url 'baja_estudiante' est.id %}" 
-                             class="btn btn-sm btn-outline-danger px-2 py-1" 
-                             style="border-radius:8px; font-size:0.8rem;" 
-                             data-bs-toggle="tooltip" 
-                             data-bs-placement="top" 
-                             title="Dar de Baja a este Alumno"
-                             onclick="return confirm('¿Dar de baja a {{ est.nombre_completo|escapejs }}?');">
-                            <i class="bi bi-person-x"></i>
-                          </a>
-                        {% else %}
-                          <a href="{% url 'baja_estudiante' est.id %}" 
-                             class="btn btn-sm btn-outline-success px-2 py-1" 
-                             style="border-radius:8px; font-size:0.8rem;" 
-                             data-bs-toggle="tooltip" 
-                             data-bs-placement="top" 
-                             title="Re-activar Matrícula"
-                             onclick="return confirm('¿Re-activar a {{ est.nombre_completo|escapejs }}?');">
-                            <i class="bi bi-person-check"></i>
-                          </a>
-                        {% endif %}
                       </div>
                     </td>
                   </tr>
                 {% endfor %}
               {% else %}
                 <tr>
-                  <td colspan="6" class="text-center py-5 text-muted">
-                    <i class="bi bi-people fs-1 text-muted d-block mb-3"></i>
-                    <h5 class="fw-bold text-dark">No se encontraron estudiantes</h5>
-                    <p class="small text-muted mb-0">Haz clic en "Matricular Estudiante" para agregar alumnos al sistema.</p>
+                  <td colspan="6" class="text-center py-5">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width:60px; height:60px; background:#F0EDFF; color:#7C5CFC; font-size:1.8rem;">
+                      <i class="bi bi-people"></i>
+                    </div>
+                    <h6 class="fw-bold text-dark">No se encontraron estudiantes</h6>
+                    <p class="text-muted small mb-3">Intenta cambiar los filtros de búsqueda o matricula a un nuevo alumno.</p>
+                    {% if is_admin or is_secretario %}
+                      <a href="{% url 'matricular_estudiante' %}" class="btn btn-sm btn-primary fw-bold px-3 py-2" style="border-radius:10px; background:#7C5CFC; border:none;">
+                        <i class="bi bi-person-plus-fill me-1"></i> Matricular Estudiante
+                      </a>
+                    {% endif %}
                   </td>
                 </tr>
               {% endif %}
@@ -422,34 +503,41 @@
           </table>
         </div>
 
-        <!-- PAGINACION -->
+        <!-- PAGINACIÓN -->
         {% if estudiantes.has_other_pages %}
-          <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top flex-wrap gap-2">
-            <div class="text-muted small">
-              Mostrando registros <strong>{{ estudiantes.start_index }} - {{ estudiantes.end_index }}</strong> de <strong>{{ estudiantes.paginator.count }}</strong>
-            </div>
+          <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top flex-wrap gap-2">
+            <span class="text-muted extra-small fw-bold">
+              Página {{ estudiantes.number }} de {{ estudiantes.paginator.num_pages }}
+            </span>
+
             <nav>
-              <ul class="pagination pagination-sm mb-0">
+              <ul class="pagination pagination-sm mb-0 gap-1">
                 {% if estudiantes.has_previous %}
                   <li class="page-item">
-                    <a class="page-link text-primary fw-bold" href="?page={{ estudiantes.previous_page_number }}{% if busqueda %}&q={{ busqueda }}{% endif %}{% if seccion_seleccionada %}&seccion={{ seccion_seleccionada }}{% endif %}">‹ Anterior</a>
+                    <a class="page-link border-0 text-dark fw-bold rounded-2 px-2.5" href="?page={{ estudiantes.previous_page_number }}{% if busqueda %}&q={{ busqueda }}{% endif %}{% if seccion_seleccionada %}&seccion={{ seccion_seleccionada }}{% endif %}">
+                      <i class="bi bi-chevron-left"></i>
+                    </a>
                   </li>
-                {% else %}
-                  <li class="page-item disabled"><span class="page-link">‹ Anterior</span></li>
                 {% endif %}
 
-                {% for i in estudiantes.paginator.page_range %}
-                  <li class="page-item {% if estudiantes.number == i %}active{% endif %}">
-                    <a class="page-link {% if estudiantes.number == i %}bg-primary border-primary{% endif %}" href="?page={{ i }}{% if busqueda %}&q={{ busqueda }}{% endif %}{% if seccion_seleccionada %}&seccion={{ seccion_seleccionada }}{% endif %}">{{ i }}</a>
-                  </li>
+                {% for num in estudiantes.paginator.page_range %}
+                  {% if estudiantes.number == num %}
+                    <li class="page-item active">
+                      <span class="page-link border-0 fw-extrabold rounded-2 px-3" style="background:#7C5CFC; color:#FFFFFF;">{{ num }}</span>
+                    </li>
+                  {% elif num > estudiantes.number|add:'-3' and num < estudiantes.number|add:'3' %}
+                    <li class="page-item">
+                      <a class="page-link border-0 text-dark fw-bold rounded-2 px-3" href="?page={{ num }}{% if busqueda %}&q={{ busqueda }}{% endif %}{% if seccion_seleccionada %}&seccion={{ seccion_seleccionada }}{% endif %}">{{ num }}</a>
+                    </li>
+                  {% endif %}
                 {% endfor %}
 
                 {% if estudiantes.has_next %}
                   <li class="page-item">
-                    <a class="page-link text-primary fw-bold" href="?page={{ estudiantes.next_page_number }}{% if busqueda %}&q={{ busqueda }}{% endif %}{% if seccion_seleccionada %}&seccion={{ seccion_seleccionada }}{% endif %}">Siguiente ›</a>
+                    <a class="page-link border-0 text-dark fw-bold rounded-2 px-2.5" href="?page={{ estudiantes.next_page_number }}{% if busqueda %}&q={{ busqueda }}{% endif %}{% if seccion_seleccionada %}&seccion={{ seccion_seleccionada }}{% endif %}">
+                      <i class="bi bi-chevron-right"></i>
+                    </a>
                   </li>
-                {% else %}
-                  <li class="page-item disabled"><span class="page-link">Siguiente ›</span></li>
                 {% endif %}
               </ul>
             </nav>
@@ -463,19 +551,5 @@
 </div>
 
 <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
-<script>
-  document.addEventListener("DOMContentLoaded", function() {
-    // Inicializar tooltips de Bootstrap
-    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
-
-    // Menú lateral móvil
-    const mobileBtn = document.getElementById('mobileMenuBtn');
-    const sidebar = document.getElementById('sidebar');
-    if (mobileBtn) {
-      mobileBtn.addEventListener('click', () => sidebar.classList.toggle('active'));
-    }
-  });
-</script>
 </body>
 </html>

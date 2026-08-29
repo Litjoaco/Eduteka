@@ -38,6 +38,31 @@
 
     .wrapper { display: flex; flex: 1; position: relative; }
 
+    .main-content {
+      flex: 1;
+      margin-left: 248px;
+      transition: margin-left 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      background: var(--bg);
+    }
+    body.sidebar-collapsed .main-content {
+      margin-left: 72px;
+    }
+    @media (max-width: 991.98px) {
+      .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+      }
+      .topbar {
+        padding: 0 1.25rem !important;
+      }
+      .content-body {
+        padding: 1.25rem 1rem !important;
+      }
+    }
+
     .topbar {
       height: 70px;
       background: rgba(255, 255, 255, 0.85) !important;
@@ -169,7 +194,6 @@
         </div>
       </div>
 
-
       <!-- KPI METRICS ROW -->
       <div class="row g-3 mb-4">
         <div class="col-md-4 col-6">
@@ -233,7 +257,6 @@
                       <span class="badge fw-bold px-2.5 py-1 {% if item.curso.activo %}badge-status-active{% else %}badge-status-inactive{% endif %}">
                         {% if item.curso.activo %}Activo{% else %}Inactivo{% endif %}
                       </span>
-
 
                       {% if is_admin %}
                         <div class="dropdown">
@@ -407,7 +430,6 @@
                 </div>
               </div>
             {% endfor %}
-
 
           {% endfor %}
         {% else %}

@@ -150,3 +150,7 @@ Thumbs.db
 
 # Django Media (uploads)
 media/
+
+# Temporary scratch files
+scratch/
+
