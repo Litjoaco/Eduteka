@@ -70,7 +70,6 @@
       border-radius: 50%;
     }
 
-
     .hero-badge-pill {
       background: rgba(255, 255, 255, 0.2);
       color: #FFFFFF !important;
@@ -106,7 +105,6 @@
       gap: 1.25rem;
       margin-bottom: 2rem;
     }
-
 
     .kpi-card-stat {
       background: var(--white);
@@ -191,6 +189,18 @@
       transform: translateY(-2px);
       box-shadow: 0 6px 18px rgba(16, 124, 65, 0.35);
     }
+
+    @media (max-width: 991.98px) {
+      .main-content { margin-left: 0 !important; width: 100% !important; }
+      .topbar { padding: 0.75rem 1rem; height: auto; flex-wrap: wrap; gap: 0.5rem; }
+      .content-body { padding: 1.25rem 1rem; }
+      .hero-banner-stats { padding: 1.5rem 1.25rem; }
+    }
+
+    @media (max-width: 575.98px) {
+      .content-body { padding: 1rem 0.75rem; }
+      .chart-card-stats { padding: 1.25rem 1rem; }
+    }
   </style>
 </head>
 <body>
@@ -241,7 +251,6 @@
           </div>
         </div>
       </div>
-
 
       <!-- 4 TOP KPIS -->
       <div class="kpi-grid-stats">
@@ -841,6 +850,14 @@
         }
       });
     }
+
+    document.getElementById('mobileMenuBtn')?.addEventListener('click', function() {
+      if (typeof window.toggleSidebarMobile === 'function') {
+        window.toggleSidebarMobile();
+      } else {
+        document.getElementById('sidebar')?.classList.toggle('open');
+      }
+    });
 
   });
 </script>

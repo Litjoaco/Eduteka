@@ -33,6 +33,8 @@ urlpatterns = [
     path('calificaciones/', include('calificaciones.urls')),
     path('planes/', include('planes.urls')),
     path('api/buscar-colegios/', colegios_views.api_buscar_colegios, name='api_buscar_colegios'),
+    path('terminos-y-condiciones/', views.terminos_privacidad_view, name='terminos_condiciones'),
+    path('politica-privacidad/', views.terminos_privacidad_view, name='politica_privacidad'),
 ]
 
 

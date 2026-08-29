@@ -249,9 +249,7 @@
         </div>
     </div>
 
-    <!-- ==========================================================================
-         MODAL DE TÉRMINOS Y CONDICIONES Y PRIVACIDAD DE DATOS (LEGAL & SEGURO)
-         ========================================================================== -->
+    
     <div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content modal-content-terms">
@@ -269,28 +267,47 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
 
-                <div class="modal-body terms-scroll-body">
-                    <p class="mb-3">Bienvenido a <strong>Eduteka</strong>. Al registrarte como usuario institucional, aceptas los siguientes acuerdos conforme a la legislación educacional chilena:</p>
-
-                    <div class="terms-section-title">
-                        <i class="bi bi-patch-check-fill text-primary"></i> 1. Cumplimiento de Normativa MINEDUC
+                <div class="modal-body terms-scroll-body" style="font-size: 0.88rem; line-height: 1.6; color: #334155;">
+                    <div class="p-3 mb-3 rounded-3" style="background:#F8FAFC; border:1px solid #E2E8F0;">
+                        <p class="mb-0 text-dark fw-medium">
+                            Bienvenido a <strong>Eduteka</strong>. Al crear tu cuenta institucional, aceptas los siguientes acuerdos de privacidad, confidencialidad y tratamiento de datos conforme a la <strong>Ley N° 19.628</strong> y la normativa educacional chilena:
+                        </p>
                     </div>
-                    <p>La plataforma opera según la <strong>Circular N° 30 de la Superintendencia de Educación</strong> y el <strong>Decreto 67</strong>, resguardando la trazabilidad, firmas digitales y actas de evaluación escolar.</p>
 
-                    <div class="terms-section-title">
-                        <i class="bi bi-lock-fill text-success"></i> 2. Protección de Datos Personales (Ley 19.628)
+                    <div class="terms-section-title fw-extrabold text-dark d-flex align-items-center gap-1.5 mb-1 mt-3">
+                        <i class="bi bi-patch-check-fill text-primary"></i> 1. Finalidad Exclusivamente Educativa y Formativa
                     </div>
-                    <p>En conformidad con la <strong>Ley N° 19.628</strong> sobre Protección de la Vida Privada, tus datos personales y los registros de los alumnos son confidenciales, no comercializables y propiedad exclusiva del establecimiento educacional.</p>
+                    <p class="text-muted small">
+                        Tus datos personales y la información de los estudiantes se utilizarán únicamente para la gestión académica, asistencia, calificaciones y convivencia escolar del establecimiento. Los datos jamás serán comercializados, transferidos ni cedidos a terceros.
+                    </p>
 
-                    <div class="terms-section-title">
-                        <i class="bi bi-cloud-arrow-up-fill text-info"></i> 3. Seguridad y Respaldo en la Nube
+                    <div class="terms-section-title fw-extrabold text-dark d-flex align-items-center gap-1.5 mb-1 mt-3">
+                        <i class="bi bi-person-heart text-danger"></i> 2. Protección Especial de Datos de Menores (NNA)
                     </div>
-                    <p>Toda la información es transmitida con cifrado SSL/TLS de 256 bits y almacenada en infraestructuras seguras con respaldos automáticos diarios.</p>
+                    <p class="text-muted small">
+                        El tratamiento de datos de niños, niñas y adolescentes se rige por su interés superior y las directrices del MINEDUC y la Superintendencia de Educación. La información sensible (salud, PIE o psicológicos) cuenta con cifrado reforzado y acceso restringido exclusivo.
+                    </p>
 
-                    <div class="terms-section-title">
-                        <i class="bi bi-person-badge text-warning"></i> 4. Uso de Credenciales y Responsabilidad
+                    <div class="terms-section-title fw-extrabold text-dark d-flex align-items-center gap-1.5 mb-1 mt-3">
+                        <i class="bi bi-shield-check text-success"></i> 3. Derechos ARCO (Acceso, Rectificación, Cancelación y Oposición)
                     </div>
-                    <p>Cada usuario es responsable del uso de sus credenciales institucionales y del resguardo de las calificaciones y asistencias que ingrese al sistema.</p>
+                    <p class="text-muted small">
+                        Tienes derecho a acceder a tus datos registrados, solicitar rectificaciones por inexactitudes y pedir su supresión cuando cese la vinculación laboral o escolar, salvo los antecedentes exigidos legalmente por el MINEDUC.
+                    </p>
+
+                    <div class="terms-section-title fw-extrabold text-dark d-flex align-items-center gap-1.5 mb-1 mt-3">
+                        <i class="bi bi-lock-fill text-info"></i> 4. Seguridad, Firmas Criptográficas y Trazabilidad
+                    </div>
+                    <p class="text-muted small">
+                        Toda la comunicación en la plataforma se realiza mediante cifrado SSL/TLS de 256 bits y respaldo diario. Las actas de calificaciones y firmas de leccionario cuentan con sellos criptográficos SHA-256 inalterables.
+                    </p>
+
+                    <div class="terms-section-title fw-extrabold text-dark d-flex align-items-center gap-1.5 mb-1 mt-3">
+                        <i class="bi bi-person-badge text-warning"></i> 5. Responsabilidad en la Custodia de Credenciales
+                    </div>
+                    <p class="text-muted small mb-0">
+                        Cada usuario es responsable directo de la custodia de su contraseña y PIN de firma. Todo registro académico o disciplinario efectuado con su cuenta se entenderá legalmente realizado por el titular.
+                    </p>
                 </div>
 
                 <div class="modal-footer bg-light border-top p-3 px-4 d-flex justify-content-between">
@@ -311,9 +328,9 @@
         let isRutValid = false;
 
         document.addEventListener('DOMContentLoaded', function() {
-            // ==========================================
+            
             // Validador y Formateador de RUT Chileno (Módulo 11)
-            // ==========================================
+            
             const rutInput = document.getElementById('rutInput');
             const rutBadge = document.getElementById('rutStatusBadge');
 
@@ -430,9 +447,9 @@
             });
         });
 
-        // ==========================================
+        
         // Medidor de Contraseña y Checklist
-        // ==========================================
+        
         function evaluarContrasena(pass) {
             const fill = document.getElementById('passMeterFill');
             const text = document.getElementById('passMeterText');

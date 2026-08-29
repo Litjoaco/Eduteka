@@ -49,7 +49,7 @@
 
         .wrapper { display: flex; width: 100%; align-items: stretch; }
 
-        /* ── Topbar ── */
+        
         .topbar {
             height: 70px;
             background: rgba(255,255,255,.85) !important;
@@ -71,12 +71,12 @@
         .user-avatar { width: 32px; height: 32px; background: linear-gradient(135deg, var(--primary), var(--primary-hover)); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .85rem; }
         .user-name { font-weight: 600; font-size: .88rem; color: var(--dark); }
 
-        /* ── Layout ── */
+        
         .content-area { padding: 1.75rem 2rem; max-width: 1400px; width: 100%; margin: 0 auto; box-sizing: border-box; }
         .hero-title { font-size: 1.6rem; font-weight: 800; color: var(--dark); margin-bottom: .25rem; }
         .hero-subtitle { color: var(--gray-text); font-size: .9rem; }
 
-        /* ── Filter bar ── */
+        
         .filter-bar {
             background: var(--white);
             border: 1px solid var(--border);
@@ -99,7 +99,7 @@
         .filter-control:focus { border-color: var(--primary); background: var(--white); box-shadow: 0 0 0 3px rgba(124,92,252,.12); outline: none; }
         .filter-separator { width: 1px; background: var(--border); align-self: stretch; margin: 0 .25rem; }
 
-        /* ── Tab Navigation ── */
+        
         .tab-nav {
             display: flex;
             gap: 0;
@@ -128,7 +128,7 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* ── KPI Cards ── */
+        
         .kpi-card {
             background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg);
             padding: 1.25rem 1.5rem; display: flex; align-items: center; gap: 1rem;
@@ -144,7 +144,7 @@
         .kpi-value { font-size: 1.6rem; font-weight: 800; color: var(--dark); line-height: 1.1; }
         .kpi-sub   { font-size: .78rem; font-weight: 600; margin-top: .1rem; }
 
-        /* ── Dashboard Panel ── */
+        
         .dashboard-panel {
             background: var(--white); border: 1px solid var(--border);
             border-radius: var(--radius-lg); padding: 1.5rem;
@@ -157,11 +157,11 @@
         .chart-container-md { position: relative; height: 300px; width: 100%; }
         .chart-container-lg { position: relative; height: 340px; width: 100%; }
 
-        /* ── Storage bar ── */
+        
         .storage-bar-wrap { background: var(--bg); border-radius: 999px; height: 10px; overflow: hidden; margin: .6rem 0 .35rem; }
         .storage-bar-fill  { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--primary), var(--secondary)); transition: width 1s ease; }
 
-        /* ── Mini Table ── */
+        
         .mini-table { width: 100%; border-collapse: collapse; font-size: .83rem; }
         .mini-table th { color: var(--gray-text); font-weight: 700; font-size: .71rem; text-transform: uppercase; letter-spacing: .5px; padding: .4rem .5rem; border-bottom: 1px solid var(--border); }
         .mini-table td { padding: .55rem .5rem; border-bottom: 1px solid #F1F3F9; vertical-align: middle; }
@@ -172,7 +172,7 @@
         .rank-badge.silver { background: #F1F5F9; color: #475569; }
         .rank-badge.bronze { background: #FEF3E2; color: #92400E; }
 
-        /* ── Heatmap (CSS-based) ── */
+        
         .heatmap-grid { display: grid; grid-template-columns: 40px repeat(7, 1fr); gap: 3px; font-size: .68rem; }
         .heatmap-grid .h-label { color: var(--gray-text); font-weight: 600; display: flex; align-items: center; justify-content: flex-end; padding-right: 6px; height: 22px; }
         .heatmap-grid .d-label { color: var(--gray-text); font-weight: 700; text-align: center; padding-bottom: 4px; }
@@ -190,21 +190,21 @@
         .hm-4  { background: rgba(124,92,252,.70); }
         .hm-5  { background: rgba(124,92,252,.90); }
 
-        /* ── Stat badge inline ── */
+        
         .stat-inline { display: flex; justify-content: space-between; align-items: center; padding: .55rem 0; border-bottom: 1px solid #F1F3F9; font-size: .83rem; }
         .stat-inline:last-child { border-bottom: none; }
 
-        /* ── Performance dots ── */
+        
         .perf-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
 
-        /* ── Cohort Table ── */
+        
         .cohort-table { width: 100%; border-collapse: collapse; font-size: .76rem; }
         .cohort-table th { font-weight: 700; color: var(--gray-text); font-size: .69rem; text-transform: uppercase; letter-spacing: .5px; padding: .4rem .6rem; border-bottom: 1px solid var(--border); text-align: center; }
         .cohort-table td { padding: .4rem .6rem; text-align: center; font-weight: 600; border-bottom: 1px solid #F1F3F9; }
         .cohort-table td:first-child { text-align: left; color: var(--dark); font-weight: 700; }
         .cohort-cell { border-radius: 5px; display: inline-block; padding: .15rem .45rem; min-width: 40px; font-size: .73rem; }
 
-        /* ── Buttons ── */
+        
         .btn-primary-custom { background: var(--primary); color: #fff; font-weight: 600; border-radius: var(--radius-md); padding: .45rem 1rem; border: none; transition: all .2s; font-size: .85rem; height: 36px; display: inline-flex; align-items: center; gap: .4rem; }
         .btn-primary-custom:hover { background: var(--primary-hover); box-shadow: 0 4px 12px rgba(124,92,252,.3); color: #fff; }
         .btn-outline-custom { background: transparent; color: var(--dark); font-weight: 600; border-radius: var(--radius-md); padding: .45rem 1rem; border: 1px solid var(--border); transition: all .2s; font-size: .85rem; height: 36px; display: inline-flex; align-items: center; gap: .4rem; }
@@ -236,9 +236,7 @@
                 </button>
             </div>
 
-            <!-- ╔══════════════════════════════════════════╗
-                 ║  BARRA DE CONTROLES AVANZADOS            ║
-                 ╚══════════════════════════════════════════╝ -->
+            
             <form method="GET" action="" id="filtroForm">
             <div class="filter-bar mb-4">
                 <!-- Desde -->
@@ -303,9 +301,7 @@
             </div>
             </form>
 
-            <!-- ╔══════════════════════════════════════════╗
-                 ║  SISTEMA DE PESTAÑAS                     ║
-                 ╚══════════════════════════════════════════╝ -->
+            
             <nav class="tab-nav" id="tabNav">
                 <button class="tab-btn active" data-tab="general">
                     <i class="bi bi-grid-1x2"></i> General
@@ -321,9 +317,7 @@
                 </button>
             </nav>
 
-            <!-- ══════════════════════════════════════════════
-                 TAB 1: GENERAL
-            ══════════════════════════════════════════════ -->
+            
             <div id="tab-general" class="tab-content active">
 
                 <!-- KPIs -->
@@ -448,9 +442,7 @@
             </div>
             <!-- /tab-general -->
 
-            <!-- ══════════════════════════════════════════════
-                 TAB 2: ADOPCIÓN Y TRÁFICO
-            ══════════════════════════════════════════════ -->
+            
             <div id="tab-trafico" class="tab-content">
 
                 <!-- KPIs de tráfico -->
@@ -553,9 +545,7 @@
             </div>
             <!-- /tab-trafico -->
 
-            <!-- ══════════════════════════════════════════════
-                 TAB 3: RENDIMIENTO FINANCIERO
-            ══════════════════════════════════════════════ -->
+            
             <div id="tab-financiero" class="tab-content">
 
                 <!-- KPIs financieros -->
@@ -625,9 +615,7 @@
             </div>
             <!-- /tab-financiero -->
 
-            <!-- ══════════════════════════════════════════════
-                 TAB 4: COHORTES Y RETENCIÓN
-            ══════════════════════════════════════════════ -->
+            
             <div id="tab-cohortes" class="tab-content">
 
                 <!-- KPIs retención -->
@@ -717,14 +705,14 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
-    // ── Mobile Sidebar ──
+    
     const mobileBtn = document.getElementById('mobileMenuBtn');
     const sidebar   = document.getElementById('sidebar');
     if (mobileBtn && sidebar) mobileBtn.addEventListener('click', () => sidebar.classList.toggle('active'));
 
-    // ══════════════════════════════════════
+    
     // TAB SYSTEM
-    // ══════════════════════════════════════
+    
     const tabBtns = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
 
@@ -740,9 +728,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     tabBtns.forEach(btn => btn.addEventListener('click', () => activateTab(btn.dataset.tab)));
 
-    // ══════════════════════════════════════
+    
     // Helpers Chart.js
-    // ══════════════════════════════════════
+    
     Chart.defaults.font = { family: 'Plus Jakarta Sans', size: 12 };
     const tooltipDefaults = { backgroundColor: '#151A35', titleColor: '#BCC0CF', bodyColor: '#fff', padding: 10, cornerRadius: 8 };
     const initialized = {};
@@ -757,12 +745,12 @@ document.addEventListener('DOMContentLoaded', function () {
         if (tabId === 'cohortes')    initCohortes();
     }
 
-    // ── Inicializar General al arrancar ──
+    
     initTabCharts('general');
 
-    // ══════════════════════════════════════════════════════
+    
     // TAB: GENERAL
-    // ══════════════════════════════════════════════════════
+    
     function initGeneral() {
         setTimeout(() => { document.getElementById('storageBar').style.width = '69.4%'; }, 300);
 
@@ -802,11 +790,11 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ══════════════════════════════════════════════════════
+    
     // TAB: ADOPCIÓN Y TRÁFICO
-    // ══════════════════════════════════════════════════════
+    
     function initTrafico() {
-        // ── Heatmap CSS ──
+        
         const heatmapData = {
             days: ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'],
             hours: ['00h','02h','04h','06h','08h','10h','12h','14h','16h','18h','20h','22h'],
@@ -841,7 +829,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
 
-        // ── Tiempos de Carga (Radar / Bar horizontal) ──
+        
         new Chart(document.getElementById('loadTimeChart').getContext('2d'), {
             type: 'bar',
             data: {
@@ -861,7 +849,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
-        // ── Nuevas Suscripciones vs Cancelaciones ──
+        
         new Chart(document.getElementById('subscChart').getContext('2d'), {
             type: 'bar',
             data: {
@@ -885,9 +873,9 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ══════════════════════════════════════════════════════
+    
     // TAB: RENDIMIENTO FINANCIERO
-    // ══════════════════════════════════════════════════════
+    
     function initFinanciero() {
         // MRR Acumulado (Area + Line)
         new Chart(document.getElementById('mrrChart').getContext('2d'), {
@@ -925,11 +913,11 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ══════════════════════════════════════════════════════
+    
     // TAB: COHORTES Y RETENCIÓN
-    // ══════════════════════════════════════════════════════
+    
     function initCohortes() {
-        // ── Cohort Table ──
+        
         const cohorts = [
             { name: 'Feb 2026', vals: [100, 94, 91, 88, 85, 83, 80] },
             { name: 'Mar 2026', vals: [100, 95, 92, 89, 86, 84, null] },
@@ -956,7 +944,7 @@ document.addEventListener('DOMContentLoaded', function () {
             tbody.appendChild(tr);
         });
 
-        // ── Funnel de activación (Bar invertido) ──
+        
         new Chart(document.getElementById('funnelChart').getContext('2d'), {
             type: 'bar',
             data: {
@@ -982,9 +970,9 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ══════════════════════════════════════════════════════
+    
     // FILTER BAR — Feedback visual
-    // ══════════════════════════════════════════════════════
+    
     document.getElementById('btnAplicar').addEventListener('click', function() {
         this.innerHTML = '<i class="bi bi-check-lg"></i> Filtros aplicados';
         this.style.background = '#148A7A';

@@ -32,8 +32,30 @@
       overflow-x: hidden;
     }
 
-    .app-container { display: flex; min-height: 100vh; width: 100vw; overflow-x: hidden; }
-    .main-content { margin-left: 248px; flex: 1; display: flex; flex-direction: column; min-width: 0; width: calc(100% - 248px); }
+    .app-container { display: flex; min-height: 100vh; width: 100%; overflow-x: hidden; }
+    .main-content { 
+      margin-left: 248px; 
+      flex: 1; 
+      display: flex; 
+      flex-direction: column; 
+      min-width: 0; 
+      transition: margin-left 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    body.sidebar-collapsed .main-content {
+      margin-left: 72px;
+    }
+    @media (max-width: 991.98px) {
+      .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+      }
+      .topbar {
+        padding: 0 1.25rem !important;
+      }
+      .content-area {
+        padding: 1.25rem 1rem !important;
+      }
+    }
     .topbar { height: 64px; background: var(--white); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; position: sticky; top: 0; z-index: 1030; }
 
     .content-area { padding: 2rem; max-width: 1200px; margin: 0 auto; width: 100%; box-sizing: border-box; }
@@ -98,8 +120,6 @@
 
     <!-- CONTENT AREA -->
     <main class="content-area">
-
-
 
       <!-- HEADER INTRO -->
       <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
@@ -265,7 +285,11 @@
 <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 <script>
   document.getElementById('mobileMenuBtn')?.addEventListener('click', function() {
-    document.getElementById('sidebar')?.classList.toggle('active');
+    if (typeof window.toggleSidebarMobile === 'function') {
+      window.toggleSidebarMobile();
+    } else {
+      document.getElementById('sidebar')?.classList.toggle('open');
+    }
   });
 </script>
 

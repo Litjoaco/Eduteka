@@ -60,7 +60,7 @@
 
         .wrapper { display: flex; width: 100%; align-items: stretch; }
 
-        /* ── TOPBAR */
+        
         .topbar {
             height: 70px;
             background: rgba(255, 255, 255, 0.85) !important;
@@ -94,14 +94,14 @@
         }
         .user-name { font-weight: 600; font-size: .88rem; color: var(--dark); }
 
-        /* ── CONTENT AREA */
+        
         .content-area { padding: 1.75rem 2rem; max-width: 1400px; width: 100%; margin: 0 auto; }
 
-        /* ── HERO */
+        
         .hero-title   { font-size: 1.6rem; font-weight: 800; color: var(--dark); margin-bottom: .25rem; }
         .hero-subtitle { color: var(--gray-text); font-size: .9rem; }
 
-        /* ── STAT CARDS */
+        
         .stat-card {
             background: var(--white); border: 1px solid var(--border);
             border-radius: var(--radius-lg); padding: 1.25rem 1.5rem;
@@ -123,13 +123,13 @@
         .stat-value { font-size: 1.55rem; font-weight: 800; color: var(--dark); line-height: 1; }
         .stat-label { font-size: .76rem; color: var(--gray-text); font-weight: 500; margin-top: .2rem; }
 
-        /* ── PANEL */
+        
         .panel { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: 0 4px 20px rgba(0,0,0,.03); overflow: hidden; }
         .panel-header { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); }
         .panel-title { font-size: 1rem; font-weight: 700; color: var(--dark); }
         .panel-subtitle { font-size: .78rem; color: var(--gray-text); margin-top: .1rem; }
 
-        /* ── TABLE */
+        
         .roles-table { width: 100%; border-collapse: collapse; }
         .roles-table thead th {
             padding: .75rem 1.5rem;
@@ -141,7 +141,7 @@
         .roles-table tbody tr:hover { background: rgba(124,92,252,.03); }
         .roles-table tbody td { padding: 1rem 1.5rem; vertical-align: middle; }
 
-        /* ── ROLE CHIPS */
+        
         .role-chip {
             display: inline-flex; align-items: center; gap: .45rem;
             padding: .3rem .75rem; border-radius: 999px;
@@ -165,7 +165,7 @@
         .chip-default   { background: rgba(100,116,139,.1); color: #475569; }
         .chip-default .dot   { background: #475569; }
 
-        /* ── PERM BADGES */
+        
         .perm-badges { display: flex; flex-wrap: wrap; gap: .3rem; }
         .perm-badge {
             display: inline-flex; align-items: center; gap: .3rem;
@@ -182,7 +182,7 @@
         .pb-mensajes { background: #FFF7ED; color: #9A3412; }
         .pb-admin    { background: rgba(124,92,252,.1); color: #5B21B6; }
 
-        /* ── BASE BADGE */
+        
         .base-badge {
             display: inline-flex; align-items: center; gap: .3rem;
             padding: .15rem .55rem;
@@ -191,7 +191,7 @@
             font-size: .67rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
         }
 
-        /* ── ACTION BUTTONS */
+        
         .action-btn {
             width: 32px; height: 32px;
             display: inline-flex; align-items: center; justify-content: center;
@@ -204,7 +204,7 @@
         .action-btn.del:hover  { color: #DC2626; border-color: #FCA5A5; background: #FEF2F2; }
         .action-btn.view:hover { color: #2563EB; border-color: #93C5FD; background: #EFF6FF; }
 
-        /* ── BUTTONS */
+        
         .btn-primary-custom {
             display: inline-flex; align-items: center; gap: .45rem;
             padding: .55rem 1.25rem; background: var(--primary); color: #fff;
@@ -218,17 +218,33 @@
             border-radius: var(--radius-md); font-weight: 600; font-size: .82rem; color: var(--dark);
             cursor: pointer; transition: all .18s; text-decoration: none;
         }
-        .btn-outline-custom:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-soft); }
-
         /* ── FORM CONTROLS */
+        .table-search { position: relative; width: 220px; }
+        .table-search i { position: absolute; left: .75rem; top: 50%; transform: translateY(-50%); color: var(--gray-text); font-size: .85rem; }
+        .table-search input {
+            width: 100%; padding: .45rem .9rem .45rem 2.1rem;
+            border: 1px solid var(--border); border-radius: var(--radius-md);
+            background: var(--bg); font-size: .82rem; outline: none; transition: all .2s;
+        }
+        .table-search input:focus { border-color: var(--primary); background: var(--white); box-shadow: 0 0 0 3px rgba(124,92,252,.1); }
+
         .form-label-custom { font-size: .78rem; font-weight: 700; color: var(--gray-text); margin-bottom: .35rem; display: block; text-transform: uppercase; letter-spacing: .05em; }
         .form-control-custom {
             width: 100%; padding: .55rem .9rem; border: 1px solid var(--border);
             border-radius: var(--radius-md); font-size: .88rem; outline: none; transition: all .2s;
         }
-        .form-control-custom:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(124,92,252,.12); }
-
         /* ── MODAL */
+        .perm-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: .6rem; }
+        .perm-check {
+            display: flex; align-items: center; gap: .6rem;
+            padding: .6rem .85rem; border: 1px solid var(--border);
+            border-radius: var(--radius-md); cursor: pointer; transition: all .18s;
+            font-size: .83rem; font-weight: 600; user-select: none;
+        }
+        .perm-check:hover { border-color: var(--primary); background: var(--primary-soft); }
+        .perm-check input[type=checkbox] { accent-color: var(--primary); width: 15px; height: 15px; flex-shrink: 0; }
+        .perm-check.checked { border-color: var(--primary); background: var(--primary-soft); color: var(--primary); }
+
         .modal-overlay {
             display: none; position: fixed; inset: 0;
             background: rgba(21,26,53,.45); backdrop-filter: blur(4px);
@@ -244,6 +260,19 @@
         @keyframes modal-in { from { opacity:0; transform:scale(.95) translateY(12px); } to { opacity:1; transform:scale(1) translateY(0); } }
         .modal-title   { font-size: 1.1rem; font-weight: 800; color: var(--dark); margin-bottom: .25rem; }
         .modal-subtitle { font-size: .82rem; color: var(--gray-text); margin-bottom: 1.5rem; }
+
+        [data-tooltip] { position: relative; }
+        [data-tooltip]::after {
+            content: attr(data-tooltip); position: absolute; bottom: calc(100% + 6px); left: 50%;
+            transform: translateX(-50%); background: var(--dark); color: #fff;
+            font-size: .7rem; padding: .3rem .6rem; border-radius: 6px; white-space: nowrap;
+            pointer-events: none; opacity: 0; transition: opacity .2s; z-index: 99;
+        }
+        [data-tooltip]:hover::after { opacity: 1; }
+
+        @media (max-width: 991.98px) {
+            .content-area { padding: 1.25rem 1rem; }
+        }
     </style>
 </head>
 <body>
@@ -493,8 +522,6 @@
     </main>
 </div><!-- /wrapper -->
 
-
-<!-- ════ MODAL: CREAR / EDITAR ROL ════════════════════════════════════════ -->
 <div class="modal-overlay" id="modalCrear">
     <div class="modal-box">
         <div class="d-flex align-items-center justify-content-between mb-3">
@@ -535,7 +562,6 @@
     </div>
 </div>
 
-<!-- ════ MODAL: CONFIRMAR ELIMINAR ═══════════════════════════════════════ -->
 <div class="modal-overlay" id="modalDelete">
     <div class="modal-box" style="width:440px;text-align:center;">
         <div style="width:56px;height:56px;background:#FEF2F2;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
@@ -564,7 +590,6 @@
         </form>
     </div>
 </div>
-
 
 <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 <script>
@@ -627,6 +652,32 @@
         document.getElementById('deleteRolId').value         = rolId;
         document.getElementById('deleteRolName').textContent = '"' + rolName + '"';
         openModal('modalDelete');
+    }
+
+    function toggleCheck(label) {
+        const cb = label.querySelector('input[type=checkbox]');
+        setTimeout(() => {
+            label.classList.toggle('checked', cb.checked);
+        }, 0);
+    }
+
+    function filterTable() {
+        const q    = (document.getElementById('tableSearch')?.value || '').toLowerCase();
+        const mod  = (document.getElementById('filterModule')?.value || '').toLowerCase();
+        const rows = document.querySelectorAll('#rolesBody tr');
+        let vis    = 0;
+
+        rows.forEach(row => {
+            const matchQ   = !q   || row.innerText.toLowerCase().includes(q);
+            const matchMod = !mod || (row.dataset.module || '').toLowerCase().includes(mod);
+            row.style.display = (matchQ && matchMod) ? '' : 'none';
+            if (matchQ && matchMod) vis++;
+        });
+
+        const countEl = document.getElementById('tableCount');
+        if (countEl) {
+            countEl.innerHTML = 'Mostrando <strong>' + vis + '</strong> de <strong>' + rows.length + '</strong> roles';
+        }
     }
 </script>
 

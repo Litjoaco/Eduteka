@@ -589,7 +589,12 @@ def matricular_estudiante_view(request):
         return redirect('dashboard_usuario')
 
     miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
-    is_admin = request.user.colegios_administrados.filter(id=colegio.id).exists() or (miembro and miembro.rol.nombre in ['Administrador', 'Director'])
+    rol_str = (miembro.rol.nombre.lower() if miembro and miembro.rol else '')
+    is_admin = (
+        request.user.is_superuser
+        or request.user.colegios_administrados.filter(id=colegio.id).exists()
+        or any(r in rol_str for r in ['administrador', 'director', 'secretari', 'administrativ', 'admision', 'admisión'])
+    )
     if not is_admin:
         messages.error(request, "No tienes permisos para matricular estudiantes.")
         return redirect('listar_estudiantes')
@@ -675,13 +680,574 @@ def matricular_estudiante_view(request):
     return render(request, 'colegios/matricular_estudiante.html', context)
 
 
+# ── CARGA MASIVA DE ESTUDIANTES (EXCEL INTELIGENTE Y PRE-VALIDACIÓN) ──────────
+
+def validar_rut_chileno(rut_str):
+    """Valida y formatea un RUT chileno usando el algoritmo Módulo 11."""
+    if not rut_str:
+        return False, ""
+    
+    limpio = str(rut_str).strip().replace('.', '').replace('-', '').upper()
+    if len(limpio) < 8 or len(limpio) > 9:
+        return False, str(rut_str).strip()
+    
+    cuerpo = limpio[:-1]
+    dv = limpio[-1]
+    
+    if not cuerpo.isdigit():
+        return False, str(rut_str).strip()
+    
+    suma = 0
+    multiplicador = 2
+    for c in reversed(cuerpo):
+        suma += int(c) * multiplicador
+        multiplicador = 2 if multiplicador == 7 else multiplicador + 1
+    
+    esperado = 11 - (suma % 11)
+    if esperado == 11:
+        dv_esperado = '0'
+    elif esperado == 10:
+        dv_esperado = 'K'
+    else:
+        dv_esperado = str(esperado)
+    
+    valido = (dv == dv_esperado)
+    cuerpo_fmt = f"{int(cuerpo):,}".replace(',', '.')
+    rut_formateado = f"{cuerpo_fmt}-{dv}"
+    return valido, rut_formateado
+
+
+def normalizar_fecha_excel(fecha_val):
+    """Normaliza fechas desde Excel o string a formato YYYY-MM-DD."""
+    if not fecha_val:
+        return None
+    from datetime import date as dt_date, datetime as dt_datetime
+    if isinstance(fecha_val, dt_datetime):
+        return fecha_val.date().strftime('%Y-%m-%d')
+    if isinstance(fecha_val, dt_date):
+        return fecha_val.strftime('%Y-%m-%d')
+    
+    s = str(fecha_val).strip()
+    formatos = ['%d/%m/%Y', '%d-%m-%Y', '%Y-%m-%d', '%d/%m/%y', '%Y/%m/%d', '%d.%m.%Y']
+    for fmt in formatos:
+        try:
+            return dt_datetime.strptime(s, fmt).date().strftime('%Y-%m-%d')
+        except ValueError:
+            pass
+    return None
+
+
+def buscar_seccion_colegio(colegio, nombre_seccion_str):
+    """Encuentra la sección más adecuada en base al texto del Excel."""
+    if not nombre_seccion_str:
+        return None
+    
+    texto = str(nombre_seccion_str).strip()
+    # 1. Búsqueda exacta
+    seccion = SeccionCurso.objects.filter(curso__colegio=colegio, activo=True, nombre__iexact=texto).first()
+    if seccion:
+        return seccion
+    
+    # 2. Búsqueda por partes: "1° Básico A" -> Curso "1° Básico" y Letra "A"
+    partes = texto.rsplit(' ', 1)
+    if len(partes) == 2:
+        nombre_c, letra_c = partes[0].strip(), partes[1].strip().upper()
+        sec = SeccionCurso.objects.filter(
+            curso__colegio=colegio, 
+            activo=True, 
+            curso__nombre__iexact=nombre_c, 
+            letra__iexact=letra_c
+        ).first()
+        if sec:
+            return sec
+    
+    # 3. Búsqueda flexible sin acentos/símbolos
+    import unicodedata
+    def limpiar_str(s):
+        s = s.replace('°', '').replace('º', '').replace('-', ' ')
+        return unicodedata.normalize('NFKD', s).encode('ASCII', 'ignore').decode('utf-8').lower().strip()
+    
+    texto_norm = limpiar_str(texto)
+    for sec in SeccionCurso.objects.filter(curso__colegio=colegio, activo=True).select_related('curso'):
+        if limpiar_str(sec.nombre) == texto_norm or limpiar_str(f"{sec.curso.nombre} {sec.letra}") == texto_norm:
+            return sec
+            
+    return None
+
+
+@login_required
+def descargar_plantilla_estudiantes_excel_view(request):
+    """Genera dinámicamente un archivo Excel .xlsx inteligente con listas desplegables y formato institucional."""
+    import openpyxl
+    from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+    from openpyxl.worksheet.datavalidation import DataValidation
+    from openpyxl.utils import get_column_letter
+
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        messages.error(request, "No tienes permisos de acceso.")
+        return redirect('dashboard_usuario')
+
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Carga_Estudiantes"
+    ws.views.sheetView[0].showGridLines = True
+
+    # Estilos Visuales Premium
+    FILL_HEADER = PatternFill(start_color="7C5CFC", end_color="7C5CFC", fill_type="solid")
+    FONT_HEADER = Font(name="Segoe UI", size=10, bold=True, color="FFFFFF")
+    FONT_REQUIRED = Font(name="Segoe UI", size=10, bold=True, color="FDE047") # Amarillo dorado
+    
+    FILL_EXAMPLE = PatternFill(start_color="F8FAFC", end_color="F8FAFC", fill_type="solid")
+    FONT_EXAMPLE = Font(name="Segoe UI", size=9, italic=True, color="64748B")
+    
+    BORDER_THIN = Border(
+        left=Side(style='thin', color='E2E8F0'),
+        right=Side(style='thin', color='E2E8F0'),
+        top=Side(style='thin', color='E2E8F0'),
+        bottom=Side(style='thin', color='E2E8F0')
+    )
+
+    headers = [
+        ("* RUT Estudiante", 18, True),
+        ("* Nombres", 24, True),
+        ("* Apellidos", 24, True),
+        ("* Curso y Sección", 22, True),
+        ("Fecha Nacimiento (DD/MM/AAAA)", 28, False),
+        ("Género", 18, False),
+        ("Dirección", 30, False),
+        ("Comuna", 20, False),
+        ("Nombre Apoderado", 26, False),
+        ("RUT Apoderado", 18, False),
+        ("Teléfono Apoderado", 20, False),
+        ("Email Apoderado", 26, False),
+        ("Parentesco Apoderado", 20, False),
+        ("¿Es PIE? (Sí/No)", 18, False),
+        ("Diagnóstico PIE", 24, False),
+    ]
+
+    ws.row_dimensions[1].height = 36
+
+    for col_idx, (titulo, ancho, es_obligatorio) in enumerate(headers, start=1):
+        cell = ws.cell(row=1, column=col_idx, value=titulo)
+        cell.fill = FILL_HEADER
+        cell.font = FONT_REQUIRED if es_obligatorio else FONT_HEADER
+        cell.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+        cell.border = BORDER_THIN
+        ws.column_dimensions[get_column_letter(col_idx)].width = ancho
+
+    # Secciones disponibles en el colegio
+    secciones = list(SeccionCurso.objects.filter(curso__colegio=colegio, activo=True).select_related('curso').order_by('curso__orden', 'letra'))
+    nombres_secciones = [s.nombre if s.nombre else f"{s.curso.nombre} {s.letra}".strip() for s in secciones]
+    if not nombres_secciones:
+        nombres_secciones = ["1° Básico A", "1° Básico B", "2° Básico A"]
+
+    # Filas de Ejemplo
+    ejemplo_1 = [
+        "21.432.543-9", "Martina Sofía", "González Pérez",
+        nombres_secciones[0] if nombres_secciones else "1° Básico A",
+        "15/03/2014", "Femenino", "Av. Los Pajaritos 1234", "Maipú",
+        "Carlos González Ramos", "14.234.567-8", "+56 9 9123 4567", "carlos.gonzalez@correo.cl", "Papá",
+        "No", ""
+    ]
+    ejemplo_2 = [
+        "22.198.765-4", "Mateo Ignacio", "Silva Contreras",
+        nombres_secciones[0] if nombres_secciones else "1° Básico A",
+        "22/07/2014", "Masculino", "Calle Las Flores 456", "Santiago",
+        "Andrea Contreras Soto", "15.987.654-2", "+56 9 8765 4321", "andrea.contreras@correo.cl", "Mamá",
+        "Sí", "TDAH"
+    ]
+
+    ws.append(ejemplo_1)
+    ws.append(ejemplo_2)
+
+    for r in range(2, 4):
+        ws.row_dimensions[r].height = 24
+        for c in range(1, len(headers) + 1):
+            cell = ws.cell(row=r, column=c)
+            cell.fill = FILL_EXAMPLE
+            cell.font = FONT_EXAMPLE
+            cell.alignment = Alignment(horizontal="center" if c in [1, 4, 5, 6, 10, 11, 14] else "left", vertical="center")
+            cell.border = BORDER_THIN
+
+    # Pestaña Oculta con Parámetros para desplegables de Excel
+    ws_params = wb.create_sheet(title="_Parametros")
+    ws_params['A1'] = "Cursos_Disponibles"
+    for i, nom in enumerate(nombres_secciones, start=2):
+        ws_params[f'A{i}'] = nom
+
+    ws_params['B1'] = "Generos"
+    for i, g in enumerate(["Masculino", "Femenino", "Otro", "Prefiero no decir"], start=2):
+        ws_params[f'B{i}'] = g
+
+    ws_params['C1'] = "PIE"
+    for i, p in enumerate(["Sí", "No"], start=2):
+        ws_params[f'C{i}'] = p
+
+    ws_params.sheet_state = 'hidden'
+
+    # Validaciones en hoja principal
+    max_sec = len(nombres_secciones) + 1
+    dv_curso = DataValidation(type="list", formula1=f"=_Parametros!$A$2:$A${max_sec}", allow_blank=True)
+    ws.add_data_validation(dv_curso)
+    dv_curso.add("D4:D500")
+
+    dv_genero = DataValidation(type="list", formula1="=_Parametros!$B$2:$B$5", allow_blank=True)
+    ws.add_data_validation(dv_genero)
+    dv_genero.add("F4:F500")
+
+    dv_pie = DataValidation(type="list", formula1="=_Parametros!$C$2:$C$3", allow_blank=True)
+    ws.add_data_validation(dv_pie)
+    dv_pie.add("N4:N500")
+
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    slug_nombre = colegio.nombre.lower().replace(' ', '_')
+    response['Content-Disposition'] = f'attachment; filename="Plantilla_Estudiantes_{slug_nombre}.xlsx"'
+    wb.save(response)
+    return response
+
+
+@login_required
+def carga_masiva_estudiantes_view(request):
+    """Renderiza la vista principal del Asistente de Carga Masiva de Estudiantes."""
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        messages.error(request, "No tienes permisos de acceso.")
+        return redirect('dashboard_usuario')
+
+    miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
+    is_admin = request.user.colegios_administrados.filter(id=colegio.id).exists() or (miembro and miembro.rol and miembro.rol.nombre in ['Administrador', 'Director'])
+    if not is_admin:
+        messages.error(request, "No tienes permisos para realizar cargas masivas.")
+        return redirect('listar_estudiantes')
+
+    secciones = SeccionCurso.objects.filter(curso__colegio=colegio, activo=True).select_related('curso').order_by('curso__orden', 'letra')
+
+    context = {
+        'colegio': colegio,
+        'miembro': miembro,
+        'is_admin': is_admin,
+        'secciones': secciones,
+        'secciones_count': secciones.count(),
+    }
+    return render(request, 'colegios/carga_masiva_estudiantes.html', context)
+
+
+@login_required
+@require_POST
+def api_analizar_archivo_estudiantes(request):
+    """Endpoint AJAX: Analiza y pre-valida el archivo Excel/CSV subido antes de guardar."""
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        return JsonResponse({'error': 'No autorizado'}, status=403)
+
+    archivo = request.FILES.get('archivo')
+    if not archivo:
+        return JsonResponse({'error': 'No se adjuntó ningún archivo.'}, status=400)
+
+    nombre_archivo = archivo.name.lower()
+    filas_raw = []
+
+    try:
+        if nombre_archivo.endswith(('.xlsx', '.xlsm', '.xltx', '.xltm')):
+            import openpyxl
+            wb = openpyxl.load_workbook(archivo, data_only=True)
+            ws = wb.active
+            for row in ws.iter_rows(values_only=True):
+                if any(row):
+                    filas_raw.append([str(c).strip() if c is not None else '' for c in row])
+        elif nombre_archivo.endswith('.csv'):
+            import csv
+            import io
+            decoded_file = archivo.read().decode('utf-8-sig', errors='replace')
+            io_string = io.StringIO(decoded_file)
+            reader = csv.reader(io_string, delimiter=';' if ';' in decoded_file[:200] else ',')
+            for row in reader:
+                if any(row):
+                    filas_raw.append([c.strip() for c in row])
+        else:
+            return JsonResponse({'error': 'Formato no soportado. Por favor sube un archivo Excel (.xlsx) o CSV.'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': f'Error al leer el archivo: {str(e)}'}, status=400)
+
+    if len(filas_raw) < 2:
+        return JsonResponse({'error': 'El archivo no contiene filas de datos suficientes.'}, status=400)
+
+    # Identificar fila de cabeceras
+    header_idx = 0
+    headers = [c.lower() for c in filas_raw[0]]
+    if not any('rut' in h or 'nombre' in h for h in headers) and len(filas_raw) > 1:
+        header_idx = 1
+        headers = [c.lower() for c in filas_raw[1]]
+
+    def get_col_index(keywords):
+        for i, h in enumerate(headers):
+            for kw in keywords:
+                if kw in h:
+                    return i
+        return -1
+
+    idx_rut = get_col_index(['rut estudiante', 'rut alumno', 'rut'])
+    idx_nombres = get_col_index(['nombres', 'nombre'])
+    idx_apellidos = get_col_index(['apellidos', 'apellido'])
+    idx_curso = get_col_index(['curso', 'seccion', 'sección', 'grado', 'nivel'])
+    idx_nac = get_col_index(['nacimiento', 'fecha nac', 'f. nac'])
+    idx_genero = get_col_index(['genero', 'género', 'sexo'])
+    idx_direccion = get_col_index(['direccion', 'dirección', 'domicilio'])
+    idx_comuna = get_col_index(['comuna', 'ciudad'])
+    idx_apoderado = get_col_index(['nombre apoderado', 'apoderado'])
+    idx_rut_apo = get_col_index(['rut apoderado'])
+    idx_tel_apo = get_col_index(['telefono', 'teléfono', 'celular', 'fono', 'contacto'])
+    idx_email_apo = get_col_index(['email', 'correo', 'mail'])
+    idx_parentesco = get_col_index(['parentesco', 'relacion'])
+    idx_pie = get_col_index(['pie', 'es pie', 'integracion'])
+    idx_diag_pie = get_col_index(['diagnostico', 'diagnóstico', 'tipo pie'])
+
+    ruts_en_bd = set(Estudiante.objects.filter(colegio=colegio, activo=True).exclude(rut__isnull=True).exclude(rut='').values_list('rut', flat=True))
+    ruts_limpios_bd = {r.replace('.', '').replace('-', '').upper(): r for r in ruts_en_bd}
+
+    filas_analizadas = []
+    ruts_vistos_en_archivo = {}
+    filas_datos = filas_raw[header_idx + 1:]
+
+    # Descartar filas de ejemplo si el usuario no las borró pero agregó datos propios
+    filas_reales = [f for f in filas_datos if '21.432.543-9' not in str(f) and '22.198.765-4' not in str(f)]
+    if filas_reales:
+        filas_datos = filas_reales
+
+    for index, row in enumerate(filas_datos, start=1):
+        if not any(row):
+            continue
+
+        def get_val(col_i):
+            return row[col_i].strip() if 0 <= col_i < len(row) else ''
+
+        rut_raw = get_val(idx_rut)
+        nombres_raw = get_val(idx_nombres)
+        apellidos_raw = get_val(idx_apellidos)
+        curso_raw = get_val(idx_curso)
+        fecha_nac_raw = get_val(idx_nac)
+        genero_raw = get_val(idx_genero)
+        direccion_raw = get_val(idx_direccion)
+        comuna_raw = get_val(idx_comuna)
+        nombre_apo_raw = get_val(idx_apoderado)
+        rut_apo_raw = get_val(idx_rut_apo)
+        tel_apo_raw = get_val(idx_tel_apo)
+        email_apo_raw = get_val(idx_email_apo)
+        parentesco_raw = get_val(idx_parentesco)
+        pie_raw = get_val(idx_pie)
+        diag_pie_raw = get_val(idx_diag_pie)
+
+        if nombres_raw and apellidos_raw:
+            nombre_completo = f"{nombres_raw} {apellidos_raw}".strip()
+        elif nombres_raw:
+            nombre_completo = nombres_raw.strip()
+        else:
+            nombre_completo = ''
+
+        errores = []
+        advertencias = []
+
+        # 1. Nombre
+        if not nombre_completo:
+            errores.append("El nombre del estudiante es obligatorio.")
+
+        # 2. RUT Estudiante
+        rut_formateado = rut_raw
+        if rut_raw:
+            es_valido_rut, rut_formateado = validar_rut_chileno(rut_raw)
+            if not es_valido_rut:
+                advertencias.append(f"El RUT '{rut_raw}' no coincide con el dígito verificador chileno.")
+            
+            rut_limpio = rut_raw.replace('.', '').replace('-', '').upper()
+            if rut_limpio in ruts_vistos_en_archivo:
+                advertencias.append(f"RUT duplicado en la fila {ruts_vistos_en_archivo[rut_limpio]} del archivo.")
+            else:
+                ruts_vistos_en_archivo[rut_limpio] = index
+
+            if rut_limpio in ruts_limpios_bd:
+                advertencias.append(f"RUT ya registrado ({ruts_limpios_bd[rut_limpio]}). Se actualizará la matrícula.")
+        else:
+            advertencias.append("Sin RUT registrado.")
+
+        # 3. Sección
+        seccion_obj = buscar_seccion_colegio(colegio, curso_raw)
+        seccion_id = seccion_obj.id if seccion_obj else None
+        seccion_nombre = (seccion_obj.nombre if seccion_obj.nombre else f"{seccion_obj.curso.nombre} {seccion_obj.letra}".strip()) if seccion_obj else curso_raw
+
+        if not seccion_obj:
+            if curso_raw:
+                errores.append(f"Curso '{curso_raw}' no encontrado en el colegio. Selecciónalo manualmente.")
+            else:
+                errores.append("Falta asignar el curso y sección.")
+
+        # 4. Género
+        genero_norm = 'no_informa'
+        g_lower = genero_raw.lower()
+        if 'masc' in g_lower or g_lower == 'm' or g_lower == 'hombre':
+            genero_norm = 'masculino'
+        elif 'fem' in g_lower or g_lower == 'f' or g_lower == 'mujer':
+            genero_norm = 'femenino'
+        elif 'otro' in g_lower or 'no bin' in g_lower:
+            genero_norm = 'otro'
+
+        # 5. Fecha Nacimiento
+        fecha_nac_norm = normalizar_fecha_excel(fecha_nac_raw)
+        if fecha_nac_raw and not fecha_nac_norm:
+            advertencias.append(f"Fecha '{fecha_nac_raw}' no válida (use DD/MM/AAAA).")
+
+        # 6. PIE
+        es_pie = True if pie_raw.lower() in ['si', 'sí', 'true', '1', 's', 'x'] else False
+
+        if errores:
+            estado = 'error'
+        elif advertencias:
+            estado = 'advertencia'
+        else:
+            estado = 'valido'
+
+        filas_analizadas.append({
+            'index': index,
+            'estado': estado,
+            'errores': errores,
+            'advertencias': advertencias,
+            'rut': rut_formateado,
+            'nombre_completo': nombre_completo,
+            'seccion_id': seccion_id,
+            'seccion_nombre': seccion_nombre,
+            'fecha_nacimiento': fecha_nac_norm,
+            'genero': genero_norm,
+            'direccion': direccion_raw,
+            'comuna': comuna_raw,
+            'nombre_apoderado': nombre_apo_raw,
+            'rut_apoderado': rut_apo_raw,
+            'telefono_apoderado': tel_apo_raw,
+            'email_apoderado': email_apo_raw,
+            'parentesco_apoderado': parentesco_raw or 'Apoderado',
+            'es_pie': es_pie,
+            'diagnostico_pie': diag_pie_raw,
+        })
+
+    secciones_disponibles = [{'id': s.id, 'nombre': s.nombre if s.nombre else f"{s.curso.nombre} {s.letra}".strip()} for s in SeccionCurso.objects.filter(curso__colegio=colegio, activo=True).select_related('curso').order_by('curso__orden', 'letra')]
+
+    return JsonResponse({
+        'total': len(filas_analizadas),
+        'validos': sum(1 for f in filas_analizadas if f['estado'] == 'valido'),
+        'advertencias': sum(1 for f in filas_analizadas if f['estado'] == 'advertencia'),
+        'errores': sum(1 for f in filas_analizadas if f['estado'] == 'error'),
+        'filas': filas_analizadas,
+        'secciones_disponibles': secciones_disponibles
+    })
+
+
+@login_required
+@require_POST
+def api_procesar_carga_masiva_estudiantes(request):
+    """Endpoint AJAX: Guarda masivamente en base de datos los estudiantes confirmados."""
+    import json
+    from django.db import transaction
+
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        return JsonResponse({'error': 'No autorizado'}, status=403)
+
+    try:
+        data = json.loads(request.body.decode('utf-8'))
+        filas = data.get('filas', [])
+        politica_duplicados = data.get('politica_duplicados', 'actualizar')
+    except Exception as e:
+        return JsonResponse({'error': 'Datos inválidos.'}, status=400)
+
+    if not filas:
+        return JsonResponse({'error': 'No hay filas para procesar.'}, status=400)
+
+    creados_count = 0
+    actualizados_count = 0
+    omitidos_count = 0
+
+    try:
+        with transaction.atomic():
+            for item in filas:
+                nombre = item.get('nombre_completo', '').strip()
+                seccion_id = item.get('seccion_id')
+                rut = item.get('rut', '').strip()
+
+                if not nombre or not seccion_id:
+                    omitidos_count += 1
+                    continue
+
+                seccion = SeccionCurso.objects.filter(id=seccion_id, curso__colegio=colegio).first()
+                if not seccion:
+                    omitidos_count += 1
+                    continue
+
+                defaults_data = {
+                    'nombre_completo': nombre,
+                    'seccion': seccion,
+                    'fecha_nacimiento': item.get('fecha_nacimiento') or None,
+                    'genero': item.get('genero', 'no_informa'),
+                    'direccion': item.get('direccion', '').strip() or None,
+                    'comuna': item.get('comuna', '').strip() or None,
+                    'nombre_apoderado': item.get('nombre_apoderado', '').strip() or None,
+                    'rut_apoderado': item.get('rut_apoderado', '').strip() or None,
+                    'telefono_apoderado': item.get('telefono_apoderado', '').strip() or None,
+                    'email_apoderado': item.get('email_apoderado', '').strip() or None,
+                    'parentesco_apoderado': item.get('parentesco_apoderado', '').strip() or 'Apoderado',
+                    'es_pie': bool(item.get('es_pie')),
+                    'diagnostico_pie': item.get('diagnostico_pie', '').strip() or None,
+                    'activo': True,
+                }
+
+                if rut:
+                    est_existente = Estudiante.objects.filter(colegio=colegio, rut=rut).first()
+                    if est_existente:
+                        if politica_duplicados == 'actualizar':
+                            for k, v in defaults_data.items():
+                                setattr(est_existente, k, v)
+                            est_existente.save()
+                            actualizados_count += 1
+                        else:
+                            omitidos_count += 1
+                        continue
+                    
+                    Estudiante.objects.create(
+                        colegio=colegio,
+                        rut=rut,
+                        **defaults_data
+                    )
+                    creados_count += 1
+                else:
+                    Estudiante.objects.create(
+                        colegio=colegio,
+                        rut=None,
+                        **defaults_data
+                    )
+                    creados_count += 1
+
+    except Exception as e:
+        return JsonResponse({'error': f'Error durante el guardado: {str(e)}'}, status=500)
+
+    return JsonResponse({
+        'success': True,
+        'creados': creados_count,
+        'actualizados': actualizados_count,
+        'omitidos': omitidos_count,
+        'total_procesados': creados_count + actualizados_count
+    })
+
+
 @login_required
 def editar_estudiante_view(request, estudiante_id):
     colegio = obtener_colegio_usuario(request.user)
     estudiante = get_object_or_404(Estudiante, id=estudiante_id, colegio=colegio)
 
     miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
-    is_admin = request.user.colegios_administrados.filter(id=colegio.id).exists() or (miembro and miembro.rol.nombre in ['Administrador', 'Director'])
+    rol_str = (miembro.rol.nombre.lower() if miembro and miembro.rol else '')
+    is_admin = (
+        request.user.is_superuser
+        or request.user.colegios_administrados.filter(id=colegio.id).exists()
+        or any(r in rol_str for r in ['administrador', 'director', 'secretari', 'administrativ', 'admision', 'admisión'])
+    )
     if not is_admin:
         messages.error(request, "No tienes permisos para editar estudiantes.")
         return redirect('listar_estudiantes')
@@ -792,9 +1358,10 @@ def listar_asignaturas_view(request):
         return redirect('solicitar_acceso')
 
     miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
-    is_admin = request.user.colegios_administrados.filter(id=colegio.id).exists() or (miembro and miembro.rol and miembro.rol.nombre in ['Administrador', 'Director'])
+    rol_str = (miembro.rol.nombre.lower() if miembro and miembro.rol else '')
+    is_admin = request.user.is_superuser or request.user.colegios_administrados.filter(id=colegio.id).exists() or any(r in rol_str for r in ['administrador', 'director', 'utp', 'coordinador', 'pedagogico', 'pedagógico'])
     if not is_admin:
-        messages.error(request, "Acceso restringido. Se requieren permisos de Director o Administrador para gestionar el plan de estudios.")
+        messages.error(request, "Acceso restringido. Se requieren permisos de Dirección o UTP para gestionar el plan de estudios.")
         return redirect('dashboard_usuario')
 
     cursos = CursoColegio.objects.filter(colegio=colegio, activo=True).order_by('nombre')
@@ -1071,9 +1638,10 @@ def listar_cursos_view(request):
         return redirect('dashboard_usuario')
         
     miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
-    is_admin = request.user.colegios_administrados.filter(id=colegio.id).exists() or (miembro and miembro.rol.nombre in ['Administrador', 'Director'])
+    rol_str = (miembro.rol.nombre.lower() if miembro and miembro.rol else '')
+    is_admin = request.user.is_superuser or request.user.colegios_administrados.filter(id=colegio.id).exists() or any(r in rol_str for r in ['administrador', 'director', 'utp', 'coordinador', 'pedagogico', 'pedagógico'])
     if not is_admin:
-        messages.error(request, "Acceso denegado. Se requieren permisos de administrador.")
+        messages.error(request, "Acceso denegado. Se requieren permisos de Dirección o UTP.")
         return redirect('dashboard_usuario')
 
     cursos_db = CursoColegio.objects.filter(colegio=colegio).order_by('nombre')
@@ -1619,6 +2187,8 @@ def baja_personal_view(request, miembro_id):
     return redirect('listar_personal')
 
 
+# ── CENTRO DE REPORTES Y ANALÍTICA ESCOLAR ───────────────────────────────────
+
 @login_required
 def centro_reportes_view(request):
     colegio = obtener_colegio_usuario(request.user)
@@ -1630,30 +2200,607 @@ def centro_reportes_view(request):
     periodo = ConfiguracionAcademica.objects.filter(colegio=colegio).first()
     is_admin = (
         request.user.colegios_administrados.filter(id=colegio.id).exists()
-        or (miembro and miembro.rol and miembro.rol.nombre in ['Administrador', 'Director'])
+        or (miembro and miembro.rol and miembro.rol.nombre in ['Administrador', 'Director', 'UTP'])
     )
 
-    secciones_count = SeccionCurso.objects.filter(curso__colegio=colegio, activo=True).count()
-    estudiantes_count = Estudiante.objects.filter(colegio=colegio, activo=True).count()
+    secciones = SeccionCurso.objects.filter(curso__colegio=colegio, activo=True).select_related('curso').order_by('curso__orden', 'letra')
+    estudiantes_qs = Estudiante.objects.filter(colegio=colegio, activo=True)
+    
+    total_estudiantes = estudiantes_qs.count()
+    total_secciones = secciones.count()
+    total_pie = estudiantes_qs.filter(es_pie=True).count()
+
+    # Métricas Globales de Calificaciones
+    from calificaciones.models import Nota
+    notas_qs = Nota.objects.filter(evaluacion__colegio=colegio)
+    from django.db.models import Avg, Count, Q
+    promedio_global_val = notas_qs.aggregate(Avg('valor'))['valor__avg']
+    promedio_global = round(float(promedio_global_val), 1) if promedio_global_val else 0.0
+    alumnos_riesgo_notas = notas_qs.filter(valor__lt=4.0).values('estudiante').distinct().count()
+
+    # Métricas Globales de Asistencia
+    from asistencia.models import DetalleAsistencia, RegistroAsistencia
+    detalles_asist = DetalleAsistencia.objects.filter(registro__seccion__curso__colegio=colegio)
+    total_asist = detalles_asist.count()
+    if total_asist > 0:
+        presentes = detalles_asist.filter(estado__in=['presente', 'tarde', 'justificado']).count()
+        tasa_asistencia_global = round((presentes / total_asist) * 100, 1)
+    else:
+        tasa_asistencia_global = 0.0
 
     from asistencia.utils import calcular_alumnos_en_riesgo
     alumnos_riesgo_asistencia = len(calcular_alumnos_en_riesgo(colegio))
 
-    from calificaciones.models import Nota
-    alumnos_riesgo_notas = Nota.objects.filter(evaluacion__colegio=colegio, valor__lt=4.0).values('estudiante').distinct().count()
+    meses_choices = [
+        (3, 'Marzo'), (4, 'Abril'), (5, 'Mayo'), (6, 'Junio'),
+        (7, 'Julio'), (8, 'Agosto'), (9, 'Septiembre'), (10, 'Octubre'),
+        (11, 'Noviembre'), (12, 'Diciembre')
+    ]
 
     context = {
         'colegio': colegio,
         'miembro': miembro,
         'periodo': periodo,
         'is_admin': is_admin,
-        'secciones_count': secciones_count,
-        'estudiantes_count': estudiantes_count,
+        'active_page': 'reportes',
+        'secciones': secciones,
+        'secciones_count': total_secciones,
+        'estudiantes_count': total_estudiantes,
+        'pie_count': total_pie,
+        'promedio_global': promedio_global,
+        'tasa_asistencia_global': tasa_asistencia_global,
         'alumnos_riesgo_asistencia': alumnos_riesgo_asistencia,
         'alumnos_riesgo_notas': alumnos_riesgo_notas,
+        'meses_choices': meses_choices,
+        'mes_actual': timezone.now().month,
+        'anio_actual': periodo.anio_academico if periodo else timezone.now().year,
         'hoy': timezone.now(),
     }
     return render(request, 'colegios/reportes_hub.html', context)
+
+
+@login_required
+def generar_certificado_alumno_regular_view(request, estudiante_id=None):
+    """Genera el certificado oficial de alumno regular con membrete institucional imprimible en PDF."""
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        messages.error(request, "No estás asociado a ningún colegio.")
+        return redirect('solicitar_acceso')
+
+    if not estudiante_id:
+        estudiante_id = request.GET.get('estudiante_id')
+
+    if not estudiante_id:
+        estudiantes = Estudiante.objects.filter(colegio=colegio, activo=True).select_related('seccion', 'seccion__curso').order_by('nombre_completo')
+        return render(request, 'colegios/reportes/seleccionar_estudiante_certificado.html', {
+            'colegio': colegio,
+            'estudiantes': estudiantes,
+            'active_page': 'reportes'
+        })
+
+    estudiante = get_object_or_404(Estudiante, id=estudiante_id, colegio=colegio)
+    periodo = ConfiguracionAcademica.objects.filter(colegio=colegio).first()
+    anio_escolar = periodo.anio_academico if periodo else timezone.now().year
+
+    MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+    hoy = timezone.now()
+    fecha_emision_texto = f"{hoy.day} de {MESES[hoy.month - 1]} de {hoy.year}"
+
+    import hashlib
+    hash_folio = hashlib.sha256(f"{estudiante.id}-{colegio.id}-{anio_escolar}-{hoy.strftime('%Y%m%d')}".encode('utf-8')).hexdigest()[:10].upper()
+    codigo_verificacion = f"EDK-{colegio.id:03d}-{estudiante.id:04d}-{hash_folio}"
+
+    nombre_director = "Director(a) de Establecimiento"
+    if colegio.administrador and hasattr(colegio.administrador, 'perfil') and colegio.administrador.perfil.nombre_completo:
+        nombre_director = colegio.administrador.perfil.nombre_completo
+    elif colegio.administrador:
+        nombre_director = colegio.administrador.get_full_name() or colegio.administrador.username
+
+    context = {
+        'colegio': colegio,
+        'estudiante': estudiante,
+        'periodo': periodo,
+        'anio_escolar': anio_escolar,
+        'fecha_emision_texto': fecha_emision_texto,
+        'codigo_verificacion': codigo_verificacion,
+        'nombre_director': nombre_director,
+        'hoy': hoy,
+    }
+    return render(request, 'colegios/reportes/certificado_alumno_regular.html', context)
+
+
+@login_required
+def reporte_consolidado_notas_seccion_view(request):
+    """Muestra la matriz completa de notas de una sección con ranking y estadísticas."""
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        return redirect('solicitar_acceso')
+
+    secciones = SeccionCurso.objects.filter(curso__colegio=colegio, activo=True).select_related('curso').order_by('curso__orden', 'letra')
+    seccion_id = request.GET.get('seccion')
+    
+    seccion = None
+    if seccion_id and seccion_id.isdigit():
+        seccion = secciones.filter(id=int(seccion_id)).first()
+    if not seccion:
+        seccion = secciones.first()
+
+    if not seccion:
+        messages.info(request, "No hay cursos configurados en el colegio.")
+        return redirect('centro_reportes')
+
+    asignaturas = Asignatura.objects.filter(curso=seccion.curso, activo=True).order_by('nombre')
+    estudiantes = Estudiante.objects.filter(seccion=seccion, activo=True).order_by('nombre_completo')
+
+    from calificaciones.models import Nota
+    from django.db.models import Avg
+
+    matriz = []
+    promedios_asignatura = {}
+    for a in asignaturas:
+        promedios_asignatura[a.id] = []
+
+    todos_promedios_alumnos = []
+
+    for est in estudiantes:
+        fila_notas = {}
+        notas_alumno = []
+        rojas_cnt = 0
+
+        for asig in asignaturas:
+            n_qs = Nota.objects.filter(evaluacion__seccion=seccion, evaluacion__asignatura=asig, estudiante=est)
+            avg_asig = n_qs.aggregate(Avg('valor'))['valor__avg']
+            if avg_asig is not None:
+                val = round(float(avg_asig), 1)
+                fila_notas[asig.id] = val
+                notas_alumno.append(val)
+                promedios_asignatura[asig.id].append(val)
+                if val < 4.0:
+                    rojas_cnt += 1
+            else:
+                fila_notas[asig.id] = None
+
+        if notas_alumno:
+            prom_est = round(sum(notas_alumno) / len(notas_alumno), 1)
+            todos_promedios_alumnos.append(prom_est)
+        else:
+            prom_est = None
+
+        matriz.append({
+            'estudiante': est,
+            'notas': fila_notas,
+            'promedio': prom_est,
+            'rojas_count': rojas_cnt,
+            'estado': 'Aprobando' if (prom_est and prom_est >= 4.0 and rojas_cnt <= 2) else ('En Riesgo' if prom_est else 'Sin Notas')
+        })
+
+    # Calcular ranking de notas
+    matriz_ordenada = sorted([m for m in matriz if m['promedio'] is not None], key=lambda x: x['promedio'], reverse=True)
+    ranking_map = {m['estudiante'].id: idx + 1 for idx, m in enumerate(matriz_ordenada)}
+    for m in matriz:
+        m['ranking'] = ranking_map.get(m['estudiante'].id, '-')
+
+    # Resumen por asignatura
+    resumen_asignaturas = []
+    for asig in asignaturas:
+        vals = promedios_asignatura[asig.id]
+        if vals:
+            avg_col = round(sum(vals) / len(vals), 1)
+            aprob = sum(1 for v in vals if v >= 4.0)
+            pct_aprob = round((aprob / len(vals)) * 100, 1)
+        else:
+            avg_col = '-'
+            pct_aprob = '-'
+        resumen_asignaturas.append({
+            'asignatura': asig,
+            'promedio': avg_col,
+            'pct_aprobacion': pct_aprob
+        })
+
+    promedio_seccion_global = round(sum(todos_promedios_alumnos) / len(todos_promedios_alumnos), 1) if todos_promedios_alumnos else '-'
+    aprobados_total = sum(1 for m in matriz if m['promedio'] and m['promedio'] >= 4.0)
+    tasa_aprobacion_seccion = round((aprobados_total / len(matriz) * 100), 1) if matriz else 0
+
+    context = {
+        'colegio': colegio,
+        'seccion': seccion,
+        'secciones': secciones,
+        'asignaturas': asignaturas,
+        'matriz': matriz,
+        'resumen_asignaturas': resumen_asignaturas,
+        'promedio_seccion_global': promedio_seccion_global,
+        'tasa_aprobacion_seccion': tasa_aprobacion_seccion,
+        'total_estudiantes': len(matriz),
+        'active_page': 'reportes',
+        'hoy': timezone.now(),
+    }
+    return render(request, 'colegios/reportes/reporte_matriz_notas.html', context)
+
+
+@login_required
+def exportar_consolidado_notas_excel_view(request, seccion_id):
+    """Exporta la matriz de calificaciones de una sección a una planilla Excel con estilos profesionales."""
+    import openpyxl
+    from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+    from openpyxl.utils import get_column_letter
+    from django.db.models import Avg
+    from calificaciones.models import Nota
+
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        return redirect('solicitar_acceso')
+
+    seccion = get_object_or_404(SeccionCurso, id=seccion_id, curso__colegio=colegio)
+    asignaturas = Asignatura.objects.filter(curso=seccion.curso, activo=True).order_by('nombre')
+    estudiantes = Estudiante.objects.filter(seccion=seccion, activo=True).order_by('nombre_completo')
+
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Matriz_Calificaciones"
+    ws.views.sheetView[0].showGridLines = True
+
+    FILL_HEADER = PatternFill(start_color="7C5CFC", end_color="7C5CFC", fill_type="solid")
+    FONT_HEADER = Font(name="Segoe UI", size=10, bold=True, color="FFFFFF")
+    FILL_ROJO = PatternFill(start_color="FEE2E2", end_color="FEE2E2", fill_type="solid")
+    FONT_ROJO = Font(name="Segoe UI", size=9, bold=True, color="DC2626")
+    FONT_NORMAL = Font(name="Segoe UI", size=9, color="0F172A")
+    BORDER_THIN = Border(left=Side(style='thin', color='E2E8F0'), right=Side(style='thin', color='E2E8F0'), top=Side(style='thin', color='E2E8F0'), bottom=Side(style='thin', color='E2E8F0'))
+
+    ws.merge_cells('A1:G1')
+    ws['A1'] = f"{colegio.nombre} - INFORME MATRIZ DE CALIFICACIONES: {seccion.nombre}"
+    ws['A1'].font = Font(name="Segoe UI", size=13, bold=True, color="7C5CFC")
+    ws['A1'].alignment = Alignment(vertical="center")
+
+    headers = ["#", "RUT", "Nombre Completo"] + [a.nombre[:15] for a in asignaturas] + ["Promedio General", "Notas Rojas", "Estado"]
+    ws.row_dimensions[3].height = 28
+
+    for col_idx, h in enumerate(headers, start=1):
+        cell = ws.cell(row=3, column=col_idx, value=h)
+        cell.fill = FILL_HEADER
+        cell.font = FONT_HEADER
+        cell.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+        cell.border = BORDER_THIN
+        ws.column_dimensions[get_column_letter(col_idx)].width = 24 if col_idx == 3 else (14 if col_idx > 3 else 12)
+
+    current_row = 4
+    for idx, est in enumerate(estudiantes, start=1):
+        ws.row_dimensions[current_row].height = 20
+        c1 = ws.cell(row=current_row, column=1, value=idx)
+        c2 = ws.cell(row=current_row, column=2, value=est.rut or '-')
+        c3 = ws.cell(row=current_row, column=3, value=est.nombre_completo)
+        for c in [c1, c2, c3]:
+            c.font = FONT_NORMAL
+            c.border = BORDER_THIN
+
+        notas_alumno = []
+        rojas_cnt = 0
+        for a_idx, asig in enumerate(asignaturas, start=4):
+            n_qs = Nota.objects.filter(evaluacion__seccion=seccion, evaluacion__asignatura=asig, estudiante=est)
+            avg_val = n_qs.aggregate(Avg('valor'))['valor__avg']
+            cell = ws.cell(row=current_row, column=a_idx)
+            cell.border = BORDER_THIN
+            cell.alignment = Alignment(horizontal="center", vertical="center")
+            if avg_val is not None:
+                val = round(float(avg_val), 1)
+                cell.value = val
+                notas_alumno.append(val)
+                if val < 4.0:
+                    cell.fill = FILL_ROJO
+                    cell.font = FONT_ROJO
+                    rojas_cnt += 1
+                else:
+                    cell.font = FONT_NORMAL
+            else:
+                cell.value = '-'
+                cell.font = Font(name="Segoe UI", size=9, color="94A3B8")
+
+        prom_col_idx = 4 + len(asignaturas)
+        prom_cell = ws.cell(row=current_row, column=prom_col_idx)
+        prom_cell.border = BORDER_THIN
+        prom_cell.alignment = Alignment(horizontal="center", vertical="center")
+        if notas_alumno:
+            prom_val = round(sum(notas_alumno) / len(notas_alumno), 1)
+            prom_cell.value = prom_val
+            prom_cell.font = FONT_HEADER if prom_val >= 4.0 else FONT_ROJO
+        else:
+            prom_cell.value = '-'
+            prom_cell.font = FONT_NORMAL
+
+        rojas_cell = ws.cell(row=current_row, column=prom_col_idx + 1, value=rojas_cnt)
+        rojas_cell.border = BORDER_THIN
+        rojas_cell.alignment = Alignment(horizontal="center", vertical="center")
+        rojas_cell.font = FONT_ROJO if rojas_cnt > 0 else FONT_NORMAL
+
+        estado_val = "Aprobando" if (notas_alumno and (sum(notas_alumno)/len(notas_alumno)) >= 4.0 and rojas_cnt <= 2) else ("En Riesgo" if notas_alumno else "Sin Notas")
+        estado_cell = ws.cell(row=current_row, column=prom_col_idx + 2, value=estado_val)
+        estado_cell.border = BORDER_THIN
+        estado_cell.alignment = Alignment(horizontal="center", vertical="center")
+        estado_cell.font = FONT_NORMAL
+
+        current_row += 1
+
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    slug_sec = seccion.nombre.lower().replace(' ', '_')
+    response['Content-Disposition'] = f'attachment; filename="Matriz_Calificaciones_{slug_sec}.xlsx"'
+    wb.save(response)
+    return response
+
+
+@login_required
+def reporte_mensual_asistencia_seccion_view(request):
+    """Muestra la planilla mensual de asistencia consolidada por sección con alertas <85%."""
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        return redirect('solicitar_acceso')
+
+    secciones = SeccionCurso.objects.filter(curso__colegio=colegio, activo=True).select_related('curso').order_by('curso__orden', 'letra')
+    seccion_id = request.GET.get('seccion')
+    mes_str = request.GET.get('mes')
+
+    seccion = None
+    if seccion_id and seccion_id.isdigit():
+        seccion = secciones.filter(id=int(seccion_id)).first()
+    if not seccion:
+        seccion = secciones.first()
+
+    if not seccion:
+        messages.info(request, "No hay secciones configuradas.")
+        return redirect('centro_reportes')
+
+    periodo = ConfiguracionAcademica.objects.filter(colegio=colegio).first()
+    anio = periodo.anio_academico if periodo else timezone.now().year
+
+    try:
+        mes = int(mes_str) if mes_str else timezone.now().month
+    except ValueError:
+        mes = timezone.now().month
+
+    from asistencia.models import RegistroAsistencia, DetalleAsistencia
+
+    registros_mes = RegistroAsistencia.objects.filter(
+        seccion=seccion,
+        fecha__year=anio,
+        fecha__month=mes
+    ).order_by('fecha')
+
+    dias_registrados = list(registros_mes.values_list('fecha', flat=True).distinct())
+    total_dias_habiles = len(dias_registrados)
+
+    estudiantes = Estudiante.objects.filter(seccion=seccion, activo=True).order_by('nombre_completo')
+    tabla_alumnos = []
+    alertas_desercion_cnt = 0
+    todos_pct = []
+
+    for est in estudiantes:
+        detalles = DetalleAsistencia.objects.filter(registro__in=registros_mes, estudiante=est)
+        presentes = detalles.filter(estado__in=['presente', 'tarde', 'justificado']).count()
+        ausentes = detalles.filter(estado='ausente').count()
+        tardes = detalles.filter(estado='tarde').count()
+
+        if total_dias_habiles > 0:
+            pct_asist = round((presentes / total_dias_habiles) * 100, 1)
+            todos_pct.append(pct_asist)
+        else:
+            pct_asist = 100.0
+
+        es_critico = (pct_asist < 85.0 and total_dias_habiles > 0)
+        if es_critico:
+            alertas_desercion_cnt += 1
+
+        tabla_alumnos.append({
+            'estudiante': est,
+            'presentes': presentes,
+            'ausentes': ausentes,
+            'tardes': tardes,
+            'porcentaje': pct_asist,
+            'es_critico': es_critico,
+        })
+
+    tasa_seccion_mes = round(sum(todos_pct) / len(todos_pct), 1) if todos_pct else 100.0
+
+    meses_choices = [
+        (3, 'Marzo'), (4, 'Abril'), (5, 'Mayo'), (6, 'Junio'),
+        (7, 'Julio'), (8, 'Agosto'), (9, 'Septiembre'), (10, 'Octubre'),
+        (11, 'Noviembre'), (12, 'Diciembre')
+    ]
+
+    context = {
+        'colegio': colegio,
+        'seccion': seccion,
+        'secciones': secciones,
+        'mes': mes,
+        'anio': anio,
+        'meses_choices': meses_choices,
+        'total_dias_habiles': total_dias_habiles,
+        'tabla_alumnos': tabla_alumnos,
+        'tasa_seccion_mes': tasa_seccion_mes,
+        'alertas_desercion_cnt': alertas_desercion_cnt,
+        'active_page': 'reportes',
+        'hoy': timezone.now(),
+    }
+    return render(request, 'colegios/reportes/reporte_asistencia_mensual.html', context)
+
+
+@login_required
+def exportar_mensual_asistencia_excel_view(request, seccion_id):
+    """Exporta el reporte consolidado de asistencia mensual de una sección a Excel (.xlsx)."""
+    import openpyxl
+    from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+    from openpyxl.utils import get_column_letter
+
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        return redirect('solicitar_acceso')
+
+    seccion = get_object_or_404(SeccionCurso, id=seccion_id, curso__colegio=colegio)
+    mes_str = request.GET.get('mes')
+    try:
+        mes = int(mes_str) if mes_str else timezone.now().month
+    except ValueError:
+        mes = timezone.now().month
+
+    periodo = ConfiguracionAcademica.objects.filter(colegio=colegio).first()
+    anio = periodo.anio_academico if periodo else timezone.now().year
+
+    from asistencia.models import RegistroAsistencia, DetalleAsistencia
+
+    registros_mes = RegistroAsistencia.objects.filter(
+        seccion=seccion,
+        fecha__year=anio,
+        fecha__month=mes
+    ).order_by('fecha')
+
+    dias_habiles = len(set(registros_mes.values_list('fecha', flat=True)))
+    estudiantes = Estudiante.objects.filter(seccion=seccion, activo=True).order_by('nombre_completo')
+
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = f"Asistencia_Mes_{mes}"
+    ws.views.sheetView[0].showGridLines = True
+
+    FILL_HEADER = PatternFill(start_color="10B981", end_color="10B981", fill_type="solid")
+    FONT_HEADER = Font(name="Segoe UI", size=10, bold=True, color="FFFFFF")
+    FILL_ROJO = PatternFill(start_color="FEE2E2", end_color="FEE2E2", fill_type="solid")
+    FONT_ROJO = Font(name="Segoe UI", size=9, bold=True, color="DC2626")
+    FONT_NORMAL = Font(name="Segoe UI", size=9, color="0F172A")
+    BORDER_THIN = Border(left=Side(style='thin', color='E2E8F0'), right=Side(style='thin', color='E2E8F0'), top=Side(style='thin', color='E2E8F0'), bottom=Side(style='thin', color='E2E8F0'))
+
+    ws.merge_cells('A1:F1')
+    ws['A1'] = f"{colegio.nombre} - REPORTE MENSUAL DE ASISTENCIA (SIGE): {seccion.nombre} - Mes {mes}/{anio}"
+    ws['A1'].font = Font(name="Segoe UI", size=12, bold=True, color="10B981")
+
+    headers = ["#", "RUT", "Nombre Completo", "Días Hábiles", "Días Presente", "Inasistencias", "% Asistencia Mensual", "Alerta (<85%)"]
+    ws.row_dimensions[3].height = 26
+
+    for col_idx, h in enumerate(headers, start=1):
+        cell = ws.cell(row=3, column=col_idx, value=h)
+        cell.fill = FILL_HEADER
+        cell.font = FONT_HEADER
+        cell.alignment = Alignment(horizontal="center", vertical="center")
+        cell.border = BORDER_THIN
+        ws.column_dimensions[get_column_letter(col_idx)].width = 26 if col_idx == 3 else 16
+
+    current_row = 4
+    for idx, est in enumerate(estudiantes, start=1):
+        detalles = DetalleAsistencia.objects.filter(registro__in=registros_mes, estudiante=est)
+        presentes = detalles.filter(estado__in=['presente', 'tarde', 'justificado']).count()
+        ausentes = detalles.filter(estado='ausente').count()
+        pct = round((presentes / dias_habiles * 100), 1) if dias_habiles > 0 else 100.0
+
+        ws.row_dimensions[current_row].height = 20
+        c1 = ws.cell(row=current_row, column=1, value=idx)
+        c2 = ws.cell(row=current_row, column=2, value=est.rut or '-')
+        c3 = ws.cell(row=current_row, column=3, value=est.nombre_completo)
+        c4 = ws.cell(row=current_row, column=4, value=dias_habiles)
+        c5 = ws.cell(row=current_row, column=5, value=presentes)
+        c6 = ws.cell(row=current_row, column=6, value=ausentes)
+        c7 = ws.cell(row=current_row, column=7, value=f"{pct}%")
+        c8 = ws.cell(row=current_row, column=8, value="CRÍTICO (<85%)" if (pct < 85.0 and dias_habiles > 0) else "NORMAL")
+
+        for c in [c1, c2, c3, c4, c5, c6, c7, c8]:
+            c.border = BORDER_THIN
+            c.font = FONT_NORMAL
+            if c != c3:
+                c.alignment = Alignment(horizontal="center", vertical="center")
+
+        if pct < 85.0 and dias_habiles > 0:
+            c7.fill = FILL_ROJO
+            c7.font = FONT_ROJO
+            c8.fill = FILL_ROJO
+            c8.font = FONT_ROJO
+
+        current_row += 1
+
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    slug_sec = seccion.nombre.lower().replace(' ', '_')
+    response['Content-Disposition'] = f'attachment; filename="Asistencia_Mensual_{slug_sec}_Mes_{mes}.xlsx"'
+    wb.save(response)
+    return response
+
+
+@login_required
+def reporte_convivencia_consolidado_view(request):
+    """Consolidado de anotaciones, méritos y deméritos por sección y alertas de convivencia."""
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        return redirect('solicitar_acceso')
+
+    secciones = SeccionCurso.objects.filter(curso__colegio=colegio, activo=True).select_related('curso').order_by('curso__orden', 'letra')
+    seccion_id = request.GET.get('seccion')
+
+    from colegios.models import AnotacionEstudiante
+    anotaciones_qs = AnotacionEstudiante.objects.filter(colegio=colegio).select_related('estudiante', 'estudiante__seccion', 'docente', 'asignatura')
+
+    if seccion_id and seccion_id.isdigit():
+        anotaciones_qs = anotaciones_qs.filter(estudiante__seccion_id=int(seccion_id))
+
+    total_positivas = anotaciones_qs.filter(tipo='positiva').count()
+    total_negativas = anotaciones_qs.filter(tipo='negativa').count()
+    total_citaciones = anotaciones_qs.filter(tipo='citacion').count()
+    total_neutras = anotaciones_qs.filter(tipo='neutra').count()
+
+    context = {
+        'colegio': colegio,
+        'secciones': secciones,
+        'seccion_seleccionada': int(seccion_id) if (seccion_id and seccion_id.isdigit()) else None,
+        'anotaciones': anotaciones_qs.order_by('-fecha', '-id')[:50],
+        'total_positivas': total_positivas,
+        'total_negativas': total_negativas,
+        'total_citaciones': total_citaciones,
+        'total_neutras': total_neutras,
+        'active_page': 'reportes',
+        'hoy': timezone.now(),
+    }
+    return render(request, 'colegios/reportes/reporte_convivencia.html', context)
+
+
+@login_required
+def reporte_resumen_ejecutivo_institucional_view(request):
+    """Ficha ejecutiva 360° con métricas institucionales para directivos y MINEDUC."""
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        return redirect('solicitar_acceso')
+
+    periodo = ConfiguracionAcademica.objects.filter(colegio=colegio).first()
+    estudiantes_qs = Estudiante.objects.filter(colegio=colegio, activo=True)
+    secciones_qs = SeccionCurso.objects.filter(curso__colegio=colegio, activo=True)
+
+    # Métricas
+    total_matricula = estudiantes_qs.count()
+    hombres_cnt = estudiantes_qs.filter(genero='masculino').count()
+    mujeres_cnt = estudiantes_qs.filter(genero='femenino').count()
+    pie_cnt = estudiantes_qs.filter(es_pie=True).count()
+
+    basica_cnt = estudiantes_qs.filter(seccion__curso__nivel='basica').count()
+    media_cnt = estudiantes_qs.filter(seccion__curso__nivel='media').count()
+
+    from calificaciones.models import Nota
+    from django.db.models import Avg
+    promedio_global = Nota.objects.filter(evaluacion__colegio=colegio).aggregate(Avg('valor'))['valor__avg']
+    promedio_global_fmt = round(float(promedio_global), 1) if promedio_global else 0.0
+
+    from colegios.models import TallerExtracurricular, CuentaFinanciera
+    from solicitudes.models import MiembroColegio
+    talleres_cnt = TallerExtracurricular.objects.filter(colegio=colegio, activo=True).count()
+    personal_cnt = MiembroColegio.objects.filter(colegio=colegio, activo=True).count()
+
+    context = {
+        'colegio': colegio,
+        'periodo': periodo,
+        'total_matricula': total_matricula,
+        'hombres_cnt': hombres_cnt,
+        'mujeres_cnt': mujeres_cnt,
+        'pie_cnt': pie_cnt,
+        'basica_cnt': basica_cnt,
+        'media_cnt': media_cnt,
+        'promedio_global': promedio_global_fmt,
+        'talleres_cnt': talleres_cnt,
+        'personal_cnt': personal_cnt,
+        'secciones_cnt': secciones_qs.count(),
+        'active_page': 'reportes',
+        'hoy': timezone.now(),
+    }
+    return render(request, 'colegios/reportes/reporte_resumen_ejecutivo.html', context)
 
 
 @login_required
@@ -1927,6 +3074,7 @@ def convivencia_hub_view(request):
 
 
 @login_required
+@login_required
 def calendario_escolar_view(request):
     colegio = obtener_colegio_usuario(request.user)
     if not colegio:
@@ -1937,81 +3085,217 @@ def calendario_escolar_view(request):
     periodo = ConfiguracionAcademica.objects.filter(colegio=colegio).first()
     is_admin = (
         request.user.colegios_administrados.filter(id=colegio.id).exists()
-        or (miembro and miembro.rol and miembro.rol.nombre in ['Administrador', 'Director'])
+        or (miembro and miembro.rol and miembro.rol.nombre in ['Administrador', 'Director', 'UTP'])
     )
+    is_profesor = (miembro and miembro.rol and miembro.rol.nombre == 'Profesor')
 
     from colegios.models import EventoAgenda
+    from datetime import datetime, time, timedelta
+
     if request.method == 'POST':
-        titulo = request.POST.get('titulo', '').strip()
-        tipo = request.POST.get('tipo', 'actividad')
-        fecha_str = request.POST.get('fecha_inicio')
-        hora_str = request.POST.get('hora_inicio', '08:00')
-        lugar = request.POST.get('lugar', '').strip()
-        curso_id = request.POST.get('curso_id')
+        action = request.POST.get('action')
 
-        asignado_a_id = request.POST.get('asignado_a_id')
-        es_para_todos = (request.POST.get('es_para_todos') in ['on', '1', 'true'])
-        es_recurrente = (request.POST.get('es_recurrente') in ['on', '1', 'true'])
+        if action == 'crear_bloque_clase':
+            # 1. Crear Bloque de Clase Semanal Recurrente
+            asignatura_id = request.POST.get('asignatura_id')
+            curso_id = request.POST.get('curso_id')
+            docente_id = request.POST.get('docente_id')
+            dia_semana = request.POST.get('dia_semana')
+            hora_inicio_str = request.POST.get('hora_inicio', '08:00')
+            hora_fin_str = request.POST.get('hora_fin', '09:30')
+            lugar = request.POST.get('lugar', '').strip()
 
-        descripcion = request.POST.get('descripcion', '').strip()
-
-        if titulo and fecha_str:
-            try:
-                dt_str = f"{fecha_str} {hora_str}"
-                fecha_inicio = timezone.make_aware(datetime.strptime(dt_str, '%Y-%m-%d %H:%M'))
-            except ValueError:
-                fecha_inicio = timezone.now()
-
-            dia_semana = fecha_inicio.weekday() if es_recurrente else None
+            asig_obj = Asignatura.objects.filter(id=asignatura_id, colegio=colegio).first() if (asignatura_id and asignatura_id.isdigit()) else None
             curso_obj = CursoColegio.objects.filter(id=curso_id, colegio=colegio).first() if (curso_id and curso_id.isdigit()) else None
-            asignado_obj = User.objects.filter(id=asignado_a_id).first() if (asignado_a_id and asignado_a_id.isdigit()) else None
+            docente_obj = User.objects.filter(id=docente_id).first() if (docente_id and docente_id.isdigit()) else request.user
 
-            EventoAgenda.objects.create(
-                colegio=colegio,
-                creado_por=request.user,
-                asignado_a=asignado_obj,
-                es_para_todos=es_para_todos,
-                es_recurrente=es_recurrente,
-                dia_semana=dia_semana,
-                titulo=titulo,
-                tipo=tipo,
-                fecha_inicio=fecha_inicio,
-                lugar=lugar if lugar else None,
-                curso=curso_obj,
-                descripcion=descripcion if descripcion else None
-            )
-            messages.success(request, f"¡Evento '{titulo}' guardado en la agenda!")
-            return redirect('calendario_escolar')
+            if asig_obj and dia_semana is not None and dia_semana.isdigit():
+                dia_num = int(dia_semana)
+                
+                # Base date: primer lunes de referencia
+                base_monday = timezone.now().date() - timedelta(days=timezone.now().date().weekday())
+                target_date = base_monday + timedelta(days=dia_num)
 
+                try:
+                    h_ini = datetime.strptime(hora_inicio_str, '%H:%M').time()
+                    h_fin = datetime.strptime(hora_fin_str, '%H:%M').time()
+                    dt_ini = timezone.make_aware(datetime.combine(target_date, h_ini))
+                    dt_fin = timezone.make_aware(datetime.combine(target_date, h_fin))
+                except ValueError:
+                    dt_ini = timezone.now()
+                    dt_fin = timezone.now() + timedelta(hours=1, minutes=30)
+
+                nombre_curso = curso_obj.nombre if curso_obj else (asig_obj.curso.nombre if asig_obj.curso else '')
+                titulo_clase = f"{asig_obj.nombre}" + (f" ({nombre_curso})" if nombre_curso else "")
+
+                EventoAgenda.objects.create(
+                    colegio=colegio,
+                    creado_por=request.user,
+                    asignado_a=docente_obj,
+                    es_recurrente=True,
+                    dia_semana=dia_num,
+                    titulo=titulo_clase,
+                    tipo='clase',
+                    fecha_inicio=dt_ini,
+                    fecha_fin=dt_fin,
+                    lugar=lugar if lugar else (f"Sala {nombre_curso}" if nombre_curso else "Sala de Clases"),
+                    curso=curso_obj or asig_obj.curso,
+                    asignatura=asig_obj,
+                    descripcion=f"Horario fijo semanal de {asig_obj.nombre}."
+                )
+                messages.success(request, f"¡Bloque de clase para '{asig_obj.nombre}' ({docente_obj.get_full_name() or docente_obj.username}) programado exitosamente!")
+                return redirect(f"{reverse('calendario_escolar')}?tab=horario&docente_id={docente_obj.id}")
+
+        else:
+            # 2. Crear Reunión o Evento Extraordinario
+            titulo = request.POST.get('titulo', '').strip()
+            tipo = request.POST.get('tipo', 'reunion')
+            fecha_str = request.POST.get('fecha_inicio')
+            hora_str = request.POST.get('hora_inicio', '08:00')
+            hora_fin_str = request.POST.get('hora_fin')
+            lugar = request.POST.get('lugar', '').strip()
+            curso_id = request.POST.get('curso_id')
+            asignado_a_id = request.POST.get('asignado_a_id')
+            es_para_todos = (request.POST.get('es_para_todos') in ['on', '1', 'true'])
+            descripcion = request.POST.get('descripcion', '').strip()
+
+            if titulo and fecha_str:
+                try:
+                    dt_str = f"{fecha_str} {hora_str}"
+                    fecha_inicio = timezone.make_aware(datetime.strptime(dt_str, '%Y-%m-%d %H:%M'))
+                    if hora_fin_str:
+                        dt_fin_str = f"{fecha_str} {hora_fin_str}"
+                        fecha_fin = timezone.make_aware(datetime.strptime(dt_fin_str, '%Y-%m-%d %H:%M'))
+                    else:
+                        fecha_fin = fecha_inicio + timedelta(hours=1)
+                except ValueError:
+                    fecha_inicio = timezone.now()
+                    fecha_fin = timezone.now() + timedelta(hours=1)
+
+                curso_obj = CursoColegio.objects.filter(id=curso_id, colegio=colegio).first() if (curso_id and curso_id.isdigit()) else None
+                asignado_obj = User.objects.filter(id=asignado_a_id).first() if (asignado_a_id and asignado_a_id.isdigit()) else None
+
+                EventoAgenda.objects.create(
+                    colegio=colegio,
+                    creado_por=request.user,
+                    asignado_a=asignado_obj,
+                    es_para_todos=es_para_todos,
+                    es_recurrente=False,
+                    titulo=titulo,
+                    tipo=tipo,
+                    fecha_inicio=fecha_inicio,
+                    fecha_fin=fecha_fin,
+                    lugar=lugar if lugar else None,
+                    curso=curso_obj,
+                    descripcion=descripcion if descripcion else None
+                )
+                messages.success(request, f"¡Reunión/Evento '{titulo}' agendado exitosamente!")
+                return redirect(f"{reverse('calendario_escolar')}?tab=reuniones")
+
+    # Parámetros y Filtros de Vista
+    tab_activa = request.GET.get('tab', 'horario')
+    docente_id_filtro = request.GET.get('docente_id')
+    curso_id_filtro = request.GET.get('curso_id')
+
+    # Si es profesor y no eligió filtro, pre-cargar su propio horario
+    if is_profesor and not is_admin and not docente_id_filtro:
+        docente_id_filtro = str(request.user.id)
+
+    personal = MiembroColegio.objects.filter(colegio=colegio, activo=True).select_related('usuario', 'rol').order_by('usuario__first_name', 'usuario__last_name')
+    cursos = CursoColegio.objects.filter(colegio=colegio, activo=True).order_by('orden', 'nombre')
+    asignaturas = Asignatura.objects.filter(colegio=colegio, activo=True).select_related('curso').order_by('curso__orden', 'nombre')
+
+    # ── 1. MATRIZ DE HORARIO SEMANAL DE CLASES ────────────────────────────────
+    clases_qs = EventoAgenda.objects.filter(colegio=colegio, tipo='clase', es_recurrente=True).select_related('asignatura', 'curso', 'asignado_a')
+
+    docente_seleccionado = None
+    if docente_id_filtro and docente_id_filtro.isdigit():
+        clases_qs = clases_qs.filter(asignado_a_id=int(docente_id_filtro))
+        docente_seleccionado = User.objects.filter(id=int(docente_id_filtro)).first()
+
+    curso_seleccionado = None
+    if curso_id_filtro and curso_id_filtro.isdigit():
+        clases_qs = clases_qs.filter(curso_id=int(curso_id_filtro))
+        curso_seleccionado = CursoColegio.objects.filter(id=int(curso_id_filtro)).first()
+
+    # Bloques estándar diarios
+    bloques_horarios = [
+        {'id': 1, 'nombre': 'Bloque 1', 'hora_inicio': '08:00', 'hora_fin': '09:30', 'tipo': 'clase'},
+        {'id': 2, 'nombre': 'Bloque 2', 'hora_inicio': '09:45', 'hora_fin': '11:15', 'tipo': 'clase'},
+        {'id': 3, 'nombre': 'Bloque 3', 'hora_inicio': '11:30', 'hora_fin': '13:00', 'tipo': 'clase'},
+        {'id': 0, 'nombre': 'Almuerzo / Colación', 'hora_inicio': '13:00', 'hora_fin': '14:00', 'tipo': 'recreo'},
+        {'id': 4, 'nombre': 'Bloque 4', 'hora_inicio': '14:00', 'hora_fin': '15:30', 'tipo': 'clase'},
+        {'id': 5, 'nombre': 'Bloque 5', 'hora_inicio': '15:45', 'hora_fin': '17:15', 'tipo': 'clase'},
+    ]
+
+    dias_semana_nombres = [
+        (0, 'Lunes'), (1, 'Martes'), (2, 'Miércoles'), (3, 'Jueves'), (4, 'Viernes')
+    ]
+
+    # Construir grilla {bloque_idx: {dia_idx: [eventos]}}
+    grilla_horario = []
+    for blk in bloques_horarios:
+        fila_dias = []
+        for dia_num, dia_nom in dias_semana_nombres:
+            # Buscar clases que coincidan con el día y hora aproximada
+            if blk['tipo'] == 'clase':
+                eventos_celda = [
+                    ev for ev in clases_qs
+                    if ev.dia_semana == dia_num and ev.fecha_inicio and ev.fecha_inicio.strftime('%H:%M') <= blk['hora_inicio'] <= (ev.fecha_fin.strftime('%H:%M') if ev.fecha_fin else '23:59')
+                ]
+            else:
+                eventos_celda = []
+            fila_dias.append({
+                'dia_num': dia_num,
+                'dia_nom': dia_nom,
+                'eventos': eventos_celda
+            })
+        grilla_horario.append({
+            'bloque': blk,
+            'dias': fila_dias
+        })
+
+    # ── 2. AGENDA DE REUNIONES Y EVENTOS EXTRAORDINARIOS ─────────────────────
     hoy_date = timezone.now().date()
-    eventos_hoy = EventoAgenda.objects.filter(colegio=colegio, fecha_inicio__date=hoy_date).order_by('fecha_inicio')
-    proximos_eventos = EventoAgenda.objects.filter(colegio=colegio, fecha_inicio__date__gte=hoy_date).order_by('fecha_inicio')[:20]
-    cursos = CursoColegio.objects.filter(colegio=colegio, activo=True).order_by('nivel', 'nombre')
-    personal = MiembroColegio.objects.filter(colegio=colegio, activo=True).select_related('usuario', 'rol').order_by('usuario__first_name')
+    reuniones_qs = EventoAgenda.objects.filter(colegio=colegio).exclude(tipo='clase').select_related('curso', 'asignado_a', 'creado_por').order_by('fecha_inicio')
+    
+    proximas_reuniones = reuniones_qs.filter(fecha_inicio__date__gte=hoy_date)[:20]
+    reuniones_hoy = reuniones_qs.filter(fecha_inicio__date=hoy_date)
+
+    # Métricas Globales de Conteo
+    total_clases = EventoAgenda.objects.filter(colegio=colegio, tipo='clase').count()
+    total_reuniones = reuniones_qs.filter(tipo__in=['reunion', 'reunion_apoderados', 'consejo_profesores', 'entrevista']).count()
+    total_evaluaciones = reuniones_qs.filter(tipo='evaluacion').count()
+    total_actividades = reuniones_qs.filter(tipo__in=['actividad', 'feriado']).count()
 
     abs_ical_url = request.build_absolute_uri(reverse('exportar_ical_agenda')) + f"?colegio_id={colegio.id}"
     webcal_url = abs_ical_url.replace('https://', 'webcal://').replace('http://', 'webcal://')
     google_cal_feed_url = f"https://calendar.google.com/calendar/r?cid={webcal_url}"
-
-
-    total_clases = EventoAgenda.objects.filter(colegio=colegio, tipo='clase').count()
-    total_evaluaciones = EventoAgenda.objects.filter(colegio=colegio, tipo='evaluacion', fecha_inicio__gte=hoy_date).count()
-    total_reuniones = EventoAgenda.objects.filter(colegio=colegio, tipo='reunion', fecha_inicio__gte=hoy_date).count()
-    total_actividades = EventoAgenda.objects.filter(colegio=colegio, tipo='actividad', fecha_inicio__gte=hoy_date).count()
 
     context = {
         'colegio': colegio,
         'miembro': miembro,
         'periodo': periodo,
         'is_admin': is_admin,
+        'is_profesor': is_profesor,
         'active_page': 'calendario',
-        'eventos_hoy': eventos_hoy,
-        'proximos_eventos': proximos_eventos,
-        'cursos': cursos,
+        'tab_activa': tab_activa,
+        'docente_id_filtro': int(docente_id_filtro) if (docente_id_filtro and docente_id_filtro.isdigit()) else None,
+        'docente_seleccionado': docente_seleccionado,
+        'curso_id_filtro': int(curso_id_filtro) if (curso_id_filtro and curso_id_filtro.isdigit()) else None,
+        'curso_seleccionado': curso_seleccionado,
         'personal': personal,
+        'cursos': cursos,
+        'asignaturas': asignaturas,
+        'dias_semana_nombres': dias_semana_nombres,
+        'bloques_horarios': bloques_horarios,
+        'grilla_horario': grilla_horario,
+        'total_clases_programadas': clases_qs.count(),
+        'proximas_reuniones': proximas_reuniones,
+        'reuniones_hoy': reuniones_hoy,
         'total_clases': total_clases,
-        'total_evaluaciones': total_evaluaciones,
         'total_reuniones': total_reuniones,
+        'total_evaluaciones': total_evaluaciones,
         'total_actividades': total_actividades,
         'hoy': timezone.now(),
         'abs_ical_url': abs_ical_url,
@@ -2021,8 +3305,6 @@ def calendario_escolar_view(request):
     return render(request, 'colegios/calendario_escolar.html', context)
 
 
-
-
 @login_required
 def api_eventos_calendario_view(request):
     colegio = obtener_colegio_usuario(request.user)
@@ -2030,10 +3312,16 @@ def api_eventos_calendario_view(request):
         return JsonResponse([], safe=False)
 
     docente_id = request.GET.get('docente_id')
+    filtro_tipo = request.GET.get('tipo', '') # 'reuniones', 'clases', 'todos'
     from colegios.models import EventoAgenda
     from django.db.models import Q
 
     qs = EventoAgenda.objects.filter(colegio=colegio)
+
+    if filtro_tipo == 'reuniones':
+        qs = qs.exclude(tipo='clase')
+    elif filtro_tipo == 'clases':
+        qs = qs.filter(tipo='clase')
 
     if docente_id and docente_id.isdigit():
         target_uid = int(docente_id)
@@ -2041,10 +3329,14 @@ def api_eventos_calendario_view(request):
 
     events_list = []
     color_map = {
-        'clase': '#7C5CFC',       # Morado
-        'evaluacion': '#E11D48',  # Rojo
-        'reunion': '#D97706',     # Naranja
-        'actividad': '#059669',   # Verde
+        'clase': '#7C5CFC',                 # Morado
+        'reunion_apoderados': '#D97706',    # Ámbar / Naranja
+        'consejo_profesores': '#2563EB',    # Azul
+        'entrevista': '#0891B2',            # Cian
+        'evaluacion': '#E11D48',            # Rojo carmesí
+        'actividad': '#059669',             # Verde
+        'feriado': '#64748B',               # Gris pizarra
+        'reunion': '#D97706',               # Ámbar
     }
 
     for ev in qs:
@@ -2055,6 +3347,7 @@ def api_eventos_calendario_view(request):
             'borderColor': color_map.get(ev.tipo, '#7C5CFC'),
             'extendedProps': {
                 'tipo': ev.get_tipo_display(),
+                'tipo_raw': ev.tipo,
                 'lugar': ev.lugar or 'Sin definir',
                 'curso': ev.curso.nombre if ev.curso else 'General',
                 'docente': ev.asignado_a.get_full_name() if ev.asignado_a else ('Todos' if ev.es_para_todos else (ev.creado_por.get_full_name() if ev.creado_por else 'Institución')),
@@ -2066,6 +3359,8 @@ def api_eventos_calendario_view(request):
             fc_dow = (ev.dia_semana + 1) % 7
             item['daysOfWeek'] = [fc_dow]
             item['startTime'] = ev.fecha_inicio.strftime('%H:%M:%S')
+            if ev.fecha_fin:
+                item['endTime'] = ev.fecha_fin.strftime('%H:%M:%S')
         else:
             item['start'] = ev.fecha_inicio.isoformat()
             if ev.fecha_fin:
@@ -2738,36 +4033,100 @@ def exportar_estadisticas_excel_view(request):
 # ==============================================================================
 
 def inicializar_datos_finanzas(colegio):
-    from .models import CuentaFinanciera, CategoriaFinanciera
+    from .models import CuentaFinanciera, CategoriaFinanciera, ProyectoEscolar
+    from decimal import Decimal
+
     if not CuentaFinanciera.objects.filter(colegio=colegio).exists():
+        # Bolsas de Subvención
         CuentaFinanciera.objects.create(
             colegio=colegio,
-            nombre="Caja Chica Dirección / General",
-            tipo="caja_chica",
-            saldo_inicial=150000.0,
-            saldo_actual=150000.0
+            nombre="Bolsa Subvención Escolar Preferencial (SEP)",
+            tipo="subvencion_sep",
+            fondo_asociado="sep",
+            banco="Banco Estado",
+            numero_cuenta="SEP-00129-3",
+            saldo_inicial=8500000.0,
+            saldo_actual=8500000.0
         )
         CuentaFinanciera.objects.create(
             colegio=colegio,
-            nombre="Cuenta Corriente Institucional",
-            tipo="cuenta_bancaria",
+            nombre="Bolsa Programa de Integración Escolar (PIE)",
+            tipo="subvencion_pie",
+            fondo_asociado="pie",
+            banco="Banco Estado",
+            numero_cuenta="PIE-00418-7",
+            saldo_inicial=5200000.0,
+            saldo_actual=5200000.0
+        )
+        CuentaFinanciera.objects.create(
+            colegio=colegio,
+            nombre="Bolsa Subvención General / Operacional",
+            tipo="subvencion_general",
+            fondo_asociado="subvencion_general",
             banco="Banco Santander",
             numero_cuenta="0-000-00-12345-6",
-            saldo_inicial=0.0,
-            saldo_actual=0.0
+            saldo_inicial=12000000.0,
+            saldo_actual=12000000.0
+        )
+        CuentaFinanciera.objects.create(
+            colegio=colegio,
+            nombre="Fondo de Mantenimiento e Infraestructura",
+            tipo="fondo_mantenimiento",
+            fondo_asociado="mantenimiento",
+            banco="Banco Estado",
+            numero_cuenta="MNT-99214-1",
+            saldo_inicial=3800000.0,
+            saldo_actual=3800000.0
+        )
+
+        # Cajas Chicas Especializadas
+        CuentaFinanciera.objects.create(
+            colegio=colegio,
+            nombre="Caja Chica Útiles Escolares & Fungibles",
+            tipo="caja_chica_utiles",
+            fondo_asociado="sep",
+            saldo_inicial=350000.0,
+            saldo_actual=350000.0
+        )
+        CuentaFinanciera.objects.create(
+            colegio=colegio,
+            nombre="Caja Chica Convivencia & Inspectoría",
+            tipo="caja_chica_convivencia",
+            fondo_asociado="subvencion_general",
+            saldo_inicial=200000.0,
+            saldo_actual=200000.0
+        )
+        CuentaFinanciera.objects.create(
+            colegio=colegio,
+            nombre="Caja Chica Ciencias & Laboratorios",
+            tipo="caja_chica_ciencias",
+            fondo_asociado="sep",
+            saldo_inicial=250000.0,
+            saldo_actual=250000.0
+        )
+        CuentaFinanciera.objects.create(
+            colegio=colegio,
+            nombre="Caja Chica Dirección / Rectoría",
+            tipo="caja_chica_rectoria",
+            fondo_asociado="fondos_propios",
+            saldo_inicial=300000.0,
+            saldo_actual=300000.0
         )
 
     categorias_base = [
         ("Subvención Escolar / Mineduc", "ingreso", "bi-bank", "#10B981"),
-        ("Matrículas y Colegiaturas", "ingreso", "bi-cash-coin", "#3B82F6"),
-        ("Aportes Centro de Padres", "ingreso", "bi-people-fill", "#8B5CF6"),
+        ("Aporte Fondo SEP", "ingreso", "bi-award-fill", "#7C5CFC"),
+        ("Aporte Fondo PIE", "ingreso", "bi-person-hearts", "#3B82F6"),
+        ("Aportes Centro de Padres & Donaciones", "ingreso", "bi-people-fill", "#8B5CF6"),
         ("Otros Ingresos", "ingreso", "bi-plus-circle", "#64748B"),
-        ("Material Didáctico e Insumos", "egreso", "bi-pencil-square", "#F59E0B"),
-        ("Servicios Básicos (Luz / Agua / Internet)", "egreso", "bi-lightning-charge", "#EF4444"),
+        ("Útiles Escolares & Material Fungible", "egreso", "bi-journal-check", "#F59E0B"),
+        ("Recursos Pedagógicos & Aula", "egreso", "bi-pencil-square", "#7C5CFC"),
+        ("Material Didáctico Sensorial (PIE)", "egreso", "bi-puzzle-fill", "#3B82F6"),
         ("Mantención e Infraestructura", "egreso", "bi-tools", "#6366F1"),
-        ("Sueldos y Honorarios", "egreso", "bi-person-badge", "#EC4899"),
+        ("Equipamiento Tecnológico", "egreso", "bi-laptop", "#10B981"),
+        ("Servicios Básicos (Luz / Agua / Gas)", "egreso", "bi-lightning-charge", "#EF4444"),
         ("Caja Chica Gastos Menores", "egreso", "bi-wallet2", "#06B6D4"),
-        ("Eventos y Actividades Extraescolares", "egreso", "bi-trophy", "#10B981"),
+        ("Eventos y Actividades Formativas", "egreso", "bi-trophy", "#10B981"),
     ]
 
     for nombre, tipo, icono, color in categorias_base:
@@ -2776,6 +4135,39 @@ def inicializar_datos_finanzas(colegio):
             nombre=nombre,
             tipo=tipo,
             defaults={'icono': icono, 'color': color, 'activo': True}
+        )
+
+    # Proyectos Base si no existen
+    if not ProyectoEscolar.objects.filter(colegio=colegio).exists():
+        ProyectoEscolar.objects.create(
+            colegio=colegio,
+            codigo="PRY-SEP-01",
+            nombre="Campaña Útiles Escolares Alumnos Prioritarios 2026",
+            descripcion="Adquisición de cuadernos, resmas, lápices, mochilas y estuches para el 100% de estudiantes prioritarios según registro social.",
+            tipo_fondo="sep",
+            categoria_supereduc="utiles_escolares",
+            presupuesto_asignado=Decimal('1850000.0'),
+            estado="en_ejecucion"
+        )
+        ProyectoEscolar.objects.create(
+            colegio=colegio,
+            codigo="PRY-PIE-02",
+            nombre="Implementación Sala Sensorial y Recursos Fonoaudiológicos",
+            descripcion="Equipamiento con materiales didácticos sensoriales, software de fonoaudiología y mobiliario ergonómico para aula de recursos PIE.",
+            tipo_fondo="pie",
+            categoria_supereduc="pedagogico",
+            presupuesto_asignado=Decimal('2400000.0'),
+            estado="en_ejecucion"
+        )
+        ProyectoEscolar.objects.create(
+            colegio=colegio,
+            codigo="PRY-MNT-03",
+            nombre="Mantención Eléctrica y Pintura Aulas Pabellón B",
+            descripcion="Renovación de iluminación LED, pintura lavable de salas y reparación de canaletas perimetrales.",
+            tipo_fondo="mantenimiento",
+            categoria_supereduc="infraestructura",
+            presupuesto_asignado=Decimal('3100000.0'),
+            estado="en_ejecucion"
         )
 
 
@@ -2789,33 +4181,58 @@ def finanzas_dashboard_view(request):
     miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
     periodo = ConfiguracionAcademica.objects.filter(colegio=colegio).first()
     is_admin = (
-        request.user.colegios_administrados.filter(id=colegio.id).exists()
+        request.user.is_superuser
+        or request.user.colegios_administrados.filter(id=colegio.id).exists()
         or (miembro and miembro.rol and miembro.rol.nombre in ['Administrador', 'Director'])
     )
 
-    # Inicializar cuentas y categorías si es primera vez
+    from .models import RolPermiso, MiembroPermiso
+    tiene_permiso = is_admin
+    if not tiene_permiso and miembro and miembro.rol:
+        tiene_permiso = RolPermiso.objects.filter(rol=miembro.rol, modulo__nombre__iexact='Finanzas', puede_ver=True).exists()
+    if not tiene_permiso and miembro:
+        tiene_permiso = MiembroPermiso.objects.filter(miembro=miembro, modulo__nombre__iexact='Finanzas', puede_ver=True).exists()
+
+    if not tiene_permiso:
+        messages.error(request, "Acceso restringido. Se requieren permisos de Administración para ver las finanzas del colegio.")
+        return redirect('dashboard_usuario')
+
+    # Inicializar cuentas y proyectos si es primera vez
     inicializar_datos_finanzas(colegio)
 
-    from .models import CuentaFinanciera, CategoriaFinanciera, MovimientoFinanciero, FacturaGasto
+    from .models import CuentaFinanciera, CategoriaFinanciera, MovimientoFinanciero, FacturaGasto, ProyectoEscolar
     from django.db.models import Sum, Q
+    from decimal import Decimal
 
     # Cuentas activas
     cuentas = CuentaFinanciera.objects.filter(colegio=colegio, activo=True).order_by('tipo', 'nombre')
+    cajas_chicas = cuentas.filter(tipo__startswith='caja_chica')
+    bolsas_subvencion = cuentas.exclude(tipo__startswith='caja_chica')
+    
+    # Proyectos activos
+    proyectos = ProyectoEscolar.objects.filter(colegio=colegio, activo=True).order_by('-fecha_inicio', '-id')
+
     categorias_ingreso = CategoriaFinanciera.objects.filter(colegio=colegio, tipo='ingreso', activo=True).order_by('nombre')
     categorias_egreso = CategoriaFinanciera.objects.filter(colegio=colegio, tipo='egreso', activo=True).order_by('nombre')
     todas_categorias = CategoriaFinanciera.objects.filter(colegio=colegio, activo=True).order_by('tipo', 'nombre')
 
     # Filtros
     cuenta_filtro = request.GET.get('cuenta')
+    proyecto_filtro = request.GET.get('proyecto')
+    fondo_filtro = request.GET.get('fondo')
     tipo_filtro = request.GET.get('tipo')
     categoria_filtro = request.GET.get('categoria')
     busqueda = request.GET.get('q', '').strip()
-    tab_activa = request.GET.get('tab', 'movimientos')
+    tab_activa = request.GET.get('tab', 'fondos')
 
-    movimientos_qs = MovimientoFinanciero.objects.filter(colegio=colegio).select_related('cuenta', 'categoria', 'registrado_por').order_by('-fecha', '-id')
+    movimientos_qs = MovimientoFinanciero.objects.filter(colegio=colegio).select_related('cuenta', 'proyecto', 'categoria', 'registrado_por').order_by('-fecha', '-id')
 
     if cuenta_filtro and cuenta_filtro.isdigit():
         movimientos_qs = movimientos_qs.filter(cuenta_id=int(cuenta_filtro))
+    if proyecto_filtro and proyecto_filtro.isdigit():
+        movimientos_qs = movimientos_qs.filter(proyecto_id=int(proyecto_filtro))
+    if fondo_filtro:
+        movimientos_qs = movimientos_qs.filter(Q(tipo_fondo=fondo_filtro) | Q(cuenta__fondo_asociado=fondo_filtro))
     if tipo_filtro in ['ingreso', 'egreso']:
         movimientos_qs = movimientos_qs.filter(tipo=tipo_filtro)
     if categoria_filtro and categoria_filtro.isdigit():
@@ -2824,18 +4241,28 @@ def finanzas_dashboard_view(request):
         movimientos_qs = movimientos_qs.filter(
             Q(concepto__icontains=busqueda) |
             Q(descripcion__icontains=busqueda) |
-            Q(numero_comprobante__icontains=busqueda)
+            Q(numero_comprobante__icontains=busqueda) |
+            Q(proyecto__nombre__icontains=busqueda)
         )
 
     # Facturas
-    facturas_qs = FacturaGasto.objects.filter(colegio=colegio).select_related('movimiento_asociado', 'registrado_por').order_by('-fecha_emision', '-id')
+    facturas_qs = FacturaGasto.objects.filter(colegio=colegio).select_related('proyecto', 'movimiento_asociado', 'registrado_por').order_by('-fecha_emision', '-id')
 
-    from decimal import Decimal
+    # Cálculos por Bolsas de Subvención
+    saldo_sep = Decimal(cuentas.filter(Q(fondo_asociado='sep') | Q(tipo='subvencion_sep')).aggregate(Sum('saldo_actual'))['saldo_actual__sum'] or 0)
+    saldo_pie = Decimal(cuentas.filter(Q(fondo_asociado='pie') | Q(tipo='subvencion_pie')).aggregate(Sum('saldo_actual'))['saldo_actual__sum'] or 0)
+    saldo_general = Decimal(cuentas.filter(Q(fondo_asociado='subvencion_general') | Q(tipo='subvencion_general')).aggregate(Sum('saldo_actual'))['saldo_actual__sum'] or 0)
+    saldo_mantenimiento = Decimal(cuentas.filter(Q(fondo_asociado='mantenimiento') | Q(tipo='fondo_mantenimiento')).aggregate(Sum('saldo_actual'))['saldo_actual__sum'] or 0)
+    saldo_propios = Decimal(cuentas.filter(fondo_asociado='fondos_propios').aggregate(Sum('saldo_actual'))['saldo_actual__sum'] or 0)
 
-    # KPIs Financieros Globales
+    # Totales Globales
     saldo_total_disponible = Decimal(cuentas.aggregate(Sum('saldo_actual'))['saldo_actual__sum'] or 0)
-    saldo_caja_chica = Decimal(cuentas.filter(tipo='caja_chica').aggregate(Sum('saldo_actual'))['saldo_actual__sum'] or 0)
-    saldo_bancos = Decimal(cuentas.filter(tipo='cuenta_bancaria').aggregate(Sum('saldo_actual'))['saldo_actual__sum'] or 0)
+    saldo_total_cajas_chicas = Decimal(cajas_chicas.aggregate(Sum('saldo_actual'))['saldo_actual__sum'] or 0)
+
+    # Totales Proyectos
+    total_presupuesto_proyectos = Decimal(proyectos.aggregate(Sum('presupuesto_asignado'))['presupuesto_asignado__sum'] or 0)
+    total_gastado_proyectos = sum([p.total_gastado for p in proyectos])
+    total_saldo_proyectos = total_presupuesto_proyectos - total_gastado_proyectos
 
     hoy = timezone.now().date()
     mes_actual = hoy.month
@@ -2879,13 +4306,14 @@ def finanzas_dashboard_view(request):
         flujo_ingresos.append(float(ing_m))
         flujo_egresos.append(float(egr_m))
 
-
-    # Datos para Gráfico de Gastos por Categoría
+    # Datos para Gráfico de Gastos por Categoría Supereduc
     gastos_por_cat = MovimientoFinanciero.objects.filter(
         colegio=colegio, tipo='egreso', estado='completado', fecha__year=anio_actual
-    ).values('categoria__nombre').annotate(total=Sum('monto')).order_by('-total')
+    ).values('clasificacion_supereduc').annotate(total=Sum('monto')).order_by('-total')
 
-    cat_labels = [item['categoria__nombre'] or 'Sin Categoría' for item in gastos_por_cat[:6]]
+    # Diccionario de nombres legibles Supereduc
+    supereduc_dict = dict(ProyectoEscolar.CATEGORIA_SUPEREDUC)
+    cat_labels = [supereduc_dict.get(item['clasificacion_supereduc'], item['clasificacion_supereduc']) for item in gastos_por_cat[:6]]
     cat_valores = [float(item['total']) for item in gastos_por_cat[:6]]
 
     # Paginación de movimientos
@@ -2900,8 +4328,11 @@ def finanzas_dashboard_view(request):
         'is_admin': is_admin,
         'active_page': 'finanzas',
         'hoy': timezone.now(),
-        # Cuentas & Categorías
+        # Cuentas, Cajas & Proyectos
         'cuentas': cuentas,
+        'cajas_chicas': cajas_chicas,
+        'bolsas_subvencion': bolsas_subvencion,
+        'proyectos': proyectos,
         'categorias_ingreso': categorias_ingreso,
         'categorias_egreso': categorias_egreso,
         'todas_categorias': todas_categorias,
@@ -2911,13 +4342,24 @@ def finanzas_dashboard_view(request):
         'tab_activa': tab_activa,
         # Filtros seleccionados
         'cuenta_filtro': int(cuenta_filtro) if cuenta_filtro and cuenta_filtro.isdigit() else None,
+        'proyecto_filtro': int(proyecto_filtro) if proyecto_filtro and proyecto_filtro.isdigit() else None,
+        'fondo_filtro': fondo_filtro,
         'tipo_filtro': tipo_filtro,
         'categoria_filtro': int(categoria_filtro) if categoria_filtro and categoria_filtro.isdigit() else None,
         'busqueda': busqueda,
-        # KPIs
+        # KPIs de Bolsas y Subvenciones
+        'saldo_sep': saldo_sep,
+        'saldo_pie': saldo_pie,
+        'saldo_general': saldo_general,
+        'saldo_mantenimiento': saldo_mantenimiento,
+        'saldo_propios': saldo_propios,
         'saldo_total_disponible': saldo_total_disponible,
-        'saldo_caja_chica': saldo_caja_chica,
-        'saldo_bancos': saldo_bancos,
+        'saldo_total_cajas_chicas': saldo_total_cajas_chicas,
+        # KPIs Proyectos
+        'total_presupuesto_proyectos': total_presupuesto_proyectos,
+        'total_gastado_proyectos': total_gastado_proyectos,
+        'total_saldo_proyectos': total_saldo_proyectos,
+        # KPIs Mes
         'ingresos_mes': ingresos_mes,
         'egresos_mes': egresos_mes,
         'balance_mes': balance_mes,
@@ -2929,8 +4371,121 @@ def finanzas_dashboard_view(request):
         'flujo_egresos': flujo_egresos,
         'cat_labels': cat_labels,
         'cat_valores': cat_valores,
+        # Opciones select
+        'tipos_fondo_opciones': ProyectoEscolar.TIPO_FONDO,
+        'categorias_supereduc_opciones': ProyectoEscolar.CATEGORIA_SUPEREDUC,
     }
     return render(request, 'colegios/finanzas_dashboard.html', context)
+
+
+@login_required
+def crear_proyecto_escolar_view(request):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        return redirect('dashboard_usuario')
+
+    if request.method == 'POST':
+        from .models import ProyectoEscolar
+        from decimal import Decimal
+
+        codigo = request.POST.get('codigo', '').strip().upper()
+        nombre = request.POST.get('nombre', '').strip()
+        descripcion = request.POST.get('descripcion', '').strip()
+        tipo_fondo = request.POST.get('tipo_fondo', 'sep')
+        categoria_supereduc = request.POST.get('categoria_supereduc', 'pedagogico')
+        presupuesto_str = request.POST.get('presupuesto_asignado', '0').replace('.', '').replace(',', '.').replace('$', '').strip()
+        fecha_inicio_str = request.POST.get('fecha_inicio')
+        fecha_termino_str = request.POST.get('fecha_termino')
+
+        try:
+            presupuesto_asignado = Decimal(presupuesto_str)
+        except Exception:
+            presupuesto_asignado = Decimal('0.0')
+
+        try:
+            fecha_inicio = datetime.strptime(fecha_inicio_str, '%Y-%m-%d').date() if fecha_inicio_str else timezone.now().date()
+        except ValueError:
+            fecha_inicio = timezone.now().date()
+
+        fecha_termino = None
+        if fecha_termino_str:
+            try:
+                fecha_termino = datetime.strptime(fecha_termino_str, '%Y-%m-%d').date()
+            except ValueError:
+                pass
+
+        if not codigo:
+            codigo = f"PRY-{tipo_fondo.upper()[:3]}-{timezone.now().strftime('%d%H')}"
+
+        proyecto = ProyectoEscolar.objects.create(
+            colegio=colegio,
+            codigo=codigo,
+            nombre=nombre if nombre else "Nuevo Proyecto Escolar",
+            descripcion=descripcion,
+            tipo_fondo=tipo_fondo,
+            categoria_supereduc=categoria_supereduc,
+            presupuesto_asignado=presupuesto_asignado,
+            fecha_inicio=fecha_inicio,
+            fecha_termino=fecha_termino,
+            responsable=request.user,
+            estado='en_ejecucion',
+            activo=True
+        )
+
+        messages.success(request, f"¡Proyecto '{proyecto.nombre}' ({proyecto.codigo}) creado con presupuesto de ${presupuesto_asignado:,.0f}!")
+
+    return redirect('/colegios/finanzas/?tab=proyectos')
+
+
+@login_required
+def editar_proyecto_escolar_view(request, proyecto_id):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        return redirect('dashboard_usuario')
+
+    from .models import ProyectoEscolar
+    from decimal import Decimal
+
+    proyecto = get_object_or_404(ProyectoEscolar, id=proyecto_id, colegio=colegio)
+
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre', '').strip()
+        descripcion = request.POST.get('descripcion', '').strip()
+        tipo_fondo = request.POST.get('tipo_fondo', proyecto.tipo_fondo)
+        categoria_supereduc = request.POST.get('categoria_supereduc', proyecto.categoria_supereduc)
+        presupuesto_str = request.POST.get('presupuesto_asignado', '0').replace('.', '').replace(',', '.').replace('$', '').strip()
+        estado = request.POST.get('estado', proyecto.estado)
+
+        try:
+            proyecto.presupuesto_asignado = Decimal(presupuesto_str)
+        except Exception:
+            pass
+
+        if nombre:
+            proyecto.nombre = nombre
+        proyecto.descripcion = descripcion
+        proyecto.tipo_fondo = tipo_fondo
+        proyecto.categoria_supereduc = categoria_supereduc
+        proyecto.estado = estado
+        proyecto.save()
+
+        messages.success(request, f"Proyecto '{proyecto.codigo}' actualizado correctamente.")
+
+    return redirect('/colegios/finanzas/?tab=proyectos')
+
+
+@login_required
+def eliminar_proyecto_escolar_view(request, proyecto_id):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        return redirect('dashboard_usuario')
+
+    from .models import ProyectoEscolar
+    proyecto = get_object_or_404(ProyectoEscolar, id=proyecto_id, colegio=colegio)
+    proyecto.activo = False
+    proyecto.save()
+    messages.info(request, f"Proyecto '{proyecto.nombre}' archivado.")
+    return redirect('/colegios/finanzas/?tab=proyectos')
 
 
 @login_required
@@ -2941,12 +4496,16 @@ def crear_movimiento_financiero_view(request):
         return redirect('dashboard_usuario')
 
     if request.method == 'POST':
-        from .models import CuentaFinanciera, CategoriaFinanciera, MovimientoFinanciero
+        from .models import CuentaFinanciera, CategoriaFinanciera, MovimientoFinanciero, ProyectoEscolar
         from decimal import Decimal
 
         tipo = request.POST.get('tipo', 'egreso')
         cuenta_id = request.POST.get('cuenta_id')
+        proyecto_id = request.POST.get('proyecto_id')
         categoria_id = request.POST.get('categoria_id')
+        tipo_fondo = request.POST.get('tipo_fondo')
+        clasificacion_supereduc = request.POST.get('clasificacion_supereduc', 'pedagogico')
+        
         monto_str = request.POST.get('monto', '0').replace('.', '').replace(',', '.').replace('$', '').strip()
         concepto = request.POST.get('concepto', '').strip()
         descripcion = request.POST.get('descripcion', '').strip()
@@ -2957,6 +4516,15 @@ def crear_movimiento_financiero_view(request):
 
         cuenta = get_object_or_404(CuentaFinanciera, id=cuenta_id, colegio=colegio)
         categoria = CategoriaFinanciera.objects.filter(id=categoria_id, colegio=colegio).first() if categoria_id else None
+        proyecto = ProyectoEscolar.objects.filter(id=proyecto_id, colegio=colegio).first() if proyecto_id else None
+
+        if not tipo_fondo:
+            if proyecto:
+                tipo_fondo = proyecto.tipo_fondo
+            elif cuenta.fondo_asociado:
+                tipo_fondo = cuenta.fondo_asociado
+            else:
+                tipo_fondo = 'subvencion_general'
 
         try:
             monto = Decimal(monto_str)
@@ -2972,8 +4540,11 @@ def crear_movimiento_financiero_view(request):
         movimiento = MovimientoFinanciero.objects.create(
             colegio=colegio,
             cuenta=cuenta,
+            proyecto=proyecto,
             categoria=categoria,
             tipo=tipo,
+            tipo_fondo=tipo_fondo,
+            clasificacion_supereduc=clasificacion_supereduc,
             monto=monto,
             concepto=concepto if concepto else f"Movimiento de {tipo.capitalize()}",
             descripcion=descripcion,
@@ -2995,7 +4566,7 @@ def crear_movimiento_financiero_view(request):
         signo_msg = 'Ingreso registrado (+${:,.0f})' if tipo == 'ingreso' else 'Egreso registrado (-${:,.0f})'
         messages.success(request, f"¡{signo_msg.format(monto)} en {cuenta.nombre}!")
 
-    return redirect('finanzas_dashboard')
+    return redirect('/colegios/finanzas/?tab=movimientos')
 
 
 @login_required
@@ -3017,7 +4588,7 @@ def eliminar_movimiento_financiero_view(request, movimiento_id):
 
     mov.delete()
     messages.info(request, "Movimiento eliminado y saldo de la cuenta ajustado.")
-    return redirect('finanzas_dashboard')
+    return redirect('/colegios/finanzas/?tab=movimientos')
 
 
 @login_required
@@ -3027,10 +4598,14 @@ def crear_factura_view(request):
         return redirect('dashboard_usuario')
 
     if request.method == 'POST':
-        from .models import FacturaGasto
+        from .models import FacturaGasto, ProyectoEscolar
         from decimal import Decimal
 
         tipo_doc = request.POST.get('tipo_documento', 'factura_afecta')
+        proyecto_id = request.POST.get('proyecto_id')
+        tipo_fondo = request.POST.get('tipo_fondo', 'subvencion_general')
+        clasificacion_supereduc = request.POST.get('clasificacion_supereduc', 'pedagogico')
+        
         folio = request.POST.get('folio', '').strip()
         proveedor_nombre = request.POST.get('proveedor_nombre', '').strip()
         proveedor_rut = request.POST.get('proveedor_rut', '').strip()
@@ -3039,6 +4614,10 @@ def crear_factura_view(request):
         monto_total_str = request.POST.get('monto_total', '0').replace('.', '').replace(',', '.').replace('$', '').strip()
         archivo = request.FILES.get('archivo_factura')
         observaciones = request.POST.get('observaciones', '').strip()
+
+        proyecto = ProyectoEscolar.objects.filter(id=proyecto_id, colegio=colegio).first() if proyecto_id else None
+        if proyecto and not tipo_fondo:
+            tipo_fondo = proyecto.tipo_fondo
 
         try:
             monto_total = Decimal(monto_total_str)
@@ -3068,7 +4647,10 @@ def crear_factura_view(request):
 
         FacturaGasto.objects.create(
             colegio=colegio,
+            proyecto=proyecto,
             tipo_documento=tipo_doc,
+            tipo_fondo=tipo_fondo,
+            clasificacion_supereduc=clasificacion_supereduc,
             folio=folio if folio else f"DOC-{timezone.now().strftime('%H%M%S')}",
             proveedor_nombre=proveedor_nombre if proveedor_nombre else "Proveedor Varios",
             proveedor_rut=proveedor_rut,
@@ -3108,8 +4690,11 @@ def pagar_factura_view(request, factura_id):
         mov = MovimientoFinanciero.objects.create(
             colegio=colegio,
             cuenta=cuenta,
+            proyecto=factura.proyecto,
             categoria=categoria_egreso,
             tipo='egreso',
+            tipo_fondo=factura.tipo_fondo,
+            clasificacion_supereduc=factura.clasificacion_supereduc,
             monto=factura.monto_total,
             concepto=f"Pago {factura.get_tipo_documento_display()} #{factura.folio} - {factura.proveedor_nombre}",
             fecha=timezone.now().date(),
@@ -3157,6 +4742,7 @@ def crear_cuenta_financiera_view(request):
 
         nombre = request.POST.get('nombre', '').strip()
         tipo = request.POST.get('tipo', 'caja_chica')
+        fondo_asociado = request.POST.get('fondo_asociado', 'fondos_propios')
         banco = request.POST.get('banco', '').strip()
         numero_cuenta = request.POST.get('numero_cuenta', '').strip()
         saldo_inicial_str = request.POST.get('saldo_inicial', '0').replace('.', '').replace(',', '.').replace('$', '').strip()
@@ -3170,6 +4756,7 @@ def crear_cuenta_financiera_view(request):
             colegio=colegio,
             nombre=nombre if nombre else "Nueva Cuenta",
             tipo=tipo,
+            fondo_asociado=fondo_asociado,
             banco=banco,
             numero_cuenta=numero_cuenta,
             saldo_inicial=saldo_inicial,
@@ -3179,7 +4766,7 @@ def crear_cuenta_financiera_view(request):
 
         messages.success(request, f"¡Cuenta / Caja '{nombre}' creada con éxito!")
 
-    return redirect('/colegios/finanzas/?tab=cuentas')
+    return redirect('/colegios/finanzas/?tab=fondos')
 
 
 @login_required
@@ -3205,6 +4792,91 @@ def crear_categoria_financiera_view(request):
             messages.success(request, f"Categoría '{nombre}' creada.")
 
     return redirect('finanzas_dashboard')
+
+
+# ==============================================================================
+# INFORMES DE RENDICIÓN DE CUENTAS & REPORTES SUPEREDUC
+# ==============================================================================
+
+@login_required
+def rendicion_subvencion_imprimible_view(request, tipo_fondo):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        return redirect('dashboard_usuario')
+
+    from .models import MovimientoFinanciero, FacturaGasto, ProyectoEscolar, CuentaFinanciera
+    from django.db.models import Sum
+    from decimal import Decimal
+
+    nombres_fondo = dict(ProyectoEscolar.TIPO_FONDO)
+    titulo_fondo = nombres_fondo.get(tipo_fondo, f"Fondo {tipo_fondo.upper()}")
+
+    # Egresos asociados al fondo
+    egresos = MovimientoFinanciero.objects.filter(
+        colegio=colegio, tipo='egreso', tipo_fondo=tipo_fondo
+    ).select_related('proyecto', 'cuenta', 'categoria', 'registrado_por').order_by('fecha', 'id')
+
+    # Facturas asociadas al fondo
+    facturas = FacturaGasto.objects.filter(
+        colegio=colegio, tipo_fondo=tipo_fondo
+    ).select_related('proyecto', 'registrado_por').order_by('fecha_emision', 'id')
+
+    proyectos = ProyectoEscolar.objects.filter(colegio=colegio, tipo_fondo=tipo_fondo, activo=True)
+    cuentas = CuentaFinanciera.objects.filter(colegio=colegio, fondo_asociado=tipo_fondo, activo=True)
+
+    total_presupuesto = Decimal(proyectos.aggregate(Sum('presupuesto_asignado'))['presupuesto_asignado__sum'] or 0)
+    total_ejecutado = Decimal(egresos.aggregate(Sum('monto'))['monto__sum'] or 0)
+    saldo_disponible = Decimal(cuentas.aggregate(Sum('saldo_actual'))['saldo_actual__sum'] or 0)
+
+    # Desglose por Partida Supereduc
+    desglose_partidas = {}
+    for eg in egresos:
+        partida = eg.get_clasificacion_supereduc_display() if hasattr(eg, 'get_clasificacion_supereduc_display') else eg.clasificacion_supereduc
+        desglose_partidas[partida] = desglose_partidas.get(partida, Decimal('0.0')) + eg.monto
+
+    context = {
+        'colegio': colegio,
+        'tipo_fondo': tipo_fondo,
+        'titulo_fondo': titulo_fondo,
+        'hoy': timezone.now(),
+        'egresos': egresos,
+        'facturas': facturas,
+        'proyectos': proyectos,
+        'cuentas': cuentas,
+        'total_presupuesto': total_presupuesto,
+        'total_ejecutado': total_ejecutado,
+        'saldo_disponible': saldo_disponible,
+        'desglose_partidas': desglose_partidas,
+    }
+    return render(request, 'colegios/finanzas/rendicion_subvencion_imprimible.html', context)
+
+
+@login_required
+def acta_rendicion_cajachica_imprimible_view(request, cuenta_id):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        return redirect('dashboard_usuario')
+
+    from .models import CuentaFinanciera, MovimientoFinanciero
+    from django.db.models import Sum
+    from decimal import Decimal
+
+    cuenta = get_object_or_404(CuentaFinanciera, id=cuenta_id, colegio=colegio)
+    movimientos = MovimientoFinanciero.objects.filter(cuenta=cuenta).select_related('proyecto', 'categoria', 'registrado_por').order_by('fecha', 'id')
+
+    total_ingresos = Decimal(movimientos.filter(tipo='ingreso').aggregate(Sum('monto'))['monto__sum'] or 0)
+    total_egresos = Decimal(movimientos.filter(tipo='egreso').aggregate(Sum('monto'))['monto__sum'] or 0)
+
+    context = {
+        'colegio': colegio,
+        'cuenta': cuenta,
+        'hoy': timezone.now(),
+        'movimientos': movimientos,
+        'total_ingresos': total_ingresos,
+        'total_egresos': total_egresos,
+        'saldo_actual': cuenta.saldo_actual,
+    }
+    return render(request, 'colegios/finanzas/acta_rendicion_cajachica.html', context)
 
 
 @login_required
@@ -3234,93 +4906,126 @@ def exportar_finanzas_excel_view(request):
         bottom=Side(style='thin', color='E2E8F0')
     )
 
-    from .models import CuentaFinanciera, MovimientoFinanciero, FacturaGasto
+    from .models import CuentaFinanciera, MovimientoFinanciero, FacturaGasto, ProyectoEscolar
 
-    # HOJA 1: RESUMEN DE CUENTAS & BALANCE
-    ws1 = wb.create_sheet(title="Resumen & Cajas")
+    # HOJA 1: RENDICIÓN SUPEREDUC & SUBVENCIONES
+    ws1 = wb.create_sheet(title="Rendición Supereduc")
     ws1.views.sheetView[0].showGridLines = True
-    ws1['A1'] = f"EDUTEKA - LIBRO DE FINANZAS Y TESORERÍA"
+    ws1['A1'] = f"INFORME DE RENDICIÓN DE CUENTAS ESCOLAR (SUPEREDUC)"
     ws1['A1'].font = title_font
-    ws1['A2'] = f"Colegio: {colegio.nombre} | Emisión: {timezone.now().strftime('%d/%m/%Y %H:%M')}"
+    ws1['A2'] = f"Colegio: {colegio.nombre} | Ciudad: {colegio.ciudad_comuna} | Fecha: {timezone.now().strftime('%d/%m/%Y %H:%M')}"
     ws1['A2'].font = sub_font
 
-    headers_c1 = ["Cuenta / Caja", "Tipo", "Banco / Ref.", "N° Cuenta", "Saldo Inicial", "Saldo Actual", "Estado"]
-    for col_idx, h in enumerate(headers_c1, start=1):
+    headers_super = ["Fecha Gasto", "Subvención / Fondo", "Proyecto PME", "Partida Supereduc", "N° Doc / Boleta", "Concepto & Detalle", "Monto Rendido ($)", "Cuenta / Caja"]
+    for col_idx, h in enumerate(headers_super, start=1):
         cell = ws1.cell(row=4, column=col_idx, value=h)
         cell.fill = header_fill
         cell.font = header_font
         cell.alignment = Alignment(horizontal="center", vertical="center")
         cell.border = thin_border
 
-    cuentas = CuentaFinanciera.objects.filter(colegio=colegio, activo=True)
-    for row_idx, c in enumerate(cuentas, start=5):
+    egresos_super = MovimientoFinanciero.objects.filter(colegio=colegio, tipo='egreso').select_related('cuenta', 'proyecto', 'categoria').order_by('tipo_fondo', '-fecha')
+    for row_idx, m in enumerate(egresos_super, start=5):
         row_data = [
-            c.nombre,
-            c.get_tipo_display(),
-            c.banco or "-",
-            c.numero_cuenta or "-",
-            f"${c.saldo_inicial:,.0f}",
-            f"${c.saldo_actual:,.0f}",
-            "Activa" if c.activo else "Inactiva"
+            m.fecha.strftime('%d/%m/%Y'),
+            m.get_tipo_fondo_display() if hasattr(m, 'get_tipo_fondo_display') else m.tipo_fondo,
+            m.proyecto.nombre if m.proyecto else "Gastos Generales / Operación",
+            m.get_clasificacion_supereduc_display() if hasattr(m, 'get_clasificacion_supereduc_display') else m.clasificacion_supereduc,
+            m.numero_comprobante or "-",
+            m.concepto,
+            f"${m.monto:,.0f}",
+            m.cuenta.nombre
         ]
         for col_idx, val in enumerate(row_data, start=1):
             cell = ws1.cell(row=row_idx, column=col_idx, value=val)
             cell.font = regular_font
             cell.border = thin_border
-            cell.alignment = Alignment(horizontal="center" if col_idx in [2, 4, 7] else "left", vertical="center")
+            cell.alignment = Alignment(horizontal="center" if col_idx in [1, 5] else "left", vertical="center")
 
-    # HOJA 2: MOVIMIENTOS
-    ws2 = wb.create_sheet(title="Libro Ingresos y Egresos")
+    # HOJA 2: PROYECTOS ESCOLARES
+    ws2 = wb.create_sheet(title="Proyectos Escolares")
     ws2.views.sheetView[0].showGridLines = True
-    ws2['A1'] = "HISTORIAL DETALLADO DE INGRESOS Y EGRESOS"
+    ws2['A1'] = "CONTROL PRESUPUESTARIO DE PROYECTOS ESCOLARES & CENTROS DE COSTO"
     ws2['A1'].font = title_font
     ws2['A2'] = f"Colegio: {colegio.nombre}"
     ws2['A2'].font = sub_font
 
-    headers_mov = ["Fecha", "Tipo", "Cuenta", "Categoría", "Concepto", "Método Pago", "N° Comprobante", "Monto ($)", "Registrado Por"]
-    for col_idx, h in enumerate(headers_mov, start=1):
+    headers_pry = ["Código", "Nombre Proyecto", "Fondo / Subvención", "Partida", "Presupuesto ($)", "Gastado Real ($)", "Saldo Disponible ($)", "% Avance", "Estado"]
+    for col_idx, h in enumerate(headers_pry, start=1):
         cell = ws2.cell(row=4, column=col_idx, value=h)
         cell.fill = header_fill
         cell.font = header_font
         cell.alignment = Alignment(horizontal="center", vertical="center")
         cell.border = thin_border
 
-    movimientos = MovimientoFinanciero.objects.filter(colegio=colegio).select_related('cuenta', 'categoria', 'registrado_por').order_by('-fecha', '-id')
-    for row_idx, m in enumerate(movimientos, start=5):
-        signo = "+" if m.tipo == 'ingreso' else "-"
-        monto_str = f"{signo}${m.monto:,.0f}"
+    proyectos_list = ProyectoEscolar.objects.filter(colegio=colegio, activo=True)
+    for row_idx, p in enumerate(proyectos_list, start=5):
         row_data = [
-            m.fecha.strftime('%d/%m/%Y'),
-            m.get_tipo_display(),
-            m.cuenta.nombre,
-            m.categoria.nombre if m.categoria else "Sin Categoría",
-            m.concepto,
-            m.get_metodo_pago_display(),
-            m.numero_comprobante or "-",
-            monto_str,
-            m.registrado_por.get_full_name() or m.registrado_por.username if m.registrado_por else "-"
+            p.codigo,
+            p.nombre,
+            p.get_tipo_fondo_display(),
+            p.get_categoria_supereduc_display(),
+            f"${p.presupuesto_asignado:,.0f}",
+            f"${p.total_gastado:,.0f}",
+            f"${p.saldo_disponible:,.0f}",
+            f"{p.porcentaje_ejecucion}%",
+            p.get_estado_display()
         ]
         for col_idx, val in enumerate(row_data, start=1):
             cell = ws2.cell(row=row_idx, column=col_idx, value=val)
             cell.font = regular_font
             cell.border = thin_border
-            cell.alignment = Alignment(horizontal="center" if col_idx in [1, 2, 6, 7] else "left", vertical="center")
+            cell.alignment = Alignment(horizontal="center" if col_idx in [1, 8, 9] else "left", vertical="center")
 
-    # HOJA 3: FACTURAS
-    ws3 = wb.create_sheet(title="Facturas & Proveedores")
+    # HOJA 3: LIBRO DE MOVIMIENTOS
+    ws3 = wb.create_sheet(title="Libro Ingresos y Egresos")
     ws3.views.sheetView[0].showGridLines = True
-    ws3['A1'] = "REGISTRO DE FACTURAS Y DOCUMENTOS TRIBUTARIOS"
+    ws3['A1'] = "LIBRO COMPLETO DE INGRESOS Y EGRESOS"
     ws3['A1'].font = title_font
-    ws3['A2'] = f"Colegio: {colegio.nombre}"
-    ws3['A2'].font = sub_font
 
-    headers_fac = ["Tipo Documento", "Folio / N°", "Proveedor", "RUT Emisor", "Emisión", "Vencimiento", "Neto ($)", "IVA ($)", "Total ($)", "Estado Pago"]
-    for col_idx, h in enumerate(headers_fac, start=1):
+    headers_mov = ["Fecha", "Tipo", "Cuenta / Caja", "Fondo", "Proyecto", "Concepto", "Comprobante", "Monto ($)", "Registrado Por"]
+    for col_idx, h in enumerate(headers_mov, start=1):
         cell = ws3.cell(row=4, column=col_idx, value=h)
         cell.fill = header_fill
         cell.font = header_font
         cell.alignment = Alignment(horizontal="center", vertical="center")
         cell.border = thin_border
+
+    movimientos = MovimientoFinanciero.objects.filter(colegio=colegio).select_related('cuenta', 'proyecto', 'registrado_por').order_by('-fecha', '-id')
+    for row_idx, m in enumerate(movimientos, start=5):
+        signo = "+" if m.tipo == 'ingreso' else "-"
+        row_data = [
+            m.fecha.strftime('%d/%m/%Y'),
+            m.get_tipo_display(),
+            m.cuenta.nombre,
+            m.get_tipo_fondo_display() if hasattr(m, 'get_tipo_fondo_display') else m.tipo_fondo,
+            m.proyecto.codigo if m.proyecto else "-",
+            m.concepto,
+            m.numero_comprobante or "-",
+            f"{signo}${m.monto:,.0f}",
+            m.registrado_por.get_full_name() if m.registrado_por else "-"
+        ]
+        for col_idx, val in enumerate(row_data, start=1):
+            cell = ws3.cell(row=row_idx, column=col_idx, value=val)
+            cell.font = regular_font
+            cell.border = thin_border
+            cell.alignment = Alignment(horizontal="center" if col_idx in [1, 2, 5, 7] else "left", vertical="center")
+
+    # Autoajuste de columnas en todas las hojas
+    for ws in [ws1, ws2, ws3]:
+        for col in ws.columns:
+            max_len = 0
+            col_letter = get_column_letter(col[0].column)
+            for cell in col:
+                if cell.value and cell.row >= 4:
+                    max_len = max(max_len, len(str(cell.value)))
+            ws.column_dimensions[col_letter].width = max(max_len + 4, 13)
+
+    from django.http import HttpResponse
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename="Rendicion_Finanzas_{colegio.nombre.replace(" ", "_")}.xlsx"'
+    wb.save(response)
+    return response
 
     facturas = FacturaGasto.objects.filter(colegio=colegio).order_by('-fecha_emision', '-id')
     for row_idx, f in enumerate(facturas, start=5):
@@ -3511,9 +5216,21 @@ def inventario_dashboard_view(request):
     miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
     periodo = ConfiguracionAcademica.objects.filter(colegio=colegio).first()
     is_admin = (
-        request.user.colegios_administrados.filter(id=colegio.id).exists()
+        request.user.is_superuser
+        or request.user.colegios_administrados.filter(id=colegio.id).exists()
         or (miembro and miembro.rol and miembro.rol.nombre in ['Administrador', 'Director'])
     )
+
+    from .models import RolPermiso, MiembroPermiso
+    tiene_permiso = is_admin
+    if not tiene_permiso and miembro and miembro.rol:
+        tiene_permiso = RolPermiso.objects.filter(rol=miembro.rol, modulo__nombre__in=['Inventario', 'Bodega'], puede_ver=True).exists()
+    if not tiene_permiso and miembro:
+        tiene_permiso = MiembroPermiso.objects.filter(miembro=miembro, modulo__nombre__in=['Inventario', 'Bodega'], puede_ver=True).exists()
+
+    if not tiene_permiso:
+        messages.error(request, "Acceso restringido. Se requieren permisos de Inventario o Administración.")
+        return redirect('dashboard_usuario')
 
     inicializar_datos_inventario(colegio)
 
@@ -3726,9 +5443,21 @@ def proveedores_directorio_view(request):
     miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
     periodo = ConfiguracionAcademica.objects.filter(colegio=colegio).first()
     is_admin = (
-        request.user.colegios_administrados.filter(id=colegio.id).exists()
+        request.user.is_superuser
+        or request.user.colegios_administrados.filter(id=colegio.id).exists()
         or (miembro and miembro.rol and miembro.rol.nombre in ['Administrador', 'Director'])
     )
+
+    from .models import RolPermiso, MiembroPermiso
+    tiene_permiso = is_admin
+    if not tiene_permiso and miembro and miembro.rol:
+        tiene_permiso = RolPermiso.objects.filter(rol=miembro.rol, modulo__nombre__iexact='Proveedores', puede_ver=True).exists()
+    if not tiene_permiso and miembro:
+        tiene_permiso = MiembroPermiso.objects.filter(miembro=miembro, modulo__nombre__iexact='Proveedores', puede_ver=True).exists()
+
+    if not tiene_permiso:
+        messages.error(request, "Acceso restringido. Se requieren permisos de Proveedores o Administración.")
+        return redirect('dashboard_usuario')
 
     inicializar_datos_inventario(colegio)
 
@@ -4051,8 +5780,6 @@ def talleres_dashboard_view(request):
         request.user.colegios_administrados.filter(id=colegio.id).exists()
         or (miembro and miembro.rol and miembro.rol.nombre in ['Administrador', 'Director'])
     )
-
-    inicializar_datos_talleres(colegio)
 
     from .models import TallerExtracurricular, InscripcionTaller, SesionAsistenciaTaller, CursoColegio
     from django.db.models import Q, Count
@@ -4552,9 +6279,6 @@ def simce_dashboard_view(request):
 
     from .models import EnsayoSIMCE, ResultadoEnsayoSIMCE, PuntajeHistoricoSIMCE, CursoColegio
 
-    # Inicializar datos demo si está vacío
-    inicializar_datos_simce_demo(colegio, request.user)
-
     # Filtros
     asignatura_filtro = request.GET.get('asignatura', '')
     curso_filtro = request.GET.get('curso', '')
@@ -4991,3 +6715,1205 @@ def exportar_simce_excel_view(request, ensayo_id=None):
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
     wb.save(response)
     return response
+
+
+# ════════════════════════════════════════════════════════════════════════════════
+# 📦 VISTAS DE ADQUISICIONES, 3 COTIZACIONES Y ÓRDENES DE COMPRA (SUPEREDUC)
+# ════════════════════════════════════════════════════════════════════════════════
+
+@login_required
+def procesos_compra_dashboard_view(request):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        messages.error(request, "No estás asociado a ningún colegio.")
+        return redirect('solicitar_acceso')
+
+    miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
+    is_admin = (
+        request.user.is_superuser
+        or request.user.colegios_administrados.filter(id=colegio.id).exists()
+        or (miembro and miembro.rol and miembro.rol.nombre in ['Administrador', 'Director'])
+    )
+
+    from .models import RolPermiso, MiembroPermiso
+    tiene_permiso = is_admin
+    if not tiene_permiso and miembro and miembro.rol:
+        tiene_permiso = RolPermiso.objects.filter(rol=miembro.rol, modulo__nombre__in=['Proveedores', 'Inventario', 'Finanzas'], puede_ver=True).exists()
+    if not tiene_permiso and miembro:
+        tiene_permiso = MiembroPermiso.objects.filter(miembro=miembro, modulo__nombre__in=['Proveedores', 'Inventario', 'Finanzas'], puede_ver=True).exists()
+
+    if not tiene_permiso:
+        messages.error(request, "Acceso restringido. Se requieren permisos de Adquisiciones, Proveedores o Administración.")
+        return redirect('dashboard_usuario')
+
+    from .models import ProcesoCompra, ItemProcesoCompra, CotizacionProveedor, ItemInventario, ProveedorColegio
+    from django.db.models import Count, Sum, Q
+
+    # Filtros
+    estado_filtro = request.GET.get('estado', '')
+    fondo_filtro = request.GET.get('fondo', '')
+    busqueda = request.GET.get('q', '').strip()
+
+    qs = ProcesoCompra.objects.filter(colegio=colegio).prefetch_related('items', 'cotizaciones__proveedor').select_related('cotizacion_ganadora', 'creado_por')
+
+    if estado_filtro:
+        qs = qs.filter(estado=estado_filtro)
+    if fondo_filtro:
+        qs = qs.filter(tipo_fondo=fondo_filtro)
+    if busqueda:
+        qs = qs.filter(
+            Q(codigo__icontains=busqueda) |
+            Q(titulo__icontains=busqueda) |
+            Q(centro_costo__icontains=busqueda) |
+            Q(numero_orden_compra__icontains=busqueda)
+        )
+
+    # Métricas
+    todos_procesos = ProcesoCompra.objects.filter(colegio=colegio)
+    total_procesos_count = todos_procesos.count()
+    en_cotizacion_count = todos_procesos.filter(estado__in=['en_cotizacion', 'evaluacion']).count()
+    adjudicados_count = todos_procesos.filter(estado__in=['adjudicado', 'orden_compra_emitida', 'recepcionado']).count()
+    
+    # Procesos con 3 o más cotizaciones
+    con_3_cotizaciones_count = 0
+    for p in todos_procesos:
+        if p.cumple_normativa_3_cotizaciones:
+            con_3_cotizaciones_count += 1
+
+    # Total invertido en compras adjudicadas
+    monto_total_adjudicado = CotizacionProveedor.objects.filter(
+        proceso__colegio=colegio,
+        es_ganadora=True
+    ).aggregate(tot=Sum('monto_total'))['tot'] or 0
+
+    items_inventario = ItemInventario.objects.filter(colegio=colegio, activo=True).order_by('nombre')
+    proveedores_colegio = ProveedorColegio.objects.filter(colegio=colegio, activo=True).order_by('nombre')
+
+    context = {
+        'colegio': colegio,
+        'miembro': miembro,
+        'is_admin': is_admin,
+        'procesos': qs,
+        'total_procesos_count': total_procesos_count,
+        'en_cotizacion_count': en_cotizacion_count,
+        'adjudicados_count': adjudicados_count,
+        'con_3_cotizaciones_count': con_3_cotizaciones_count,
+        'monto_total_adjudicado': monto_total_adjudicado,
+        'estado_filtro': estado_filtro,
+        'fondo_filtro': fondo_filtro,
+        'busqueda': busqueda,
+        'items_inventario': items_inventario,
+        'proveedores_colegio': proveedores_colegio,
+        'active_page': 'adquisiciones',
+    }
+    return render(request, 'colegios/procesos_compra_dashboard.html', context)
+
+
+@login_required
+def crear_proceso_compra_view(request):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        messages.error(request, "No tienes un establecimiento asociado.")
+        return redirect('dashboard_usuario')
+
+    if request.method == 'POST':
+        from .models import ProcesoCompra, ItemProcesoCompra, ItemInventario
+        
+        titulo = request.POST.get('titulo', '').strip()
+        tipo_fondo = request.POST.get('tipo_fondo', 'subvencion_general')
+        centro_costo = request.POST.get('centro_costo', '').strip()
+        descripcion = request.POST.get('descripcion', '').strip()
+        fecha_limite = request.POST.get('fecha_limite_cotizacion') or None
+
+        if not titulo:
+            messages.error(request, "El título del requerimiento de compra es obligatorio.")
+            return redirect('procesos_compra_dashboard')
+
+        # Generar código correlativo
+        anio = timezone.now().year
+        total_este_anio = ProcesoCompra.objects.filter(colegio=colegio, fecha_creacion__year=anio).count() + 1
+        codigo = f"REQ-{anio}-{total_este_anio:03d}"
+
+        proceso = ProcesoCompra.objects.create(
+            colegio=colegio,
+            codigo=codigo,
+            titulo=titulo,
+            tipo_fondo=tipo_fondo,
+            centro_costo=centro_costo,
+            descripcion=descripcion,
+            fecha_limite_cotizacion=fecha_limite,
+            creado_por=request.user,
+            estado='en_cotizacion'
+        )
+
+        # Procesar ítems múltiples
+        descripciones = request.POST.getlist('item_descripcion[]')
+        cantidades = request.POST.getlist('item_cantidad[]')
+        unidades = request.POST.getlist('item_unidad[]')
+        inventario_ids = request.POST.getlist('item_inventario_id[]')
+        especificaciones = request.POST.getlist('item_especificaciones[]')
+
+        for i, desc in enumerate(descripciones):
+            desc_clean = desc.strip()
+            if desc_clean:
+                cant = 1
+                try:
+                    cant = max(1, int(cantidades[i])) if i < len(cantidades) else 1
+                except (ValueError, IndexError):
+                    cant = 1
+                
+                unid = unidades[i].strip() if i < len(unidades) and unidades[i].strip() else 'unidades'
+                spec = especificaciones[i].strip() if i < len(especificaciones) else ''
+                inv_obj = None
+                if i < len(inventario_ids) and inventario_ids[i].isdigit():
+                    inv_obj = ItemInventario.objects.filter(colegio=colegio, id=int(inventario_ids[i])).first()
+
+                ItemProcesoCompra.objects.create(
+                    proceso=proceso,
+                    item_inventario=inv_obj,
+                    descripcion=desc_clean,
+                    cantidad=cant,
+                    unidad_medida=unid,
+                    especificaciones_tecnicas=spec
+                )
+
+        messages.success(request, f"¡Requerimiento {proceso.codigo} creado con éxito! Ya puedes solicitar y registrar las 3 cotizaciones.")
+        return redirect('detalle_proceso_compra', proceso_id=proceso.id)
+
+    return redirect('procesos_compra_dashboard')
+
+
+@login_required
+def detalle_proceso_compra_view(request, proceso_id):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        return redirect('solicitar_acceso')
+
+    from .models import ProcesoCompra, CotizacionProveedor, ProveedorColegio
+    proceso = get_object_or_404(ProcesoCompra, id=proceso_id, colegio=colegio)
+    
+    cotizaciones = proceso.cotizaciones.select_related('proveedor', 'registrado_por').order_by('monto_total', 'plazo_entrega_dias')
+    items = proceso.items.all()
+    proveedores_disponibles = ProveedorColegio.objects.filter(colegio=colegio, activo=True).order_by('nombre')
+
+    # Identificar la mejor oferta económica y la más rápida para el cuadro comparativo
+    mejor_precio_id = None
+    mas_rapida_id = None
+    if cotizaciones.exists():
+        mejor_precio_id = cotizaciones.first().id
+        mas_rapida_id = cotizaciones.order_by('plazo_entrega_dias').first().id
+
+    context = {
+        'colegio': colegio,
+        'proceso': proceso,
+        'items': items,
+        'cotizaciones': cotizaciones,
+        'proveedores_disponibles': proveedores_disponibles,
+        'mejor_precio_id': mejor_precio_id,
+        'mas_rapida_id': mas_rapida_id,
+        'active_page': 'adquisiciones',
+    }
+    return render(request, 'colegios/detalle_proceso_compra.html', context)
+
+
+@login_required
+def registrar_cotizacion_view(request, proceso_id):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        return redirect('solicitar_acceso')
+
+    from .models import ProcesoCompra, CotizacionProveedor, ProveedorColegio
+    from decimal import Decimal
+
+    proceso = get_object_or_404(ProcesoCompra, id=proceso_id, colegio=colegio)
+
+    if request.method == 'POST':
+        proveedor_id = request.POST.get('proveedor_id')
+        num_cot = request.POST.get('numero_cotizacion_proveedor', '').strip()
+        fecha_cot = request.POST.get('fecha_cotizacion') or timezone.now().date()
+        validez = request.POST.get('validez_dias', '30')
+        monto_total_str = request.POST.get('monto_total', '0').replace('.', '').replace(',', '.').strip()
+        monto_neto_str = request.POST.get('monto_neto', '0').replace('.', '').replace(',', '.').strip()
+        plazo_dias = request.POST.get('plazo_entrega_dias', '5')
+        condiciones = request.POST.get('condiciones_pago', 'Transferencia 30 días').strip()
+        incluye_despacho = request.POST.get('incluye_despacho') == 'on' or request.POST.get('incluye_despacho') == 'true'
+        observaciones = request.POST.get('observaciones', '').strip()
+        archivo = request.FILES.get('archivo_adjunto')
+
+        proveedor = get_object_or_404(ProveedorColegio, id=proveedor_id, colegio=colegio)
+
+        try:
+            monto_total = Decimal(monto_total_str) if monto_total_str else Decimal('0')
+            monto_neto = Decimal(monto_neto_str) if monto_neto_str else Decimal('0')
+            validez_dias = int(validez) if validez.isdigit() else 30
+            plazo_entrega = int(plazo_dias) if plazo_dias.isdigit() else 5
+        except Exception:
+            monto_total = Decimal('0')
+            monto_neto = Decimal('0')
+            validez_dias = 30
+            plazo_entrega = 5
+
+        # Si solo ingresó monto total, calcular neto e IVA
+        if monto_total > 0 and monto_neto == 0:
+            monto_neto = round(monto_total / Decimal('1.19'), 2)
+            iva = monto_total - monto_neto
+        elif monto_neto > 0 and monto_total == 0:
+            iva = round(monto_neto * Decimal('0.19'), 2)
+            monto_total = monto_neto + iva
+        else:
+            iva = monto_total - monto_neto if monto_total > monto_neto else Decimal('0')
+
+        cot = CotizacionProveedor.objects.create(
+            proceso=proceso,
+            proveedor=proveedor,
+            numero_cotizacion_proveedor=num_cot,
+            fecha_cotizacion=fecha_cot,
+            validez_dias=validez_dias,
+            monto_neto=monto_neto,
+            iva=iva,
+            monto_total=monto_total,
+            plazo_entrega_dias=plazo_entrega,
+            condiciones_pago=condiciones,
+            incluye_despacho=incluye_despacho,
+            observaciones=observaciones,
+            archivo_adjunto=archivo,
+            registrado_por=request.user
+        )
+
+        # Actualizar estado si ya tiene cotizaciones
+        if proceso.estado == 'en_cotizacion' and proceso.cotizaciones.count() >= 3:
+            proceso.estado = 'evaluacion'
+            proceso.save()
+
+        messages.success(request, f"¡Cotización de '{proveedor.nombre}' por ${monto_total:,.0f} registrada con éxito!")
+        return redirect('detalle_proceso_compra', proceso_id=proceso.id)
+
+    return redirect('detalle_proceso_compra', proceso_id=proceso.id)
+
+
+@login_required
+def adjudicar_proceso_compra_view(request, proceso_id):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        return redirect('solicitar_acceso')
+
+    from .models import ProcesoCompra, CotizacionProveedor
+    proceso = get_object_or_404(ProcesoCompra, id=proceso_id, colegio=colegio)
+
+    if request.method == 'POST':
+        cotizacion_id = request.POST.get('cotizacion_id')
+        justificacion = request.POST.get('justificacion', '').strip()
+
+        if not cotizacion_id:
+            messages.error(request, "Debes seleccionar la cotización ganadora.")
+            return redirect('detalle_proceso_compra', proceso_id=proceso.id)
+
+        if not justificacion:
+            messages.error(request, "La justificación legal de la compra es obligatoria para rendiciones normativas.")
+            return redirect('detalle_proceso_compra', proceso_id=proceso.id)
+
+        cotizacion = get_object_or_404(CotizacionProveedor, id=cotizacion_id, proceso=proceso)
+
+        # Marcar cotizaciones
+        proceso.cotizaciones.update(es_ganadora=False)
+        cotizacion.es_ganadora = True
+        cotizacion.save()
+
+        # Generar número de Orden de Compra correlativa
+        anio = timezone.now().year
+        total_oc_anio = ProcesoCompra.objects.filter(colegio=colegio, fecha_emision_oc__year=anio).count() + 1
+        numero_oc = f"OC-{anio}-{total_oc_anio:03d}"
+
+        proceso.cotizacion_ganadora = cotizacion
+        proceso.justificacion_adjudicacion = justificacion
+        proceso.fecha_adjudicacion = timezone.now()
+        proceso.adjudicado_por = request.user
+        proceso.numero_orden_compra = numero_oc
+        proceso.fecha_emision_oc = timezone.now()
+        proceso.estado = 'orden_compra_emitida'
+        proceso.save()
+
+        messages.success(request, f"¡Proceso adjudicado a '{cotizacion.proveedor.nombre}'! Se ha emitido la Orden de Compra {numero_oc}.")
+        return redirect('detalle_proceso_compra', proceso_id=proceso.id)
+
+    return redirect('detalle_proceso_compra', proceso_id=proceso.id)
+
+
+@login_required
+def orden_compra_imprimible_view(request, proceso_id):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        return redirect('solicitar_acceso')
+
+    from .models import ProcesoCompra
+    proceso = get_object_or_404(ProcesoCompra, id=proceso_id, colegio=colegio)
+
+    if not proceso.cotizacion_ganadora:
+        messages.warning(request, "Este proceso aún no ha sido adjudicado a un proveedor.")
+        return redirect('detalle_proceso_compra', proceso_id=proceso.id)
+
+    cotizacion = proceso.cotizacion_ganadora
+    proveedor = cotizacion.proveedor
+    items = proceso.items.all()
+
+    context = {
+        'colegio': colegio,
+        'proceso': proceso,
+        'cotizacion': cotizacion,
+        'proveedor': proveedor,
+        'items': items,
+        'hoy': timezone.now(),
+    }
+    return render(request, 'colegios/orden_compra_imprimible.html', context)
+
+
+@login_required
+def recepcionar_compra_inventario_view(request, proceso_id):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        return redirect('solicitar_acceso')
+
+    from .models import ProcesoCompra, ItemInventario, CategoriaInventario, MovimientoStock
+
+    proceso = get_object_or_404(ProcesoCompra, id=proceso_id, colegio=colegio)
+
+    if request.method == 'POST':
+        numero_guia = request.POST.get('numero_guia_factura', '').strip()
+        observaciones = request.POST.get('observaciones_recepcion', '').strip()
+
+        # Ingresar o aumentar stock de cada ítem en el inventario escolar
+        cat_default = CategoriaInventario.objects.filter(colegio=colegio).first()
+
+        for item in proceso.items.all():
+            item_inv = item.item_inventario
+            if not item_inv:
+                # Si no estaba enlazado a un producto existente, crearlo o buscar por nombre
+                item_inv = ItemInventario.objects.filter(colegio=colegio, nombre__iexact=item.descripcion).first()
+                if not item_inv:
+                    item_inv = ItemInventario.objects.create(
+                        colegio=colegio,
+                        categoria=cat_default,
+                        proveedor_principal=proceso.cotizacion_ganadora.proveedor if proceso.cotizacion_ganadora else None,
+                        nombre=item.descripcion,
+                        unidad_medida=item.unidad_medida,
+                        stock_actual=0,
+                        stock_minimo=1,
+                        descripcion=f"Ingresado automáticamente desde compra {proceso.codigo}"
+                    )
+                item.item_inventario = item_inv
+                item.save()
+
+            # Aumentar stock
+            stock_anterior = item_inv.stock_actual
+            item_inv.stock_actual += item.cantidad
+            item_inv.save()
+
+            # Registrar movimiento de stock
+            MovimientoStock.objects.create(
+                item=item_inv,
+                tipo='entrada',
+                cantidad=item.cantidad,
+                stock_resultante=item_inv.stock_actual,
+                motivo=f"Recepción conforme de Orden de Compra {proceso.numero_orden_compra or proceso.codigo}. Doc: {numero_guia}",
+                registrado_por=request.user
+            )
+
+        proceso.estado = 'recepcionado'
+        proceso.fecha_recepcion = timezone.now()
+        proceso.recepcionado_por = request.user
+        proceso.numero_guia_factura = numero_guia
+        proceso.observaciones_recepcion = observaciones
+        proceso.save()
+
+        messages.success(request, f"¡Productos recepcionados con éxito! El stock del inventario ha sido actualizado automáticamente.")
+        return redirect('detalle_proceso_compra', proceso_id=proceso.id)
+
+    return redirect('detalle_proceso_compra', proceso_id=proceso.id)
+
+
+# ==============================================================================
+# VISTAS DE HORARIO ESCOLAR & HORARIO DOCENTE
+# ==============================================================================
+
+@login_required
+def horario_docente_imprimible_view(request, docente_id=None):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        return redirect('dashboard_usuario')
+
+    from django.contrib.auth.models import User
+    from .horario_utils import obtener_datos_horario_docente
+    from solicitudes.models import MiembroColegio
+
+    miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
+    is_admin = (
+        request.user.colegios_administrados.filter(id=colegio.id).exists()
+        or (miembro and miembro.rol and miembro.rol.nombre in ['Administrador', 'Director', 'UTP'])
+    )
+
+    if docente_id and is_admin:
+        docente = get_object_or_404(User, id=docente_id)
+    else:
+        # Los profesores regulares solo pueden ver y descargar su propio horario
+        docente = request.user
+
+    horario_data = obtener_datos_horario_docente(colegio, docente)
+
+    context = {
+        'colegio': colegio,
+        'docente': docente,
+        'horario_data': horario_data,
+        'hoy': timezone.now(),
+    }
+    return render(request, 'colegios/horario_docente_imprimible.html', context)
+
+
+@login_required
+def guardar_horario_clase_view(request):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        return redirect('dashboard_usuario')
+
+    from solicitudes.models import MiembroColegio
+    miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
+    is_admin = (
+        request.user.colegios_administrados.filter(id=colegio.id).exists()
+        or (miembro and miembro.rol and miembro.rol.nombre in ['Administrador', 'Director', 'UTP'])
+    )
+
+    if not is_admin:
+        messages.error(request, "No tienes permisos para modificar el horario escolar.")
+        return redirect('dashboard_usuario')
+
+    if request.method == 'POST':
+        from .models import BloqueHorario, HorarioClase, SeccionCurso, Asignatura
+        from django.contrib.auth.models import User
+
+        horario_id = request.POST.get('horario_id')
+        seccion_id = request.POST.get('seccion_id')
+        asignatura_id = request.POST.get('asignatura_id')
+        docente_id = request.POST.get('docente_id')
+        bloque_id = request.POST.get('bloque_id')
+        dia_semana = request.POST.get('dia_semana')
+        sala = request.POST.get('sala', '').strip()
+        color = request.POST.get('color', '#7C5CFC')
+
+        seccion = get_object_or_404(SeccionCurso, id=seccion_id, curso__colegio=colegio)
+        asignatura = get_object_or_404(Asignatura, id=asignatura_id, colegio=colegio)
+        bloque = get_object_or_404(BloqueHorario, id=bloque_id, colegio=colegio)
+        docente = User.objects.filter(id=docente_id).first() if docente_id else None
+
+        if not docente and asignatura.docente:
+            docente = asignatura.docente
+
+        if horario_id and horario_id.isdigit():
+            horario = get_object_or_404(HorarioClase, id=int(horario_id), colegio=colegio)
+            horario.seccion = seccion
+            horario.asignatura = asignatura
+            horario.docente = docente
+            horario.bloque = bloque
+            horario.dia_semana = int(dia_semana)
+            horario.sala = sala
+            horario.color = color
+            horario.save()
+            messages.success(request, f"¡Clase actualizada en el horario con éxito!")
+        else:
+            horario, created = HorarioClase.objects.update_or_create(
+                colegio=colegio,
+                seccion=seccion,
+                bloque=bloque,
+                dia_semana=int(dia_semana),
+                defaults={
+                    'asignatura': asignatura,
+                    'docente': docente,
+                    'sala': sala,
+                    'color': color,
+                    'activo': True
+                }
+            )
+            messages.success(request, f"¡Clase de {asignatura.nombre} ({seccion.nombre}) asignada al {bloque.nombre}!")
+
+    next_url = request.POST.get('next') or 'dashboard_usuario'
+    return redirect(next_url)
+
+
+@login_required
+def eliminar_horario_clase_view(request, horario_id):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        return redirect('dashboard_usuario')
+
+    from solicitudes.models import MiembroColegio
+    miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
+    is_admin = (
+        request.user.colegios_administrados.filter(id=colegio.id).exists()
+        or (miembro and miembro.rol and miembro.rol.nombre in ['Administrador', 'Director', 'UTP'])
+    )
+
+    if not is_admin:
+        messages.error(request, "No tienes permisos para eliminar clases del horario escolar.")
+        return redirect('dashboard_usuario')
+
+    from .models import HorarioClase
+    horario = get_object_or_404(HorarioClase, id=horario_id, colegio=colegio)
+    horario.delete()
+    messages.info(request, "Bloque de clase eliminado del horario.")
+
+    next_url = request.GET.get('next') or request.POST.get('next') or 'dashboard_usuario'
+    return redirect(next_url)
+
+
+# ==============================================================================
+# VISTAS: LECCIONARIO DIGITAL & PLANIFICACIÓN CURRICULAR (MINEDUC COMPLIANT)
+# ==============================================================================
+
+@login_required
+def leccionario_hub_view(request):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        return redirect('dashboard_usuario')
+
+    from solicitudes.models import MiembroColegio
+    from .models import (
+        RegistroLeccionario, PlanificacionCurricular, SeccionCurso, 
+        Asignatura, BloqueHorario, HorarioClase
+    )
+    from django.db.models import Q
+    import datetime
+
+    miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
+    is_admin = (
+        request.user.colegios_administrados.filter(id=colegio.id).exists()
+        or (miembro and miembro.rol and miembro.rol.nombre in ['Administrador', 'Director', 'UTP'])
+    )
+    is_profesor = (miembro and miembro.rol and miembro.rol.nombre == 'Profesor')
+
+    # Filtros
+    fecha_str = request.GET.get('fecha')
+    if fecha_str:
+        try:
+            fecha_filtro = datetime.datetime.strptime(fecha_str, '%Y-%m-%d').date()
+        except ValueError:
+            fecha_filtro = timezone.now().date()
+    else:
+        fecha_filtro = timezone.now().date()
+
+    seccion_id = request.GET.get('seccion_id')
+    asignatura_id = request.GET.get('asignatura_id')
+    docente_id = request.GET.get('docente_id')
+
+    leccionarios_qs = RegistroLeccionario.objects.filter(colegio=colegio).select_related(
+        'seccion', 'asignatura', 'docente', 'bloque'
+    )
+
+    if fecha_filtro:
+        leccionarios_qs = leccionarios_qs.filter(fecha=fecha_filtro)
+    if seccion_id and seccion_id.isdigit():
+        leccionarios_qs = leccionarios_qs.filter(seccion_id=int(seccion_id))
+    if asignatura_id and asignatura_id.isdigit():
+        leccionarios_qs = leccionarios_qs.filter(asignatura_id=int(asignatura_id))
+    if docente_id and docente_id.isdigit() and is_admin:
+        leccionarios_qs = leccionarios_qs.filter(docente_id=int(docente_id))
+    elif not is_admin:
+        # Los profesores ven sus propios leccionarios
+        leccionarios_qs = leccionarios_qs.filter(docente=request.user)
+
+    # Clases del día según el horario para verificar qué leccionarios faltan firmar hoy
+    dia_semana_num = fecha_filtro.isoweekday()
+    clases_programadas = HorarioClase.objects.filter(
+        colegio=colegio,
+        dia_semana=dia_semana_num,
+        activo=True
+    ).select_related('seccion', 'asignatura', 'docente', 'bloque')
+
+    if not is_admin:
+        clases_programadas = clases_programadas.filter(docente=request.user)
+
+    # Combinar clases programadas con el estado de firma
+    clases_con_leccionario = []
+    firmados_count = 0
+    for c in clases_programadas:
+        lecc = RegistroLeccionario.objects.filter(
+            colegio=colegio,
+            seccion=c.seccion,
+            asignatura=c.asignatura,
+            bloque=c.bloque,
+            fecha=fecha_filtro
+        ).first()
+        esta_firmado = bool(lecc and lecc.firmado)
+        if esta_firmado:
+            firmados_count += 1
+        clases_con_leccionario.append({
+            'clase': c,
+            'leccionario': lecc,
+            'firmado': esta_firmado
+        })
+
+    total_clases_dia = len(clases_programadas)
+    pct_cumplimiento = int((firmados_count / total_clases_dia * 100)) if total_clases_dia > 0 else 100
+
+    secciones_colegio = SeccionCurso.objects.filter(curso__colegio=colegio, activo=True).select_related('curso').order_by('curso__orden', 'letra')
+    asignaturas_colegio = Asignatura.objects.filter(colegio=colegio, activo=True).order_by('nombre')
+    bloques_colegio = BloqueHorario.objects.filter(colegio=colegio, activo=True).order_by('orden')
+    docentes_colegio = User.objects.filter(
+        Q(asignaturas_dictadas__colegio=colegio) | Q(solicitudes_acceso__colegio=colegio, solicitudes_acceso__estado='aprobada')
+    ).distinct().order_by('first_name', 'last_name')
+
+    context = {
+        'colegio': colegio,
+        'miembro': miembro,
+        'is_admin': is_admin,
+        'is_profesor': is_profesor,
+        'fecha_filtro': fecha_filtro,
+        'seccion_id_filtro': int(seccion_id) if seccion_id and seccion_id.isdigit() else None,
+        'asignatura_id_filtro': int(asignatura_id) if asignatura_id and asignatura_id.isdigit() else None,
+        'docente_id_filtro': int(docente_id) if docente_id and docente_id.isdigit() else None,
+        'leccionarios': leccionarios_qs,
+        'clases_con_leccionario': clases_con_leccionario,
+        'total_clases_dia': total_clases_dia,
+        'firmados_count': firmados_count,
+        'pct_cumplimiento': pct_cumplimiento,
+        'secciones_colegio': secciones_colegio,
+        'asignaturas_colegio': asignaturas_colegio,
+        'bloques_colegio': bloques_colegio,
+        'docentes_colegio': docentes_colegio,
+        'active_page': 'leccionario',
+    }
+    return render(request, 'colegios/leccionario_hub.html', context)
+
+
+@login_required
+def guardar_firma_leccionario_view(request):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'success': False, 'message': 'Colegio no encontrado.'})
+        return redirect('dashboard_usuario')
+
+    if request.method == 'POST':
+        from .models import RegistroLeccionario, SeccionCurso, Asignatura, BloqueHorario, HorarioClase
+        import hashlib
+        import datetime
+
+        leccionario_id = request.POST.get('leccionario_id')
+        seccion_id = request.POST.get('seccion_id')
+        asignatura_id = request.POST.get('asignatura_id')
+        bloque_id = request.POST.get('bloque_id')
+        horario_clase_id = request.POST.get('horario_clase_id')
+        fecha_str = request.POST.get('fecha')
+        
+        oa_codigo = request.POST.get('oa_codigo', '').strip()
+        contenido_tratado = request.POST.get('contenido_tratado', '').strip()
+        actividad_tipo = request.POST.get('actividad_tipo', 'catedra')
+        observaciones = request.POST.get('observaciones', '').strip()
+
+        if not contenido_tratado:
+            messages.error(request, "Debes ingresar la descripción pedagógica del contenido tratado.")
+            return redirect(request.POST.get('next') or 'leccionario_hub')
+
+        try:
+            fecha_valida = datetime.datetime.strptime(fecha_str, '%Y-%m-%d').date() if fecha_str else timezone.now().date()
+        except ValueError:
+            fecha_valida = timezone.now().date()
+
+        seccion = get_object_or_404(SeccionCurso, id=seccion_id, curso__colegio=colegio)
+        asignatura = get_object_or_404(Asignatura, id=asignatura_id, colegio=colegio)
+        bloque = BloqueHorario.objects.filter(id=bloque_id, colegio=colegio).first() if bloque_id else None
+        horario_clase = HorarioClase.objects.filter(id=horario_clase_id, colegio=colegio).first() if horario_clase_id else None
+
+        # Generar Hash Criptográfico de Seguridad SHA-256
+        timestamp_now = timezone.now()
+        raw_hash_data = f"EDUTEKA_LECCIONARIO_{colegio.id}_{request.user.id}_{seccion.id}_{asignatura.id}_{fecha_valida}_{timestamp_now.isoformat()}"
+        hash_firma = hashlib.sha256(raw_hash_data.encode('utf-8')).hexdigest()
+
+        if leccionario_id and leccionario_id.isdigit():
+            lecc = get_object_or_404(RegistroLeccionario, id=int(leccionario_id), colegio=colegio)
+            lecc.oa_codigo = oa_codigo
+            lecc.contenido_tratado = contenido_tratado
+            lecc.actividad_tipo = actividad_tipo
+            lecc.observaciones = observaciones
+            lecc.firmado = True
+            lecc.fecha_firma = timestamp_now
+            lecc.hash_firma = hash_firma
+            lecc.save()
+        else:
+            lecc, created = RegistroLeccionario.objects.update_or_create(
+                colegio=colegio,
+                seccion=seccion,
+                asignatura=asignatura,
+                bloque=bloque,
+                fecha=fecha_valida,
+                defaults={
+                    'horario_clase': horario_clase,
+                    'docente': request.user,
+                    'oa_codigo': oa_codigo,
+                    'contenido_tratado': contenido_tratado,
+                    'actividad_tipo': actividad_tipo,
+                    'observaciones': observaciones,
+                    'firmado': True,
+                    'fecha_firma': timestamp_now,
+                    'hash_firma': hash_firma,
+                }
+            )
+
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success': True,
+                'message': f'¡Leccionario firmado exitosamente para {asignatura.nombre} ({seccion.nombre})!',
+                'leccionario_id': lecc.id,
+                'hash_firma': hash_firma[:12] + '...'
+            })
+
+        messages.success(request, f"¡Leccionario firmado exitosamente con sello digital para {asignatura.nombre} ({seccion.nombre})!")
+
+    next_url = request.POST.get('next') or 'leccionario_hub'
+    return redirect(next_url)
+
+
+@login_required
+def planificaciones_hub_view(request):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        return redirect('dashboard_usuario')
+
+    from solicitudes.models import MiembroColegio
+    from .models import PlanificacionCurricular, SeccionCurso, Asignatura
+    from django.db.models import Q
+    import datetime
+
+    miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
+    is_admin = (
+        request.user.colegios_administrados.filter(id=colegio.id).exists()
+        or (miembro and miembro.rol and miembro.rol.nombre in ['Administrador', 'Director', 'UTP'])
+    )
+
+    if request.method == 'POST':
+        plan_id = request.POST.get('plan_id')
+        seccion_id = request.POST.get('seccion_id')
+        asignatura_id = request.POST.get('asignatura_id')
+        titulo_unidad = request.POST.get('titulo_unidad', '').strip()
+        semestre = request.POST.get('semestre', 1)
+        fecha_inicio_str = request.POST.get('fecha_inicio')
+        fecha_termino_str = request.POST.get('fecha_termino')
+        oas_curriculares = request.POST.get('oas_curriculares', '').strip()
+        estrategias_metodologicas = request.POST.get('estrategias_metodologicas', '').strip()
+        evaluacion_descripcion = request.POST.get('evaluacion_descripcion', '').strip()
+
+        seccion = get_object_or_404(SeccionCurso, id=seccion_id, curso__colegio=colegio)
+        asignatura = get_object_or_404(Asignatura, id=asignatura_id, colegio=colegio)
+
+        try:
+            f_ini = datetime.datetime.strptime(fecha_inicio_str, '%Y-%m-%d').date()
+            f_fin = datetime.datetime.strptime(fecha_termino_str, '%Y-%m-%d').date()
+        except (ValueError, TypeError):
+            f_ini = timezone.now().date()
+            f_fin = timezone.now().date() + datetime.timedelta(days=30)
+
+        if plan_id and plan_id.isdigit():
+            plan = get_object_or_404(PlanificacionCurricular, id=int(plan_id), colegio=colegio)
+            plan.seccion = seccion
+            plan.asignatura = asignatura
+            plan.titulo_unidad = titulo_unidad
+            plan.semestre = int(semestre)
+            plan.fecha_inicio = f_ini
+            plan.fecha_termino = f_fin
+            plan.oas_curriculares = oas_curriculares
+            plan.estrategias_metodologicas = estrategias_metodologicas
+            plan.evaluacion_descripcion = evaluacion_descripcion
+            if 'enviar_a_utp' in request.POST:
+                plan.estado = 'enviada'
+            plan.save()
+            messages.success(request, f"¡Planificación '{titulo_unidad}' actualizada con éxito!")
+        else:
+            estado_inicial = 'enviada' if 'enviar_a_utp' in request.POST else 'borrador'
+            PlanificacionCurricular.objects.create(
+                colegio=colegio,
+                seccion=seccion,
+                asignatura=asignatura,
+                docente=request.user,
+                titulo_unidad=titulo_unidad,
+                semestre=int(semestre),
+                fecha_inicio=f_ini,
+                fecha_termino=f_fin,
+                oas_curriculares=oas_curriculares,
+                estrategias_metodologicas=estrategias_metodologicas,
+                evaluacion_descripcion=evaluacion_descripcion,
+                estado=estado_inicial
+            )
+            messages.success(request, f"¡Planificación '{titulo_unidad}' creada con éxito!")
+        return redirect('planificaciones_hub')
+
+    planificaciones_qs = PlanificacionCurricular.objects.filter(colegio=colegio).select_related(
+        'seccion', 'asignatura', 'docente', 'revisado_por_utp'
+    )
+    if not is_admin:
+        planificaciones_qs = planificaciones_qs.filter(docente=request.user)
+
+    secciones_colegio = SeccionCurso.objects.filter(curso__colegio=colegio, activo=True).select_related('curso').order_by('curso__orden', 'letra')
+    asignaturas_colegio = Asignatura.objects.filter(colegio=colegio, activo=True).order_by('nombre')
+
+    context = {
+        'colegio': colegio,
+        'miembro': miembro,
+        'is_admin': is_admin,
+        'planificaciones': planificaciones_qs,
+        'secciones_colegio': secciones_colegio,
+        'asignaturas_colegio': asignaturas_colegio,
+        'active_page': 'planificaciones',
+    }
+    return render(request, 'colegios/planificaciones_hub.html', context)
+
+
+@login_required
+def cambiar_estado_planificacion_view(request, plan_id):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        return redirect('dashboard_usuario')
+
+    from solicitudes.models import MiembroColegio
+    from .models import PlanificacionCurricular
+
+    miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
+    is_admin = (
+        request.user.colegios_administrados.filter(id=colegio.id).exists()
+        or (miembro and miembro.rol and miembro.rol.nombre in ['Administrador', 'Director', 'UTP'])
+    )
+
+    if not is_admin:
+        messages.error(request, "Solo el equipo de UTP o Dirección puede auditar y aprobar planificaciones.")
+        return redirect('planificaciones_hub')
+
+    plan = get_object_or_404(PlanificacionCurricular, id=plan_id, colegio=colegio)
+    
+    if request.method == 'POST':
+        nuevo_estado = request.POST.get('nuevo_estado')
+        feedback_utp = request.POST.get('feedback_utp', '').strip()
+
+        if nuevo_estado in ['aprobada', 'observada', 'enviada', 'borrador']:
+            plan.estado = nuevo_estado
+            plan.feedback_utp = feedback_utp
+            plan.revisado_por_utp = request.user
+            plan.fecha_revision_utp = timezone.now()
+            plan.save()
+            messages.success(request, f"Planificación actualizada a estado: {plan.get_estado_display()}")
+
+    return redirect('planificaciones_hub')
+
+
+# ==============================================================================
+# VISTAS: MÓDULO PIE (PROGRAMA DE INTEGRACIÓN ESCOLAR / NEE)
+# ==============================================================================
+
+@login_required
+def pie_dashboard_view(request):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        return redirect('dashboard_usuario')
+
+    from solicitudes.models import MiembroColegio
+    from .models import FichaEstudiantePIE, Estudiante, SeccionCurso
+    from django.db.models import Count, Q
+
+    miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
+    is_admin = (
+        request.user.colegios_administrados.filter(id=colegio.id).exists()
+        or (miembro and miembro.rol and miembro.rol.nombre in ['Administrador', 'Director', 'UTP', 'Convivencia'])
+    )
+
+    fichas_qs = FichaEstudiantePIE.objects.filter(colegio=colegio, activo=True).select_related(
+        'estudiante', 'estudiante__seccion', 'profesional_a_cargo'
+    )
+
+    # Filtros
+    tipo_nee = request.GET.get('tipo_nee')
+    seccion_id = request.GET.get('seccion_id')
+    search_q = request.GET.get('q', '').strip()
+
+    if tipo_nee:
+        fichas_qs = fichas_qs.filter(tipo_nee=tipo_nee)
+    if seccion_id and seccion_id.isdigit():
+        fichas_qs = fichas_qs.filter(estudiante__seccion_id=int(seccion_id))
+    if search_q:
+        fichas_qs = fichas_qs.filter(
+            Q(estudiante__nombre_completo__icontains=search_q) |
+            Q(estudiante__rut__icontains=search_q) |
+            Q(diagnostico_personalizado__icontains=search_q)
+        )
+
+    total_pie = FichaEstudiantePIE.objects.filter(colegio=colegio, activo=True).count()
+    total_neet = FichaEstudiantePIE.objects.filter(colegio=colegio, activo=True, tipo_nee='transitoria').count()
+    total_neep = FichaEstudiantePIE.objects.filter(colegio=colegio, activo=True, tipo_nee='permanente').count()
+    total_con_paci = FichaEstudiantePIE.objects.filter(colegio=colegio, activo=True, requiere_paci=True).count()
+
+    # Estudiantes del colegio aún no inscritos en PIE
+    alumnos_disponibles = Estudiante.objects.filter(
+        colegio=colegio, activo=True
+    ).exclude(ficha_pie__isnull=False).order_by('nombre_completo')
+
+    secciones_colegio = SeccionCurso.objects.filter(curso__colegio=colegio, activo=True).select_related('curso').order_by('curso__orden', 'letra')
+    especialistas = User.objects.filter(
+        Q(solicitudes_acceso__colegio=colegio, solicitudes_acceso__estado='aprobada') |
+        Q(asignaturas_dictadas__colegio=colegio)
+    ).distinct().order_by('first_name', 'last_name')
+
+    context = {
+        'colegio': colegio,
+        'miembro': miembro,
+        'is_admin': is_admin,
+        'fichas_pie': fichas_qs,
+        'total_pie': total_pie,
+        'total_neet': total_neet,
+        'total_neep': total_neep,
+        'total_con_paci': total_con_paci,
+        'alumnos_disponibles': alumnos_disponibles,
+        'secciones_colegio': secciones_colegio,
+        'especialistas': especialistas,
+        'active_page': 'pie',
+    }
+    return render(request, 'colegios/pie_dashboard.html', context)
+
+
+@login_required
+def crear_ficha_pie_view(request):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        return redirect('dashboard_usuario')
+
+    if request.method == 'POST':
+        from .models import FichaEstudiantePIE, Estudiante
+        import datetime
+
+        estudiante_id = request.POST.get('estudiante_id')
+        tipo_nee = request.POST.get('tipo_nee', 'transitoria')
+        diagnostico = request.POST.get('diagnostico')
+        diagnostico_personalizado = request.POST.get('diagnostico_personalizado', '').strip()
+        profesional_id = request.POST.get('profesional_id')
+        fecha_ingreso_str = request.POST.get('fecha_ingreso')
+        fecha_revaluacion_str = request.POST.get('fecha_revaluacion')
+        requiere_paci = request.POST.get('requiere_paci') == 'on'
+        observaciones_ingreso = request.POST.get('observaciones_ingreso', '').strip()
+
+        estudiante = get_object_or_404(Estudiante, id=estudiante_id, colegio=colegio)
+        profesional = User.objects.filter(id=profesional_id).first() if profesional_id else None
+
+        try:
+            f_ing = datetime.datetime.strptime(fecha_ingreso_str, '%Y-%m-%d').date() if fecha_ingreso_str else timezone.now().date()
+        except ValueError:
+            f_ing = timezone.now().date()
+
+        f_rev = None
+        if fecha_revaluacion_str:
+            try:
+                f_rev = datetime.datetime.strptime(fecha_revaluacion_str, '%Y-%m-%d').date()
+            except ValueError:
+                f_rev = None
+
+        ficha, created = FichaEstudiantePIE.objects.update_or_create(
+            estudiante=estudiante,
+            defaults={
+                'colegio': colegio,
+                'tipo_nee': tipo_nee,
+                'diagnostico': diagnostico,
+                'diagnostico_personalizado': diagnostico_personalizado,
+                'profesional_a_cargo': profesional,
+                'fecha_ingreso': f_ing,
+                'fecha_revaluacion': f_rev,
+                'requiere_paci': requiere_paci,
+                'observaciones_ingreso': observaciones_ingreso,
+                'activo': True
+            }
+        )
+        messages.success(request, f"¡Ficha PIE creada con éxito para {estudiante.nombre_completo}!")
+        return redirect('detalle_estudiante_pie', ficha_id=ficha.id)
+
+    return redirect('pie_dashboard')
+
+
+@login_required
+def detalle_estudiante_pie_view(request, ficha_id):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        return redirect('dashboard_usuario')
+
+    from solicitudes.models import MiembroColegio
+    from .models import FichaEstudiantePIE, AtencionEspecialistaPIE, PlanAdecuacionCurricular, Asignatura
+
+    miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
+    is_admin = (
+        request.user.colegios_administrados.filter(id=colegio.id).exists()
+        or (miembro and miembro.rol and miembro.rol.nombre in ['Administrador', 'Director', 'UTP', 'Convivencia'])
+    )
+
+    ficha = get_object_or_404(FichaEstudiantePIE, id=ficha_id, colegio=colegio)
+    atenciones = ficha.atenciones.all().select_related('especialista').order_by('-fecha', '-fecha_registro')
+    pacis = ficha.pacis.all().select_related('asignatura', 'aprobado_por').order_by('-anio_lectivo')
+    asignaturas = Asignatura.objects.filter(colegio=colegio, activo=True).order_by('nombre')
+    especialistas = User.objects.filter(
+        Q(solicitudes_acceso__colegio=colegio, solicitudes_acceso__estado='aprobada') |
+        Q(asignaturas_dictadas__colegio=colegio)
+    ).distinct().order_by('first_name', 'last_name')
+
+    context = {
+        'colegio': colegio,
+        'miembro': miembro,
+        'is_admin': is_admin,
+        'ficha': ficha,
+        'atenciones': atenciones,
+        'pacis': pacis,
+        'asignaturas': asignaturas,
+        'especialistas': especialistas,
+        'hoy': timezone.now(),
+        'active_page': 'pie',
+    }
+    return render(request, 'colegios/detalle_estudiante_pie.html', context)
+
+
+@login_required
+def registrar_sesion_pie_view(request, ficha_id):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        return redirect('dashboard_usuario')
+
+    from .models import FichaEstudiantePIE, AtencionEspecialistaPIE
+    ficha = get_object_or_404(FichaEstudiantePIE, id=ficha_id, colegio=colegio)
+
+    if request.method == 'POST':
+        import datetime
+
+        rol_especialista = request.POST.get('rol_especialista', 'educadora_diferencial')
+        tipo_sesion = request.POST.get('tipo_sesion', 'aula_recursos')
+        fecha_str = request.POST.get('fecha')
+        objetivo_trabajado = request.POST.get('objetivo_trabajado', '').strip()
+        resumen_intervencion = request.POST.get('resumen_intervencion', '').strip()
+        acuerdos_pedagogicos = request.POST.get('acuerdos_pedagogicos', '').strip()
+
+        try:
+            f_sesion = datetime.datetime.strptime(fecha_str, '%Y-%m-%d').date() if fecha_str else timezone.now().date()
+        except ValueError:
+            f_sesion = timezone.now().date()
+
+        AtencionEspecialistaPIE.objects.create(
+            ficha_pie=ficha,
+            especialista=request.user,
+            rol_especialista=rol_especialista,
+            fecha=f_sesion,
+            tipo_sesion=tipo_sesion,
+            objetivo_trabajado=objetivo_trabajado,
+            resumen_intervencion=resumen_intervencion,
+            acuerdos_pedagogicos=acuerdos_pedagogicos
+        )
+        messages.success(request, f"¡Atención de especialista registrada en la bitácora PIE de {ficha.estudiante.nombre_completo}!")
+
+    return redirect('detalle_estudiante_pie', ficha_id=ficha.id)
+
+
+@login_required
+def guardar_paci_view(request, ficha_id):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        return redirect('dashboard_usuario')
+
+    from .models import FichaEstudiantePIE, PlanAdecuacionCurricular, Asignatura
+    ficha = get_object_or_404(FichaEstudiantePIE, id=ficha_id, colegio=colegio)
+
+    if request.method == 'POST':
+        from .models import PlanAdecuacionCurricular, Asignatura
+
+        paci_id = request.POST.get('paci_id')
+        asignatura_id = request.POST.get('asignatura_id')
+        anio_lectivo = request.POST.get('anio_lectivo', 2026)
+        tiempo_adicional = request.POST.get('tiempo_adicional') == 'on'
+        adaptacion_materiales = request.POST.get('adaptacion_materiales', '').strip()
+        espacio_evaluacion = request.POST.get('espacio_evaluacion', '').strip()
+        graduacion_complejidad = request.POST.get('graduacion_complejidad', '').strip()
+        priorizacion_objetivos = request.POST.get('priorizacion_objetivos', '').strip()
+        estrategias_evaluacion = request.POST.get('estrategias_evaluacion', '').strip()
+        observaciones = request.POST.get('observaciones', '').strip()
+
+        asignatura = Asignatura.objects.filter(id=asignatura_id, colegio=colegio).first() if asignatura_id else None
+
+        if paci_id and paci_id.isdigit():
+            paci = get_object_or_404(PlanAdecuacionCurricular, id=int(paci_id), ficha_pie=ficha)
+            paci.asignatura = asignatura
+            paci.anio_lectivo = int(anio_lectivo)
+            paci.tiempo_adicional = tiempo_adicional
+            paci.adaptacion_materiales = adaptacion_materiales
+            paci.espacio_evaluacion = espacio_evaluacion
+            paci.graduacion_complejidad = graduacion_complejidad
+            paci.priorizacion_objetivos = priorizacion_objetivos
+            paci.estrategias_evaluacion = estrategias_evaluacion
+            paci.observaciones = observaciones
+            paci.save()
+            messages.success(request, f"¡PACI actualizado exitosamente para {ficha.estudiante.nombre_completo}!")
+        else:
+            PlanAdecuacionCurricular.objects.create(
+                ficha_pie=ficha,
+                asignatura=asignatura,
+                anio_lectivo=int(anio_lectivo),
+                tiempo_adicional=tiempo_adicional,
+                adaptacion_materiales=adaptacion_materiales,
+                espacio_evaluacion=espacio_evaluacion,
+                graduacion_complejidad=graduacion_complejidad,
+                priorizacion_objetivos=priorizacion_objetivos,
+                estrategias_evaluacion=estrategias_evaluacion,
+                observaciones=observaciones
+            )
+            messages.success(request, f"¡PACI creado exitosamente para {ficha.estudiante.nombre_completo}!")
+
+    return redirect('detalle_estudiante_pie', ficha_id=ficha.id)
+
+
+@login_required
+def aprobar_paci_view(request, paci_id):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        return redirect('dashboard_usuario')
+
+    from solicitudes.models import MiembroColegio
+    from .models import PlanAdecuacionCurricular
+
+    miembro = MiembroColegio.objects.filter(usuario=request.user, colegio=colegio, activo=True).first()
+    is_admin = (
+        request.user.colegios_administrados.filter(id=colegio.id).exists()
+        or (miembro and miembro.rol and miembro.rol.nombre in ['Administrador', 'Director', 'UTP'])
+    )
+
+    if not is_admin:
+        messages.error(request, "Solo el equipo de UTP o Dirección puede aprobar el PACI oficial.")
+        return redirect('pie_dashboard')
+
+    paci = get_object_or_404(PlanAdecuacionCurricular, id=paci_id, ficha_pie__colegio=colegio)
+    paci.aprobado_utp = True
+    paci.fecha_aprobacion = timezone.now().date()
+    paci.aprobado_por = request.user
+    paci.save()
+    messages.success(request, f"¡PACI aprobado oficialmente por UTP para {paci.ficha_pie.estudiante.nombre_completo}!")
+
+    return redirect('detalle_estudiante_pie', ficha_id=paci.ficha_pie.id)
+
+
+@login_required
+def paci_imprimible_view(request, ficha_id):
+    colegio = obtener_colegio_usuario(request.user)
+    if not colegio:
+        return redirect('dashboard_usuario')
+
+    from .models import FichaEstudiantePIE
+
+    ficha = get_object_or_404(FichaEstudiantePIE, id=ficha_id, colegio=colegio)
+    pacis = ficha.pacis.all().select_related('asignatura', 'aprobado_por').order_by('-anio_lectivo')
+    atenciones_recientes = ficha.atenciones.all().select_related('especialista')[:10]
+
+    context = {
+        'colegio': colegio,
+        'ficha': ficha,
+        'estudiante': ficha.estudiante,
+        'pacis': pacis,
+        'atenciones_recientes': atenciones_recientes,
+        'hoy': timezone.now(),
+    }
+    return render(request, 'colegios/paci_imprimible.html', context)
+
+
+
+

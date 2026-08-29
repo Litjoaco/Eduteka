@@ -97,7 +97,6 @@
       backdrop-filter: blur(8px);
     }
 
-
     /* Cards Grid */
     .prov-grid {
       display: grid;
@@ -163,6 +162,19 @@
       color: var(--white);
       transform: scale(1.03);
     }
+
+    @media (max-width: 991.98px) {
+      .main-content { margin-left: 0 !important; width: 100% !important; }
+      .topbar { padding: 0.75rem 1rem; height: auto; flex-wrap: wrap; gap: 0.5rem; }
+      .content-body { padding: 1.25rem 1rem; }
+      .hero-banner-prov { padding: 1.5rem 1.25rem; }
+    }
+
+    @media (max-width: 575.98px) {
+      .content-body { padding: 1rem 0.75rem; }
+      .panel-card-prov { padding: 1.25rem 1rem; }
+      .stat-card-prov { padding: 1rem; }
+    }
   </style>
 </head>
 <body>
@@ -207,6 +219,10 @@
           </div>
 
           <div class="d-flex gap-2 flex-wrap">
+            <a href="{% url 'procesos_compra_dashboard' %}" class="btn btn-warning text-dark fw-extrabold px-3 py-2 shadow-sm" style="border-radius:12px;">
+              <i class="bi bi-receipt-cutoff me-1"></i> Cotizaciones & Compras (3 Cot.)
+            </a>
+
             <button type="button" class="btn btn-light fw-bold px-3 py-2 shadow-sm" style="border-radius:12px; color:#7C5CFC;" data-bs-toggle="modal" data-bs-target="#modalNuevoProveedor">
               <i class="bi bi-plus-lg me-1"></i> Nuevo Proveedor
             </button>
@@ -217,7 +233,6 @@
           </div>
         </div>
       </div>
-
 
       <!-- BUSCADOR -->
       <div class="card p-3 mb-4 border-0 shadow-sm" style="border-radius:14px;">
@@ -504,6 +519,14 @@
     const modal = new bootstrap.Modal(document.getElementById('modalEditarProveedor'));
     modal.show();
   }
+
+  document.getElementById('mobileMenuBtn')?.addEventListener('click', function() {
+    if (typeof window.toggleSidebarMobile === 'function') {
+      window.toggleSidebarMobile();
+    } else {
+      document.getElementById('sidebar')?.classList.toggle('open');
+    }
+  });
 </script>
 </body>
 </html>

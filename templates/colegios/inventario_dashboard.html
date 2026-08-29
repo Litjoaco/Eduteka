@@ -39,6 +39,31 @@
 
     .wrapper { display: flex; flex: 1; position: relative; }
 
+    .main-content {
+      flex: 1;
+      margin-left: 248px;
+      transition: margin-left 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      background: var(--bg);
+    }
+    body.sidebar-collapsed .main-content {
+      margin-left: 72px;
+    }
+    @media (max-width: 991.98px) {
+      .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+      }
+      .topbar {
+        padding: 0 1.25rem !important;
+      }
+      .content-body {
+        padding: 1.25rem 1rem !important;
+      }
+    }
+
     .topbar {
       height: 70px;
       background: rgba(255, 255, 255, 0.85) !important;
@@ -104,7 +129,6 @@
       gap: 1.25rem;
       margin-bottom: 2rem;
     }
-
 
     .kpi-card-inv {
       background: var(--white);
@@ -252,21 +276,24 @@
           </div>
 
           <div class="d-flex gap-2 flex-wrap">
+            <a href="{% url 'procesos_compra_dashboard' %}" class="btn btn-warning text-dark fw-extrabold px-3 py-2 shadow-sm" style="border-radius:12px;">
+              <i class="bi bi-receipt-cutoff me-1"></i> Cotizaciones & Compras (3 Cot.)
+            </a>
+
             <button type="button" class="btn btn-light fw-bold px-3 py-2 shadow-sm" style="border-radius:12px; color:#7C5CFC;" data-bs-toggle="modal" data-bs-target="#modalNuevoItem">
               <i class="bi bi-plus-lg me-1"></i> Nuevo Artículo
             </button>
 
             <a href="{% url 'proveedores_directorio' %}" class="btn btn-outline-light fw-bold px-3 py-2" style="border-radius:12px;">
-              <i class="bi bi-truck me-1"></i> Ver Proveedores
+              <i class="bi bi-truck me-1"></i> Proveedores
             </a>
 
             <a href="{% url 'exportar_inventario_excel' %}" class="btn btn-outline-light fw-bold px-3 py-2" style="border-radius:12px;">
-              <i class="bi bi-file-earmark-excel me-1"></i> Exportar Excel
+              <i class="bi bi-file-earmark-excel me-1"></i> Exportar
             </a>
           </div>
         </div>
       </div>
-
 
       <!-- 4 KPIS -->
       <div class="kpi-grid-inv">
@@ -416,11 +443,10 @@
                     {% endif %}
                   </td>
                   <td class="text-center">
-                    <div class="d-flex align-items-center justify-content-center gap-1">
-                      <!-- BOTON PEDIR REPOSICION -->
+                      <!-- BOTON PEDIR COTIZACION -->
                       {% if it.proveedor_principal %}
-                        <button type="button" class="btn btn-sm {% if it.en_alerta %}btn-danger{% else %}btn-outline-success{% endif %} py-0.5 px-2 fw-bold" style="border-radius:6px; font-size:0.76rem;" title="Pedir Reposición / Contactar Proveedor" onclick="openContactarProveedorModal('{{ it.id }}', '{{ it.nombre|escapejs }}', '{{ it.stock_actual }}', '{{ it.unidad_medida|escapejs }}', '{{ it.proveedor_principal.nombre|escapejs }}', '{{ it.proveedor_principal.contacto_nombre|default:''|escapejs }}', '{{ it.proveedor_principal.telefono|default:''|escapejs }}', '{{ it.proveedor_principal.email|default:''|escapejs }}', '{{ colegio.nombre|escapejs }}')">
-                          <i class="bi bi-whatsapp me-1"></i> Pedir
+                        <button type="button" class="btn btn-sm {% if it.en_alerta %}btn-danger{% else %}btn-outline-primary{% endif %} py-0.5 px-2 fw-bold" style="border-radius:6px; font-size:0.76rem;" title="Solicitar Cotización al Proveedor" onclick="openContactarProveedorModal('{{ it.id }}', '{{ it.nombre|escapejs }}', '{{ it.stock_actual }}', '{{ it.unidad_medida|escapejs }}', '{{ it.proveedor_principal.nombre|escapejs }}', '{{ it.proveedor_principal.contacto_nombre|default:''|escapejs }}', '{{ it.proveedor_principal.telefono|default:''|escapejs }}', '{{ it.proveedor_principal.email|default:''|escapejs }}', '{{ colegio.nombre|escapejs }}')">
+                          <i class="bi bi-receipt-cutoff me-1"></i> Cotizar
                         </button>
                       {% endif %}
 
@@ -615,27 +641,37 @@
   </div>
 </div>
 
-<!-- MODAL CONTACTAR PROVEEDOR (WHATSAPP & CORREO AUTO-REDACTADO) -->
+<!-- MODAL CONTACTAR PROVEEDOR (SOLICITUD DE COTIZACIÓN POR WHATSAPP & CORREO) -->
 <div class="modal fade" id="modalContactarProveedor" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content border-0 shadow-lg" style="border-radius:16px;">
       <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
-        <h5 class="modal-title fw-extrabold text-dark"><i class="bi bi-chat-dots-fill text-success me-2"></i>Solicitar Reposición al Proveedor</h5>
+        <div>
+          <h5 class="modal-title fw-extrabold text-dark"><i class="bi bi-receipt text-primary me-2"></i>Solicitar Cotización Formal al Proveedor</h5>
+          <small class="text-muted">Envía la solicitud de cotización por WhatsApp o correo para respaldar el proceso de compra.</small>
+        </div>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body p-4">
         
+        <div class="alert alert-warning d-flex align-items-center gap-2 py-2 px-3 mb-3" style="border-radius:10px; font-size:0.82rem;">
+          <i class="bi bi-shield-exclamation text-warning fs-5"></i>
+          <div>
+            <strong>Normativa Supereduc:</strong> Recuerda solicitar cotizaciones a un mínimo de <strong>3 proveedores distintos</strong> antes de emitir la Orden de Compra.
+          </div>
+        </div>
+
         <div class="row g-3 mb-3">
           <div class="col-md-6">
             <div class="p-3 bg-light rounded-3 border h-100">
-              <span class="text-muted extra-small text-uppercase fw-bold d-block">Insumo / Stock</span>
+              <span class="text-muted extra-small text-uppercase fw-bold d-block">Insumo a Cotizar</span>
               <h6 class="fw-extrabold text-dark mb-1" id="contItemNombre">-</h6>
               <span class="badge bg-danger-subtle text-danger fw-bold" id="contItemStock">-</span>
             </div>
           </div>
           <div class="col-md-6">
             <div class="p-3 bg-light rounded-3 border h-100">
-              <span class="text-muted extra-small text-uppercase fw-bold d-block">Proveedor Asignado</span>
+              <span class="text-muted extra-small text-uppercase fw-bold d-block">Proveedor a Consultar</span>
               <h6 class="fw-extrabold text-dark mb-1" id="contProvNombre">-</h6>
               <span class="text-muted small d-block" id="contProvEjecutivo">-</span>
               <span class="text-muted small d-block" id="contProvTel">-</span>
@@ -644,21 +680,27 @@
         </div>
 
         <div class="mb-3">
-          <label class="form-label fw-bold text-dark small">Mensaje Automático de Pedido / Reposición</label>
-          <textarea id="contMensajeTexto" class="form-control fw-medium" rows="4" style="border-radius:10px; font-size:0.88rem;"></textarea>
-          <span class="text-muted extra-small">Puedes editar el texto antes de enviarlo directamente por WhatsApp o Correo.</span>
+          <label class="form-label fw-bold text-dark small">Mensaje Formal de Solicitud de Cotización (Editable)</label>
+          <textarea id="contMensajeTexto" class="form-control fw-medium" rows="5" style="border-radius:10px; font-size:0.88rem;"></textarea>
+          <span class="text-muted extra-small">Puedes editar el texto con las cantidades requeridas antes de enviarlo.</span>
         </div>
 
-        <div class="d-flex gap-2 justify-content-end pt-2">
-          <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Cerrar</button>
-          
-          <button type="button" class="btn btn-outline-primary fw-bold px-3" id="btnEnviarEmail">
-            <i class="bi bi-envelope-fill me-1"></i> Enviar Correo
-          </button>
+        <div class="d-flex gap-2 justify-content-between align-items-center pt-2 flex-wrap">
+          <a href="{% url 'procesos_compra_dashboard' %}" class="btn btn-sm btn-outline-dark fw-bold px-3 py-2" style="border-radius:10px;">
+            <i class="bi bi-folder-plus me-1"></i> Ir a Módulo de Compras (3 Cot.)
+          </a>
 
-          <button type="button" class="btn btn-success fw-extrabold px-4" id="btnEnviarWhatsapp" style="border-radius:10px; background:#10B981; border:none;">
-            <i class="bi bi-whatsapp me-1"></i> Abrir WhatsApp
-          </button>
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Cerrar</button>
+            
+            <button type="button" class="btn btn-outline-primary fw-bold px-3" id="btnEnviarEmail">
+              <i class="bi bi-envelope-fill me-1"></i> Pedir por Correo
+            </button>
+
+            <button type="button" class="btn btn-success fw-extrabold px-4" id="btnEnviarWhatsapp" style="border-radius:10px; background:#10B981; border:none;">
+              <i class="bi bi-whatsapp me-1"></i> Pedir por WhatsApp
+            </button>
+          </div>
         </div>
 
       </div>
@@ -684,7 +726,7 @@
     document.getElementById('contProvTel').textContent = telefono ? 'Tel/WhatsApp: ' + telefono : '';
 
     const saludo = contactoNombre ? 'Hola ' + contactoNombre + ' (' + provNombre + ')' : 'Estimados ' + provNombre;
-    const msg = saludo + ',\n\nLes escribimos desde ' + colegioNombre + ' para solicitar la reposición urgente del siguiente insumo:\n- Artículo: ' + itemNombre + '\n- Stock disponible actualmente: ' + stockActual + ' ' + unidadMedida + '\n\nPor favor confirmar disponibilidad de stock, tiempo de entrega y cotización formal.\n\nQuedamos atentos a su respuesta.\nSaludos cordiales.';
+    const msg = saludo + ',\n\nLes escribimos desde el establecimiento ' + colegioNombre + '.\n\nRequerimos solicitar una COTIZACIÓN FORMAL para la adquisición del siguiente producto:\n- Ítem: ' + itemNombre + '\n- Cantidad estimada: [Especificar cantidad requerida]\n- Lugar de entrega: Dependencias del establecimiento escolar\n\nAgradeceremos enviarnos su cotización formal (PDF) indicando:\n1. Precio neto y total con IVA (19%)\n2. Plazo estimado de entrega (días hábiles)\n3. Condiciones y forma de pago\n\nQuedamos a la espera de su oferta para nuestra evaluación de compras.\n\nSaludos cordiales,\nAdministración / Dirección ' + colegioNombre;
 
     document.getElementById('contMensajeTexto').value = msg;
 
@@ -700,7 +742,7 @@
     };
 
     document.getElementById('btnEnviarEmail').onclick = function() {
-      const subject = encodeURIComponent('Solicitud de Reposición y Cotización: ' + itemNombre + ' - ' + colegioNombre);
+      const subject = encodeURIComponent('Solicitud de Cotización Formal: ' + itemNombre + ' - ' + colegioNombre);
       const body = encodeURIComponent(document.getElementById('contMensajeTexto').value);
       window.location.href = 'mailto:' + (email || '') + '?subject=' + subject + '&body=' + body;
     };

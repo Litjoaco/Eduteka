@@ -63,6 +63,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 return false;
             }
 
+            const termsCheck = document.getElementById('termsCheck');
+            if (termsCheck && !termsCheck.checked) {
+                e.preventDefault();
+                alert('Debes aceptar los Términos de Servicio y la Política de Protección de Datos Personales (Ley 19.628) para enviar tu solicitud.');
+                termsCheck.focus();
+                return false;
+            }
+
             const btn = document.getElementById('btnSubmitSolicitud');
             const txt = document.getElementById('btnSubmitText');
             const icon = document.getElementById('btnSubmitIcon');
@@ -75,6 +83,19 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+/* ── Aceptar Términos desde el Modal ── */
+function acceptTermsModal() {
+    const termsCheck = document.getElementById('termsCheck');
+    if (termsCheck) {
+        termsCheck.checked = true;
+    }
+    const modalEl = document.getElementById('termsModal');
+    if (modalEl) {
+        const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+        modal.hide();
+    }
+}
 
 /* ── Cargar Colegios vía API ── */
 function cargarColegios(query) {

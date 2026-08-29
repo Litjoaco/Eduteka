@@ -1,0 +1,552 @@
+<!-- MODAL REUTILIZABLE: FIRMA ELECTRÓNICA / PIN DE 4 DÍGITOS CON RECUPERACIÓN POR EMAIL -->
+<div class="modal fade" id="modalPinFirmaDigital" tabindex="-1" aria-labelledby="modalPinFirmaDigitalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 24px; overflow: hidden; background: #FFFFFF;">
+      
+      <!-- HEADER CON GRADIENTE MORADO INSTITUCIONAL -->
+      <div class="p-4 text-white text-center position-relative" style="background: linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #4F46E5 100%);">
+        <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2 shadow" style="width: 56px; height: 56px; background: rgba(255, 255, 255, 0.18); backdrop-filter: blur(8px); border: 2px solid rgba(255,255,255,0.4); font-size: 1.5rem;">
+          🔒
+        </div>
+        <h5 class="fw-extrabold mb-1 fs-5 text-white" id="modalPinTitulo">Firma Electrónica Simple</h5>
+        <p class="mb-0 text-white-50 extra-small" id="modalPinSubtitulo">Ingresa tu PIN de 4 dígitos para autorizar y firmar este registro.</p>
+      </div>
+
+      <!-- CUERPO DEL MODAL -->
+      <div class="modal-body p-4">
+        
+        <!-- MENSAJE DE ALERTA DINÁMICO -->
+        <div id="pinAlertBox" class="alert d-none py-2 px-3 rounded-3 extra-small fw-bold mb-3 text-center" role="alert"></div>
+
+        <!-- MODO 1: VERIFICACIÓN DE PIN (4 DÍGITOS) -->
+        <div id="seccionVerificarPin">
+          <label class="form-label text-muted extra-small fw-extrabold text-uppercase d-block text-center mb-2">
+            PIN de Autorización (4 Dígitos)
+          </label>
+
+          <div class="d-flex justify-content-center gap-2 mb-3" id="otpContainerVerificar">
+            <input type="password" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="form-control otp-digit-input text-center fw-extrabold" data-index="0" autofocus>
+            <input type="password" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="form-control otp-digit-input text-center fw-extrabold" data-index="1">
+            <input type="password" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="form-control otp-digit-input text-center fw-extrabold" data-index="2">
+            <input type="password" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="form-control otp-digit-input text-center fw-extrabold" data-index="3">
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mb-4 px-1">
+            <span class="text-muted extra-small" id="pinDiasVigenciaBadge">
+              <i class="bi bi-clock-history text-primary me-1"></i> Vigencia: Trimestral
+            </span>
+            <button type="button" class="btn btn-link p-0 text-decoration-none extra-small text-danger fw-bold" onclick="cambiarAModoRecuperarPin()">
+              <i class="bi bi-envelope-at me-0.5"></i> ¿Olvidaste tu PIN?
+            </button>
+          </div>
+
+          <button type="button" class="btn w-100 py-2.5 fw-extrabold shadow-sm d-flex align-items-center justify-content-center gap-2" id="btnConfirmarFirmaPin" style="background: linear-gradient(135deg, #7C5CFC 0%, #5B21B6 100%); color: #FFFFFF; border-radius: 14px; border: none; font-size: 0.95rem;">
+            <i class="bi bi-check-circle-fill"></i>
+            <span>Confirmar y Firmar</span>
+          </button>
+        </div>
+
+        <!-- MODO 2: CONFIGURACIÓN / RENOVACIÓN DE PIN -->
+        <div id="seccionEstablecerPin" class="d-none">
+          <div class="p-3 mb-3 rounded-3" style="background: #F5F3FF; border: 1px solid #DDD6FE;">
+            <div class="d-flex align-items-start gap-2">
+              <i class="bi bi-info-circle-fill text-primary fs-6 mt-0.5"></i>
+              <span class="extra-small text-dark fw-medium">
+                Por política de seguridad escolar, tu PIN debe tener 4 dígitos y se renueva automáticamente cada <strong>3 meses (90 días)</strong>.
+              </span>
+            </div>
+          </div>
+
+          <!-- NUEVO PIN -->
+          <label class="form-label text-muted extra-small fw-extrabold text-uppercase d-block text-center mb-1.5">
+            1. Ingresa tu Nuevo PIN (4 Dígitos)
+          </label>
+          <div class="d-flex justify-content-center gap-2 mb-3" id="otpContainerNuevo">
+            <input type="password" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="form-control otp-digit-input-new text-center fw-extrabold" data-index="0">
+            <input type="password" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="form-control otp-digit-input-new text-center fw-extrabold" data-index="1">
+            <input type="password" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="form-control otp-digit-input-new text-center fw-extrabold" data-index="2">
+            <input type="password" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="form-control otp-digit-input-new text-center fw-extrabold" data-index="3">
+          </div>
+
+          <!-- CONFIRMAR PIN -->
+          <label class="form-label text-muted extra-small fw-extrabold text-uppercase d-block text-center mb-1.5">
+            2. Confirma tu Nuevo PIN
+          </label>
+          <div class="d-flex justify-content-center gap-2 mb-3" id="otpContainerConfirmar">
+            <input type="password" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="form-control otp-digit-input-confirm text-center fw-extrabold" data-index="0">
+            <input type="password" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="form-control otp-digit-input-confirm text-center fw-extrabold" data-index="1">
+            <input type="password" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="form-control otp-digit-input-confirm text-center fw-extrabold" data-index="2">
+            <input type="password" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="form-control otp-digit-input-confirm text-center fw-extrabold" data-index="3">
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-light w-50 py-2 fw-bold text-muted" style="border-radius: 12px;" onclick="cambiarAModoVerificarPin()">
+              Cancelar
+            </button>
+            <button type="button" class="btn w-50 py-2 fw-extrabold" id="btnGuardarNuevoPin" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: #FFFFFF; border-radius: 12px; border: none;">
+              Guardar PIN
+            </button>
+          </div>
+        </div>
+
+        <!-- MODO 3: RECUPERACIÓN VÍA CÓDIGO OTP DE 6 DÍGITOS POR EMAIL -->
+        <div id="seccionRecuperarPin" class="d-none">
+          <div class="p-3 mb-3 rounded-3" style="background: #FEF3C7; border: 1px solid #FDE68A;">
+            <div class="d-flex align-items-start gap-2">
+              <i class="bi bi-shield-exclamation text-warning fs-6 mt-0.5"></i>
+              <span class="extra-small text-dark fw-medium">
+                Enviaremos un código de seguridad de 6 dígitos a tu correo para autorizar el desbloqueo o creación de un nuevo PIN.
+              </span>
+            </div>
+          </div>
+
+          <div class="mb-3 text-center" id="bloqueSolicitarCodigoReset">
+            <button type="button" class="btn btn-sm btn-outline-primary fw-bold px-3 py-2 w-100 mb-2" id="btnSolicitarCodigoResetPin" style="border-radius: 10px;">
+              <i class="bi bi-envelope-arrow-up me-1"></i> Enviar Código a mi Correo
+            </button>
+          </div>
+
+          <div id="bloqueIngresoCodigoReset">
+            <!-- 6 DÍGITOS OTP -->
+            <label class="form-label text-muted extra-small fw-extrabold text-uppercase d-block text-center mb-1.5">
+              1. Código de 6 Dígitos recibido por Correo
+            </label>
+            <div class="d-flex justify-content-center gap-1.5 mb-3" id="otpContainerReset">
+              <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="form-control otp-digit-input-reset text-center fw-extrabold" style="width:46px; height:52px;" data-index="0">
+              <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="form-control otp-digit-input-reset text-center fw-extrabold" style="width:46px; height:52px;" data-index="1">
+              <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="form-control otp-digit-input-reset text-center fw-extrabold" style="width:46px; height:52px;" data-index="2">
+              <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="form-control otp-digit-input-reset text-center fw-extrabold" style="width:46px; height:52px;" data-index="3">
+              <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="form-control otp-digit-input-reset text-center fw-extrabold" style="width:46px; height:52px;" data-index="4">
+              <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="form-control otp-digit-input-reset text-center fw-extrabold" style="width:46px; height:52px;" data-index="5">
+            </div>
+
+            <!-- NUEVO PIN -->
+            <label class="form-label text-muted extra-small fw-extrabold text-uppercase d-block text-center mb-1.5">
+              2. Tu Nuevo PIN de 4 Dígitos
+            </label>
+            <div class="d-flex justify-content-center gap-2 mb-3" id="otpContainerResetNuevo">
+              <input type="password" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="form-control otp-digit-input-reset-new text-center fw-extrabold" data-index="0">
+              <input type="password" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="form-control otp-digit-input-reset-new text-center fw-extrabold" data-index="1">
+              <input type="password" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="form-control otp-digit-input-reset-new text-center fw-extrabold" data-index="2">
+              <input type="password" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="form-control otp-digit-input-reset-new text-center fw-extrabold" data-index="3">
+            </div>
+
+            <!-- CONFIRMAR NUEVO PIN -->
+            <label class="form-label text-muted extra-small fw-extrabold text-uppercase d-block text-center mb-1.5">
+              3. Confirma tu Nuevo PIN
+            </label>
+            <div class="d-flex justify-content-center gap-2 mb-4" id="otpContainerResetConfirm">
+              <input type="password" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="form-control otp-digit-input-reset-confirm text-center fw-extrabold" data-index="0">
+              <input type="password" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="form-control otp-digit-input-reset-confirm text-center fw-extrabold" data-index="1">
+              <input type="password" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="form-control otp-digit-input-reset-confirm text-center fw-extrabold" data-index="2">
+              <input type="password" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="form-control otp-digit-input-reset-confirm text-center fw-extrabold" data-index="3">
+            </div>
+
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-light w-50 py-2 fw-bold text-muted" style="border-radius: 12px;" onclick="cambiarAModoVerificarPin()">
+                Cancelar
+              </button>
+              <button type="button" class="btn w-50 py-2 fw-extrabold" id="btnVerificarResetPin" style="background: linear-gradient(135deg, #7C5CFC 0%, #5B21B6 100%); color: #FFFFFF; border-radius: 12px; border: none;">
+                Restablecer PIN
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- FOOTER -->
+      <div class="modal-footer border-top-0 pt-0 pb-3 justify-content-center">
+        <span class="text-muted" style="font-size: 0.72rem;">
+          <i class="bi bi-shield-check text-success me-1"></i> Cifrado criptográfico institucional SHA-256
+        </span>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<style>
+  .otp-digit-input, .otp-digit-input-new, .otp-digit-input-confirm,
+  .otp-digit-input-reset, .otp-digit-input-reset-new, .otp-digit-input-reset-confirm {
+    width: 56px;
+    height: 60px;
+    font-size: 1.6rem;
+    border: 2px solid #E2E8F0;
+    border-radius: 14px;
+    background: #F8FAFC;
+    color: #1E1B4B;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .otp-digit-input:focus, .otp-digit-input-new:focus, .otp-digit-input-confirm:focus,
+  .otp-digit-input-reset:focus, .otp-digit-input-reset-new:focus, .otp-digit-input-reset-confirm:focus {
+    border-color: #7C5CFC;
+    background: #FFFFFF;
+    box-shadow: 0 0 0 4px rgba(124, 92, 252, 0.15);
+    outline: none;
+    transform: translateY(-2px);
+  }
+  .shake-pin {
+    animation: shakePin 0.4s ease-in-out;
+  }
+  @keyframes shakePin {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-8px); }
+    40%, 80% { transform: translateX(8px); }
+  }
+</style>
+
+<script>
+  let callbackPinExito = null;
+  let modalPinInstance = null;
+
+  function getCookieCSRF(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
+  function mostrarAlertaPin(mensaje, tipo = 'danger') {
+    const alertBox = document.getElementById('pinAlertBox');
+    if (!alertBox) return;
+    alertBox.className = `alert alert-${tipo} py-2 px-3 rounded-3 extra-small fw-bold mb-3 text-center`;
+    alertBox.innerText = mensaje;
+    alertBox.classList.remove('d-none');
+  }
+
+  function ocultarAlertaPin() {
+    const alertBox = document.getElementById('pinAlertBox');
+    if (alertBox) alertBox.classList.add('d-none');
+  }
+
+  function cambiarAModoEstablecerPin(mensajeInformativo = null) {
+    document.getElementById('seccionVerificarPin').classList.add('d-none');
+    document.getElementById('seccionRecuperarPin').classList.add('d-none');
+    document.getElementById('seccionEstablecerPin').classList.remove('d-none');
+    document.getElementById('modalPinTitulo').innerText = 'Configurar PIN de Firma';
+    document.getElementById('modalPinSubtitulo').innerText = 'Define tu clave numérica de 4 dígitos para autorizar acciones.';
+    
+    document.querySelectorAll('.otp-digit-input-new, .otp-digit-input-confirm').forEach(i => i.value = '');
+    const firstInput = document.querySelector('.otp-digit-input-new[data-index="0"]');
+    if (firstInput) setTimeout(() => firstInput.focus(), 150);
+
+    if (mensajeInformativo) {
+      mostrarAlertaPin(mensajeInformativo, 'warning');
+    } else {
+      ocultarAlertaPin();
+    }
+  }
+
+  function cambiarAModoVerificarPin() {
+    document.getElementById('seccionEstablecerPin').classList.add('d-none');
+    document.getElementById('seccionRecuperarPin').classList.add('d-none');
+    document.getElementById('seccionVerificarPin').classList.remove('d-none');
+    document.getElementById('modalPinTitulo').innerText = 'Firma Electrónica Simple';
+    document.getElementById('modalPinSubtitulo').innerText = 'Ingresa tu PIN de 4 dígitos para asentar este registro.';
+    
+    document.querySelectorAll('.otp-digit-input').forEach(i => i.value = '');
+    const firstInput = document.querySelector('.otp-digit-input[data-index="0"]');
+    if (firstInput) setTimeout(() => firstInput.focus(), 150);
+    ocultarAlertaPin();
+  }
+
+  function cambiarAModoRecuperarPin() {
+    document.getElementById('seccionVerificarPin').classList.add('d-none');
+    document.getElementById('seccionEstablecerPin').classList.add('d-none');
+    document.getElementById('seccionRecuperarPin').classList.remove('d-none');
+    document.getElementById('modalPinTitulo').innerText = 'Recuperar PIN por Correo';
+    document.getElementById('modalPinSubtitulo').innerText = 'Valida tu identidad con el código enviado a tu correo.';
+    
+    document.querySelectorAll('.otp-digit-input-reset, .otp-digit-input-reset-new, .otp-digit-input-reset-confirm').forEach(i => i.value = '');
+    ocultarAlertaPin();
+  }
+
+  // Setup de auto-tab en inputs OTP
+  function setupOtpInputs(selector, totalExpected = 4) {
+    const inputs = document.querySelectorAll(selector);
+    inputs.forEach((input, index) => {
+      input.addEventListener('input', function(e) {
+        this.value = this.value.replace(/[^0-9]/g, '');
+        if (this.value.length === 1 && index < inputs.length - 1) {
+          inputs[index + 1].focus();
+        }
+      });
+
+      input.addEventListener('keydown', function(e) {
+        if (e.key === 'Backspace' && this.value === '' && index > 0) {
+          inputs[index - 1].focus();
+        } else if (e.key === 'Enter') {
+          if (selector === '.otp-digit-input') {
+            document.getElementById('btnConfirmarFirmaPin').click();
+          } else if (selector === '.otp-digit-input-reset-confirm') {
+            document.getElementById('btnVerificarResetPin').click();
+          }
+        }
+      });
+
+      input.addEventListener('paste', function(e) {
+        e.preventDefault();
+        const text = (e.clipboardData || window.clipboardData).getData('text').trim().replace(/[^0-9]/g, '');
+        if (text.length >= totalExpected) {
+          for (let i = 0; i < totalExpected; i++) {
+            if (inputs[i]) inputs[i].value = text[i];
+          }
+          if (inputs[totalExpected - 1]) inputs[totalExpected - 1].focus();
+        }
+      });
+    });
+  }
+
+  // Función Principal global
+  function solicitarFirmaPIN(callbackExitoso) {
+    callbackPinExito = callbackExitoso;
+    const modalEl = document.getElementById('modalPinFirmaDigital');
+    if (!modalPinInstance) {
+      modalPinInstance = new bootstrap.Modal(modalEl);
+    }
+
+    fetch("{% url 'api_estado_pin' %}")
+      .then(res => res.json())
+      .then(data => {
+        if (!data.tiene_pin) {
+          cambiarAModoEstablecerPin('Aún no tienes un PIN configurado. Por favor define tus 4 dígitos para continuar.');
+        } else if (data.expirado) {
+          cambiarAModoEstablecerPin('Tu PIN ha expirado por política de 90 días. Por favor crea uno nuevo.');
+        } else {
+          cambiarAModoVerificarPin();
+          const badge = document.getElementById('pinDiasVigenciaBadge');
+          if (badge) {
+            badge.innerHTML = `<i class="bi bi-clock-history text-primary me-1"></i> Vigencia: ${data.dias_restantes} días restantes`;
+          }
+        }
+        modalPinInstance.show();
+      })
+      .catch(err => {
+        console.error('Error al verificar estado de PIN:', err);
+        cambiarAModoVerificarPin();
+        modalPinInstance.show();
+      });
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    setupOtpInputs('.otp-digit-input', 4);
+    setupOtpInputs('.otp-digit-input-new', 4);
+    setupOtpInputs('.otp-digit-input-confirm', 4);
+    setupOtpInputs('.otp-digit-input-reset', 6);
+    setupOtpInputs('.otp-digit-input-reset-new', 4);
+    setupOtpInputs('.otp-digit-input-reset-confirm', 4);
+
+    // 1. Botón Confirmar Verificación PIN
+    const btnVerificar = document.getElementById('btnConfirmarFirmaPin');
+    if (btnVerificar) {
+      btnVerificar.addEventListener('click', function() {
+        const inputs = document.querySelectorAll('.otp-digit-input');
+        let pin = '';
+        inputs.forEach(i => pin += i.value);
+
+        if (pin.length !== 4) {
+          mostrarAlertaPin('Por favor ingresa los 4 dígitos completos de tu PIN.');
+          return;
+        }
+
+        btnVerificar.disabled = true;
+        btnVerificar.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span> Verificando...`;
+
+        fetch("{% url 'api_verificar_pin' %}", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookieCSRF('csrftoken')
+          },
+          body: JSON.stringify({ pin: pin })
+        })
+        .then(res => res.json())
+        .then(data => {
+          btnVerificar.disabled = false;
+          btnVerificar.innerHTML = `<i class="bi bi-check-circle-fill"></i> <span>Confirmar y Firmar</span>`;
+
+          if (data.valido) {
+            modalPinInstance.hide();
+            if (typeof callbackPinExito === 'function') {
+              callbackPinExito(pin);
+            }
+          } else {
+            const container = document.getElementById('otpContainerVerificar');
+            container.classList.add('shake-pin');
+            setTimeout(() => container.classList.remove('shake-pin'), 400);
+
+            if (data.expirado) {
+              cambiarAModoEstablecerPin('Tu PIN ha expirado tras 90 días. Por favor renuévalo.');
+            } else {
+              mostrarAlertaPin(data.mensaje || 'PIN incorrecto.');
+              inputs.forEach(i => i.value = '');
+              inputs[0].focus();
+            }
+          }
+        })
+        .catch(err => {
+          btnVerificar.disabled = false;
+          btnVerificar.innerHTML = `<i class="bi bi-check-circle-fill"></i> <span>Confirmar y Firmar</span>`;
+          mostrarAlertaPin('Error de conexión con el servidor.');
+        });
+      });
+    }
+
+    // 2. Botón Guardar Nuevo PIN
+    const btnGuardarNuevo = document.getElementById('btnGuardarNuevoPin');
+    if (btnGuardarNuevo) {
+      btnGuardarNuevo.addEventListener('click', function() {
+        let nuevoPin = '';
+        let confirmarPin = '';
+        document.querySelectorAll('.otp-digit-input-new').forEach(i => nuevoPin += i.value);
+        document.querySelectorAll('.otp-digit-input-confirm').forEach(i => confirmarPin += i.value);
+
+        if (nuevoPin.length !== 4 || confirmarPin.length !== 4) {
+          mostrarAlertaPin('Ambos campos deben tener 4 dígitos numéricos.');
+          return;
+        }
+
+        if (nuevoPin !== confirmarPin) {
+          mostrarAlertaPin('Los PINs ingresados no coinciden.');
+          return;
+        }
+
+        btnGuardarNuevo.disabled = true;
+        btnGuardarNuevo.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span> Guardando...`;
+
+        fetch("{% url 'api_establecer_pin' %}", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookieCSRF('csrftoken')
+          },
+          body: JSON.stringify({ nuevo_pin: nuevoPin, confirmar_pin: confirmarPin })
+        })
+        .then(res => res.json())
+        .then(data => {
+          btnGuardarNuevo.disabled = false;
+          btnGuardarNuevo.innerHTML = `Guardar PIN`;
+
+          if (data.exito) {
+            cambiarAModoVerificarPin();
+            mostrarAlertaPin('¡PIN guardado exitosamente! Ahora puedes confirmar tu acción.', 'success');
+          } else {
+            mostrarAlertaPin(data.mensaje || 'No se pudo guardar el PIN.');
+          }
+        })
+        .catch(err => {
+          btnGuardarNuevo.disabled = false;
+          btnGuardarNuevo.innerHTML = `Guardar PIN`;
+          mostrarAlertaPin('Error de conexión con el servidor.');
+        });
+      });
+    }
+
+    // 3. Botón Solicitar Código OTP de Recuperación al Correo
+    const btnSolicitarCodigo = document.getElementById('btnSolicitarCodigoResetPin');
+    if (btnSolicitarCodigo) {
+      btnSolicitarCodigo.addEventListener('click', function() {
+        btnSolicitarCodigo.disabled = true;
+        btnSolicitarCodigo.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span> Enviando código al correo...`;
+
+        fetch("{% url 'api_solicitar_reset_pin' %}", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookieCSRF('csrftoken')
+          }
+        })
+        .then(res => res.json())
+        .then(data => {
+          btnSolicitarCodigo.disabled = false;
+          btnSolicitarCodigo.innerHTML = `<i class="bi bi-arrow-repeat me-1"></i> Reenviar Código al Correo`;
+
+          if (data.exito) {
+            mostrarAlertaPin(data.mensaje, 'success');
+            const firstResetInput = document.querySelector('.otp-digit-input-reset[data-index="0"]');
+            if (firstResetInput) firstResetInput.focus();
+          } else {
+            mostrarAlertaPin(data.mensaje || 'No se pudo enviar el código.');
+          }
+        })
+        .catch(err => {
+          btnSolicitarCodigo.disabled = false;
+          btnSolicitarCodigo.innerHTML = `<i class="bi bi-envelope-arrow-up me-1"></i> Enviar Código a mi Correo`;
+          mostrarAlertaPin('Error de conexión al solicitar el código.');
+        });
+      });
+    }
+
+    // 4. Botón Validar OTP y Guardar Nuevo PIN
+    const btnVerificarReset = document.getElementById('btnVerificarResetPin');
+    if (btnVerificarReset) {
+      btnVerificarReset.addEventListener('click', function() {
+        let codigo = '';
+        let nuevoPin = '';
+        let confirmarPin = '';
+        document.querySelectorAll('.otp-digit-input-reset').forEach(i => codigo += i.value);
+        document.querySelectorAll('.otp-digit-input-reset-new').forEach(i => nuevoPin += i.value);
+        document.querySelectorAll('.otp-digit-input-reset-confirm').forEach(i => confirmarPin += i.value);
+
+        if (codigo.length !== 6) {
+          mostrarAlertaPin('Ingresa el código de 6 dígitos que enviamos a tu correo.');
+          return;
+        }
+
+        if (nuevoPin.length !== 4 || confirmarPin.length !== 4) {
+          mostrarAlertaPin('El nuevo PIN debe componerse de 4 números.');
+          return;
+        }
+
+        if (nuevoPin !== confirmarPin) {
+          mostrarAlertaPin('Los nuevos PINs no coinciden.');
+          return;
+        }
+
+        btnVerificarReset.disabled = true;
+        btnVerificarReset.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span> Restableciendo...`;
+
+        fetch("{% url 'api_verificar_reset_pin' %}", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookieCSRF('csrftoken')
+          },
+          body: JSON.stringify({
+            codigo: codigo,
+            nuevo_pin: nuevoPin,
+            confirmar_pin: confirmarPin
+          })
+        })
+        .then(res => res.json())
+        .then(data => {
+          btnVerificarReset.disabled = false;
+          btnVerificarReset.innerHTML = `Restablecer PIN`;
+
+          if (data.exito) {
+            cambiarAModoVerificarPin();
+            mostrarAlertaPin('¡PIN recuperado y desbloqueado exitosamente!', 'success');
+          } else {
+            mostrarAlertaPin(data.mensaje || 'Error al restablecer PIN.');
+          }
+        })
+        .catch(err => {
+          btnVerificarReset.disabled = false;
+          btnVerificarReset.innerHTML = `Restablecer PIN`;
+          mostrarAlertaPin('Error de conexión con el servidor.');
+        });
+      });
+    }
+
+  });
+</script>

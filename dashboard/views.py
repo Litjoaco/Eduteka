@@ -28,6 +28,11 @@ def dashboard_view(request):
 
 
 
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.conf import settings
+from django.urls import reverse
+
 @login_required
 @require_POST
 def aprobar_solicitud(request, solicitud_id):
@@ -64,7 +69,32 @@ def aprobar_solicitud(request, solicitud_id):
         nombre_u = getattr(solicitud.usuario, 'perfil', None)
         nombre_str = nombre_u.nombre_completo if nombre_u else (solicitud.usuario.get_full_name() or solicitud.usuario.email)
         rol_str = rol_obj.nombre if rol_obj else 'Miembro'
-        messages.success(request, f"¡Solicitud aprobada! Se asignó el rol '{rol_str}' a {nombre_str}.")
+
+        # Enviar correo de notificación de aprobación
+        destinatario_email = solicitud.usuario.email
+        if destinatario_email:
+            try:
+                login_url = request.build_absolute_uri(reverse('login'))
+                html_content = render_to_string('emails/solicitud_aprobada_email.html', {
+                    'user': solicitud.usuario,
+                    'nombre': nombre_str,
+                    'colegio': solicitud.colegio,
+                    'rol_nombre': rol_str,
+                    'login_url': login_url,
+                })
+                text_content = f"Hola {nombre_str},\n\nTu solicitud de acceso al colegio {solicitud.colegio.nombre} ha sido APROBADA con el rol de '{rol_str}'.\n\nPuedes ingresar en: {login_url}"
+                msg = EmailMultiAlternatives(
+                    subject=f"[Eduteka] Solicitud Aprobada - {solicitud.colegio.nombre}",
+                    body=text_content,
+                    from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', 'Eduteka <notificaciones@eduteka.cl>'),
+                    to=[destinatario_email],
+                )
+                msg.attach_alternative(html_content, "text/html")
+                msg.send(fail_silently=True)
+            except Exception as e:
+                print(f"Error enviando correo de aprobacion: {e}")
+
+        messages.success(request, f"¡Solicitud aprobada! Se asignó el rol '{rol_str}' a {nombre_str} y se le notificó por correo.")
     else:
         messages.error(request, "No tienes permiso para aprobar esta solicitud.")
     return redirect('dashboard_usuario')
@@ -74,11 +104,41 @@ def aprobar_solicitud(request, solicitud_id):
 def rechazar_solicitud(request, solicitud_id):
     solicitud = get_object_or_404(SolicitudAcceso, id=solicitud_id)
     if request.user == solicitud.colegio.administrador or MiembroColegio.objects.filter(usuario=request.user, colegio=solicitud.colegio, rol__nombre__in=['Administrador', 'Director'], activo=True).exists():
+        motivo = request.POST.get('motivo_rechazo', '').strip()
+        if not motivo:
+            motivo = "No se especificó un motivo adicional."
+
         solicitud.estado = 'rechazada'
-        solicitud.save()
+        solicitud.motivo_rechazo = motivo
+        solicitud.save(update_fields=['estado', 'motivo_rechazo'])
+
         nombre_u = getattr(solicitud.usuario, 'perfil', None)
         nombre_str = nombre_u.nombre_completo if nombre_u else (solicitud.usuario.get_full_name() or solicitud.usuario.email)
-        messages.success(request, f"La solicitud de {nombre_str} fue rechazada.")
+
+        # Enviar correo de notificación de rechazo con el motivo
+        destinatario_email = solicitud.usuario.email
+        if destinatario_email:
+            try:
+                html_content = render_to_string('emails/solicitud_rechazada_email.html', {
+                    'user': solicitud.usuario,
+                    'nombre': nombre_str,
+                    'colegio': solicitud.colegio,
+                    'rol_solicitado': solicitud.rol_solicitado.capitalize(),
+                    'motivo_rechazo': motivo,
+                })
+                text_content = f"Hola {nombre_str},\n\nTu solicitud de vinculacion a {solicitud.colegio.nombre} no ha sido aprobada.\n\nMotivo indicado por la Direccion:\n\"{motivo}\""
+                msg = EmailMultiAlternatives(
+                    subject=f"[Eduteka] Estado de Solicitud de Acceso - {solicitud.colegio.nombre}",
+                    body=text_content,
+                    from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', 'Eduteka <notificaciones@eduteka.cl>'),
+                    to=[destinatario_email],
+                )
+                msg.attach_alternative(html_content, "text/html")
+                msg.send(fail_silently=True)
+            except Exception as e:
+                print(f"Error enviando correo de rechazo: {e}")
+
+        messages.success(request, f"La solicitud de {nombre_str} fue rechazada y se le envió el motivo por correo electrónico.")
     else:
         messages.error(request, "No tienes permiso para rechazar esta solicitud.")
     return redirect('dashboard_usuario')

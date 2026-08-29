@@ -1,0 +1,292 @@
+{% load static colegio_tags %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Horario Semanal - {{ horario_data.nombre_docente }} - {{ colegio.nombre }}</title>
+  
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #7C5CFC;
+      --dark: #1E293B;
+      --bg: #F8FAFC;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: #ECEFF5;
+      color: var(--dark);
+      padding: 2rem 1rem;
+      margin: 0;
+    }
+
+    .doc-nav-bar {
+      max-width: 1040px;
+      margin: 0 auto 1.5rem auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #FFFFFF;
+      padding: 0.85rem 1.5rem;
+      border-radius: 14px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    }
+
+    .timetable-sheet {
+      max-width: 1040px;
+      margin: 0 auto;
+      background: #FFFFFF;
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      padding: 2.75rem;
+      position: relative;
+    }
+
+    .timetable-header {
+      border-bottom: 2px solid #F1F5F9;
+      padding-bottom: 1.5rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .table-schedule {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 2rem;
+    }
+
+    .table-schedule th {
+      background: #1E1B4B;
+      color: #FFFFFF;
+      font-weight: 800;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 0.75rem 0.85rem;
+      border: 1px solid #312E81;
+      text-align: center;
+    }
+
+    .table-schedule th.col-block {
+      background: #0F172A;
+      width: 140px;
+    }
+
+    .table-schedule td {
+      padding: 0.65rem 0.75rem;
+      border: 1px solid #E2E8F0;
+      font-size: 0.82rem;
+      vertical-align: middle;
+      text-align: center;
+    }
+
+    .row-recreo {
+      background: #F8FAFC !important;
+      color: #64748B;
+      font-weight: 700;
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .row-almuerzo {
+      background: #FEF3C7 !important;
+      color: #92400E;
+      font-weight: 800;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .class-slot-card {
+      background: #F5F3FF;
+      border: 1.5px solid #DDD6FE;
+      border-left: 4px solid var(--primary);
+      border-radius: 10px;
+      padding: 0.5rem 0.6rem;
+      text-align: left;
+    }
+
+    .class-slot-title {
+      font-weight: 800;
+      color: #1E1B4B;
+      font-size: 0.84rem;
+      line-height: 1.2;
+    }
+
+    .class-slot-meta {
+      font-size: 0.74rem;
+      color: #6D28D9;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    .signatures-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      margin-top: 3.5rem;
+      padding-top: 1rem;
+    }
+
+    .signature-card {
+      border-top: 1.5px dashed #94A3B8;
+      padding-top: 0.75rem;
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    @media print {
+      body { background: #FFFFFF; padding: 0; }
+      .doc-nav-bar { display: none !important; }
+      .timetable-sheet { box-shadow: none; border: none; padding: 0; max-width: 100%; }
+      @page { size: landscape; margin: 1cm; }
+    }
+
+    @media (max-width: 575.98px) {
+      body { padding: 1rem 0.5rem; }
+      .doc-nav-bar { padding: 0.75rem 1rem; flex-wrap: wrap; gap: 0.5rem; }
+      .timetable-sheet { padding: 1.5rem 1rem; border-radius: 12px; }
+      .signatures-row { grid-template-columns: 1fr; gap: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BARRA DE ACCIÓN SUPERIOR -->
+  <div class="doc-nav-bar">
+    <div class="d-flex align-items-center gap-2">
+      <a href="{% url 'dashboard_usuario' %}" class="btn btn-sm btn-outline-secondary fw-bold px-3 py-1.5" style="border-radius:10px;">
+        <i class="bi bi-arrow-left me-1"></i> Volver al Panel
+      </a>
+      <span class="badge bg-light text-dark border px-2.5 py-1 fw-bold">{{ horario_data.nombre_docente }}</span>
+    </div>
+
+    <button type="button" onclick="window.print()" class="btn btn-primary fw-extrabold px-4 py-2 shadow-sm d-flex align-items-center gap-2" style="background:#7C5CFC; border:none; border-radius:10px;">
+      <i class="bi bi-printer-fill fs-6"></i>
+      <span>Imprimir / Exportar Horario PDF</span>
+    </button>
+  </div>
+
+  <!-- HOJA DE HORARIO SEMANAL -->
+  <div class="timetable-sheet">
+    
+    <!-- ENCABEZADO OFICIAL -->
+    <div class="timetable-header d-flex justify-content-between align-items-start flex-wrap gap-4">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <div class="rounded-3 d-flex align-items-center justify-content-center fw-bold" style="width:40px; height:40px; background:rgba(124,92,252,0.1); color:#7C5CFC; font-size:1.3rem;">
+            🎓
+          </div>
+          <div>
+            <h4 class="fw-extrabold text-dark mb-0 fs-4">{{ colegio.nombre }}</h4>
+            <span class="text-muted extra-small">RBD: <strong>{{ colegio.rbd|default:"En trámite" }}</strong> • {{ colegio.ciudad_comuna|default:"Chile" }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-end">
+        <span class="badge px-3 py-1.5 fw-extrabold rounded-pill mb-1" style="background:linear-gradient(135deg, #7C5CFC 0%, #4F46E5 100%); color:#FFFFFF; font-size:0.8rem;">
+          HORARIO SEMANAL DOCENTE {{ hoy|date:"Y" }}
+        </span>
+        <div class="fw-extrabold fs-5 text-dark">{{ horario_data.nombre_docente }}</div>
+        <span class="text-muted extra-small">Carga: <strong>{{ horario_data.total_horas_semanales }} horas pedagógicas semanales</strong></span>
+      </div>
+    </div>
+
+    <!-- 3 RESUMEN KPIS -->
+    <div class="row g-3 mb-4">
+      <div class="col-4">
+        <div class="p-2.5 bg-light rounded-3 border text-center">
+          <span class="text-muted extra-small text-uppercase fw-bold d-block">Horas Pedagógicas</span>
+          <span class="fs-5 fw-extrabold text-primary d-block">{{ horario_data.total_horas_semanales }} hrs / sem</span>
+        </div>
+      </div>
+      <div class="col-4">
+        <div class="p-2.5 bg-light rounded-3 border text-center">
+          <span class="text-muted extra-small text-uppercase fw-bold d-block">Cursos Asignados</span>
+          <span class="fs-5 fw-extrabold text-dark d-block">{{ horario_data.total_cursos_count }} Seccione{{ horario_data.total_cursos_count|pluralize:"s" }}</span>
+        </div>
+      </div>
+      <div class="col-4">
+        <div class="p-2.5 bg-light rounded-3 border text-center">
+          <span class="text-muted extra-small text-uppercase fw-bold d-block">Jornada Escolar</span>
+          <span class="fs-5 fw-extrabold text-success d-block">Lunes a Viernes</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MATRIZ DE HORARIO SEMANAL -->
+    <div class="table-responsive">
+      <table class="table-schedule">
+        <thead>
+          <tr>
+            <th class="col-block">Bloque / Hora</th>
+            {% for dia_num, dia_nom in horario_data.dias_semana_columnas %}
+              <th>{{ dia_nom }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for fila in horario_data.matriz_semanal %}
+            {% if fila.es_recreo %}
+              <tr class="row-recreo">
+                <td class="fw-extrabold">{{ fila.bloque.hora_inicio|time:"H:i" }} - {{ fila.bloque.hora_fin|time:"H:i" }}</td>
+                <td colspan="5"><i class="bi bi-cup-hot me-1"></i> {{ fila.bloque.nombre }}</td>
+              </tr>
+            {% elif fila.es_almuerzo %}
+              <tr class="row-almuerzo">
+                <td class="fw-extrabold">{{ fila.bloque.hora_inicio|time:"H:i" }} - {{ fila.bloque.hora_fin|time:"H:i" }}</td>
+                <td colspan="5"><i class="bi bi-egg-fried me-1"></i> {{ fila.bloque.nombre }}</td>
+              </tr>
+            {% else %}
+              <tr>
+                <td class="fw-extrabold text-muted small" style="background:#F8FAFC;">
+                  <div class="text-dark fw-bold">{{ fila.bloque.nombre }}</div>
+                  <div class="extra-small font-monospace">{{ fila.bloque.hora_inicio|time:"H:i" }} - {{ fila.bloque.hora_fin|time:"H:i" }}</div>
+                </td>
+                {% for celda in fila.celdas %}
+                  <td>
+                    {% if celda.clase %}
+                      <div class="class-slot-card" style="border-left-color: {{ celda.clase.color|default:'#7C5CFC' }};">
+                        <div class="class-slot-title">{{ celda.clase.asignatura.nombre }}</div>
+                        <div class="class-slot-meta">
+                          <span><i class="bi bi-people-fill me-0.5"></i>{{ celda.clase.seccion.nombre }}</span>
+                          {% if celda.clase.sala %}
+                            <span class="ms-1.5">• <i class="bi bi-geo-alt-fill me-0.5"></i>{{ celda.clase.sala }}</span>
+                          {% endif %}
+                        </div>
+                      </div>
+                    {% else %}
+                      <span class="text-muted extra-small">-</span>
+                    {% endif %}
+                  </td>
+                {% endfor %}
+              </tr>
+            {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- FIRMAS OFICIALES -->
+    <div class="signatures-row">
+      <div class="signature-card">
+        Firma del Docente<br>
+        <span class="text-muted extra-small fw-normal">{{ horario_data.nombre_docente }}</span>
+      </div>
+      <div class="signature-card">
+        Unidad Técnica Pedagógica / Dirección<br>
+        <span class="text-muted extra-small fw-normal">{{ colegio.nombre }}</span>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
     <style>
-        /* ══ DESIGN TOKENS (idénticos al resto del Super Admin) ═══════════════ */
+        
         :root {
             --primary:        #7C5CFC;
             --primary-soft:   rgba(124, 92, 252, 0.08);
@@ -60,7 +60,7 @@
 
         .wrapper { display: flex; width: 100%; align-items: stretch; }
 
-        /* ── TOPBAR */
+        
         .topbar {
             height: 70px;
             background: rgba(255, 255, 255, 0.85) !important;
@@ -94,14 +94,14 @@
         }
         .user-name { font-weight: 600; font-size: .88rem; color: var(--dark); }
 
-        /* ── CONTENT AREA */
+        
         .content-area { padding: 1.75rem 2rem; max-width: 1400px; width: 100%; margin: 0 auto; }
 
-        /* ── HERO */
+        
         .hero-title { font-size: 1.45rem; font-weight: 800; color: var(--dark); letter-spacing: -.02em; }
         .hero-subtitle { font-size: .86rem; color: var(--gray-text); margin-top: .15rem; }
 
-        /* ── BUTTONS */
+        
         .btn-primary-custom {
             background: var(--primary); color: white; border: none;
             border-radius: var(--radius-md); padding: .6rem 1.35rem;
@@ -120,7 +120,7 @@
         }
         .btn-danger-custom:hover { background: #DC2626; color: white; transform: translateY(-1px); }
 
-        /* ── VERTICAL TABS NAV */
+        
         .config-nav {
             background: var(--white); border-radius: var(--radius-lg);
             border: 1px solid var(--border); padding: .75rem;
@@ -148,7 +148,7 @@
         }
         .config-tab-btn.danger-tab.active i { color: #DC2626; }
 
-        /* ── PANEL BOX */
+        
         .panel-box {
             background: var(--white); border-radius: var(--radius-lg);
             border: 1px solid var(--border); padding: 1.75rem;
@@ -161,7 +161,7 @@
         .panel-box-title { font-size: 1.05rem; font-weight: 800; color: var(--dark); margin: 0; }
         .panel-box-desc  { font-size: .82rem; color: var(--gray-text); margin-top: .15rem; }
 
-        /* ── FORM CONTROLS */
+        
         .form-control-custom {
             width: 100%; padding: .6rem .85rem;
             border: 1px solid var(--border); border-radius: var(--radius-md);
@@ -177,7 +177,7 @@
             margin-bottom: .35rem; display: block;
         }
 
-        /* ── FEATURE FLAG CARDS */
+        
         .flag-card {
             background: var(--bg); border: 1px solid var(--border);
             border-radius: var(--radius-md); padding: 1.1rem 1.25rem;
@@ -188,7 +188,7 @@
         .flag-title { font-size: .88rem; font-weight: 700; color: var(--dark); }
         .flag-desc  { font-size: .78rem; color: var(--gray-text); margin-top: .15rem; }
 
-        /* ── DANGER ZONE */
+        
         .danger-panel {
             background: #FFF5F5; border: 1px solid #FCA5A5;
             border-radius: var(--radius-lg); padding: 1.75rem;
@@ -282,7 +282,7 @@
                 <!-- CONTENIDO DE LAS PESTAÑAS (9 Cols en desktop) -->
                 <div class="col-12 col-lg-9">
 
-                    <!-- ═════ PESTAÑA 1: INTEGRACIONES Y APIS (ACTIVA POR DEFECTO) ═════ -->
+                    
                     <div id="tab-integraciones" class="tab-panel">
 
                         <!-- Sección 1: Integración SII -->
@@ -437,8 +437,7 @@
 
                     </div>
 
-
-                    <!-- ═════ PESTAÑA 2: SEGURIDAD Y ACCESOS ═════ -->
+                    
                     <div id="tab-seguridad" class="tab-panel d-none">
                         <div class="panel-box">
                             <div class="panel-box-header">
@@ -526,8 +525,7 @@
                         </div>
                     </div>
 
-
-                    <!-- ═════ PESTAÑA 3: FEATURE FLAGS (CONTROL DE MÓDULOS) ═════ -->
+                    
                     <div id="tab-features" class="tab-panel d-none">
                         <div class="panel-box">
                             <div class="panel-box-header">
@@ -619,8 +617,7 @@
                         </div>
                     </div>
 
-
-                    <!-- ═════ PESTAÑA 4: ESTADO DEL SISTEMA (ÁREA DE PELIGRO) ═════ -->
+                    
                     <div id="tab-sistema" class="tab-panel d-none">
                         <div class="danger-panel mb-4">
                             <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
@@ -698,17 +695,16 @@
     </main>
 </div><!-- /wrapper -->
 
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // ── Mobile sidebar toggle
+    
     document.addEventListener('DOMContentLoaded', () => {
         const btn = document.getElementById('mobileMenuBtn');
         const sb  = document.getElementById('sidebar');
         if (btn && sb) btn.addEventListener('click', () => sb.classList.toggle('active'));
     });
 
-    // ── Navegación por pestañas (Tabs Switching)
+    
     function switchTab(tabId, btn) {
         // Ocultar todos los paneles
         document.querySelectorAll('.tab-panel').forEach(panel => {
@@ -730,13 +726,13 @@
         }
     }
 
-    // ── Guardado de feedback visual
+    
     function handleSaveConfig(e, seccion) {
         e.preventDefault();
         alert('¡Configuración de "' + seccion + '" actualizada correctamente!\nLos cambios han sido aplicados al entorno del sistema.');
     }
 
-    // ── Búsqueda de parámetros
+    
     document.getElementById('configSearch').addEventListener('input', function() {
         const q = this.value.toLowerCase().trim();
         if (!q) return;

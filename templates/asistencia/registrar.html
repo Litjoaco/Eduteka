@@ -68,6 +68,17 @@
       transform: translateY(-2px);
       box-shadow: 0 8px 24px rgba(124, 92, 252, 0.08);
     }
+
+    @media (max-width: 991.98px) {
+      .main-content { margin-left: 0 !important; width: 100% !important; }
+      .topbar { padding: 0.75rem 1rem; height: auto; flex-wrap: wrap; gap: 0.5rem; }
+      .content-body { padding: 1.25rem 1rem; }
+    }
+
+    @media (max-width: 575.98px) {
+      .content-body { padding: 1rem 0.75rem; }
+      .seccion-card-custom { padding: 1.25rem 1rem; }
+    }
   </style>
 </head>
 <body>
@@ -97,9 +108,17 @@
           <h2 class="fw-extrabold text-dark mb-1" style="font-size: 1.6rem;">Registro Diario de Asistencia</h2>
           <p class="text-muted small mb-0">Selecciona el curso o sección para tomar lista y registrar la asistencia de los estudiantes.</p>
         </div>
-        <a href="{% url 'historial_asistencia' %}" class="btn btn-outline-primary fw-bold px-3.5 py-2" style="border-radius: 12px;">
-          <i class="bi bi-clock-history me-1.5"></i> Ver Historial de Asistencia
-        </a>
+        <div class="d-flex gap-2 flex-wrap">
+          <a href="{% url 'asistencia_qr_express' %}" class="btn btn-primary fw-extrabold px-3 py-2 shadow-sm" style="border-radius: 12px; background: linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%); border:none;">
+            <i class="bi bi-lightning-charge-fill me-1.5"></i> Mi Clase Ahora
+          </a>
+          <a href="{% url 'asistencia_qr_carteles' %}" class="btn btn-outline-primary fw-bold px-3 py-2" style="border-radius: 12px;">
+            <i class="bi bi-qr-code-scan me-1.5"></i> Carteles QR de Salas
+          </a>
+          <a href="{% url 'historial_asistencia' %}" class="btn btn-outline-secondary fw-bold px-3 py-2" style="border-radius: 12px;">
+            <i class="bi bi-clock-history me-1.5"></i> Historial
+          </a>
+        </div>
       </div>
 
       <!-- FORMULARIO DE FECHA -->
@@ -171,12 +190,16 @@
     window.location.href = `/asistencia/registrar/${seccionId}/?fecha=${fecha}`;
   }
 
-
   document.addEventListener("DOMContentLoaded", function() {
     const mobileBtn = document.getElementById('mobileMenuBtn');
-    const sidebar = document.getElementById('sidebar');
     if (mobileBtn) {
-      mobileBtn.addEventListener('click', () => sidebar.classList.toggle('active'));
+      mobileBtn.addEventListener('click', () => {
+        if (typeof window.toggleSidebarMobile === 'function') {
+          window.toggleSidebarMobile();
+        } else {
+          document.getElementById('sidebar')?.classList.toggle('open');
+        }
+      });
     }
   });
 </script>

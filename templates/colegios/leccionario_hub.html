@@ -1,0 +1,531 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leccionario Digital - {{ colegio.nombre|default:'Eduteka' }}</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #7C5CFC;
+      --primary-soft: rgba(124, 92, 252, 0.08);
+      --primary-hover: #6747E3;
+      --secondary: #65CDBF;
+      --bg: #F8F9FD;
+      --white: #FFFFFF;
+      --dark: #151A35;
+      --gray-text: #687089;
+      --border: #E2E8F0;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+    }
+    * { font-family: 'Plus Jakarta Sans', sans-serif; box-sizing: border-box; }
+    body { background-color: var(--bg); color: var(--dark); min-height: 100vh; margin: 0; }
+    
+    .wrapper { display: flex; min-height: 100vh; position: relative; }
+    .main-content {
+      flex: 1;
+      margin-left: 248px;
+      transition: margin-left 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    body.sidebar-collapsed .main-content {
+      margin-left: 72px;
+    }
+    @media (max-width: 991.98px) {
+      .main-content {
+        margin-left: 0 !important;
+      }
+    }
+
+    .content-body { padding: 2rem 2.25rem; max-width: 1440px; margin: 0 auto; width: 100%; }
+
+    /* Topbar */
+    .topbar {
+      height: 72px;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2.25rem; position: sticky; top: 0; z-index: 90;
+    }
+
+    .hero-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem 2rem;
+      margin-bottom: 1.75rem;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.025);
+    }
+
+    .class-sign-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.02);
+    }
+    .class-sign-card:hover {
+      border-color: #CBD5E1;
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(124, 92, 252, 0.08);
+    }
+
+    .status-badge-soft {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 0.28rem 0.65rem;
+      border-radius: 20px;
+    }
+    .status-badge-soft.signed {
+      background: #ECFDF5;
+      color: #059669;
+      border: 1px solid #A7F3D0;
+    }
+    .status-badge-soft.pending {
+      background: #FFFBEB;
+      color: #D97706;
+      border: 1px solid #FDE68A;
+    }
+
+    .hash-badge {
+      font-family: 'JetBrains Mono', monospace;
+      background: #F8FAFC;
+      color: #64748B;
+      padding: 0.25rem 0.55rem;
+      border-radius: 8px;
+      font-size: 0.72rem;
+      border: 1px solid #E2E8F0;
+      display: inline-block;
+    }
+
+    .table-panel-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+    }
+
+    .table-custom-lecc {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+    .table-custom-lecc th {
+      background: #F8FAFC;
+      color: #64748B;
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      padding: 1rem 1.25rem;
+      border-bottom: 1.5px solid var(--border);
+    }
+    .table-custom-lecc td {
+      padding: 1.1rem 1.25rem;
+      vertical-align: middle;
+      border-bottom: 1px solid #F1F5F9;
+      font-size: 0.86rem;
+    }
+    .table-custom-lecc tr:hover td {
+      background: #F8FAFC;
+    }
+    .table-custom-lecc tr:last-child td {
+      border-bottom: none;
+    }
+
+    @media (max-width: 991.98px) {
+      .main-content { margin-left: 0 !important; width: 100% !important; }
+      .topbar { padding: 0.75rem 1rem; height: auto; flex-wrap: wrap; gap: 0.5rem; }
+      .content-body { padding: 1.25rem 1rem; }
+      .hero-lecc { padding: 1.5rem 1.25rem; }
+    }
+
+    @media (max-width: 575.98px) {
+      .content-body { padding: 1rem 0.75rem; }
+      .stat-lecc-card { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="wrapper">
+  {% include 'colegios/_sidebar.html' with active_page='leccionario' %}
+
+  <div class="main-content">
+    
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-sm d-lg-none" id="mobileMenuBtn" style="border:none; background:var(--primary-soft); color:var(--primary); width:38px; height:38px; border-radius:10px;">
+          <i class="bi bi-list fs-5"></i>
+        </button>
+        <div class="d-flex align-items-center gap-3">
+          <div class="rounded-3 d-flex align-items-center justify-content-center shadow-sm" style="width:42px; height:42px; background:linear-gradient(135deg, #EDE9FE 0%, #E0E7FF 100%); color:#7C5CFC; font-size:1.25rem; border:1px solid #DDD6FE;">
+            <i class="bi bi-journal-check"></i>
+          </div>
+          <div>
+            <span class="fw-extrabold text-dark fs-6 d-block lh-1 mb-0.5">Leccionario Digital de Clases</span>
+            <span class="text-muted extra-small">Registro diario y firma electrónica fiscalizable</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex align-items-center gap-2">
+        <a href="{% url 'planificaciones_hub' %}" class="btn btn-sm btn-outline-primary fw-bold px-3 py-2 d-flex align-items-center gap-1.5" style="border-radius:12px; font-size:0.82rem;">
+          <i class="bi bi-card-checklist"></i>
+          <span>Planificaciones Curriculares</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- BODY -->
+    <main class="content-body">
+      
+      <!-- HERO RESUMEN DE CUMPLIMIENTO -->
+      <div class="hero-card">
+        <div class="d-flex justify-content-between align-items-start align-items-lg-center flex-column flex-lg-row gap-3">
+          <div>
+            <div class="d-flex align-items-center gap-2 mb-1.5 flex-wrap">
+              <h2 class="fw-extrabold text-dark fs-5 mb-0">Control de Leccionario del Día</h2>
+              <span class="badge bg-light text-dark border px-2.5 py-1 fw-bold" style="font-size:0.78rem; border-radius:8px;">
+                <i class="bi bi-calendar3 text-primary me-1"></i>{{ fecha_filtro|date:"l, d \d\e F \d\e Y"|title }}
+              </span>
+            </div>
+            <p class="text-muted small mb-0">
+              Registra los Objetivos de Aprendizaje (OA), contenidos tratados y sella cada bloque pedagógico con tu PIN de seguridad.
+            </p>
+          </div>
+
+          <!-- Semáforo de Cumplimiento -->
+          <div class="d-flex align-items-center gap-3.5 bg-light p-3 px-4 rounded-4 border shadow-sm">
+            <div>
+              <div class="extra-small text-muted fw-bold text-uppercase" style="letter-spacing:0.5px;">Cumplimiento Jornada</div>
+              <div class="fs-5 fw-extrabold text-dark lh-1 mt-0.5">{{ firmados_count }} de {{ total_clases_dia }} Firmadas</div>
+            </div>
+            <div class="rounded-circle d-flex align-items-center justify-content-center fw-extrabold shadow-sm" style="width:48px; height:48px; background:linear-gradient(135deg, #7C5CFC 0%, #4F46E5 100%); color:#FFFFFF; font-size:0.9rem;">
+              {{ pct_cumplimiento }}%
+            </div>
+          </div>
+        </div>
+
+        <!-- FILTROS DE FECHA Y CURSO -->
+        <form method="GET" class="row g-2.5 mt-3 pt-3 border-top">
+          <div class="col-md-3">
+            <label class="form-label extra-small fw-extrabold text-muted text-uppercase mb-1">Fecha de Clase</label>
+            <input type="date" name="fecha" value="{{ fecha_filtro|date:'Y-m-d' }}" class="form-control form-control-sm fw-bold" onchange="this.form.submit();" style="border-radius:10px;">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label extra-small fw-extrabold text-muted text-uppercase mb-1">Curso / Sección</label>
+            <select name="seccion_id" class="form-select form-select-sm fw-semibold" onchange="this.form.submit();" style="border-radius:10px;">
+              <option value="">Todos los Cursos</option>
+              {% for s in secciones_colegio %}
+                <option value="{{ s.id }}" {% if seccion_id_filtro == s.id %}selected{% endif %}>{{ s.nombre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label extra-small fw-extrabold text-muted text-uppercase mb-1">Asignatura</label>
+            <select name="asignatura_id" class="form-select form-select-sm fw-semibold" onchange="this.form.submit();" style="border-radius:10px;">
+              <option value="">Todas las Asignaturas</option>
+              {% for a in asignaturas_colegio %}
+                <option value="{{ a.id }}" {% if asignatura_id_filtro == a.id %}selected{% endif %}>{{ a.nombre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          {% if is_admin %}
+          <div class="col-md-3">
+            <label class="form-label extra-small fw-extrabold text-muted text-uppercase mb-1">Docente</label>
+            <select name="docente_id" class="form-select form-select-sm fw-semibold" onchange="this.form.submit();" style="border-radius:10px;">
+              <option value="">Todos los Docentes</option>
+              {% for d in docentes_colegio %}
+                <option value="{{ d.id }}" {% if docente_id_filtro == d.id %}selected{% endif %}>{{ d.get_full_name|default:d.username }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          {% endif %}
+        </form>
+      </div>
+
+      <!-- VISTA 1: CLASES PROGRAMADAS PARA HOY CON BOTÓN DE FIRMA DIRECTO -->
+      <div class="mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h3 class="fw-extrabold text-dark fs-6 mb-0">
+            <i class="bi bi-clock-history text-primary me-1.5"></i> Bloques de Clase de la Jornada
+          </h3>
+          <span class="badge bg-light text-dark border px-2.5 py-1 fw-bold" style="font-size:0.75rem;">{{ clases_con_leccionario|length }} Bloques Programados</span>
+        </div>
+
+        <div class="row g-3.5">
+          {% for item in clases_con_leccionario %}
+            <div class="col-md-6 col-xl-4">
+              <div class="class-sign-card h-100" style="border-left: 4px solid {% if item.firmado %}#10B981{% else %}#F59E0B{% endif %};">
+                <div>
+                  <div class="d-flex justify-content-between align-items-center mb-2.5">
+                    <span class="fw-bold font-monospace text-dark" style="font-size:0.92rem;">
+                      {{ item.clase.bloque.hora_inicio|time:"H:i" }} — {{ item.clase.bloque.hora_fin|time:"H:i" }}
+                    </span>
+                    {% if item.firmado %}
+                      <span class="status-badge-soft signed">
+                        <i class="bi bi-check-circle-fill"></i> Firmado
+                      </span>
+                    {% else %}
+                      <span class="status-badge-soft pending">
+                        <i class="bi bi-exclamation-circle-fill"></i> Pendiente
+                      </span>
+                    {% endif %}
+                  </div>
+
+                  <h4 class="fw-extrabold text-dark mb-1.5" style="font-size:1.15rem; line-height:1.3;">{{ item.clase.asignatura.nombre }}</h4>
+                  <div class="d-flex align-items-center gap-2 text-muted small mb-3 flex-wrap">
+                    <span class="badge bg-purple-subtle text-primary border-0 px-2.5 py-1 fw-bold" style="background:#EDE9FE; color:#6D28D9; border-radius:8px;">{{ item.clase.seccion.nombre }}</span>
+                    {% if item.clase.sala %}
+                      <span class="badge bg-light text-secondary border px-2 py-1 fw-semibold" style="border-radius:8px;">
+                        <i class="bi bi-geo-alt-fill text-muted me-0.5"></i>Sala {{ item.clase.sala }}
+                      </span>
+                    {% endif %}
+                  </div>
+
+                  {% if item.leccionario %}
+                    <div class="p-3 bg-light rounded-3 mb-3 border extra-small">
+                      {% if item.leccionario.oa_codigo %}
+                        <span class="badge bg-primary text-white fw-bold mb-1.5" style="border-radius:6px;">{{ item.leccionario.oa_codigo }}</span>
+                      {% endif %}
+                      <p class="mb-1.5 text-dark fw-medium text-truncate-2" style="line-height:1.4;">{{ item.leccionario.contenido_tratado }}</p>
+                      {% if item.leccionario.hash_firma %}
+                        <div class="hash-badge text-truncate mt-1" title="{{ item.leccionario.hash_firma }}">
+                          <i class="bi bi-shield-check text-success me-0.5"></i> Hash: {{ item.leccionario.hash_firma|slice:":16" }}...
+                        </div>
+                      {% endif %}
+                    </div>
+                  {% endif %}
+                </div>
+
+                <div class="pt-3 border-top">
+                  <button type="button" class="btn btn-sm {% if item.firmado %}btn-light border text-dark{% else %}btn-primary text-white{% endif %} fw-extrabold w-100 py-2.5 d-flex align-items-center justify-content-center gap-2" style="border-radius:12px; font-size:0.85rem; {% if not item.firmado %}background:linear-gradient(135deg, #7C5CFC 0%, #4F46E5 100%); border:none; box-shadow:0 4px 14px rgba(124,92,252,0.25);{% endif %}" onclick="abrirModalFirmarLeccionario('{{ item.clase.seccion.id }}', '{{ item.clase.asignatura.id }}', '{{ item.clase.bloque.id }}', '{{ item.clase.id }}', '{{ item.clase.asignatura.nombre }}', '{{ item.clase.seccion.nombre }}', '{{ item.clase.bloque.nombre }}', '{{ item.leccionario.id|default:'' }}', '{{ item.leccionario.oa_codigo|default:'' }}', `{{ item.leccionario.contenido_tratado|default:''|escapejs }}`, '{{ item.leccionario.actividad_tipo|default:'catedra' }}', `{{ item.leccionario.observaciones|default:''|escapejs }}`)">
+                    <i class="bi bi-pen-fill"></i>
+                    <span>{% if item.firmado %}Editar / Refirmar Leccionario{% else %}Registrar y Firmar Leccionario{% endif %}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          {% empty %}
+            <div class="col-12">
+              <div class="p-4 p-md-5 bg-white rounded-4 text-center border">
+                <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2.5" style="width:52px; height:52px; background:#F1F5F9; color:#64748B; font-size:1.4rem;">
+                  ☕
+                </div>
+                <h5 class="fw-extrabold text-dark fs-6 mb-1">No hay clases programadas en el horario para esta fecha</h5>
+                <p class="text-muted extra-small mb-0">Selecciona otra fecha o ajusta los filtros superiores para auditar registros históricos.</p>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- VISTA 2: LIBRO DE LECCIONARIOS FISCALIZABLE -->
+      <div class="table-panel-card mb-4">
+        <div class="card-header bg-white p-3.5 px-4 border-bottom d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-journal-text text-primary fs-5"></i>
+            <span class="fw-extrabold text-dark fs-6">Libro de Clases y Leccionarios Registrados</span>
+          </div>
+          <span class="badge bg-light text-dark border px-2.5 py-1 fw-bold" style="font-size:0.75rem;">{{ leccionarios|length }} Registro{{ leccionarios|length|pluralize:"s" }}</span>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table-custom-lecc mb-0">
+            <thead>
+              <tr>
+                <th>Fecha & Bloque</th>
+                <th>Curso & Asignatura</th>
+                <th>Docente</th>
+                <th>Contenido & OA</th>
+                <th>Tipo de Actividad</th>
+                <th>Estado & Sello</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for l in leccionarios %}
+                <tr>
+                  <td>
+                    <div class="fw-extrabold text-dark">{{ l.fecha|date:"d/m/Y" }}</div>
+                    <div class="text-muted extra-small">{{ l.bloque.nombre|default:'Bloque de Clase' }}</div>
+                  </td>
+                  <td>
+                    <div class="fw-bold text-dark">{{ l.asignatura.nombre }}</div>
+                    <span class="badge bg-purple-subtle text-primary fw-bold" style="background:#EDE9FE; color:#6D28D9; font-size:0.72rem; border-radius:6px;">{{ l.seccion.nombre }}</span>
+                  </td>
+                  <td>
+                    <div class="fw-semibold text-dark">{{ l.docente.get_full_name|default:l.docente.username }}</div>
+                  </td>
+                  <td style="max-width: 320px;">
+                    {% if l.oa_codigo %}
+                      <span class="badge bg-light text-dark border fw-bold me-1">{{ l.oa_codigo }}</span>
+                    {% endif %}
+                    <span class="text-dark">{{ l.contenido_tratado }}</span>
+                    {% if l.observaciones %}
+                      <div class="text-muted extra-small mt-1 fst-italic">Obs: {{ l.observaciones }}</div>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <span class="badge bg-light text-secondary border fw-medium px-2 py-1" style="border-radius:6px;">{{ l.get_actividad_tipo_display }}</span>
+                  </td>
+                  <td>
+                    {% if l.firmado %}
+                      <div class="text-success fw-bold extra-small mb-1">
+                        <i class="bi bi-check-circle-fill me-1"></i> Firmado ({{ l.fecha_firma|time:"H:i" }})
+                      </div>
+                      {% if l.hash_firma %}
+                        <div class="hash-badge" title="{{ l.hash_firma }}">
+                          {{ l.hash_firma|slice:":12" }}...
+                        </div>
+                      {% endif %}
+                    {% else %}
+                      <span class="badge bg-warning-subtle text-warning fw-bold">Sin Firmar</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="6" class="text-center py-5 text-muted">
+                    <i class="bi bi-inbox fs-3 d-block mb-1 text-muted"></i>
+                    No se encontraron registros de leccionario para los filtros aplicados.
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<div class="modal fade" id="modalFirmarLeccionario" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 540px;">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 22px; overflow: hidden;">
+      
+      <div class="p-4 text-white" style="background: linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #4F46E5 100%);">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="badge bg-white text-primary fw-extrabold px-2.5 py-1 rounded-pill" style="font-size:0.75rem;">
+            Registro Oficial MINEDUC
+          </span>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <h4 class="fw-extrabold mb-1 fs-5 text-white" id="modalLeccTitulo">Firmar Leccionario de Clase</h4>
+        <p class="mb-0 text-white-50 extra-small" id="modalLeccSubtitulo">Ingresa los contenidos pedagógicos tratados y valida con tu firma electrónica.</p>
+      </div>
+
+      <form method="POST" action="{% url 'guardar_firma_leccionario' %}" id="formFirmarLeccionario">
+        {% csrf_token %}
+        <input type="hidden" name="leccionario_id" id="inputLeccId">
+        <input type="hidden" name="seccion_id" id="inputLeccSeccionId">
+        <input type="hidden" name="asignatura_id" id="inputLeccAsignaturaId">
+        <input type="hidden" name="bloque_id" id="inputLeccBloqueId">
+        <input type="hidden" name="horario_clase_id" id="inputLeccHorarioId">
+        <input type="hidden" name="fecha" value="{{ fecha_filtro|date:'Y-m-d' }}">
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+
+        <div class="modal-body p-4">
+          <div class="mb-3">
+            <label class="form-label fw-bold text-dark small">Objetivo de Aprendizaje (OA)</label>
+            <input type="text" name="oa_codigo" id="inputLeccOa" class="form-control" placeholder="Ej: OA 04, OA 08 (Bases Curriculares)" style="border-radius:10px;">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold text-dark small">Contenido Tratado & Actividad <span class="text-danger">*</span></label>
+            <textarea name="contenido_tratado" id="inputLeccContenido" rows="3" class="form-control" placeholder="Describe detalladamente los contenidos, páginas o ejercicios vistos durante el bloque de clases..." style="border-radius:10px;" required></textarea>
+          </div>
+
+          <div class="row g-2.5 mb-3">
+            <div class="col-6">
+              <label class="form-label fw-bold text-dark small">Tipo de Actividad</label>
+              <select name="actividad_tipo" id="inputLeccTipo" class="form-select" style="border-radius:10px;">
+                <option value="catedra">Clase Expositiva</option>
+                <option value="grupal">Trabajo Grupal</option>
+                <option value="laboratorio">Laboratorio / Práctico</option>
+                <option value="evaluacion">Evaluación / Prueba</option>
+                <option value="taller">Taller de Ejercitación</option>
+                <option value="salida">Salida a Terreno</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-bold text-dark small">Observaciones / Incidentes</label>
+              <input type="text" name="observaciones" id="inputLeccObs" class="form-control" placeholder="Ej: Clase adelantada, etc." style="border-radius:10px;">
+            </div>
+          </div>
+
+          <div class="p-3 bg-light rounded-3 border d-flex align-items-center gap-2.5">
+            <i class="bi bi-shield-lock-fill text-primary fs-4"></i>
+            <div class="extra-small text-muted">
+              Al guardar, se generará un <strong class="text-dark">Sello Criptográfico SHA-256</strong> con tu usuario, fecha y hora oficial de cierre de bloque.
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer border-top p-3 px-4 bg-white">
+          <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal" style="border-radius:10px;">Cancelar</button>
+          <button type="submit" class="btn btn-primary fw-extrabold px-4" style="border-radius:10px; background:linear-gradient(135deg, #7C5CFC 0%, #4F46E5 100%); border:none; box-shadow:0 4px 14px rgba(124,92,252,0.25);">
+            <i class="bi bi-check2-circle me-1"></i> Firmar y Guardar
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  function abrirModalFirmarLeccionario(seccionId, asigId, bloqueId, horarioId, asigNom, seccNom, bloqueNom, leccId, oa, contenido, tipo, obs) {
+    document.getElementById('inputLeccId').value = leccId || '';
+    document.getElementById('inputLeccSeccionId').value = seccionId;
+    document.getElementById('inputLeccAsignaturaId').value = asigId;
+    document.getElementById('inputLeccBloqueId').value = bloqueId;
+    document.getElementById('inputLeccHorarioId').value = horarioId;
+    
+    document.getElementById('modalLeccTitulo').innerText = `Leccionario: ${asigNom}`;
+    document.getElementById('modalLeccSubtitulo').innerText = `${seccNom} • ${bloqueNom}`;
+    
+    document.getElementById('inputLeccOa').value = oa || '';
+    document.getElementById('inputLeccContenido').value = contenido || '';
+    document.getElementById('inputLeccTipo').value = tipo || 'catedra';
+    document.getElementById('inputLeccObs').value = obs || '';
+
+    const modal = new bootstrap.Modal(document.getElementById('modalFirmarLeccionario'));
+    modal.show();
+  }
+
+  document.getElementById('mobileMenuBtn')?.addEventListener('click', function() {
+    if (typeof window.toggleSidebarMobile === 'function') {
+      window.toggleSidebarMobile();
+    } else {
+      document.getElementById('sidebar')?.classList.toggle('open');
+    }
+  });
+</script>
+
+{% include 'colegios/_modal_pin_firma.html' %}
+</body>
+</html>

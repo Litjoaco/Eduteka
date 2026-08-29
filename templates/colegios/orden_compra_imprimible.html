@@ -1,0 +1,340 @@
+{% load static colegio_tags %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orden de Compra {{ proceso.numero_orden_compra }} - {{ colegio.nombre }} - Eduteka</title>
+
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #7C5CFC;
+      --primary-soft: rgba(124, 92, 252, 0.08);
+      --primary-hover: #6747E3;
+      --secondary: #65CDBF;
+      --bg: #F8F9FD;
+      --white: #FFFFFF;
+      --dark: #151A35;
+      --gray-text: #687089;
+      --border: #E2E8F0;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+    }
+
+    * { font-family: 'Plus Jakarta Sans', sans-serif; box-sizing: border-box; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--dark);
+      margin: 0;
+      padding: 1.5rem 1rem 3rem;
+      min-height: 100vh;
+    }
+
+    /* EDUTEKA TOP NAVIGATION BAR FOR DOCUMENTS */
+    .doc-nav-bar {
+      max-width: 900px;
+      margin: 0 auto 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--white);
+      padding: 0.85rem 1.5rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.03);
+    }
+
+    /* OFFICIAL DOCUMENT SHEET */
+    .oc-sheet {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--white);
+      padding: 3rem 3.5rem;
+      border-radius: var(--radius-lg);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .oc-sheet::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, #7C5CFC 0%, #6344CE 50%, #4F46E5 100%);
+    }
+
+    .oc-header-banner {
+      border-bottom: 2px solid #F1F5F9;
+      padding-bottom: 1.75rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .oc-badge-title {
+      background: linear-gradient(135deg, #7C5CFC 0%, #4F46E5 100%);
+      color: #FFFFFF;
+      padding: 0.5rem 1.25rem;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 1.1rem;
+      letter-spacing: 0.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 4px 12px rgba(124, 92, 252, 0.25);
+    }
+
+    .info-card-oc {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: var(--radius-md);
+      padding: 1.25rem 1.5rem;
+      height: 100%;
+    }
+
+    .table-oc {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin: 1.5rem 0;
+    }
+    .table-oc th {
+      background: #F8FAFC;
+      color: #64748B;
+      font-weight: 800;
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 0.85rem 1rem;
+      border-top: 1px solid #E2E8F0;
+      border-bottom: 2px solid var(--primary);
+    }
+    .table-oc td {
+      padding: 0.9rem 1rem;
+      border-bottom: 1px solid #F1F5F9;
+      font-size: 0.88rem;
+    }
+
+    .signatures-container {
+      margin-top: 3.5rem;
+      padding-top: 1rem;
+      display: flex;
+      justify-content: space-around;
+      text-align: center;
+    }
+    .sig-block {
+      width: 250px;
+      border-top: 1.5px solid var(--dark);
+      padding-top: 0.5rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--dark);
+    }
+
+    .legal-footer-box {
+      margin-top: 2rem;
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius-sm);
+      padding: 1rem 1.25rem;
+      font-size: 0.78rem;
+      color: #475569;
+      line-height: 1.5;
+    }
+
+    @media print {
+      body { background: #FFFFFF; padding: 0; }
+      .oc-sheet { box-shadow: none; border: none; padding: 0; max-width: 100%; }
+      .doc-nav-bar { display: none !important; }
+    }
+
+    @media (max-width: 575.98px) {
+      body { padding: 1rem 0.5rem; }
+      .doc-nav-bar { padding: 0.75rem 1rem; flex-wrap: wrap; gap: 0.5rem; }
+      .oc-sheet { padding: 1.5rem 1rem; border-radius: 12px; }
+      .signatures-container { flex-direction: column; gap: 2rem; align-items: center; }
+      .sig-block { width: 80%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- EDUTEKA TOP NAVIGATION BAR -->
+  <div class="doc-nav-bar">
+    <div class="d-flex align-items-center gap-3">
+      <a href="{% url 'detalle_proceso_compra' proceso.id %}" class="btn btn-sm btn-outline-secondary fw-bold px-3 py-1.5" style="border-radius:10px;">
+        <i class="bi bi-arrow-left me-1"></i> Volver al Proceso
+      </a>
+      <span class="text-muted small">|</span>
+      <span class="badge bg-light text-dark border px-2.5 py-1 fw-bold">{{ proceso.codigo }}</span>
+    </div>
+
+    <div class="d-flex align-items-center gap-2">
+      <button type="button" onclick="window.print()" class="btn btn-primary fw-extrabold px-4 py-2 shadow-sm d-flex align-items-center gap-2" style="background:#7C5CFC; border:none; border-radius:10px;">
+        <i class="bi bi-printer-fill fs-6"></i>
+        <span>Imprimir / Exportar PDF</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- OFFICIAL PURCHASE ORDER DOCUMENT -->
+  <div class="oc-sheet">
+    
+    <!-- HEADER -->
+    <div class="oc-header-banner d-flex justify-content-between align-items-start flex-wrap gap-4">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <div class="rounded-3 d-flex align-items-center justify-content-center fw-bold" style="width:36px; height:36px; background:rgba(124,92,252,0.1); color:#7C5CFC;">
+            <i class="bi bi-building"></i>
+          </div>
+          <h4 class="fw-extrabold text-dark mb-0 fs-4">{{ colegio.nombre }}</h4>
+        </div>
+        <div class="text-muted small mt-1">
+          <span>RBD: <strong>{{ colegio.rbd|default:"En trámite" }}</strong></span>
+          <span class="mx-2">•</span>
+          <span>RUT Sostenedor: <strong>{{ colegio.rut_sostenedor|default:colegio.administrador.username }}</strong></span>
+        </div>
+        <div class="text-muted small">
+          <span>{{ colegio.direccion|default:"Chile" }}{% if colegio.comuna %}, {{ colegio.comuna }}{% endif %}</span>
+          <span class="mx-2">•</span>
+          <span>Contacto: {{ colegio.administrador.email }}</span>
+        </div>
+      </div>
+
+      <div class="text-end">
+        <div class="oc-badge-title mb-1">
+          <i class="bi bi-receipt"></i> ORDEN DE COMPRA
+        </div>
+        <div class="fw-extrabold fs-5 text-primary">{{ proceso.numero_orden_compra }}</div>
+        <span class="text-muted extra-small">Fecha de Emisión: <strong>{{ proceso.fecha_emision_oc|date:"d/m/Y"|default:hoy|date:"d/m/Y" }}</strong></span>
+      </div>
+    </div>
+
+    <!-- 2 CARDS: PROVEEDOR ADJUDICADO & CONDICIONES -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-6">
+        <div class="info-card-oc">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="badge px-2 py-1 fw-bold" style="background:rgba(124,92,252,0.12); color:#7C5CFC; border-radius:6px; font-size:0.72rem; text-transform:uppercase;">
+              Proveedor Adjudicado
+            </span>
+          </div>
+          <h6 class="fw-extrabold text-dark mb-1 fs-6">{{ proveedor.nombre }}</h6>
+          <div class="text-muted small">RUT: <strong class="text-dark">{{ proveedor.rut|default:"-" }}</strong></div>
+          <div class="text-muted small">Contacto: {{ proveedor.contacto_nombre|default:"Atención a Clientes" }}</div>
+          <div class="text-muted small">Teléfono / WhatsApp: {{ proveedor.telefono|default:"-" }}</div>
+          <div class="text-muted small">Email: {{ proveedor.email|default:"-" }}</div>
+          <div class="text-muted small mt-1">Cotización Ref.: <strong class="text-primary">{{ cotizacion.numero_cotizacion_proveedor|default:"S/N" }}</strong></div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="info-card-oc">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="badge px-2 py-1 fw-bold" style="background:rgba(16,185,129,0.12); color:#059669; border-radius:6px; font-size:0.72rem; text-transform:uppercase;">
+              Financiamiento & Despacho
+            </span>
+          </div>
+          <div class="small mb-1">Requerimiento: <strong class="text-dark">{{ proceso.codigo }}</strong></div>
+          <div class="small mb-1">Fondo / Glosa: <strong class="text-dark">{{ proceso.get_tipo_fondo_display }}</strong></div>
+          {% if proceso.centro_costo %}<div class="small mb-1 text-muted">Centro de Costo: <strong class="text-dark">{{ proceso.centro_costo }}</strong></div>{% endif %}
+          <div class="small mb-1 text-muted">Plazo de Entrega: <strong class="text-dark">{{ cotizacion.plazo_entrega_dias }} días hábiles</strong></div>
+          <div class="small mb-1 text-muted">Forma de Pago: <strong class="text-dark">{{ cotizacion.condiciones_pago }}</strong></div>
+          <div class="small text-muted">Lugar de Entrega: <strong class="text-dark">{{ colegio.direccion|default:"Dependencias del Establecimiento" }}</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ASUNTO -->
+    <div class="p-3 bg-light rounded-3 border mb-4 small">
+      <span class="text-muted extra-small text-uppercase fw-extrabold d-block mb-0.5 text-primary">Asunto / Destino de la Compra</span>
+      <strong class="text-dark fs-6">{{ proceso.titulo }}</strong>
+      {% if proceso.descripcion %}<div class="text-muted mt-1">{{ proceso.descripcion }}</div>{% endif %}
+    </div>
+
+    <!-- ITEMS TABLE -->
+    <table class="table-oc">
+      <thead>
+        <tr>
+          <th style="width: 45px;" class="text-center">#</th>
+          <th>Descripción del Producto / Insumo</th>
+          <th class="text-center" style="width: 110px;">Cantidad</th>
+          <th class="text-center" style="width: 110px;">Unidad</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for it in items %}
+        <tr>
+          <td class="text-center text-muted fw-bold">{{ forloop.counter }}</td>
+          <td>
+            <strong class="text-dark">{{ it.descripcion }}</strong>
+            {% if it.especificaciones_tecnicas %}
+              <div class="extra-small text-muted mt-0.5">{{ it.especificaciones_tecnicas }}</div>
+            {% endif %}
+          </td>
+          <td class="text-center fw-extrabold text-dark">{{ it.cantidad }}</td>
+          <td class="text-center text-muted">{{ it.unidad_medida }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- TOTALS SECTION -->
+    <div class="row justify-content-end mb-4">
+      <div class="col-md-5 col-8">
+        <div class="p-3.5 bg-light rounded-3 border">
+          <div class="d-flex justify-content-between text-muted small mb-1.5">
+            <span>Monto Neto:</span>
+            <span class="fw-bold text-dark">{{ cotizacion.monto_neto|formato_pesos }}</span>
+          </div>
+          <div class="d-flex justify-content-between text-muted small mb-1.5">
+            <span>IVA (19%):</span>
+            <span class="fw-bold text-dark">{{ cotizacion.iva|formato_pesos }}</span>
+          </div>
+          {% if cotizacion.costo_despacho > 0 %}
+          <div class="d-flex justify-content-between text-muted small mb-1.5">
+            <span>Costo Despacho:</span>
+            <span class="fw-bold text-dark">{{ cotizacion.costo_despacho|formato_pesos }}</span>
+          </div>
+          {% endif %}
+          <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+            <span class="fw-extrabold text-dark fs-6">TOTAL COMPRA:</span>
+            <span class="fw-extrabold fs-4 text-primary">{{ cotizacion.monto_total|formato_pesos }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LEGAL COMPLIANCE SUPEREDUC -->
+    <div class="legal-footer-box">
+      <div class="fw-extrabold text-dark mb-1"><i class="bi bi-shield-check text-success me-1"></i> Respaldo Normativo & Justificación Legal</div>
+      <div><strong>Criterio de Selección:</strong> {{ proceso.justificacion_adjudicacion }}</div>
+      <div class="mt-1 extra-small opacity-75">
+        Esta Orden de Compra cumple estrictamente con el marco normativo de la <strong>Circular N° 30 de la Superintendencia de Educación</strong>, contando con un expediente digital verificado de 3 cotizaciones comparables archivadas en el sistema institucional Eduteka.
+      </div>
+    </div>
+
+    <!-- FORMAL SIGNATURES -->
+    <div class="signatures-container">
+      <div class="sig-block">
+        Firma / Timbre Dirección o Sostenedor<br>
+        <span class="text-muted extra-small fw-normal">{{ colegio.nombre_administrador|default:colegio.administrador.get_full_name|default:"Dirección del Establecimiento" }}</span>
+      </div>
+      <div class="sig-block">
+        Recepción Conforme Proveedor<br>
+        <span class="text-muted extra-small fw-normal">{{ proveedor.nombre }}</span>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

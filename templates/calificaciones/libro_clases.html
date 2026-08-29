@@ -41,6 +41,31 @@
 
     .wrapper { display: flex; flex: 1; position: relative; }
 
+    .main-content {
+      flex: 1;
+      margin-left: 248px;
+      transition: margin-left 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      background: var(--bg);
+    }
+    body.sidebar-collapsed .main-content {
+      margin-left: 72px;
+    }
+    @media (max-width: 991.98px) {
+      .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+      }
+      .topbar {
+        padding: 0 1.25rem !important;
+      }
+      .content-body {
+        padding: 1.25rem 1rem !important;
+      }
+    }
+
     .topbar {
       height: 70px;
       background: rgba(255, 255, 255, 0.85) !important;
@@ -541,38 +566,60 @@
     }
   });
 
-  // Guardado asíncrono en tiempo real
-  function guardarNotaAjax(input, valor) {
-    const estudianteId = input.getAttribute('data-estudiante');
-    const evaluacionId = input.getAttribute('data-evaluacion');
-    const indicator = document.getElementById('autoSaveIndicator');
+{% include 'colegios/_modal_pin_firma.html' %}
 
-    if (indicator) {
-      indicator.innerHTML = '<span class="spinner-border spinner-border-sm text-primary me-1"></span> Guardando...';
-      indicator.className = 'badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-2 fw-bold';
+<script>
+  let sesionPinValida = false;
+
+  function verificarSesionPin(callback) {
+    if (sesionPinValida) {
+      callback();
+      return;
     }
+    solicitarFirmaPIN(function(pin) {
+      sesionPinValida = true;
+      const indicator = document.getElementById('autoSaveIndicator');
+      if (indicator) {
+        indicator.innerHTML = '<i class="bi bi-shield-check text-success me-1"></i> Sesión Firmada con PIN';
+      }
+      callback();
+    });
+  }
 
-    fetch("{% url 'guardar_notas' %}", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "X-CSRFToken": "{{ csrf_token }}"
-      },
-      body: `estudiante_id=${estudianteId}&evaluacion_id=${evaluacionId}&valor=${encodeURIComponent(valor)}`
-    })
-    .then(r => r.json())
-    .then(data => {
+  // Guardado asíncrono en tiempo real con verificación de PIN
+  function guardarNotaAjax(input, valor) {
+    verificarSesionPin(function() {
+      const estudianteId = input.getAttribute('data-estudiante');
+      const evaluacionId = input.getAttribute('data-evaluacion');
+      const indicator = document.getElementById('autoSaveIndicator');
+
       if (indicator) {
-        indicator.innerHTML = '<i class="bi bi-cloud-check-fill text-success me-1"></i> Autosincronizado';
-        indicator.className = 'badge bg-light text-muted border px-3 py-2 fw-bold';
+        indicator.innerHTML = '<span class="spinner-border spinner-border-sm text-primary me-1"></span> Guardando...';
+        indicator.className = 'badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-2 fw-bold';
       }
-    })
-    .catch(e => {
-      console.error(e);
-      if (indicator) {
-        indicator.innerHTML = '<i class="bi bi-exclamation-circle text-danger me-1"></i> Error al sincronizar';
-        indicator.className = 'badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2 fw-bold';
-      }
+
+      fetch("{% url 'guardar_notas' %}", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: `estudiante_id=${estudianteId}&evaluacion_id=${evaluacionId}&valor=${encodeURIComponent(valor)}`
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (indicator) {
+          indicator.innerHTML = '<i class="bi bi-cloud-check-fill text-success me-1"></i> Autosincronizado';
+          indicator.className = 'badge bg-light text-muted border px-3 py-2 fw-bold';
+        }
+      })
+      .catch(e => {
+        console.error(e);
+        if (indicator) {
+          indicator.innerHTML = '<i class="bi bi-exclamation-circle text-danger me-1"></i> Error al sincronizar';
+          indicator.className = 'badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2 fw-bold';
+        }
+      });
     });
   }
 </script>

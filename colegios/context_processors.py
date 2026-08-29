@@ -22,14 +22,19 @@ def colegio_context(request):
     else:
         rol_nombre = 'Usuario'
 
+    rol_lower = rol_nombre.lower().strip()
     is_admin = (
         request.user.is_superuser
         or request.user.colegios_administrados.filter(id=colegio.id).exists()
-        or rol_nombre.lower() in ['administrador', 'director']
+        or any(r in rol_lower for r in ['administrador', 'director', 'sostenedor', 'rector'])
     )
-    is_profesor = (rol_nombre.lower() == 'profesor')
-    is_inspector = (rol_nombre.lower() == 'inspector')
-    is_secretario = (rol_nombre.lower() == 'secretario')
+    is_utp = any(r in rol_lower for r in ['utp', 'pedagogic', 'pedagógic', 'coordinador', 'evaluador', 'curriculum'])
+    is_profesor = any(r in rol_lower for r in ['profesor', 'docente', 'educador', 'maestro'])
+    is_inspector = any(r in rol_lower for r in ['inspector', 'inspectora'])
+    is_convivencia = any(r in rol_lower for r in ['convivencia', 'psicolog', 'psicólog', 'orientad', 'dupla', 'pie', 'social', 'psicopedagog'])
+    is_secretario = any(r in rol_lower for r in ['secretari', 'administrativ', 'recepcion', 'asistente'])
+    is_apoderado = any(r in rol_lower for r in ['apoderado', 'padre', 'madre', 'tutor'])
+    is_estudiante = any(r in rol_lower for r in ['alumno', 'alumna', 'estudiante'])
 
     modulos_qs = ColegioModulo.objects.filter(colegio=colegio, activo=True).select_related('modulo')
     modulos_activos = set(m.modulo.nombre.lower().strip() for m in modulos_qs)
@@ -73,9 +78,13 @@ def colegio_context(request):
         'miembro': miembro,
         'rol_nombre': rol_nombre,
         'is_admin': is_admin,
+        'is_utp': is_utp,
         'is_profesor': is_profesor,
         'is_inspector': is_inspector,
+        'is_convivencia': is_convivencia,
         'is_secretario': is_secretario,
+        'is_apoderado': is_apoderado,
+        'is_estudiante': is_estudiante,
         'permisos_ver': permisos_ver,
         'nombre_display': user_display_name,
         'hoy': timezone.now(),

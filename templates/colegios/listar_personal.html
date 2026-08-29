@@ -38,6 +38,31 @@
 
     .wrapper { display: flex; flex: 1; position: relative; }
 
+    .main-content {
+      flex: 1;
+      margin-left: 248px;
+      transition: margin-left 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      background: var(--bg);
+    }
+    body.sidebar-collapsed .main-content {
+      margin-left: 72px;
+    }
+    @media (max-width: 991.98px) {
+      .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+      }
+      .topbar {
+        padding: 0 1.25rem !important;
+      }
+      .content-body {
+        padding: 1.25rem 1rem !important;
+      }
+    }
+
     .topbar {
       height: 70px;
       background: rgba(255, 255, 255, 0.85) !important;
@@ -127,7 +152,6 @@
     .badge-role-admin { background: #F0EDFF; color: #7C5CFC; border: 1px solid #D8CEFF; border-radius: 20px; font-size: 0.8rem; }
     .badge-role-teacher { background: #ECFDF5; color: #059669; border: 1px solid #A7F3D0; border-radius: 20px; font-size: 0.8rem; }
     .badge-role-staff { background: #EFF6FF; color: #2563EB; border: 1px solid #BFDBFE; border-radius: 20px; font-size: 0.8rem; }
-
 
     /* Role Cards */
     .role-grid-card {
@@ -226,9 +250,7 @@
 
       <div class="tab-content" id="personalTabsContent">
         
-        <!-- ==========================================
-             TAB 1: NOMINA DE PERSONAL
-             ========================================== -->
+        
         <div class="tab-pane fade show active" id="staff-tab-pane" role="tabpanel">
           <div class="card-panel-custom">
             
@@ -280,7 +302,6 @@
                           {% endif %}
                         </td>
 
-
                         <td>
                           <button type="button" class="btn btn-sm btn-light border fw-bold text-dark px-2.5 py-1" style="border-radius:8px; font-size:0.8rem;" 
                                   data-member-id="{{ m.id }}" 
@@ -322,7 +343,6 @@
                                     onclick="openIndividualPermsModalFromBtn(this)">
                               <i class="bi bi-sliders me-1"></i> Permisos
                             </button>
-
 
                             <!-- BOTON EDITAR ROL -->
                             <button type="button" class="btn btn-sm btn-light border fw-bold text-dark px-2.5 py-1" style="border-radius:8px; font-size:0.8rem;" data-bs-toggle="modal" data-bs-target="#modalEditarRol{{ m.id }}">
@@ -406,9 +426,7 @@
           </div>
         </div>
 
-        <!-- ==========================================
-             TAB 2: GESTION DE ROLES Y MATRIZ DE PERMISOS
-             ========================================== -->
+        
         <div class="tab-pane fade" id="roles-tab-pane" role="tabpanel">
           <div class="row g-3 mb-4">
             {% for r in roles %}
@@ -470,9 +488,6 @@
   </div>
 </div>
 
-<!-- ==========================================
-     MODAL MATRIZ DE PERMISOS DE ROL
-     ========================================== -->
 <div class="modal fade" id="modalRolePerms" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
@@ -565,9 +580,6 @@
   </div>
 </div>
 
-<!-- ==========================================
-     MODAL PERMISOS INDIVIDUALES DE FUNCIONARIO
-     ========================================== -->
 <div class="modal fade" id="modalIndividualPerms" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
@@ -653,9 +665,6 @@
   </div>
 </div>
 
-<!-- ==========================================
-     MODAL ASIGNAR ASIGNATURAS A DOCENTE
-     ========================================== -->
 <div class="modal fade" id="modalAssignSubjects" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
@@ -839,7 +848,6 @@
     const modal = new bootstrap.Modal(document.getElementById('modalIndividualPerms'));
     modal.show();
   }
-
 
   function toggleIndRowDisabled(modId) {
     const isChecked = document.getElementById(`ind_override_${modId}`).checked;

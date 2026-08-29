@@ -1,0 +1,176 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acceso Inteligente por QR - Eduteka</title>
+
+  <!-- Bootstrap CSS & Fuentes -->
+  <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+  <style>
+    :root {
+      --primary: #7C5CFC;
+      --primary-soft: #F0EDFF;
+      --dark: #0F172A;
+      --bg: #F8FAFC;
+    }
+
+    body {
+      background: var(--bg);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: var(--dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.5rem 1rem;
+    }
+
+    .smart-card-wrapper {
+      max-width: 480px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .smart-main-card {
+      background: white;
+      border: 1px solid #E2E8F0;
+      border-radius: 24px;
+      padding: 2rem 1.8rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+    }
+
+    .badge-room {
+      background: #F0EDFF;
+      color: var(--primary);
+      font-weight: 800;
+      padding: 0.5rem 1.2rem;
+      border-radius: 50px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .action-course-btn {
+      background: white;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 14px;
+      padding: 1rem 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      text-decoration: none;
+      color: var(--dark);
+      margin-bottom: 0.75rem;
+      transition: all 0.2s ease;
+    }
+    .action-course-btn:hover {
+      border-color: var(--primary);
+      background: #FAF8FF;
+      color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    .btn-primary-action {
+      background: linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%);
+      color: white;
+      font-weight: 800;
+      border-radius: 14px;
+      padding: 1rem;
+      border: none;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(124, 92, 252, 0.25);
+      transition: transform 0.15s ease;
+    }
+    .btn-primary-action:hover {
+      color: white;
+      transform: scale(1.02);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="smart-card-wrapper">
+    <div class="smart-main-card">
+      <div class="text-center mb-4">
+        <div class="badge-room mb-3">
+          <i class="bi bi-geo-alt-fill"></i> Sala {{ seccion.nombre }}
+        </div>
+        <h4 class="fw-extrabold text-dark mb-1">Toma de Asistencia Inteligente</h4>
+        <p class="text-muted small mb-0">{{ hoy|date:"l, d \d\e F"|title }} &bull; {{ hora_actual }} hrs</p>
+      </div>
+
+      {% if clase_activa %}
+        <!-- CLASE DETECTADA POR HORARIO -->
+        <div class="p-3 mb-4 rounded-4" style="background:#F0EDFF; border: 1.5px solid #DDD6FE;">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="badge bg-primary text-white px-2 py-1 small">Clase en Curso</span>
+            <small class="text-muted fw-bold">{{ clase_activa.rango_horario_str }}</small>
+          </div>
+          <h5 class="fw-extrabold text-dark mb-1">{{ clase_activa.asignatura.nombre|default:clase_activa.titulo }}</h5>
+          <p class="text-muted small mb-3">Curso: <strong>{{ seccion.nombre }}</strong></p>
+
+          <a href="/asistencia/registrar/{{ seccion.id }}/?fecha={{ hoy|date:'Y-m-d' }}{% if clase_activa.asignatura %}&asignatura={{ clase_activa.asignatura.id }}{% endif %}&qr_scan=1" 
+             class="btn-primary-action">
+            <i class="bi bi-check2-circle fs-5"></i> Iniciar Lista de Asistencia
+          </a>
+        </div>
+      {% endif %}
+
+      <!-- SELECCIONAR ASIGNATURA DE LA SALA -->
+      <div class="mb-3">
+        <label class="fw-bold small text-muted text-uppercase mb-2 d-block">
+          {% if clase_activa %}Otras asignaturas en esta sala:{% else %}Selecciona la asignatura a registrar:{% endif %}
+        </label>
+
+        {% if asignaturas_docente %}
+          {% for asig in asignaturas_docente %}
+            <a href="/asistencia/registrar/{{ seccion.id }}/?fecha={{ hoy|date:'Y-m-d' }}&asignatura={{ asig.id }}&qr_scan=1" 
+               class="action-course-btn">
+              <div>
+                <div class="fw-bold text-dark">{{ asig.nombre }}</div>
+                <small class="text-muted"><i class="bi bi-person-check me-1"></i>Tu asignatura</small>
+              </div>
+              <i class="bi bi-chevron-right text-muted"></i>
+            </a>
+          {% endfor %}
+        {% endif %}
+
+        {% for asig in asignaturas_seccion %}
+          {% if asig not in asignaturas_docente %}
+            <a href="/asistencia/registrar/{{ seccion.id }}/?fecha={{ hoy|date:'Y-m-d' }}&asignatura={{ asig.id }}&qr_scan=1" 
+               class="action-course-btn">
+              <div>
+                <div class="fw-bold text-dark">{{ asig.nombre }}</div>
+                <small class="text-muted"><i class="bi bi-arrow-repeat me-1"></i>Docente titular: {{ asig.docente.get_full_name|default:"Sin asignar" }}</small>
+              </div>
+              <i class="bi bi-chevron-right text-muted"></i>
+            </a>
+          {% endif %}
+        {% empty %}
+          <a href="/asistencia/registrar/{{ seccion.id }}/?fecha={{ hoy|date:'Y-m-d' }}&qr_scan=1" class="btn-primary-action">
+            <i class="bi bi-check2-circle"></i> Tomar Lista General de {{ seccion.nombre }}
+          </a>
+        {% endfor %}
+      </div>
+
+      <div class="text-center pt-2">
+        <a href="{% url 'registrar_asistencia' %}" class="text-muted small text-decoration-none">
+          <i class="bi bi-arrow-left me-1"></i> Ir al panel completo de asistencia
+        </a>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

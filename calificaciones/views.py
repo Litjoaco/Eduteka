@@ -29,9 +29,11 @@ def obtener_datos_base_calificaciones(request):
 
     is_admin = False
     if colegio:
+        rol_nombre_str = (miembro.rol.nombre.lower() if miembro and miembro.rol else '')
         is_admin = (
-            user.colegios_administrados.filter(id=colegio.id).exists()
-            or (miembro and miembro.rol and miembro.rol.nombre in ['Administrador', 'Director'])
+            user.is_superuser
+            or user.colegios_administrados.filter(id=colegio.id).exists()
+            or any(r in rol_nombre_str for r in ['administrador', 'director', 'utp', 'coordinador', 'pedagogico', 'pedagógico'])
         )
 
     return colegio, miembro, periodo, is_admin

@@ -59,7 +59,7 @@
 
         .wrapper { display: flex; width: 100%; align-items: stretch; }
 
-        /* ── Topbar ── */
+        
         .topbar {
             height: 68px;
             background: rgba(255,255,255,0.9);
@@ -105,10 +105,10 @@
         }
         .user-name { font-weight: 700; font-size: .86rem; color: var(--dark); }
 
-        /* ── Content ── */
+        
         .content-area { padding: 1.75rem 2rem; max-width: 1420px; width: 100%; margin: 0 auto; }
 
-        /* ── Hero ── */
+        
         .hero-badge {
             display: inline-flex; align-items: center; gap: .4rem;
             background: var(--primary-soft); color: var(--primary);
@@ -118,7 +118,7 @@
         .hero-title { font-size: 1.7rem; font-weight: 800; color: var(--dark); margin-bottom: .2rem; }
         .hero-sub { color: var(--gray-text); font-size: .88rem; margin-bottom: 0; }
 
-        /* ── Section divider label ── */
+        
         .section-label {
             font-size: .68rem; font-weight: 800; color: var(--gray-text);
             text-transform: uppercase; letter-spacing: 1px;
@@ -126,7 +126,7 @@
         }
         .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-        /* ── KPI Cards ── */
+        
         .kpi-card {
             background: var(--white); border: 1px solid var(--border);
             border-radius: var(--radius-lg); padding: 1.2rem 1.3rem;
@@ -168,7 +168,7 @@
         .ring-wrap svg { transform: rotate(-90deg); }
         .ring-inner { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: .58rem; font-weight: 800; color: var(--primary); white-space: nowrap; }
 
-        /* ── Panels ── */
+        
         .panel {
             background: var(--white); border: 1px solid var(--border);
             border-radius: var(--radius-lg); padding: 1.35rem 1.6rem;
@@ -177,7 +177,7 @@
         .panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.1rem; }
         .panel-title { font-size: .98rem; font-weight: 800; color: var(--dark); margin: 0; display: flex; align-items: center; gap: .5rem; }
 
-        /* ── Tables (compact) ── */
+        
         .tbl { width: 100%; border-collapse: separate; border-spacing: 0 5px; }
         .tbl th { color: var(--gray-text); font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; padding: .4rem .9rem; border: none; background: none; }
         .tbl td { background: var(--white); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: .65rem .9rem; font-size: .86rem; vertical-align: middle; }
@@ -185,7 +185,7 @@
         .tbl td:last-child  { border-right: 1px solid var(--border); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
         .tbl tbody tr:hover td { background: #FAF9FF; border-color: #D6CFFE; }
 
-        /* ── Pills ── */
+        
         .pill { display: inline-flex; align-items: center; gap: .3rem; padding: .22rem .65rem; border-radius: 20px; font-size: .72rem; font-weight: 700; }
         .p-red    { background: #FEF2F2; color: #EF4444; }
         .p-yellow { background: #FFFBEB; color: #D97706; }
@@ -194,11 +194,11 @@
         .p-gray   { background: #F3F4F6; color: var(--gray-text); }
         .p-teal   { background: var(--secondary-soft); color: #0E8A7E; }
 
-        /* ── Charts ── */
+        
         .chart-h260 { position: relative; height: 260px; }
         .chart-h200 { position: relative; height: 200px; }
 
-        /* ── Donut chart block ── */
+        
         .donut-layout { display: flex; align-items: center; gap: 1.5rem; }
         .donut-legend { flex: 1; display: flex; flex-direction: column; gap: .55rem; }
         .leg-row { display: flex; align-items: center; gap: .5rem; font-size: .82rem; }
@@ -207,7 +207,7 @@
         .leg-count { color: var(--gray-text); font-size: .78rem; font-weight: 600; }
         .leg-pct { background: #F3F4F6; color: var(--gray-text); font-size: .68rem; font-weight: 700; padding: .15rem .4rem; border-radius: 6px; }
 
-        /* ── Activity Feed / Timeline ── */
+        
         .feed { list-style: none; padding: 0; margin: 0; }
         .feed-item {
             display: flex; gap: .85rem; align-items: flex-start;
@@ -232,7 +232,7 @@
         .feed-detail { font-size: .76rem; color: var(--gray-text); }
         .feed-time   { font-size: .7rem; color: #BCC0CF; margin-top: 2px; }
 
-        /* ── Buttons ── */
+        
         .btn-purple {
             background: var(--primary); color: #fff; font-weight: 700;
             border-radius: var(--radius-md); padding: .42rem 1rem;
@@ -348,7 +348,7 @@
                 <p class="hero-sub">Vista 360° del negocio — KPIs SaaS, ingresos y actividad del sistema</p>
             </div>
 
-            <!-- ── FILA 1: 5 KPIs ────────────────────────────────────────── -->
+            
             <div class="section-label"><i class="bi bi-bar-chart-fill"></i> Métricas Clave</div>
             <div class="row g-3 mb-4">
 
@@ -863,7 +863,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
-    // ── Mobile sidebar ──────────────────────────────────────────────────────────
+    
     const mobileBtn = document.getElementById('mobileMenuBtn');
     const sidebar   = document.getElementById('sidebar');
     if (mobileBtn && sidebar) mobileBtn.addEventListener('click', () => sidebar.classList.toggle('active'));
@@ -959,7 +959,7 @@ document.addEventListener('DOMContentLoaded', function () {
         else if (retVal < 90) arc.style.stroke = '#F59E0B';
     }
 
-    // ── Revenue Line Chart ──────────────────────────────────────────────────────
+    
     const revCtx = document.getElementById('revenueChart').getContext('2d');
     const grad   = revCtx.createLinearGradient(0, 0, 0, 260);
     grad.addColorStop(0, 'rgba(124,92,252,0.20)');
@@ -1012,7 +1012,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // ── Planes Doughnut Chart ───────────────────────────────────────────────────
+    
     const planesRaw  = JSON.parse('{{ distribucion_planes_json|escapejs }}');
     const COLORS     = ['#7C5CFC','#65CDBF','#F59E0B','#EF4444','#10B981','#6366F1','#EC4899'];
     const hasData    = planesRaw.data.some(v => v > 0);

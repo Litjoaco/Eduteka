@@ -6,7 +6,7 @@
 {% endcomment %}
 
 <style>
-  /* ═══ SIDEBAR UNIFICADO SUPER ADMIN 248PX ═════════════════════════════ */
+  
   html {
     font-size: 14px !important;
   }
@@ -94,6 +94,26 @@
 
   .sidebar-footer {
     padding: .65rem; border-top: 1px solid var(--border); margin-top: auto;
+  }
+
+  .sidebar-backdrop {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    z-index: 1035;
+    opacity: 0;
+    transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  @media (max-width: 991.98px) {
+    .sidebar.open ~ .sidebar-backdrop,
+    .sidebar.active ~ .sidebar-backdrop,
+    body.sidebar-mobile-open .sidebar-backdrop {
+      display: block;
+      opacity: 1;
+    }
   }
 
   /* Main content offset unificado a 248px */
@@ -197,3 +217,26 @@
     </a>
   </div>
 </aside>
+
+<div class="sidebar-backdrop" id="sidebarBackdropSuper" onclick="closeSidebarSuperAdmin()"></div>
+
+<script>
+  window.openSidebarSuperAdmin = function() {
+    var sb = document.getElementById('sidebar');
+    if (sb) sb.classList.add('open');
+    document.body.classList.add('sidebar-mobile-open');
+  };
+  window.closeSidebarSuperAdmin = function() {
+    var sb = document.getElementById('sidebar');
+    if (sb) sb.classList.remove('open');
+    document.body.classList.remove('sidebar-mobile-open');
+  };
+  window.toggleSidebarSuperAdmin = function() {
+    var sb = document.getElementById('sidebar');
+    if (sb && (sb.classList.contains('open') || sb.classList.contains('active'))) {
+      closeSidebarSuperAdmin();
+    } else {
+      openSidebarSuperAdmin();
+    }
+  };
+</script>

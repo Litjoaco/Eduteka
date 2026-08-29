@@ -1,4 +1,4 @@
-{% load static %}
+{% load static colegio_tags %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -19,16 +19,22 @@
       --primary: #7C5CFC;
       --primary-soft: rgba(124, 92, 252, 0.08);
       --primary-hover: #6747E3;
-      --secondary: #65CDBF;
-      --bg: #F8F9FD;
-      --white: #FFFFFF;
-      --dark: #151A35;
+      --primary-dark: #1E1B4B;
+      --secondary: #10B981;
+      --accent: #3B82F6;
+      --warning: #F59E0B;
+      --danger: #EF4444;
+      --bg: #F8FAFC;
+      --surface: #FFFFFF;
+      --dark: #0F172A;
       --gray-text: #64748B;
-      --border: #BCC0CF;
-      --radius-xl: 20px;
-      --radius-lg: 16px;
-      --radius-md: 12px;
-      --radius-sm: 8px;
+      --gray-light: #94A3B8;
+      --border: #E2E8F0;
+      --border-purple: #EDE9FE;
+      --radius-xl: 24px;
+      --radius-lg: 18px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
     }
 
     * { font-family: 'Plus Jakarta Sans', sans-serif; }
@@ -47,104 +53,413 @@
 
     /* Topbar */
     .topbar {
-      height: 70px;
-      background: rgba(255, 255, 255, 0.85) !important;
-      backdrop-filter: blur(12px) !important;
-      -webkit-backdrop-filter: blur(12px) !important;
+      height: 74px;
+      background: rgba(255, 255, 255, 0.92) !important;
+      backdrop-filter: blur(16px) !important;
+      -webkit-backdrop-filter: blur(16px) !important;
       border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 2rem; position: sticky; top: 0; z-index: 98;
+      display: grid;
+      grid-template-columns: 280px 1fr auto;
+      align-items: center;
+      padding: 0 2.25rem;
+      position: sticky;
+      top: 0;
+      z-index: 98;
+      gap: 1.5rem;
     }
-    .content-body { padding: 2rem; flex-grow: 1; max-width: 1440px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+
+    @media (max-width: 991px) {
+      .topbar {
+        display: flex;
+        justify-content: space-between;
+      }
+    }
+
+    .topbar-center-search {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .topbar-search-box-centered {
+      background: #F8FAFC;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 14px;
+      padding: 0.58rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      width: 100%;
+      max-width: 480px;
+      font-size: 0.88rem;
+      color: var(--gray-text);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .topbar-search-box-centered:focus-within {
+      background: #FFFFFF;
+      border-color: #7C5CFC;
+      box-shadow: 0 0 0 4px rgba(124, 92, 252, 0.12);
+    }
+    .topbar-search-box-centered input {
+      border: none;
+      background: transparent;
+      outline: none;
+      width: 100%;
+      font-size: 0.86rem;
+      color: var(--dark);
+      font-weight: 600;
+    }
+
+    /* Notification Bell Button & Dropdown */
+    .btn-bell-dropdown {
+      position: relative;
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: #F8FAFC;
+      border: 1.5px solid #E2E8F0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #475569;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-bell-dropdown:hover {
+      background: #EDE9FE;
+      border-color: #C4B5FD;
+      color: #7C5CFC;
+      transform: translateY(-1px);
+    }
+    .btn-bell-dropdown.show {
+      background: #7C5CFC;
+      border-color: #7C5CFC;
+      color: #FFFFFF;
+    }
+    .bell-badge-count {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      min-width: 19px;
+      height: 19px;
+      padding: 0 4px;
+      border-radius: 10px;
+      background: #EF4444;
+      color: #FFFFFF;
+      font-size: 0.68rem;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #FFFFFF;
+      box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
+    }
+
+    /* Modern Profile Pill Button */
+    .btn-topbar-profile-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+      background: #F8FAFC;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 24px;
+      padding: 0.35rem 0.85rem 0.35rem 0.4rem;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      color: #1E293B;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .btn-topbar-profile-pill:hover {
+      background: #FFFFFF;
+      border-color: #CBD5E1;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      transform: translateY(-1px);
+      color: #0F172A;
+    }
+    .profile-avatar-initials {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7C5CFC 0%, #4F46E5 100%);
+      color: #FFFFFF;
+      font-weight: 800;
+      font-size: 0.82rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(124, 92, 252, 0.25);
+    }
+    .profile-name-text {
+      display: block;
+      font-weight: 800;
+      font-size: 0.82rem;
+      color: #1E293B;
+      line-height: 1.1;
+      margin-bottom: 2px;
+    }
+    .profile-role-subtext {
+      display: block;
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: #64748B;
+      line-height: 1;
+    }
+    .notifications-dropdown-menu {
+      width: 410px;
+      max-width: calc(100vw - 32px);
+      border-radius: 20px;
+      border: 1px solid #E2E8F0;
+      box-shadow: 0 20px 45px rgba(15, 23, 42, 0.14);
+      padding: 0;
+      overflow: hidden;
+      overflow-x: hidden !important;
+      margin-top: 10px !important;
+    }
+    .notifications-list-scroll {
+      max-height: 380px;
+      overflow-y: auto;
+      overflow-x: hidden !important;
+    }
+    .notif-item {
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.9rem;
+      border-bottom: 1px solid #F1F5F9;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      color: inherit;
+      box-sizing: border-box;
+      width: 100%;
+    }
+    .notif-item:hover {
+      background: #F8FAFC;
+    }
+    .notif-item:last-child {
+      border-bottom: none;
+    }
+    .notif-icon-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 1.1rem;
+    }
+    .notif-title-text {
+      font-weight: 800;
+      font-size: 0.88rem;
+      color: #0F172A;
+      line-height: 1.25;
+      word-break: break-word;
+    }
+    .notif-time-badge {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #94A3B8;
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-left: 0.5rem;
+    }
+    .notif-desc-text {
+      font-size: 0.82rem;
+      color: #64748B;
+      line-height: 1.35;
+      margin-top: 0.25rem;
+      word-break: break-word;
+    }
+    .notif-footer-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      padding: 0.85rem 1rem;
+      background: #F8FAFC;
+      color: #6D28D9;
+      font-weight: 800;
+      font-size: 0.82rem;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      border-top: 1px solid #F1F5F9;
+    }
+    .notif-footer-btn:hover {
+      background: #EDE9FE;
+      color: #5B21B6;
+    }
+    .content-body {
+      padding: 2.25rem;
+      flex-grow: 1;
+      max-width: 1460px;
+      margin: 0 auto;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    /* Topbar right buttons */
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 0.12rem 0.5rem;
+      border-radius: 20px;
+    }
+
+    .btn-topbar-custom {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      background: #FFFFFF;
+      border: 1.5px solid #E2E8F0;
+      color: #334155;
+      font-weight: 700;
+      font-size: 0.82rem;
+      border-radius: 12px;
+      padding: 0.42rem 0.95rem;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    .btn-topbar-custom:hover {
+      background: #F8FAFC;
+      border-color: #7C5CFC;
+      color: #7C5CFC;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(124, 92, 252, 0.12);
+    }
+
+    .btn-topbar-superadmin {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: linear-gradient(135deg, #1E1B4B 0%, #151A35 100%);
+      color: #FFFFFF !important;
+      border: 1.5px solid rgba(124, 92, 252, 0.35);
+      font-weight: 800;
+      font-size: 0.82rem;
+      border-radius: 12px;
+      padding: 0.42rem 0.95rem;
+      box-shadow: 0 2px 8px rgba(30, 27, 75, 0.2);
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    .btn-topbar-superadmin:hover {
+      background: linear-gradient(135deg, #2E1065 0%, #1E1B4B 100%);
+      border-color: #7C5CFC;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(124, 92, 252, 0.25);
+    }
 
     /* Hero Banner Premium */
     .hero-banner-dash {
-      background: linear-gradient(135deg, #7C5CFC 0%, #5B38EA 50%, #3B82F6 100%);
+      background: linear-gradient(135deg, #1E1B4B 0%, #312E81 35%, #4F46E5 70%, #7C5CFC 100%);
       border-radius: var(--radius-xl);
-      padding: 2.25rem 2.5rem;
+      padding: 2.25rem 2.75rem;
       margin-bottom: 2rem;
       color: #FFFFFF;
       position: relative;
       overflow: hidden;
-      box-shadow: 0 12px 35px rgba(124, 92, 252, 0.22);
+      box-shadow: 0 16px 40px rgba(30, 27, 75, 0.28);
     }
     .hero-banner-dash::before {
       content: '';
       position: absolute;
-      top: -50%; right: -10%;
-      width: 400px; height: 400px;
-      background: radial-gradient(circle, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 70%);
+      top: -40%; right: -10%;
+      width: 480px; height: 480px;
+      background: radial-gradient(circle, rgba(124, 92, 252, 0.35) 0%, rgba(124, 92, 252, 0) 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .hero-banner-dash::after {
+      content: '';
+      position: absolute;
+      bottom: -30%; left: 30%;
+      width: 320px; height: 320px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.2) 0%, rgba(16, 185, 129, 0) 70%);
       border-radius: 50%;
       pointer-events: none;
     }
 
-    .hero-role-pill {
-      background: rgba(255, 255, 255, 0.2);
+    .hero-meta-chip {
+      background: rgba(255, 255, 255, 0.12);
       backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.35);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.22);
       color: #FFFFFF;
       font-weight: 700;
       font-size: 0.76rem;
-      padding: 0.25rem 0.75rem;
+      padding: 0.28rem 0.8rem;
       border-radius: 50px;
       display: inline-flex;
       align-items: center;
       gap: 0.4rem;
     }
 
-    .btn-hero-white {
+    .btn-hero-action-primary {
       background: #FFFFFF;
-      color: var(--primary);
+      color: #4F46E5 !important;
       font-weight: 800;
+      font-size: 0.86rem;
       border: none;
       border-radius: 12px;
-      padding: 0.65rem 1.35rem;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      transition: all 0.2s ease;
+      padding: 0.65rem 1.4rem;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       text-decoration: none;
       display: inline-flex;
       align-items: center;
+      gap: 0.45rem;
     }
-    .btn-hero-white:hover {
+    .btn-hero-action-primary:hover {
       background: #F8FAFC;
-      color: var(--primary-hover);
+      color: #3730A3 !important;
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
     }
 
-    .btn-hero-glass {
-      background: rgba(255, 255, 255, 0.15);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      color: #FFFFFF;
+    .btn-hero-action-glass {
+      background: rgba(255, 255, 255, 0.14);
+      border: 1.5px solid rgba(255, 255, 255, 0.28);
+      color: #FFFFFF !important;
       font-weight: 700;
+      font-size: 0.86rem;
       border-radius: 12px;
       padding: 0.65rem 1.35rem;
       backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       transition: all 0.2s ease;
       text-decoration: none;
       display: inline-flex;
       align-items: center;
+      gap: 0.45rem;
     }
-    .btn-hero-glass:hover {
-      background: rgba(255, 255, 255, 0.25);
-      color: #FFFFFF;
+    .btn-hero-action-glass:hover {
+      background: rgba(255, 255, 255, 0.24);
+      border-color: rgba(255, 255, 255, 0.5);
+      color: #FFFFFF !important;
       transform: translateY(-2px);
     }
 
-    /* KPI Cards */
+    /* KPI Cards (Harmonious & Elevated) */
     .kpi-grid-dashboard {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-      gap: 1.25rem;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.35rem;
       margin-bottom: 2rem;
     }
 
     .kpi-card-vibrant {
       background: #FFFFFF;
-      border: 1px solid #E2E8F0;
+      border: 1.5px solid #F1F5F9;
       border-radius: var(--radius-lg);
-      padding: 1.4rem 1.5rem;
-      box-shadow: 0 4px 20px rgba(15, 23, 42, 0.03);
+      padding: 1.5rem 1.65rem;
+      box-shadow: 0 6px 24px rgba(15, 23, 42, 0.03);
       transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
       position: relative;
       overflow: hidden;
@@ -154,60 +469,93 @@
     }
     .kpi-card-vibrant:hover {
       transform: translateY(-4px);
-      box-shadow: 0 12px 30px rgba(124, 92, 252, 0.1);
-      border-color: #C5B6FF;
+      box-shadow: 0 14px 35px rgba(124, 92, 252, 0.1);
+      border-color: #DDD6FE;
     }
     .kpi-card-vibrant::after {
       content: '';
       position: absolute;
       top: 0; left: 0; right: 0;
-      height: 3px;
+      height: 4px;
       opacity: 0;
       transition: opacity 0.2s ease;
     }
-    .kpi-card-vibrant.purple::after { background: #7C5CFC; }
-    .kpi-card-vibrant.green::after { background: #10B981; }
-    .kpi-card-vibrant.blue::after { background: #3B82F6; }
-    .kpi-card-vibrant.rose::after { background: #E11D48; }
+    .kpi-card-vibrant.purple::after { background: linear-gradient(90deg, #7C5CFC, #6366F1); }
+    .kpi-card-vibrant.green::after { background: linear-gradient(90deg, #10B981, #059669); }
+    .kpi-card-vibrant.blue::after { background: linear-gradient(90deg, #3B82F6, #0284C7); }
+    .kpi-card-vibrant.rose::after { background: linear-gradient(90deg, #EF4444, #F43F5E); }
     .kpi-card-vibrant:hover::after { opacity: 1; }
 
     .kpi-icon-pill {
-      width: 48px; height: 48px;
-      border-radius: 14px;
+      width: 52px; height: 52px;
+      border-radius: 16px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 1.4rem; flex-shrink: 0;
+      font-size: 1.45rem; flex-shrink: 0;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
     }
 
     .trend-badge {
       font-size: 0.74rem;
       font-weight: 700;
-      padding: 0.2rem 0.55rem;
-      border-radius: 6px;
+      padding: 0.25rem 0.65rem;
+      border-radius: 50px;
       display: inline-flex;
       align-items: center;
-      gap: 0.25rem;
+      gap: 0.3rem;
     }
 
-    /* Shortcuts Section */
-    .shortcuts-section {
+    /* Segmented Hub Shortcuts Section */
+    .shortcuts-hub-section {
       background: #FFFFFF;
-      border: 1px solid #E2E8F0;
-      border-radius: var(--radius-lg);
-      padding: 1.65rem 1.75rem;
+      border: 1.5px solid var(--border-purple);
+      border-radius: var(--radius-xl);
+      padding: 1.75rem 2rem;
       margin-bottom: 2rem;
-      box-shadow: 0 4px 20px rgba(15, 23, 42, 0.03);
+      box-shadow: 0 6px 28px rgba(124, 92, 252, 0.05);
+    }
+
+    .hub-tabs-container {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+    }
+    .hub-tab-btn {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      color: var(--gray-text);
+      font-weight: 700;
+      font-size: 0.8rem;
+      padding: 0.45rem 1rem;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .hub-tab-btn.active, .hub-tab-btn:hover {
+      background: #EDE9FE;
+      border-color: #C4B5FD;
+      color: #6D28D9;
+    }
+    .hub-tab-btn.active {
+      box-shadow: 0 2px 8px rgba(109, 40, 217, 0.15);
     }
 
     .shortcuts-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
-      gap: 1.1rem;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 1.15rem;
+      margin-top: 1.25rem;
     }
 
     .shortcut-card-elevated {
-      background: #F8FAFC;
-      border: 1.5px solid #E2E8F0;
-      border-radius: 14px;
+      background: #FAFAFA;
+      border: 1.5px solid #F1F5F9;
+      border-radius: 16px;
       padding: 1.25rem 1rem;
       display: flex;
       flex-direction: column;
@@ -220,16 +568,16 @@
     }
     .shortcut-card-elevated:hover {
       background: #FFFFFF;
-      border-color: var(--primary);
+      border-color: #C4B5FD;
       transform: translateY(-4px);
-      box-shadow: 0 10px 25px rgba(124, 92, 252, 0.12);
+      box-shadow: 0 12px 28px rgba(124, 92, 252, 0.12);
       color: var(--primary);
     }
     .shortcut-icon-elevated {
       width: 48px; height: 48px;
       border-radius: 14px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 1.35rem;
+      font-size: 1.4rem;
       margin-bottom: 0.75rem;
       transition: transform 0.25s ease;
     }
@@ -250,46 +598,69 @@
     /* 2 Column Main Grid */
     .dashboard-two-cols {
       display: grid;
-      grid-template-columns: 1.55fr 1fr;
+      grid-template-columns: minmax(0, 1.6fr) minmax(360px, 1fr);
       gap: 1.75rem;
+      align-items: start;
       margin-bottom: 2rem;
     }
-    @media (max-width: 1024px) {
-      .dashboard-two-cols { grid-template-columns: 1fr; }
+    .dashboard-two-cols > * {
+      min-width: 0;
+    }
+    @media (max-width: 1240px) {
+      .dashboard-two-cols { grid-template-columns: 1fr !important; }
     }
 
     .card-panel-dash {
-      background: var(--white);
-      border: 1px solid #E2E8F0;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
       border-radius: var(--radius-lg);
-      padding: 1.6rem 1.75rem;
-      box-shadow: 0 4px 20px rgba(15, 23, 42, 0.03);
+      padding: 1.65rem 1.85rem;
+      box-shadow: 0 6px 24px rgba(15, 23, 42, 0.03);
       margin-bottom: 1.75rem;
+      transition: border-color 0.2s ease;
+    }
+    .card-panel-dash:hover {
+      border-color: #CBD5E1;
     }
 
     .panel-header-dash {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 1.25rem;
-      padding-bottom: 0.85rem;
+      margin-bottom: 1.35rem;
+      padding-bottom: 0.95rem;
       border-bottom: 1px solid #F1F5F9;
     }
 
-    /* Timeline Agenda Items */
+    /* Table styles */
+    .table-risk th {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #64748B;
+      background: #F8FAFC;
+      border: none;
+      padding: 0.85rem 1rem;
+    }
+    .table-risk td {
+      padding: 0.95rem 1rem;
+      vertical-align: middle;
+      border-bottom: 1px solid #F1F5F9;
+      font-size: 0.86rem;
+    }
+
+    /* Agenda Items */
     .agenda-timeline {
-      position: relative;
       display: flex;
       flex-direction: column;
       gap: 0.9rem;
     }
-
     .agenda-item-vibrant {
       background: #F8FAFC;
-      border: 1px solid #E2E8F0;
+      border: 1.5px solid #F1F5F9;
       border-left: 4px solid var(--primary);
-      border-radius: 12px;
-      padding: 1rem 1.15rem;
+      border-radius: 14px;
+      padding: 1.05rem 1.25rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -300,43 +671,455 @@
       border-color: #CBD5E1;
       border-left-color: var(--primary-hover);
       background: #FFFFFF;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.04);
-      transform: translateX(2px);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+      transform: translateX(3px);
     }
-    .agenda-item-vibrant.evaluacion { border-left-color: #E11D48; }
-    .agenda-item-vibrant.reunion { border-left-color: #D97706; }
+    .agenda-item-vibrant.evaluacion { border-left-color: #EF4444; }
+    .agenda-item-vibrant.reunion { border-left-color: #F59E0B; }
     .agenda-item-vibrant.actividad { border-left-color: #10B981; }
 
-    /* Risk Table */
-    .table-risk th {
-      font-size: 0.74rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: #64748B;
-      background: #F8FAFC;
-      border: none;
-      padding: 0.75rem 1rem;
-    }
-    .table-risk td {
-      padding: 0.85rem 1rem;
-      vertical-align: middle;
-      border-bottom: 1px solid #F1F5F9;
-      font-size: 0.86rem;
-    }
-
-    /* Notes bubble */
+    /* Note card */
     .note-card-dash {
       background: #F8FAFC;
-      border: 1px solid #E2E8F0;
-      border-radius: 12px;
-      padding: 1rem 1.15rem;
+      border: 1.5px solid #F1F5F9;
+      border-radius: 14px;
+      padding: 1.05rem 1.2rem;
       margin-bottom: 0.85rem;
       transition: all 0.2s ease;
     }
     .note-card-dash:hover {
       background: #FFFFFF;
+      border-color: #C4B5FD;
+      box-shadow: 0 6px 18px rgba(124, 92, 252, 0.06);
+    }
+
+    /* MINIMALIST & SPACIOUS HORARIO DOCENTE (CLEAN MODERN DESIGN) */
+    .schedule-minimal-container {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 22px;
+      padding: 1.85rem 2.2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.025);
+      transition: all 0.25s ease;
+    }
+    
+    .schedule-segmented-nav {
+      display: inline-flex;
+      background: #F1F5F9;
+      padding: 4px;
+      border-radius: 14px;
+      gap: 3px;
+      overflow-x: auto;
+      max-width: 100%;
+    }
+    
+    .schedule-seg-btn {
+      border: none;
+      background: transparent;
+      padding: 0.55rem 1.35rem;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #64748B;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    
+    .schedule-seg-btn:hover {
+      color: #0F172A;
+    }
+    
+    .schedule-seg-btn.active {
+      background: #FFFFFF;
+      color: #0F172A;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+    }
+    
+    .schedule-cards-grid-spacious {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.35rem;
+    }
+    
+    .schedule-clean-card {
+      background: #FFFFFF;
+      border: 1.5px solid #F1F5F9;
+      border-radius: 18px;
+      padding: 1.45rem 1.6rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+    
+    .schedule-clean-card:hover {
       border-color: #CBD5E1;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
+    }
+    
+    .status-dot-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 0.28rem 0.75rem;
+      border-radius: 20px;
+    }
+    
+    .status-dot-pill.live {
+      background: #ECFDF5;
+      color: #059669;
+    }
+    .status-dot-pill.live::before {
+      content: '';
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10B981;
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
+    }
+    
+    .status-dot-pill.next {
+      background: #FFFBEB;
+      color: #D97706;
+    }
+    .status-dot-pill.next::before {
+      content: '';
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #F59E0B;
+    }
+    
+    .status-dot-pill.scheduled {
+      background: #F8FAFC;
+      color: #64748B;
+    }
+    .status-dot-pill.scheduled::before {
+      content: '';
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #94A3B8;
+    }
+    
+    .status-dot-pill.completed {
+      background: #F1F5F9;
+      color: #94A3B8;
+    }
+    .status-dot-pill.completed::before {
+      content: '';
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #CBD5E1;
+    }
+    .table-schedule-modal {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .table-schedule-modal th {
+      background: #1E1B4B;
+      color: #FFFFFF;
+      font-weight: 800;
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 0.75rem 0.65rem;
+      text-align: center;
+      border: 1px solid #312E81;
+    }
+    .table-schedule-modal th.col-block-m {
+      background: #0F172A;
+      width: 130px;
+    }
+    .table-schedule-modal td {
+      padding: 0.5rem 0.6rem;
+      border: 1px solid #E2E8F0;
+      font-size: 0.8rem;
+      text-align: center;
+      vertical-align: middle;
+    }
+    .table-schedule-modal .slot-box {
+      background: #F5F3FF;
+      border: 1px solid #DDD6FE;
+      border-left: 3.5px solid var(--primary);
+      border-radius: 8px;
+      padding: 0.4rem 0.5rem;
+      text-align: left;
+    }
+
+    /* Modal Styles */
+    .modal-solicitudes-premium {
+      border: none !important;
+      border-radius: 24px !important;
+      overflow: hidden;
+      box-shadow: 0 25px 70px rgba(15, 23, 42, 0.28) !important;
+      background: #F8FAFC;
+    }
+    .modal-solicitudes-header-purple {
+      background: linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #4338CA 100%);
+      color: #FFFFFF;
+      padding: 1.4rem 1.8rem;
+      border-bottom: 2px solid rgba(124, 92, 252, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .pulse-glow-purple {
+      animation: pulseGlowPurple 2s infinite;
+    }
+    @keyframes pulseGlowPurple {
+      0% { box-shadow: 0 0 0 0 rgba(124, 92, 252, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(124, 92, 252, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(124, 92, 252, 0); }
+    }
+
+    .solicitud-card-redesign {
+      background: #FFFFFF;
+      border: 1.5px solid #E9D5FF;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(124, 92, 252, 0.05);
+      transition: all 0.25s ease;
+      margin-bottom: 1.25rem;
+    }
+    .solicitud-card-redesign:hover {
+      border-color: #C084FC;
+      box-shadow: 0 10px 30px rgba(124, 92, 252, 0.12);
+      transform: translateY(-2px);
+    }
+    .card-user-header {
+      background: linear-gradient(135deg, #FAF5FF 0%, #F3E8FF 100%);
+      border-bottom: 1.5px solid #E9D5FF;
+      padding: 1.15rem 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .user-portrait-circle {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #7C5CFC 0%, #4F46E5 100%);
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      font-weight: 800;
+      box-shadow: 0 4px 14px rgba(124, 92, 252, 0.3);
+      flex-shrink: 0;
+      border: 2px solid #FFFFFF;
+    }
+    .user-meta-name {
+      font-size: 1.08rem;
+      font-weight: 800;
+      color: #0F172A;
+      margin-bottom: 0.15rem;
+    }
+    .user-meta-tags {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      font-size: 0.78rem;
+      color: #475569;
+    }
+    .badge-rol-highlight {
+      background: #7C5CFC;
+      color: #FFFFFF;
+      border: none;
+      font-size: 0.78rem;
+      font-weight: 800;
+      padding: 0.45rem 0.95rem;
+      border-radius: 50px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      box-shadow: 0 4px 12px rgba(124, 92, 252, 0.3);
+    }
+    .card-body-content {
+      padding: 1.35rem 1.4rem;
+    }
+    .quote-message-block {
+      background: #F8FAFC;
+      border-left: 4px solid #7C5CFC;
+      border-radius: 0 14px 14px 0;
+      padding: 0.85rem 1.15rem;
+      font-size: 0.86rem;
+      color: #334155;
+      font-style: italic;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    .step-workflow-container {
+      background: #FAFAFA;
+      border: 1px solid #E2E8F0;
+      border-radius: 16px;
+      padding: 1.15rem 1.25rem;
+      margin-bottom: 0.75rem;
+    }
+    .step-header-label {
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: #1E293B;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .role-input-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .role-input-field {
+      background: #FFFFFF;
+      border: 1.5px solid #CBD5E1;
+      border-radius: 12px;
+      padding: 0.6rem 0.95rem;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #0F172A;
+      width: 100%;
+      transition: all 0.2s ease;
+    }
+    .role-input-field:focus {
+      border-color: #7C5CFC;
+      box-shadow: 0 0 0 3px rgba(124, 92, 252, 0.15);
+      outline: none;
+    }
+    .btn-approve-wide {
+      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+      color: #FFFFFF !important;
+      border: none;
+      font-weight: 800;
+      font-size: 0.88rem;
+      border-radius: 12px;
+      padding: 0.75rem 1.4rem;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex: 1;
+    }
+    .btn-approve-wide:hover {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(16, 185, 129, 0.45);
+    }
+    .btn-reject-pill {
+      background: #FFF1F2;
+      color: #E11D48 !important;
+      border: 1.5px solid #FECDD3;
+      font-weight: 800;
+      font-size: 0.88rem;
+      border-radius: 12px;
+      padding: 0.75rem 1.25rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-reject-pill:hover {
+      background: #FFE4E6;
+      border-color: #FDA4AF;
+      color: #BE123C !important;
+    }
+    .card-footer-subtle {
+      padding: 0.65rem 1.4rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #94A3B8;
+      font-size: 0.76rem;
+      font-weight: 600;
+    }
+
+    
+    .main-content {
+      flex: 1;
+      margin-left: 248px;
+      transition: margin-left 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      min-height: 100vh;
+    }
+    body.sidebar-collapsed .main-content {
+      margin-left: 72px;
+    }
+
+    @media (max-width: 991.98px) {
+      .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+      }
+      .topbar {
+        padding: 0 1.25rem !important;
+        height: auto !important;
+        min-height: 68px !important;
+        display: flex !important;
+        justify-content: space-between !important;
+      }
+      .content-body {
+        padding: 1.25rem 1rem !important;
+      }
+      .hero-banner-dash {
+        padding: 1.5rem 1.25rem !important;
+      }
+      .stat-card-elevated {
+        padding: 1.25rem 1rem !important;
+      }
+      .shortcuts-hub-section {
+        padding: 1.25rem 1rem !important;
+      }
+      .shortcuts-grid {
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important;
+        gap: 0.75rem !important;
+      }
+      .card-clase-horario {
+        padding: 1.25rem 1rem !important;
+      }
+    }
+
+    @media (max-width: 575.98px) {
+      .topbar-right {
+        gap: 0.4rem !important;
+      }
+      .btn-topbar-profile-pill .profile-name-text,
+      .btn-topbar-profile-pill .profile-role-subtext {
+        display: none !important;
+      }
+      .btn-topbar-profile-pill {
+        padding: 0.25rem !important;
+        border-radius: 50% !important;
+      }
+      .notifications-dropdown-menu {
+        width: calc(100vw - 24px) !important;
+      }
     }
   </style>
 </head>
@@ -348,40 +1131,131 @@
   <!-- MAIN CONTENT -->
   <div class="main-content">
     
-    <!-- TOPBAR -->
+    <!-- TOPBAR ELEGANTE (3 COLUMNAS: IZQUIERDA - BUSCADOR CENTRADO - DERECHA) -->
     <header class="topbar">
+      <!-- 1. Columna Izquierda: Brand & Título con Espaciado Generoso -->
       <div class="d-flex align-items-center gap-3">
-        <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn" style="border:none; background:var(--primary-soft); color:var(--primary);">
+        <button class="btn btn-sm d-lg-none" id="mobileMenuBtn" style="border:none; background:var(--primary-soft); color:var(--primary); padding: 0.4rem 0.6rem; border-radius: 8px;">
           <i class="bi bi-list fs-5"></i>
         </button>
-        <span class="fw-extrabold text-dark fs-5"><i class="bi bi-speedometer2 text-primary me-2"></i>Panel General</span>
+        <div class="d-flex align-items-center gap-3.5">
+          <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0 shadow-sm" style="width:42px; height:42px; background:#EDE9FE; color:#7C5CFC; font-size:1.25rem;">
+            <i class="bi bi-grid-1x2-fill"></i>
+          </div>
+          <div class="d-none d-sm-block">
+            <span class="fw-extrabold text-dark fs-6 d-block lh-1" style="letter-spacing: -0.2px;">Panel General</span>
+            <span class="text-muted extra-small d-block mt-1">{{ colegio.nombre|default:'Establecimiento Escolar' }}</span>
+          </div>
+        </div>
       </div>
 
-      <div class="topbar-right d-flex align-items-center gap-2.5">
+      <!-- 2. Columna Central: Buscador Global Centrado Limpio (Sin etiquetas saturadas) -->
+      <div class="topbar-center-search d-none d-md-flex">
+        <div class="topbar-search-box-centered">
+          <i class="bi bi-search text-muted"></i>
+          <input type="text" id="dashboardQuickSearch" placeholder="Buscar alumnos, cursos, profesores, módulos...">
+        </div>
+      </div>
+
+      <!-- 3. Columna Derecha: Campanita de Notificaciones, Acciones y Perfil Moderno -->
+      <div class="topbar-right">
         {% if request.user.is_superuser or request.user.is_staff %}
-        <a href="{% url 'dashboard_superadmin' %}" class="btn btn-sm fw-extrabold px-3 py-2 shadow-sm d-flex align-items-center gap-1.5" style="border-radius:10px; background:#151A35; color:#FFFFFF; text-decoration:none;">
+        <a href="{% url 'dashboard_superadmin' %}" class="btn-topbar-superadmin d-none d-xl-inline-flex">
           <i class="bi bi-shield-shaded text-warning"></i>
-          <span>Panel Super Admin</span>
+          <span>Super Admin</span>
         </a>
         {% endif %}
 
-        {% if is_admin and solicitudes_pendientes_count > 0 %}
-        <button type="button" class="btn btn-sm fw-extrabold px-3 py-2 shadow-sm d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#modalSolicitudesPendientes" style="border-radius:10px; background:#FFFBEB; border: 1.5px solid #F59E0B; color:#92400E;">
-          <span class="position-relative d-inline-flex align-items-center">
-            <i class="bi bi-bell-fill text-warning"></i>
-            <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
-          </span>
-          <span>Solicitudes</span>
-          <span class="badge bg-warning text-dark fw-extrabold px-1.5 py-0.5" style="border-radius:6px; font-size:0.75rem;">{{ solicitudes_pendientes_count }}</span>
-        </button>
-        {% endif %}
+        <!-- CAMPANITA DE NOTIFICACIONES INTERACTIVA -->
+        <div class="dropdown d-inline-block">
+          <button class="btn-bell-dropdown" type="button" id="dropdownNotificationsBtn" data-bs-toggle="dropdown" aria-expanded="false" title="Centro de Notificaciones">
+            <i class="bi bi-bell fs-5"></i>
+            {% if notificaciones_count > 0 %}
+              <span class="bell-badge-count" id="notifBadgeCounter">{{ notificaciones_count }}</span>
+            {% endif %}
+          </button>
 
-        <button type="button" class="btn btn-outline-primary btn-sm fw-bold px-3 py-2" data-bs-toggle="modal" data-bs-target="#modalCustomizeShortcuts" style="border-radius:10px;">
-          <i class="bi bi-sliders2-vertical me-1.5"></i> Personalizar Accesos
-        </button>
+          <div class="dropdown-menu dropdown-menu-end notifications-dropdown-menu" aria-labelledby="dropdownNotificationsBtn">
+            <!-- Header Notificaciones -->
+            <div class="p-3 px-3.5 bg-white border-bottom d-flex justify-content-between align-items-center">
+              <div class="d-flex align-items-center gap-2">
+                <span class="fw-extrabold text-dark fs-6">Notificaciones</span>
+                {% if notificaciones_count > 0 %}
+                  <span class="badge bg-purple-subtle text-primary fw-bold" style="background:#EDE9FE; color:#6D28D9; border-radius:12px; font-size:0.72rem;">
+                    {{ notificaciones_count }} Nueva{{ notificaciones_count|pluralize:"s" }}
+                  </span>
+                {% endif %}
+              </div>
+              <button type="button" class="btn btn-sm btn-link p-0 text-decoration-none text-muted extra-small fw-bold" onclick="marcarTodasNotificacionesLeidas()">
+                Marcar leídas
+              </button>
+            </div>
 
-        <div class="topbar-date d-none d-sm-block text-muted small fw-semibold">
-          <i class="bi bi-calendar3 me-1"></i> {{ hoy|date:"l, d \d\e F \d\e Y"|title }}
+            <!-- Listado de Notificaciones -->
+            <div class="notifications-list-scroll" id="notifListContainer">
+              {% if notificaciones_sistema %}
+                {% for n in notificaciones_sistema %}
+                  {% if n.is_modal_solicitudes %}
+                    <a href="javascript:void(0);" class="notif-item" data-bs-toggle="modal" data-bs-target="#modalSolicitudesPendientes">
+                      <div class="notif-icon-circle" style="background: {{ n.icono_bg }}; color: {{ n.icono_color }};">
+                        <i class="bi {{ n.icono }}"></i>
+                      </div>
+                      <div class="flex-grow-1 min-w-0">
+                        <div class="d-flex justify-content-between align-items-baseline">
+                          <span class="notif-title-text">{{ n.titulo }}</span>
+                          <span class="notif-time-badge">{{ n.tiempo }}</span>
+                        </div>
+                        <p class="notif-desc-text mb-0">{{ n.descripcion }}</p>
+                      </div>
+                    </a>
+                  {% else %}
+                    <a href="{{ n.url }}" class="notif-item">
+                      <div class="notif-icon-circle" style="background: {{ n.icono_bg }}; color: {{ n.icono_color }};">
+                        <i class="bi {{ n.icono }}"></i>
+                      </div>
+                      <div class="flex-grow-1 min-w-0">
+                        <div class="d-flex justify-content-between align-items-baseline">
+                          <span class="notif-title-text">{{ n.titulo }}</span>
+                          <span class="notif-time-badge">{{ n.tiempo }}</span>
+                        </div>
+                        <p class="notif-desc-text mb-0">{{ n.descripcion }}</p>
+                      </div>
+                    </a>
+                  {% endif %}
+                {% endfor %}
+              {% else %}
+                <div class="p-4 text-center py-5">
+                  <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2" style="width:48px; height:48px; background:#F1F5F9; color:#94A3B8; font-size:1.3rem;">
+                    <i class="bi bi-bell-slash"></i>
+                  </div>
+                  <div class="fw-extrabold text-dark small mb-0.5">¡Todo al día!</div>
+                  <p class="text-muted extra-small mb-0">No tienes alertas ni notificaciones pendientes.</p>
+                </div>
+              {% endif %}
+            </div>
+
+            <!-- Footer Notificaciones -->
+            <a href="{% url 'convivencia_hub' %}" class="notif-footer-btn">
+              <span>Ver Centro de Alertas & Convivencia</span>
+              <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- BOTÓN DE PERFIL PREMIUM CON AVATAR -->
+        <a href="{% url 'perfil_usuario' %}" class="btn-topbar-profile-pill" title="Ver Mi Perfil">
+          <div class="profile-avatar-initials">
+            {{ request.user.first_name|default:request.user.username|slice:":1"|upper }}
+          </div>
+          <div class="d-none d-lg-block text-start lh-1 pe-1">
+            <span class="profile-name-text">{{ request.user.first_name|default:request.user.username }}</span>
+            <span class="profile-role-subtext">{{ miembro.rol.nombre|default:'Administrador' }}</span>
+          </div>
+          <i class="bi bi-chevron-right text-muted extra-small d-none d-lg-inline-block" style="font-size:0.7rem;"></i>
+        </a>
+
+        <div class="topbar-date d-none d-xl-block text-muted small fw-bold px-3 py-2 bg-light border rounded-3">
+          <i class="bi bi-calendar3 text-primary me-1"></i> {{ hoy|date:"l, d \d\e F"|title }}
         </div>
       </div>
     </header>
@@ -389,66 +1263,106 @@
     <!-- CONTENT BODY -->
     <main class="content-body">
 
-      <!-- HERO BANNER VIBRANTE -->
+      <!-- HERO COMMAND BANNER (ESTILO SAAS ELEGANTE) -->
       <div class="hero-banner-dash">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-4 position-relative" style="z-index: 1;">
           <div class="d-flex align-items-center gap-3.5">
-            <div class="rounded-circle d-flex align-items-center justify-content-center border border-2 border-white shadow" style="width: 64px; height: 64px; background: rgba(255,255,255,0.2); backdrop-filter: blur(8px); font-size:1.8rem;">
+            <div class="rounded-4 d-flex align-items-center justify-content-center border border-2 border-white shadow-lg" style="width: 70px; height: 70px; background: rgba(255,255,255,0.18); backdrop-filter: blur(10px); font-size:2rem;">
               🎓
             </div>
             <div>
               <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
-                <h1 class="fw-extrabold mb-0 fs-3 text-white">¡Bienvenido, {{ nombre_display }}!</h1>
-                <span class="hero-role-pill">
-                  <i class="bi bi-shield-check"></i> {{ miembro.rol.nombre|default:'Administrador General' }}
+                <h1 class="fw-extrabold mb-0 fs-3 text-white">¡Hola, {{ nombre_display }}!</h1>
+                <span class="hero-meta-chip">
+                  <i class="bi bi-shield-check text-warning"></i> {{ miembro.rol.nombre|default:'Administrador General' }}
                 </span>
               </div>
 
-              <p class="mb-0 text-white-50 small fw-medium">
-                {{ colegio.nombre }} &nbsp;•&nbsp; Período Escolar {{ periodo.anio_lectivo|default:2026 }} &nbsp;•&nbsp; <i class="bi bi-clock me-1"></i>Última actualización en vivo
-              </p>
+              <div class="d-flex align-items-center gap-2 flex-wrap text-white-50 small fw-medium mt-1">
+                <span><i class="bi bi-building me-1"></i>{{ colegio.nombre }}</span>
+                <span>•</span>
+                <span><i class="bi bi-calendar-range me-1"></i>Año Lectivo {{ periodo.anio_lectivo|default:2026 }}</span>
+                <span>•</span>
+                <span class="badge bg-success-subtle text-success px-2 py-0.5" style="border-radius:20px; font-size:0.72rem;">
+                  <i class="bi bi-circle-fill" style="font-size:6px;"></i> Sistema en Línea
+                </span>
+              </div>
             </div>
           </div>
 
           <div class="d-flex gap-2 flex-wrap">
-            <a href="{% url 'registrar_asistencia' %}" class="btn-hero-white">
-              <i class="bi bi-calendar-check-fill me-2"></i> Tomar Asistencia Hoy
+            {% if is_admin or is_utp or is_profesor or is_inspector or 'asistencia' in permisos_ver %}
+            <a href="{% url 'registrar_asistencia' %}" class="btn-hero-action-primary">
+              <i class="bi bi-clipboard2-check-fill text-primary"></i>
+              <span>Tomar Asistencia</span>
             </a>
-            <a href="{% url 'libro_calificaciones' %}" class="btn-hero-glass">
-              <i class="bi bi-journal-bookmark-fill me-2"></i> Calificaciones
+            {% endif %}
+
+            {% if is_admin or is_utp or is_profesor or 'calificaciones' in permisos_ver %}
+            <a href="{% url 'libro_calificaciones' %}" class="btn-hero-action-glass">
+              <i class="bi bi-journal-check"></i>
+              <span>Calificaciones</span>
             </a>
+            {% endif %}
+
+            {% if is_profesor %}
+            <a href="{% url 'mis_cursos_docente' %}" class="btn-hero-action-glass">
+              <i class="bi bi-mortarboard-fill"></i>
+              <span>Mis Cursos</span>
+            </a>
+            {% endif %}
+
+            {% if is_admin or is_secretario %}
+            <a href="{% url 'matricular_estudiante' %}" class="btn-hero-action-glass">
+              <i class="bi bi-person-plus-fill"></i>
+              <span>Matricular</span>
+            </a>
+            {% endif %}
+
+            {% if is_admin %}
+            <a href="{% url 'carga_masiva_estudiantes' %}" class="btn-hero-action-glass">
+              <i class="bi bi-file-earmark-spreadsheet-fill text-warning"></i>
+              <span>Carga Masiva</span>
+            </a>
+            {% endif %}
           </div>
         </div>
 
         {% if is_admin and solicitudes_pendientes_count > 0 %}
-        <div class="mt-3 p-2.5 px-3 rounded-3 d-flex align-items-center justify-content-between flex-wrap gap-2 position-relative" style="background: rgba(254, 243, 199, 0.22); border: 1px solid rgba(254, 243, 199, 0.4); backdrop-filter: blur(10px); z-index: 1;">
-          <div class="d-flex align-items-center gap-2 text-white extra-small fw-bold">
-            <span class="rounded-circle d-flex align-items-center justify-content-center" style="width:26px; height:26px; background:#FEF3C7; color:#D97706;">
-              <i class="bi bi-person-plus-fill"></i>
+        <div class="mt-4 p-3 px-4 rounded-4 d-flex align-items-center justify-content-between flex-wrap gap-3 position-relative" style="background: rgba(255, 255, 255, 0.16); border: 1.5px solid rgba(255, 255, 255, 0.35); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); z-index: 1; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);">
+          <div class="d-flex align-items-center gap-3 text-white small fw-bold">
+            <span class="rounded-circle d-flex align-items-center justify-content-center pulse-glow-purple shadow-sm flex-shrink-0" style="width:36px; height:36px; background:#FFFFFF; color:#7C5CFC;">
+              <i class="bi bi-person-plus-fill fs-6"></i>
             </span>
-            <span>Tienes <strong>{{ solicitudes_pendientes_count }} solicitud{{ solicitudes_pendientes_count|pluralize:"es" }} de acceso</strong> pendiente{{ solicitudes_pendientes_count|pluralize:"s" }} de revisión en tu colegio</span>
+            <span>Hay <strong>{{ solicitudes_pendientes_count }} solicitud{{ solicitudes_pendientes_count|pluralize:"es" }} de acceso docente/funcionario</strong> esperando tu autorización en este colegio.</span>
           </div>
-          <button type="button" class="btn btn-sm btn-light fw-extrabold px-3 py-1 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalSolicitudesPendientes" style="border-radius:8px; font-size:0.78rem; color:#B45309;">
-            <i class="bi bi-eye-fill me-1"></i> Revisar Solicitudes
+          <button type="button" class="btn btn-sm fw-extrabold px-3.5 py-2 shadow-sm d-flex align-items-center gap-1.5" data-bs-toggle="modal" data-bs-target="#modalSolicitudesPendientes" style="border-radius:10px; font-size:0.82rem; background:#FFFFFF; color:#6D28D9; border:none; transition: all .2s ease;">
+            <i class="bi bi-eye-fill text-primary"></i> Gestionar Solicitudes Ahora
           </button>
         </div>
         {% endif %}
       </div>
 
-      <!-- 4 REAL KPI CARDS -->
+      <!-- 4 REAL KPI CARDS ELEVADAS (ADAPTADAS AL ROL) -->
       <div class="kpi-grid-dashboard">
         <!-- Estudiantes -->
         <div class="kpi-card-vibrant purple">
           <div class="d-flex justify-content-between align-items-start mb-3">
             <div>
-              <span class="text-muted extra-small text-uppercase fw-extrabold d-block mb-1">Estudiantes Activos</span>
+              <span class="text-muted extra-small text-uppercase fw-extrabold d-block mb-1">
+                {% if is_profesor and not is_admin and not is_utp %}Alumnos en Colegio{% else %}Estudiantes Activos{% endif %}
+              </span>
               <span class="fs-2 fw-extrabold text-dark lh-1">{{ total_estudiantes_count|default:0 }}</span>
             </div>
             <div class="kpi-icon-pill" style="background:#F0EDFF; color:#7C5CFC;"><i class="bi bi-people-fill"></i></div>
           </div>
           <div class="d-flex align-items-center justify-content-between pt-2 border-top">
             <span class="trend-badge" style="background:#F0EDFF; color:#7C5CFC;"><i class="bi bi-check-circle-fill"></i> Matrícula Activa</span>
-            <a href="{% url 'listar_estudiantes' %}" class="fw-bold small text-primary text-decoration-none">Ver nómina <i class="bi bi-arrow-right"></i></a>
+            {% if is_admin or is_utp or is_inspector or is_secretario %}
+              <a href="{% url 'listar_estudiantes' %}" class="fw-bold small text-primary text-decoration-none">Ver nómina <i class="bi bi-arrow-right"></i></a>
+            {% else %}
+              <a href="{% url 'mis_cursos_docente' %}" class="fw-bold small text-primary text-decoration-none">Mis alumnos <i class="bi bi-arrow-right"></i></a>
+            {% endif %}
           </div>
         </div>
 
@@ -456,29 +1370,48 @@
         <div class="kpi-card-vibrant green">
           <div class="d-flex justify-content-between align-items-start mb-3">
             <div>
-              <span class="text-muted extra-small text-uppercase fw-extrabold d-block mb-1">Cursos & Secciones</span>
+              <span class="text-muted extra-small text-uppercase fw-extrabold d-block mb-1">
+                {% if is_profesor and not is_admin and not is_utp %}Cursos Institucionales{% else %}Cursos & Secciones{% endif %}
+              </span>
               <span class="fs-2 fw-extrabold text-dark lh-1">{{ total_cursos_count|default:0 }}</span>
             </div>
             <div class="kpi-icon-pill" style="background:#ECFDF5; color:#10B981;"><i class="bi bi-diagram-3-fill"></i></div>
           </div>
           <div class="d-flex align-items-center justify-content-between pt-2 border-top">
-            <span class="trend-badge" style="background:#ECFDF5; color:#059669;"><i class="bi bi-mortarboard-fill"></i> Malla Completa</span>
-            <a href="{% url 'listar_cursos' %}" class="fw-bold small text-success text-decoration-none">Ver cursos <i class="bi bi-arrow-right"></i></a>
+            <span class="trend-badge" style="background:#ECFDF5; color:#059669;"><i class="bi bi-mortarboard-fill"></i> Malla Vigente</span>
+            {% if is_admin or is_utp %}
+              <a href="{% url 'listar_cursos' %}" class="fw-bold small text-success text-decoration-none">Ver cursos <i class="bi bi-arrow-right"></i></a>
+            {% else %}
+              <a href="{% url 'mis_cursos_docente' %}" class="fw-bold small text-success text-decoration-none">Mis materias <i class="bi bi-arrow-right"></i></a>
+            {% endif %}
           </div>
         </div>
 
-        <!-- Personal -->
+        <!-- Personal / Mis Cursos según rol -->
         <div class="kpi-card-vibrant blue">
           <div class="d-flex justify-content-between align-items-start mb-3">
             <div>
-              <span class="text-muted extra-small text-uppercase fw-extrabold d-block mb-1">Equipo Docente</span>
-              <span class="fs-2 fw-extrabold text-dark lh-1">{{ usuarios_colegio_count|default:0 }}</span>
+              <span class="text-muted extra-small text-uppercase fw-extrabold d-block mb-1">
+                {% if is_profesor and not is_admin and not is_utp %}Mis Materias Asignadas{% else %}Equipo Docente{% endif %}
+              </span>
+              <span class="fs-2 fw-extrabold text-dark lh-1">
+                {% if is_profesor and not is_admin and not is_utp %}{{ total_cursos_count|default:0 }}{% else %}{{ usuarios_colegio_count|default:0 }}{% endif %}
+              </span>
             </div>
-            <div class="kpi-icon-pill" style="background:#EFF6FF; color:#3B82F6;"><i class="bi bi-person-badge-fill"></i></div>
+            <div class="kpi-icon-pill" style="background:#EFF6FF; color:#3B82F6;">
+              <i class="bi {% if is_profesor and not is_admin and not is_utp %}bi-mortarboard-fill{% else %}bi-person-badge-fill{% endif %}"></i>
+            </div>
           </div>
           <div class="d-flex align-items-center justify-content-between pt-2 border-top">
-            <span class="trend-badge" style="background:#EFF6FF; color:#2563EB;"><i class="bi bi-shield-lock-fill"></i> Roles Asignados</span>
-            <a href="{% url 'listar_personal' %}" class="fw-bold small text-primary text-decoration-none">Gestionar <i class="bi bi-arrow-right"></i></a>
+            <span class="trend-badge" style="background:#EFF6FF; color:#2563EB;">
+              <i class="bi {% if is_profesor and not is_admin and not is_utp %}bi-book-half{% else %}bi-shield-lock-fill{% endif %}"></i>
+              {% if is_profesor and not is_admin and not is_utp %}Carga Horaria{% else %}Roles Asignados{% endif %}
+            </span>
+            {% if is_admin %}
+              <a href="{% url 'listar_personal' %}" class="fw-bold small text-primary text-decoration-none">Gestionar <i class="bi bi-arrow-right"></i></a>
+            {% else %}
+              <a href="{% url 'mis_cursos_docente' %}" class="fw-bold small text-primary text-decoration-none">Acceder <i class="bi bi-arrow-right"></i></a>
+            {% endif %}
           </div>
         </div>
 
@@ -489,94 +1422,298 @@
               <span class="text-muted extra-small text-uppercase fw-extrabold d-block mb-1">Alumnos en Riesgo</span>
               <span class="fs-2 fw-extrabold text-danger lh-1">{{ alumnos_en_riesgo_count|default:0 }}</span>
             </div>
-            <div class="kpi-icon-pill" style="background:#FFF1F2; color:#E11D48;"><i class="bi bi-exclamation-octagon-fill"></i></div>
+            <div class="kpi-icon-pill" style="background:#FFF1F2; color:#EF4444;"><i class="bi bi-exclamation-octagon-fill"></i></div>
           </div>
           <div class="d-flex align-items-center justify-content-between pt-2 border-top">
-            <span class="trend-badge" style="background:#FFF1F2; color:#E11D48;"><i class="bi bi-bell-fill"></i> Asistencia / Faltas</span>
+            <span class="trend-badge" style="background:#FFF1F2; color:#EF4444;"><i class="bi bi-bell-fill"></i> Asistencia Crítica</span>
             <a href="{% url 'convivencia_hub' %}" class="fw-bold small text-danger text-decoration-none">Revisar <i class="bi bi-arrow-right"></i></a>
           </div>
         </div>
       </div>
 
-      <!-- MÓDULO DE ACCESOS RÁPIDOS 100% REALES Y PERSONALIZABLES -->
-      <div class="shortcuts-section">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <div class="d-flex align-items-center gap-2">
-            <h3 class="fw-extrabold text-dark mb-0 fs-6"><i class="bi bi-grid-fill text-primary me-2"></i>Accesos Rápidos Institucionales</h3>
-            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-0.5" style="font-size:0.72rem; border-radius:50px;">Personalizable</span>
+      
+      <div class="schedule-minimal-container">
+        
+        <!-- CABECERA LIMPIA Y ESPACIOSA -->
+        <div class="d-flex justify-content-between align-items-start align-items-lg-center flex-column flex-lg-row gap-3 mb-4 pb-3 border-bottom">
+          <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <h3 class="fw-extrabold text-dark mb-0 fs-5">Mi Horario Escolar</h3>
+              <span class="badge px-2.5 py-1 bg-light text-dark border fw-bold rounded-pill" style="font-size: 0.76rem;">
+                {{ horario_docente_data.total_horas_semanales|default:0 }} hrs pedagógicas
+              </span>
+            </div>
+            <p class="text-muted small mb-0">
+              Docente: <strong class="text-dark">{{ horario_docente_data.nombre_docente }}</strong>
+              {% if horario_docente_data.total_cursos_count > 0 %}
+                • {{ horario_docente_data.total_cursos_count }} Seccione{{ horario_docente_data.total_cursos_count|pluralize:"s" }}
+              {% endif %}
+            </p>
           </div>
+
+          <!-- BOTONES DE ACCIÓN MINIMALISTAS -->
+          <div class="d-flex align-items-center gap-2 flex-wrap w-100 w-lg-auto justify-content-start justify-content-lg-end">
+            {% if is_admin and profesores_colegio.count > 1 %}
+              <form method="GET" action="{% url 'dashboard_usuario' %}" class="d-inline-block">
+                <select name="profesor_id" class="form-select form-select-sm fw-semibold" style="font-size:0.82rem; border-radius:10px; min-width: 180px; padding: 0.45rem 0.85rem;" onchange="this.form.submit();">
+                  {% for p in profesores_colegio %}
+                    <option value="{{ p.id }}" {% if docente_mostrar.id == p.id %}selected{% endif %}>
+                      👨‍🏫 {{ p.get_full_name|default:p.username }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </form>
+            {% endif %}
+
+            <button type="button" class="btn btn-sm btn-light border fw-bold px-3 py-2 d-flex align-items-center gap-1.5" style="border-radius:10px; font-size:0.82rem;" data-bs-toggle="modal" data-bs-target="#modalHorarioSemanal">
+              <i class="bi bi-grid-3x3-gap"></i>
+              <span>Matriz Semanal</span>
+            </button>
+
+            {% if docente_mostrar %}
+            <a href="{% url 'horario_docente_imprimible' docente_mostrar.id %}" target="_blank" class="btn btn-sm btn-light border fw-bold text-dark px-3 py-2 d-flex align-items-center gap-1.5" style="border-radius:10px; font-size:0.82rem;" title="Imprimir Horario PDF">
+              <i class="bi bi-printer"></i>
+              <span>Imprimir</span>
+            </a>
+            {% endif %}
+
+            {% if is_admin %}
+              <button type="button" class="btn btn-sm btn-primary fw-bold px-3 py-2 d-flex align-items-center gap-1.5" style="border-radius:10px; font-size:0.82rem; background:#7C5CFC; border:none;" data-bs-toggle="modal" data-bs-target="#modalAsignarHorarioClase">
+                <i class="bi bi-plus-lg"></i>
+                <span>Asignar Clase</span>
+              </button>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- SELECTOR DE DÍAS SEGMENTADO (LUNES A VIERNES) -->
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+          <div class="schedule-segmented-nav" id="scheduleDayPills">
+            {% for col_num, col_nom in horario_docente_data.dias_semana_columnas %}
+              <button type="button" 
+                      class="schedule-seg-btn {% if col_num == horario_docente_data.dia_actual_num or forloop.first and horario_docente_data.es_fin_de_semana %}active{% endif %}" 
+                      onclick="cambiarDiaHorarioVisual({{ col_num }})" 
+                      id="tabBtnDia{{ col_num }}">
+                <span>{{ col_nom }}</span>
+                {% if col_num == horario_docente_data.dia_actual_num %}
+                  <span class="badge bg-success-subtle text-success py-0.5 px-1.5 rounded-pill" style="font-size:0.65rem;">Hoy</span>
+                {% endif %}
+              </button>
+            {% endfor %}
+          </div>
+
+          <span class="text-muted small d-none d-md-inline">
+            <i class="bi bi-calendar3 me-1"></i> Período Académico {{ hoy|date:"Y" }}
+          </span>
+        </div>
+
+        <!-- CONTENEDORES DE CLASES POR CADA DÍA -->
+        {% for dia_num, dia_nom in horario_docente_data.dias_semana_columnas %}
+          <div class="schedule-day-view-panel {% if not forloop.first and horario_docente_data.es_fin_de_semana %}d-none{% elif dia_num != horario_docente_data.dia_actual_num and not horario_docente_data.es_fin_de_semana %}d-none{% endif %}" id="panelHorarioDia{{ dia_num }}">
+            
+            {% with clases_del_dia=horario_docente_data.clases_por_dia|get_item:dia_num %}
+              {% if clases_del_dia %}
+                <div class="schedule-cards-grid-spacious">
+                  {% for c in clases_del_dia %}
+                    <div class="schedule-clean-card">
+                      <div>
+                        <!-- Cabecera de la tarjeta: Hora + Estado -->
+                        <div class="d-flex justify-content-between align-items-center mb-2.5">
+                          <span class="fw-bold text-dark font-monospace" style="font-size: 0.95rem;">
+                            {{ c.bloque.hora_inicio|time:"H:i" }} — {{ c.bloque.hora_fin|time:"H:i" }}
+                          </span>
+                          {% if c.estado_tiempo == 'en_curso' %}
+                            <span class="status-dot-pill live">En curso</span>
+                          {% elif c.estado_tiempo == 'proxima' %}
+                            <span class="status-dot-pill next">Próxima</span>
+                          {% elif c.estado_tiempo == 'finalizada' %}
+                            <span class="status-dot-pill completed">Finalizada</span>
+                          {% else %}
+                            <span class="status-dot-pill scheduled">{{ c.bloque.nombre }}</span>
+                          {% endif %}
+                        </div>
+
+                        <!-- Título de Asignatura -->
+                        <h4 class="fw-extrabold text-dark mb-2" style="font-size: 1.15rem; line-height: 1.3;">
+                          {{ c.asignatura.nombre }}
+                        </h4>
+
+                        <!-- Curso y Sala -->
+                        <div class="d-flex align-items-center gap-2 flex-wrap mb-4 text-muted small">
+                          <span class="badge bg-light text-dark border px-2.5 py-1 fw-bold" style="font-size:0.78rem; border-radius:8px;">
+                            <i class="bi bi-people-fill text-primary me-1"></i>{{ c.seccion.nombre }}
+                          </span>
+                          {% if c.sala %}
+                            <span class="badge bg-light text-secondary border px-2.5 py-1 fw-semibold" style="font-size:0.78rem; border-radius:8px;">
+                              <i class="bi bi-geo-alt-fill text-muted me-1"></i>{{ c.sala }}
+                            </span>
+                          {% endif %}
+                        </div>
+                      </div>
+
+                      <!-- Acciones Rápidas del Docente -->
+                      <div class="pt-3 border-top d-flex gap-2">
+                        <a href="{% url 'registrar_asistencia' %}?seccion={{ c.seccion.id }}&asignatura={{ c.asignatura.id }}" class="btn btn-outline-primary fw-bold flex-grow-1 py-2 d-flex align-items-center justify-content-center gap-1.5" style="border-radius:12px; font-size:0.82rem;">
+                          <i class="bi bi-clipboard2-check"></i>
+                          <span>Asistencia</span>
+                        </a>
+                        <a href="{% url 'leccionario_hub' %}?seccion_id={{ c.seccion.id }}&asignatura_id={{ c.asignatura.id }}" class="btn btn-primary fw-bold flex-grow-1 py-2 d-flex align-items-center justify-content-center gap-1.5" style="border-radius:12px; font-size:0.82rem; background:#7C5CFC; border:none;">
+                          <i class="bi bi-journal-check"></i>
+                          <span>Leccionario</span>
+                        </a>
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+              {% else %}
+                <div class="p-4 p-md-5 bg-light rounded-4 text-center border" style="border-style: dashed !important; border-width: 1.5px !important;">
+                  <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width:52px; height:52px; background:#F1F5F9; color:#64748B; font-size:1.4rem;">
+                    ☕
+                  </div>
+                  <h5 class="fw-extrabold text-dark mb-1 fs-6">Sin clases programadas para el {{ dia_nom }}</h5>
+                  <p class="text-muted small mb-3" style="max-width: 480px; margin-left: auto; margin-right: auto;">No registras bloques lectivos asignados para esta jornada escolar.</p>
+                  <button type="button" class="btn btn-sm btn-light border fw-bold px-3 py-1.5" style="border-radius:10px; font-size:0.82rem;" data-bs-toggle="modal" data-bs-target="#modalHorarioSemanal">
+                    <i class="bi bi-grid-3x3-gap me-1 text-primary"></i> Consultar Horario Completo
+                  </button>
+                </div>
+              {% endif %}
+            {% endwith %}
+
+          </div>
+        {% endfor %}
+
+      </div>
+
+      <!-- MÓDULO DE ACCESOS RÁPIDOS SEGMENTADO Y ARMONIOSO -->
+      <div class="shortcuts-hub-section">
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-3">
+          <div class="d-flex align-items-center gap-2">
+            <h3 class="fw-extrabold text-dark mb-0 fs-6"><i class="bi bi-grid-fill text-primary me-2"></i>Módulos & Accesos Rápidos</h3>
+            <span class="badge fw-extrabold px-2.5 py-1" style="background:#EDE9FE; color:#6D28D9; border-radius:20px; font-size:0.72rem;">Hub Dinámico</span>
+          </div>
+
+          <!-- Filter Category Pills -->
+          <div class="hub-tabs-container" id="hubFilterTabs">
+            <button type="button" class="hub-tab-btn active" data-filter="all">
+              <i class="bi bi-stars"></i> Todos
+            </button>
+            <button type="button" class="hub-tab-btn" data-filter="academico">
+              <i class="bi bi-journal-bookmark"></i> Académico
+            </button>
+            {% if is_admin or is_secretario %}
+            <button type="button" class="hub-tab-btn" data-filter="gestion">
+              <i class="bi bi-people"></i> Gestión & Personal
+            </button>
+            {% endif %}
+            <button type="button" class="hub-tab-btn" data-filter="convivencia">
+              <i class="bi bi-shield-check"></i> Convivencia
+            </button>
+            {% if is_admin or 'finanzas' in permisos_ver or 'inventario' in permisos_ver or 'proveedores' in permisos_ver %}
+            <button type="button" class="hub-tab-btn" data-filter="finanzas">
+              <i class="bi bi-wallet2"></i> Administración
+            </button>
+            {% endif %}
+          </div>
+
           <button type="button" class="btn btn-sm btn-link text-decoration-none text-primary fw-extrabold p-0" data-bs-toggle="modal" data-bs-target="#modalCustomizeShortcuts">
-            <i class="bi bi-gear-fill me-1"></i> Configurar accesos
+            <i class="bi bi-gear-fill me-1"></i> Personalizar
           </button>
         </div>
 
         <div class="shortcuts-grid" id="shortcutsGridContainer">
+          <!-- 0. Mis Cursos & Materias (Docente/UTP/Admin) -->
+          {% if is_profesor or is_utp or is_admin %}
+          <a href="{% url 'mis_cursos_docente' %}" class="shortcut-card-elevated" data-shortcut-id="sc_mis_cursos" data-category="academico">
+            <div class="shortcut-icon-elevated" style="background:#F0EDFF; color:#7C5CFC;"><i class="bi bi-mortarboard-fill"></i></div>
+            <span class="shortcut-title-elevated">Mis Cursos & Materias</span>
+            <span class="shortcut-desc-elevated">Asignaturas y horario</span>
+          </a>
+          {% endif %}
+
           <!-- 1. Tomar Asistencia -->
-          <a href="{% url 'registrar_asistencia' %}" class="shortcut-card-elevated" data-shortcut-id="sc_asistencia">
+          {% if is_admin or is_utp or is_profesor or is_inspector or 'asistencia' in permisos_ver %}
+          <a href="{% url 'registrar_asistencia' %}" class="shortcut-card-elevated" data-shortcut-id="sc_asistencia" data-category="academico">
             <div class="shortcut-icon-elevated" style="background:#F0EDFF; color:#7C5CFC;"><i class="bi bi-clipboard-check-fill"></i></div>
             <span class="shortcut-title-elevated">Tomar Asistencia</span>
             <span class="shortcut-desc-elevated">Registro diario por sección</span>
           </a>
+          {% endif %}
 
           <!-- 2. Calificaciones -->
-          <a href="{% url 'libro_calificaciones' %}" class="shortcut-card-elevated" data-shortcut-id="sc_calificaciones">
+          {% if is_admin or is_utp or is_profesor or 'calificaciones' in permisos_ver or 'libro de clases' in permisos_ver %}
+          <a href="{% url 'libro_calificaciones' %}" class="shortcut-card-elevated" data-shortcut-id="sc_calificaciones" data-category="academico">
             <div class="shortcut-icon-elevated" style="background:#EFF6FF; color:#3B82F6;"><i class="bi bi-journal-bookmark-fill"></i></div>
             <span class="shortcut-title-elevated">Calificaciones</span>
             <span class="shortcut-desc-elevated">Libro de notas y coeficientes</span>
           </a>
+          {% endif %}
 
           <!-- 3. Matricular Alumno -->
-          <a href="{% url 'matricular_estudiante' %}" class="shortcut-card-elevated" data-shortcut-id="sc_matricula">
+          {% if is_admin or is_secretario or 'estudiantes' in permisos_ver %}
+          <a href="{% url 'matricular_estudiante' %}" class="shortcut-card-elevated" data-shortcut-id="sc_matricula" data-category="gestion">
             <div class="shortcut-icon-elevated" style="background:#ECFDF5; color:#10B981;"><i class="bi bi-person-plus-fill"></i></div>
             <span class="shortcut-title-elevated">Matricular Alumno</span>
             <span class="shortcut-desc-elevated">Ficha y diagnóstico PIE</span>
           </a>
+          {% endif %}
 
           <!-- 4. Agenda y Calendario -->
-          <a href="{% url 'calendario_escolar' %}" class="shortcut-card-elevated" data-shortcut-id="sc_calendario">
+          {% if is_admin or is_utp or is_profesor or is_inspector or is_convivencia or is_secretario or 'calendario' in permisos_ver %}
+          <a href="{% url 'calendario_escolar' %}" class="shortcut-card-elevated" data-shortcut-id="sc_calendario" data-category="academico">
             <div class="shortcut-icon-elevated" style="background:#FEF3C7; color:#D97706;"><i class="bi bi-calendar2-week-fill"></i></div>
             <span class="shortcut-title-elevated">Agenda Escolar</span>
-            <span class="shortcut-desc-elevated">Clases, pruebas y reuniones</span>
+            <span class="shortcut-desc-elevated">Clases, pruebas y eventos</span>
           </a>
+          {% endif %}
 
           <!-- 5. Convivencia Escolar -->
-          <a href="{% url 'convivencia_hub' %}" class="shortcut-card-elevated" data-shortcut-id="sc_convivencia">
-            <div class="shortcut-icon-elevated" style="background:#FFF1F2; color:#E11D48;"><i class="bi bi-shield-check"></i></div>
-            <span class="shortcut-title-elevated">Convivencia Escolar</span>
+          {% if is_admin or is_utp or is_profesor or is_inspector or is_convivencia or 'convivencia' in permisos_ver %}
+          <a href="{% url 'convivencia_hub' %}" class="shortcut-card-elevated" data-shortcut-id="sc_convivencia" data-category="convivencia">
+            <div class="shortcut-icon-elevated" style="background:#FFF1F2; color:#EF4444;"><i class="bi bi-shield-check"></i></div>
+            <span class="shortcut-title-elevated">Convivencia</span>
             <span class="shortcut-desc-elevated">Bitácora y hoja de vida</span>
           </a>
+          {% endif %}
 
           <!-- 6. Boletines y Reportes -->
-          <a href="{% url 'centro_reportes' %}" class="shortcut-card-elevated" data-shortcut-id="sc_reportes">
+          {% if is_admin or is_utp or is_profesor or is_inspector or is_secretario or 'reportes' in permisos_ver %}
+          <a href="{% url 'centro_reportes' %}" class="shortcut-card-elevated" data-shortcut-id="sc_reportes" data-category="academico">
             <div class="shortcut-icon-elevated" style="background:#FDF2F8; color:#DB2777;"><i class="bi bi-file-earmark-bar-graph-fill"></i></div>
             <span class="shortcut-title-elevated">Centro Reportes</span>
             <span class="shortcut-desc-elevated">Boletines y certificados</span>
           </a>
+          {% endif %}
 
           <!-- 7. Gestión Curricular -->
-          <a href="{% url 'listar_asignaturas' %}" class="shortcut-card-elevated" data-shortcut-id="sc_asignaturas">
+          {% if is_admin or is_utp or 'academico' in permisos_ver or 'asignaturas' in permisos_ver %}
+          <a href="{% url 'listar_asignaturas' %}" class="shortcut-card-elevated" data-shortcut-id="sc_asignaturas" data-category="academico">
             <div class="shortcut-icon-elevated" style="background:#F3E8FF; color:#9333EA;"><i class="bi bi-book-half"></i></div>
             <span class="shortcut-title-elevated">Asignaturas</span>
             <span class="shortcut-desc-elevated">Malla y asignación docente</span>
           </a>
+          {% endif %}
 
-          <!-- 8. Gestión de Personal -->
-          <a href="{% url 'listar_personal' %}" class="shortcut-card-elevated" data-shortcut-id="sc_personal">
+          <!-- 8. Gestión de Personal (Solo Director / Admin) -->
+          {% if is_admin or 'personal' in permisos_ver %}
+          <a href="{% url 'listar_personal' %}" class="shortcut-card-elevated" data-shortcut-id="sc_personal" data-category="gestion">
             <div class="shortcut-icon-elevated" style="background:#E0E7FF; color:#4F46E5;"><i class="bi bi-people-fill"></i></div>
             <span class="shortcut-title-elevated">Personal & Roles</span>
             <span class="shortcut-desc-elevated">Permisos por módulo</span>
           </a>
+          {% endif %}
 
-          <!-- 9. Políticas Académicas -->
-          <a href="{% url 'configuracion_politicas' %}" class="shortcut-card-elevated" data-shortcut-id="sc_politicas">
+          <!-- 9. Políticas Académicas (Solo Director / Admin) -->
+          {% if is_admin %}
+          <a href="{% url 'configuracion_politicas' %}" class="shortcut-card-elevated" data-shortcut-id="sc_politicas" data-category="gestion">
             <div class="shortcut-icon-elevated" style="background:#F1F5F9; color:#475569;"><i class="bi bi-sliders"></i></div>
             <span class="shortcut-title-elevated">Políticas Colegio</span>
             <span class="shortcut-desc-elevated">Escalas y reglas de notas</span>
           </a>
+          {% endif %}
 
           <!-- 10. Estadísticas & BI -->
-          {% if is_admin %}
-          <a href="{% url 'estadisticas_colegio' %}" class="shortcut-card-elevated" data-shortcut-id="sc_estadisticas">
+          {% if is_admin or is_utp or 'estadisticas' in permisos_ver %}
+          <a href="{% url 'estadisticas_colegio' %}" class="shortcut-card-elevated" data-shortcut-id="sc_estadisticas" data-category="finanzas">
             <div class="shortcut-icon-elevated" style="background:#ECFDF5; color:#059669;"><i class="bi bi-pie-chart-fill"></i></div>
             <span class="shortcut-title-elevated">Estadísticas</span>
             <span class="shortcut-desc-elevated">Demografía, notas y Excel</span>
@@ -585,7 +1722,7 @@
 
           <!-- 11. Finanzas & Caja Chica -->
           {% if is_admin or 'finanzas' in permisos_ver or 'contabilidad' in permisos_ver %}
-          <a href="{% url 'finanzas_dashboard' %}" class="shortcut-card-elevated" data-shortcut-id="sc_finanzas">
+          <a href="{% url 'finanzas_dashboard' %}" class="shortcut-card-elevated" data-shortcut-id="sc_finanzas" data-category="finanzas">
             <div class="shortcut-icon-elevated" style="background:#ECFDF5; color:#047857;"><i class="bi bi-wallet2"></i></div>
             <span class="shortcut-title-elevated">Finanzas & Caja</span>
             <span class="shortcut-desc-elevated">Caja chica, facturas y gastos</span>
@@ -594,7 +1731,7 @@
 
           <!-- 12. Inventario & Stock -->
           {% if is_admin or 'inventario' in permisos_ver or 'bodega' in permisos_ver %}
-          <a href="{% url 'inventario_dashboard' %}" class="shortcut-card-elevated" data-shortcut-id="sc_inventario">
+          <a href="{% url 'inventario_dashboard' %}" class="shortcut-card-elevated" data-shortcut-id="sc_inventario" data-category="finanzas">
             <div class="shortcut-icon-elevated" style="background:#EFF6FF; color:#2563EB;"><i class="bi bi-box-seam"></i></div>
             <span class="shortcut-title-elevated">Inventario & Stock</span>
             <span class="shortcut-desc-elevated">Insumos y alertas de stock</span>
@@ -603,7 +1740,7 @@
 
           <!-- 13. Proveedores -->
           {% if is_admin or 'proveedores' in permisos_ver %}
-          <a href="{% url 'proveedores_directorio' %}" class="shortcut-card-elevated" data-shortcut-id="sc_proveedores">
+          <a href="{% url 'proveedores_directorio' %}" class="shortcut-card-elevated" data-shortcut-id="sc_proveedores" data-category="finanzas">
             <div class="shortcut-icon-elevated" style="background:#FDF2F8; color:#DB2777;"><i class="bi bi-truck"></i></div>
             <span class="shortcut-title-elevated">Proveedores</span>
             <span class="shortcut-desc-elevated">Contactos y pedidos WhatsApp</span>
@@ -611,8 +1748,8 @@
           {% endif %}
 
           <!-- 14. Talleres Extracurriculares (ACLES) -->
-          {% if is_admin or 'talleres' in permisos_ver or 'cursos' in permisos_ver %}
-          <a href="{% url 'talleres_dashboard' %}" class="shortcut-card-elevated" data-shortcut-id="sc_talleres">
+          {% if is_admin or is_utp or 'talleres' in permisos_ver or 'cursos' in permisos_ver %}
+          <a href="{% url 'talleres_dashboard' %}" class="shortcut-card-elevated" data-shortcut-id="sc_talleres" data-category="academico">
             <div class="shortcut-icon-elevated" style="background:#FEF3C7; color:#D97706;"><i class="bi bi-star-fill"></i></div>
             <span class="shortcut-title-elevated">Talleres (ACLES)</span>
             <span class="shortcut-desc-elevated">Multicurso y asistencia</span>
@@ -620,8 +1757,8 @@
           {% endif %}
 
           <!-- 15. SIMCE & Diagnóstico DIA -->
-          {% if is_admin or is_profesor or 'simce' in permisos_ver or 'reportes' in permisos_ver %}
-          <a href="{% url 'simce_dashboard' %}" class="shortcut-card-elevated" data-shortcut-id="sc_simce">
+          {% if is_admin or is_utp or is_profesor or 'simce' in permisos_ver or 'reportes' in permisos_ver %}
+          <a href="{% url 'simce_dashboard' %}" class="shortcut-card-elevated" data-shortcut-id="sc_simce" data-category="academico">
             <div class="shortcut-icon-elevated" style="background:#F0EDFF; color:#7C5CFC;"><i class="bi bi-award-fill"></i></div>
             <span class="shortcut-title-elevated">SIMCE & DIA</span>
             <span class="shortcut-desc-elevated">Ensayos y estándares MINEDUC</span>
@@ -630,39 +1767,39 @@
         </div>
       </div>
 
-
-
-
-
-
-      <!-- MAIN 2 COLUMNS -->
+      <!-- MAIN 2 COLUMNS ARMONIOSAS -->
       <div class="dashboard-two-cols">
         
-        <!-- LEFT COLUMN (GRAPHS & RISK MONITOR) -->
+        <!-- LEFT COLUMN (ALUMNOS EN RIESGO, ASISTENCIA Y SOLICITUDES) -->
         <div>
           
-          <!-- MONITOR DE ALUMNOS EN RIESGO -->
+          <!-- MONITOR DE ALUMNOS EN RIESGO (RADAR CONVIVENCIA) -->
           <div class="card-panel-dash">
             <div class="panel-header-dash">
               <div>
-                <h3 class="fw-extrabold text-dark mb-0 fs-6"><i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>Monitor de Alumnos en Riesgo</h3>
+                <h3 class="fw-extrabold text-dark mb-0 fs-6 d-flex align-items-center gap-2">
+                  <span class="rounded-circle d-flex align-items-center justify-content-center" style="width:30px; height:30px; background:#FFF1F2; color:#EF4444;">
+                    <i class="bi bi-exclamation-triangle-fill fs-6"></i>
+                  </span>
+                  Monitor de Asistencia & Convivencia en Riesgo
+                </h3>
                 <span class="text-muted extra-small">Estudiantes con asistencia crítica (&lt; 85%) o alertas activas</span>
               </div>
-              <a href="{% url 'convivencia_hub' %}" class="btn btn-sm btn-outline-danger fw-bold" style="border-radius:8px; font-size:0.78rem;">
+              <a href="{% url 'convivencia_hub' %}" class="btn btn-sm btn-outline-danger fw-bold" style="border-radius:10px; font-size:0.78rem;">
                 Ver Todo el Módulo
               </a>
             </div>
 
             {% if alumnos_en_riesgo %}
               <div class="table-responsive">
-                <table class="table table-risk mb-0">
+                <table class="table table-risk mb-0 align-middle">
                   <thead>
                     <tr>
-                      <th>Estudiante</th>
+                      <th style="border-radius: 8px 0 0 8px;">Estudiante</th>
                       <th>Curso</th>
-                      <th>Asistencia</th>
+                      <th>Nivel de Asistencia</th>
                       <th>Faltas</th>
-                      <th class="text-end">Acción</th>
+                      <th class="text-end" style="border-radius: 0 8px 8px 0;">Acción</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -670,22 +1807,23 @@
                       <tr>
                         <td>
                           <div class="d-flex align-items-center gap-2.5">
-                            <img src="https://ui-avatars.com/api/?name={{ item.estudiante.nombres }}+{{ item.estudiante.apellidos }}&background=E2E8F0&color=475569" style="width:32px; height:32px; border-radius:50%; object-fit:cover;">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm flex-shrink-0" style="width:36px; height:36px; background:#EDE9FE; color:#7C5CFC; font-size:0.85rem;">
+                              {{ item.estudiante.nombre_completo|slice:":2"|upper }}
+                            </div>
                             <div>
-                              <div class="fw-bold text-dark">{{ item.estudiante.apellidos }}, {{ item.estudiante.nombres }}</div>
+                              <div class="fw-bold text-dark">{{ item.estudiante.nombre_completo }}</div>
                               {% if item.estudiante.es_pie %}
                                 <span class="badge px-1.5 py-0 fw-bold" style="background:#F0EDFF; color:#7C5CFC; font-size:0.65rem; border-radius:4px;">🧩 PIE</span>
                               {% endif %}
                             </div>
                           </div>
                         </td>
-                        <td><span class="badge bg-light text-dark border fw-bold">{{ item.estudiante.curso.nombre }}</span></td>
+                        <td><span class="badge bg-light text-dark border fw-bold">{{ item.estudiante.seccion.nombre|default:'Sin Sección' }}</span></td>
                         <td>
                           <div class="d-flex align-items-center gap-2">
-                            <div class="progress flex-grow-1" style="height: 6px; width: 60px; border-radius: 10px; background: #F1F5F9;">
+                            <div class="progress flex-grow-1" style="height: 6px; width: 70px; border-radius: 10px; background: #F1F5F9;">
                               <div class="progress-bar bar-pct {% if item.tasa < 85 %}bg-danger{% else %}bg-warning{% endif %}" data-pct="{{ item.tasa }}"></div>
                             </div>
-
                             <span class="fw-extrabold {% if item.tasa < 85 %}text-danger{% else %}text-warning{% endif %}" style="font-size:0.82rem;">
                               {{ item.tasa }}%
                             </span>
@@ -693,12 +1831,11 @@
                         </td>
                         <td><span class="text-danger fw-extrabold">{{ item.faltas }}</span></td>
                         <td class="text-end">
-                          <a href="{% url 'hoja_vida_estudiante' item.estudiante.id %}" class="btn btn-sm btn-light border fw-bold text-primary px-2.5 py-1" style="border-radius:8px; font-size:0.78rem;">
+                          <a href="{% url 'hoja_vida_estudiante' item.estudiante.id %}" class="btn btn-sm btn-light border fw-bold text-primary px-2.5 py-1.5" style="border-radius:8px; font-size:0.78rem;">
                             <i class="bi bi-file-person me-1"></i> Hoja Vida
                           </a>
                         </td>
                       </tr>
-
                     {% endfor %}
                   </tbody>
                 </table>
@@ -716,133 +1853,97 @@
           <div class="card-panel-dash">
             <div class="panel-header-dash">
               <div>
-                <h3 class="fw-extrabold text-dark mb-0 fs-6"><i class="bi bi-graph-up-arrow text-primary me-2"></i>Evolución de Asistencia General</h3>
+                <h3 class="fw-extrabold text-dark mb-0 fs-6 d-flex align-items-center gap-2">
+                  <span class="rounded-circle d-flex align-items-center justify-content-center" style="width:30px; height:30px; background:#EDE9FE; color:#7C5CFC;">
+                    <i class="bi bi-graph-up-arrow fs-6"></i>
+                  </span>
+                  Evolución de Asistencia General
+                </h3>
                 <span class="text-muted extra-small">Promedio mensual del establecimiento</span>
               </div>
-              <a href="{% url 'historial_asistencia' %}" class="btn btn-sm btn-light border fw-bold text-dark" style="border-radius:8px; font-size:0.78rem;">
+              <a href="{% url 'historial_asistencia' %}" class="btn btn-sm btn-light border fw-bold text-dark" style="border-radius:10px; font-size:0.78rem;">
                 <i class="bi bi-calendar3 me-1"></i> Ver Detallado
               </a>
             </div>
-            <div style="position: relative; height: 250px; width: 100%;">
+            <div style="position: relative; height: 260px; width: 100%;">
               <canvas id="mainDashboardChart"></canvas>
             </div>
           </div>
 
-          <!-- SOLICITUDES DE ACCESO PENDIENTES (ADMIN/DIRECTOR) -->
+          <!-- SOLICITUDES DE ACCESO PENDIENTES (ADMIN/DIRECTOR - RESUMEN ACOTADO) -->
           {% if is_admin and solicitudes_pendientes %}
-            <div class="card-panel-dash border-warning-subtle" style="border: 1.5px solid rgba(245, 158, 11, 0.3);">
-              <div class="panel-header-dash">
-                <div>
-                  <h3 class="fw-extrabold text-dark mb-0 fs-6 d-flex align-items-center gap-2">
-                    <span class="rounded-circle d-flex align-items-center justify-content-center" style="width:28px; height:28px; background:#FEF3C7; color:#D97706;">
-                      <i class="bi bi-bell-fill fs-6"></i>
-                    </span>
-                    Solicitudes de Acceso Pendientes
-                  </h3>
-                  <span class="text-muted extra-small">Docentes o funcionarios que solicitan ingresar a tu colegio</span>
+            <div class="card-panel-dash" style="border: 1.5px solid #DDD6FE; background: #FFFFFF; box-shadow: 0 8px 24px rgba(124, 92, 252, 0.06); border-radius: 18px; overflow: hidden; padding: 0;">
+              <div class="panel-header-dash mb-0" style="background: linear-gradient(135deg, #FAF5FF 0%, #F5F3FF 100%); border-bottom: 1.5px solid #EDE9FE; padding: 1.1rem 1.4rem;">
+                <div class="d-flex align-items-center gap-2.5">
+                  <span class="rounded-circle d-flex align-items-center justify-content-center pulse-glow-purple flex-shrink-0" style="width:32px; height:32px; background:#7C5CFC; color:#FFFFFF;">
+                    <i class="bi bi-person-plus-fill fs-6"></i>
+                  </span>
+                  <div>
+                    <h3 class="fw-extrabold text-dark mb-0 fs-6">Solicitudes de Acceso</h3>
+                    <span class="text-muted extra-small">Docentes o funcionarios pendientes de autorización</span>
+                  </div>
                 </div>
                 <div class="d-flex align-items-center gap-2">
-                  <span class="badge bg-warning text-dark fw-bold px-2.5 py-1.5" style="border-radius:8px;">{{ solicitudes_pendientes_count }} Nuevas</span>
-                  <button type="button" class="btn btn-sm btn-outline-warning fw-bold text-dark" data-bs-toggle="modal" data-bs-target="#modalSolicitudesPendientes" style="border-radius:8px; font-size:0.78rem;">
-                    <i class="bi bi-window-fullscreen me-1"></i> Ver en Ventana
+                  <span class="badge fw-extrabold px-2.5 py-1" style="background: #EDE9FE; color: #6D28D9; border: 1px solid #DDD6FE; border-radius:20px; font-size: 0.74rem;">
+                    {{ solicitudes_pendientes_count }} Pendiente{{ solicitudes_pendientes_count|pluralize:"s" }}
+                  </span>
+                  <button type="button" class="btn btn-sm fw-bold px-3 py-1.9 d-flex align-items-center gap-1.5 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalSolicitudesPendientes" style="border-radius:10px; font-size:0.78rem; background:#7C5CFC; color:#FFFFFF; border:none;">
+                    <i class="bi bi-window-fullscreen"></i>
+                    <span>Ver Todas</span>
                   </button>
                 </div>
               </div>
 
-              <div class="table-responsive">
-                <table class="table align-middle mb-0" style="font-size: 0.88rem;">
-                  <thead class="table-light" style="font-size: 0.78rem; text-transform: uppercase; color: #64748B;">
-                    <tr>
-                      <th style="padding: 0.75rem 1rem;">Solicitante</th>
-                      <th>Rol Solicitado</th>
-                      <th style="min-width: 170px;">Rol a Asignar</th>
-                      <th>Fecha</th>
-                      <th class="text-end" style="padding-right: 1rem;">Acción</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for sol in solicitudes_pendientes %}
-                      <tr>
-                        <td style="padding: 0.85rem 1rem;">
-                          <div class="d-flex align-items-center gap-2.5">
-                            <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white shadow-sm flex-shrink-0" style="width:36px; height:36px; background:#7C5CFC; font-size:0.88rem;">
-                              {{ sol.usuario.first_name|default:sol.usuario.username|slice:":1"|upper }}
-                            </div>
-                            <div>
-                              <div class="fw-bold text-dark">{{ sol.usuario.perfil.nombre_completo|default:sol.usuario.get_full_name|default:sol.usuario.username }}</div>
-                              <div class="text-muted extra-small d-flex align-items-center gap-2">
-                                <span><i class="bi bi-envelope me-0.5"></i> {{ sol.usuario.email }}</span>
-                                {% if sol.usuario.perfil.rut %}
-                                  <span>• <i class="bi bi-card-text me-0.5"></i> {{ sol.usuario.perfil.rut }}</span>
-                                {% endif %}
-                              </div>
-                              {% if sol.mensaje %}
-                                <div class="mt-1 p-1.5 px-2 bg-light rounded text-muted extra-small border" style="font-style: italic;">
-                                  <i class="bi bi-chat-quote me-1 text-primary"></i> "{{ sol.mensaje }}"
-                                </div>
-                              {% endif %}
-                            </div>
+              <div class="p-3">
+                <div class="d-flex flex-column gap-2">
+                  {% for sol in solicitudes_pendientes %}
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 p-2.5 px-3 rounded-3" style="background: #F8FAFC; border: 1px solid #E2E8F0; transition: all 0.2s ease;">
+                      <div class="d-flex align-items-center gap-2.5 min-w-0">
+                        <div class="user-portrait-circle" style="width:36px; height:36px; font-size:0.95rem; border-radius:10px; flex-shrink: 0;">
+                          {{ sol.usuario.first_name|default:sol.usuario.username|slice:":1"|upper }}
+                        </div>
+                        <div class="min-w-0">
+                          <div class="fw-bold text-dark text-truncate" style="font-size: 0.88rem;">{{ sol.usuario.perfil.nombre_completo|default:sol.usuario.get_full_name|default:sol.usuario.username }}</div>
+                          <div class="text-muted extra-small d-flex align-items-center gap-2">
+                            <span class="text-primary"><i class="bi bi-envelope-fill me-0.5"></i> {{ sol.usuario.email }}</span>
+                            <span class="badge bg-purple-subtle text-primary fw-bold" style="background:#EDE9FE; color:#6D28D9 !important; font-size:0.68rem; padding: 2px 6px; border-radius: 6px;">{{ sol.rol_solicitado|title }}</span>
                           </div>
-                        </td>
-                        <td>
-                          <span class="badge bg-secondary-subtle text-secondary border fw-bold text-capitalize px-2 py-1">
-                            {{ sol.rol_solicitado|title }}
-                          </span>
-                        </td>
-                        <td>
-                          <form id="formAprobar{{ sol.id }}" method="POST" action="{% url 'aprobar_solicitud' sol.id %}">
-                            {% csrf_token %}
-                            <select name="rol_id" class="form-select form-select-sm fw-bold border-primary-subtle" style="border-radius:8px; font-size:0.82rem; background-color:#F8FAFC;">
-                              {% for r in roles_colegio %}
-                                <option value="{{ r.id }}" {% if r.nombre|lower == sol.rol_solicitado|lower %}selected{% endif %}>
-                                  {{ r.nombre }}
-                                </option>
-                              {% empty %}
-                                <option value="profesor" selected>Profesor</option>
-                                <option value="inspector">Inspector</option>
-                                <option value="director">Director</option>
-                                <option value="administrativo">Administrativo</option>
-                              {% endfor %}
-                            </select>
-                          </form>
-                        </td>
-                        <td>
-                          <span class="text-muted extra-small">{{ sol.fecha_solicitud|date:"d/m/Y H:i" }}</span>
-                        </td>
-                        <td class="text-end" style="padding-right: 1rem;">
-                          <div class="d-flex align-items-center justify-content-end gap-1.5">
-                            <button type="submit" form="formAprobar{{ sol.id }}" class="btn btn-sm btn-success fw-bold px-2.5 py-1" style="border-radius:8px; font-size:0.8rem;" title="Aprobar con el rol seleccionado">
-                              <i class="bi bi-check-lg me-1"></i> Aprobar
-                            </button>
-                            <form method="POST" action="{% url 'rechazar_solicitud' sol.id %}" class="d-inline" onsubmit="return confirm('¿Seguro que deseas rechazar esta solicitud?');">
-                              {% csrf_token %}
-                              <button type="submit" class="btn btn-sm btn-outline-danger fw-bold px-2 py-1" style="border-radius:8px; font-size:0.8rem;" title="Rechazar solicitud">
-                                <i class="bi bi-x-lg"></i>
-                              </button>
-                            </form>
-                          </div>
-                        </td>
-                      </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
+                        </div>
+                      </div>
+                      <div class="d-flex align-items-center gap-2 flex-shrink-0">
+                        <span class="text-muted extra-small d-none d-md-inline font-monospace">
+                          <i class="bi bi-clock me-0.5"></i> {{ sol.fecha_solicitud|date:"d/m/Y H:i" }}
+                        </span>
+                        <button type="button" class="btn btn-sm fw-bold px-3 py-1.5 d-flex align-items-center gap-1 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalSolicitudesPendientes" style="border-radius:8px; font-size:0.78rem; background:linear-gradient(135deg, #7C5CFC 0%, #6366F1 100%); color:#FFFFFF; border:none;" title="Ver detalle completo y aprobar/rechazar">
+                          <i class="bi bi-eye-fill"></i>
+                          <span>Ver Detalle</span>
+                        </button>
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
               </div>
             </div>
           {% endif %}
 
         </div>
 
-        <!-- RIGHT COLUMN (AGENDA HOY & ACTIVIDAD) -->
+        <!-- RIGHT COLUMN (AGENDA HOY & ACTIVIDAD RECIENTE) -->
         <div>
           
-          <!-- MI AGENDA HOY (100% REAL) -->
+          <!-- MI AGENDA HOY -->
           <div class="card-panel-dash">
             <div class="panel-header-dash">
               <div>
-                <h3 class="fw-extrabold text-dark mb-0 fs-6"><i class="bi bi-calendar2-day-fill text-primary me-2"></i>Mi Agenda de Hoy</h3>
+                <h3 class="fw-extrabold text-dark mb-0 fs-6 d-flex align-items-center gap-2">
+                  <span class="rounded-circle d-flex align-items-center justify-content-center" style="width:30px; height:30px; background:#FEF3C7; color:#D97706;">
+                    <i class="bi bi-calendar2-day-fill fs-6"></i>
+                  </span>
+                  Mi Agenda de Hoy
+                </h3>
                 <span class="text-muted extra-small">{{ hoy|date:"l, d \d\e F"|title }}</span>
               </div>
-              <a href="{% url 'calendario_escolar' %}" class="btn btn-sm btn-light border fw-bold text-dark" style="border-radius:8px; font-size:0.78rem;">
+              <a href="{% url 'calendario_escolar' %}" class="btn btn-sm btn-light border fw-bold text-dark" style="border-radius:10px; font-size:0.78rem;">
                 <i class="bi bi-calendar-plus me-1"></i> Abrir Calendario
               </a>
             </div>
@@ -869,15 +1970,15 @@
 
                     <div>
                       {% if ev.tipo == 'clase' %}
-                        <a href="{% url 'registrar_asistencia' %}" class="btn btn-sm btn-primary fw-bold px-3 py-1.5" style="border-radius:8px; font-size:0.78rem;">
+                        <a href="{% url 'registrar_asistencia' %}" class="btn btn-sm btn-primary fw-bold px-3 py-1.5" style="border-radius:10px; font-size:0.78rem;">
                           Pasar Lista
                         </a>
                       {% elif ev.tipo == 'evaluacion' %}
-                        <a href="{% url 'libro_calificaciones' %}" class="btn btn-sm btn-danger fw-bold px-3 py-1.5" style="border-radius:8px; font-size:0.78rem;">
+                        <a href="{% url 'libro_calificaciones' %}" class="btn btn-sm btn-danger fw-bold px-3 py-1.5" style="border-radius:10px; font-size:0.78rem;">
                           Calificar
                         </a>
                       {% else %}
-                        <a href="{% url 'calendario_escolar' %}" class="btn btn-sm btn-light border fw-bold text-dark px-3 py-1.5" style="border-radius:8px; font-size:0.78rem;">
+                        <a href="{% url 'calendario_escolar' %}" class="btn btn-sm btn-light border fw-bold text-dark px-3 py-1.5" style="border-radius:10px; font-size:0.78rem;">
                           Ver Detalle
                         </a>
                       {% endif %}
@@ -890,7 +1991,7 @@
                 <i class="bi bi-calendar-check fs-2 text-muted d-block mb-1"></i>
                 <h6 class="fw-bold text-dark mb-1">Sin compromisos agendados hoy</h6>
                 <p class="text-muted small mb-3">No tienes clases o reuniones programadas para el día de hoy.</p>
-                <a href="{% url 'calendario_escolar' %}" class="btn btn-sm btn-outline-primary fw-bold px-3 py-1.5" style="border-radius:8px;">
+                <a href="{% url 'calendario_escolar' %}" class="btn btn-sm btn-outline-primary fw-bold px-3 py-1.5" style="border-radius:10px;">
                   <i class="bi bi-plus-circle me-1"></i> Agendar Evento
                 </a>
               </div>
@@ -901,10 +2002,15 @@
           <div class="card-panel-dash">
             <div class="panel-header-dash">
               <div>
-                <h3 class="fw-extrabold text-dark mb-0 fs-6"><i class="bi bi-chat-left-quote-fill text-secondary me-2"></i>Últimas Anotaciones</h3>
+                <h3 class="fw-extrabold text-dark mb-0 fs-6 d-flex align-items-center gap-2">
+                  <span class="rounded-circle d-flex align-items-center justify-content-center" style="width:30px; height:30px; background:#F0EDFF; color:#7C5CFC;">
+                    <i class="bi bi-chat-left-quote-fill fs-6"></i>
+                  </span>
+                  Últimas Anotaciones
+                </h3>
                 <span class="text-muted extra-small">Bitácora de convivencia escolar</span>
               </div>
-              <a href="{% url 'convivencia_hub' %}" class="btn btn-sm btn-light border fw-bold text-dark" style="border-radius:8px; font-size:0.78rem;">
+              <a href="{% url 'convivencia_hub' %}" class="btn btn-sm btn-light border fw-bold text-dark" style="border-radius:10px; font-size:0.78rem;">
                 Ver Todas
               </a>
             </div>
@@ -913,14 +2019,14 @@
               {% for an in ultimas_anotaciones %}
                 <div class="note-card-dash">
                   <div class="d-flex justify-content-between align-items-center mb-1">
-                    <span class="fw-bold text-dark small">{{ an.estudiante.apellidos }}, {{ an.estudiante.nombres }}</span>
-                    <span class="badge {% if an.tipo == 'positiva' %}bg-success-subtle text-success{% else %}bg-danger-subtle text-danger{% endif %} fw-bold" style="font-size:0.7rem;">
+                    <span class="fw-bold text-dark small">{{ an.estudiante.nombre_completo }}</span>
+                    <span class="badge {% if an.tipo == 'positiva' %}bg-success-subtle text-success{% else %}bg-danger-subtle text-danger{% endif %} fw-bold" style="font-size:0.7rem; border-radius:20px;">
                       {{ an.get_tipo_display|default:an.tipo|title }}
                     </span>
                   </div>
                   <p class="text-muted extra-small mb-2 text-truncate" style="max-width: 100%;">{{ an.descripcion }}</p>
                   <div class="d-flex justify-content-between align-items-center pt-1 border-top">
-                    <span class="text-muted" style="font-size:0.7rem;"><i class="bi bi-person me-1"></i>{{ an.docente.get_full_name|default:an.docente.username|default:'Docente' }}</span>
+                    <span class="text-muted extra-small"><i class="bi bi-person me-1"></i>{{ an.docente.get_full_name|default:an.docente.username|default:'Docente' }}</span>
                     <a href="{% url 'hoja_vida_estudiante' an.estudiante.id %}" class="text-primary fw-bold text-decoration-none" style="font-size:0.72rem;">Ver Alumno →</a>
                   </div>
                 </div>
@@ -943,7 +2049,7 @@
 <!-- MODAL PERSONALIZAR ACCESOS RÁPIDOS -->
 <div class="modal fade" id="modalCustomizeShortcuts" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
       <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
         <div class="d-flex align-items-center gap-2">
           <div class="rounded-3 d-flex align-items-center justify-content-center" style="width:40px; height:40px; background:#F0EDFF; color:#7C5CFC;">
@@ -1042,7 +2148,7 @@
     if (ctx) {
       const chartCtx = ctx.getContext('2d');
       const gradient = chartCtx.createLinearGradient(0, 0, 0, 240);
-      gradient.addColorStop(0, 'rgba(124, 92, 252, 0.25)');
+      gradient.addColorStop(0, 'rgba(124, 92, 252, 0.28)');
       gradient.addColorStop(1, 'rgba(124, 92, 252, 0.0)');
 
       new Chart(ctx, {
@@ -1054,14 +2160,14 @@
             data: [93.5, 94.8, 92.1, 91.0, 95.2, 94.4, 93.8, 95.0, 94.2],
             borderColor: '#7C5CFC',
             backgroundColor: gradient,
-            borderWidth: 3,
+            borderWidth: 3.2,
             fill: true,
             tension: 0.35,
             pointBackgroundColor: '#FFFFFF',
             pointBorderColor: '#7C5CFC',
             pointBorderWidth: 2.5,
             pointRadius: 4.5,
-            pointHoverRadius: 6.5
+            pointHoverRadius: 7
           }]
         },
         options: {
@@ -1070,11 +2176,11 @@
           plugins: {
             legend: { display: false },
             tooltip: {
-              backgroundColor: '#151A35',
+              backgroundColor: '#1E1B4B',
               padding: 10,
               titleFont: { family: 'Plus Jakarta Sans', size: 12, weight: 'bold' },
               bodyFont: { family: 'Plus Jakarta Sans', size: 12 },
-              cornerRadius: 8,
+              cornerRadius: 10,
               displayColors: false,
               callbacks: {
                 label: (ctx) => `Asistencia: ${ctx.parsed.y}%`
@@ -1101,6 +2207,40 @@
             }
           }
         }
+      });
+    }
+
+    // Filtrado por categoría en Hub de Accesos Rápidos
+    const filterButtons = document.querySelectorAll('#hubFilterTabs .hub-tab-btn');
+    filterButtons.forEach(btn => {
+      btn.addEventListener('click', function() {
+        filterButtons.forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        const filter = this.getAttribute('data-filter');
+        
+        document.querySelectorAll('#shortcutsGridContainer .shortcut-card-elevated').forEach(card => {
+          if (filter === 'all' || card.getAttribute('data-category') === filter) {
+            card.style.display = 'flex';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+
+    // Quick Search Filter
+    const searchInput = document.getElementById('dashboardQuickSearch');
+    if (searchInput) {
+      searchInput.addEventListener('input', function() {
+        const query = this.value.toLowerCase().trim();
+        document.querySelectorAll('#shortcutsGridContainer .shortcut-card-elevated').forEach(card => {
+          const text = card.innerText.toLowerCase();
+          if (text.includes(query)) {
+            card.style.display = 'flex';
+          } else {
+            card.style.display = 'none';
+          }
+        });
       });
     }
 
@@ -1162,103 +2302,172 @@
   }
 </script>
 
-  <!-- ==========================================================================
-       MODAL POPUP DE SOLICITUDES PENDIENTES (ALERTA DIRECTIVA)
-       ========================================================================== -->
+  
   {% if is_admin and solicitudes_pendientes %}
   <div class="modal fade" id="modalSolicitudesPendientes" tabindex="-1" aria-labelledby="modalSolLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-      <div class="modal-content" style="border-radius: 24px; border: 1.5px solid #F59E0B; box-shadow: 0 25px 60px rgba(15, 23, 42, 0.2); overflow: hidden;">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 640px; margin: 1.75rem auto;">
+      <div class="modal-content modal-solicitudes-premium">
         
-        <div class="modal-header p-3 px-4" style="background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%); border-bottom: 1px solid #FDE68A;">
+        <!-- Header con gradiente morado profundo -->
+        <div class="modal-solicitudes-header-purple" style="padding: 1.25rem 1.6rem;">
           <div class="d-flex align-items-center gap-3">
-            <div class="rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width:44px; height:44px; background:#F59E0B; color:#ffffff;">
-              <i class="bi bi-bell-fill fs-5"></i>
+            <div class="rounded-circle d-flex align-items-center justify-content-center pulse-glow-purple shadow-sm flex-shrink-0" style="width:42px; height:42px; background:#7C5CFC; color:#FFFFFF;">
+              <i class="bi bi-person-plus-fill fs-5"></i>
             </div>
             <div>
-              <h5 class="modal-title fw-extrabold text-dark mb-0 fs-5" id="modalSolLabel">¡Solicitudes de Acceso Pendientes!</h5>
-              <span class="extra-small text-muted fw-bold">Tienes {{ solicitudes_pendientes_count }} solicitud{{ solicitudes_pendientes_count|pluralize:"es" }} por revisar en {{ colegio.nombre }}</span>
+              <div class="d-flex align-items-center gap-2">
+                <h5 class="modal-title fw-extrabold mb-0 fs-6 text-white" id="modalSolLabel">Solicitudes de Incorporación Docente</h5>
+                <span class="badge fw-extrabold px-2 py-0.5" style="background: rgba(255,255,255,0.2); color:#FFFFFF; border:1px solid rgba(255,255,255,0.3); border-radius:20px; font-size:0.72rem;">
+                  {{ solicitudes_pendientes_count }} Pendiente{{ solicitudes_pendientes_count|pluralize:"s" }}
+                </span>
+              </div>
+              <p class="mb-0 text-white-50 extra-small mt-0.5">
+                {{ colegio.nombre }} • Revisa y valida antes de autorizar.
+              </p>
             </div>
           </div>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
 
-        <div class="modal-body p-4" style="max-height: 480px; overflow-y: auto;">
-          <p class="text-muted small mb-3">
-            Los siguientes docentes o funcionarios han solicitado incorporarse a la plataforma de tu colegio. Puedes revisar sus datos, <strong>cambiar el rol asignado si es necesario</strong> y aprobar o rechazar su acceso:
-          </p>
-
-          <div class="d-flex flex-column gap-3">
-            {% for sol in solicitudes_pendientes %}
-              <div class="p-3 rounded-4 border bg-light d-flex flex-column gap-2" style="border-color: #E2E8F0 !important;">
-                <div class="d-flex align-items-start justify-content-between gap-2 flex-wrap">
-                  <div class="d-flex align-items-center gap-2.5">
-                    <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white shadow-sm" style="width:40px; height:40px; background:#7C5CFC; font-size:0.95rem;">
-                      {{ sol.usuario.first_name|default:sol.usuario.username|slice:":1"|upper }}
+        <!-- Body con tarjetas paso a paso -->
+        <div class="modal-body p-3 p-md-3.5" style="background: #F8FAFC; max-height: 580px; overflow-y: auto;">
+          {% for sol in solicitudes_pendientes %}
+            <div class="solicitud-card-redesign mb-3">
+              
+              <!-- 1. Cabecera de la Tarjeta -->
+              <div class="card-user-header" style="padding: 1rem 1.25rem;">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="user-portrait-circle" style="width:46px; height:46px; font-size:1.15rem;">
+                    {{ sol.usuario.first_name|default:sol.usuario.username|slice:":1"|upper }}
+                  </div>
+                  <div>
+                    <div class="user-meta-name" style="font-size: 1rem;">
+                      {{ sol.usuario.perfil.nombre_completo|default:sol.usuario.get_full_name|default:sol.usuario.username }}
                     </div>
-                    <div>
-                      <h6 class="fw-bold text-dark mb-0">{{ sol.usuario.perfil.nombre_completo|default:sol.usuario.get_full_name|default:sol.usuario.username }}</h6>
-                      <div class="text-muted extra-small d-flex align-items-center gap-2 flex-wrap">
-                        <span><i class="bi bi-envelope me-0.5"></i> {{ sol.usuario.email }}</span>
-                        {% if sol.usuario.perfil.rut %}
-                          <span>• <i class="bi bi-card-text me-0.5"></i> {{ sol.usuario.perfil.rut }}</span>
-                        {% endif %}
-                        <span>• <i class="bi bi-clock me-0.5"></i> {{ sol.fecha_solicitud|date:"d/m/Y H:i" }}</span>
-                      </div>
+                    <div class="user-meta-tags">
+                      <span class="text-primary fw-bold"><i class="bi bi-envelope-at-fill me-0.5"></i> {{ sol.usuario.email }}</span>
+                      {% if sol.usuario.perfil.rut %}
+                        <span class="fw-bold">• <i class="bi bi-person-vcard me-0.5"></i> RUT: {{ sol.usuario.perfil.rut }}</span>
+                      {% endif %}
+                      {% if sol.usuario.perfil.telefono %}
+                        <span>• <i class="bi bi-telephone-fill me-0.5"></i> {{ sol.usuario.perfil.telefono }}</span>
+                      {% endif %}
                     </div>
                   </div>
-                  <span class="badge bg-secondary-subtle text-secondary border fw-bold text-capitalize px-2.5 py-1" style="border-radius:6px; font-size:0.78rem;">
-                    Pidió: {{ sol.rol_solicitado|title }}
-                  </span>
                 </div>
 
+                <!-- ROL SOLICITADO HIGHLIGHT -->
+                <div class="badge-rol-highlight" style="font-size: 0.72rem; padding: 0.35rem 0.8rem;">
+                  <i class="bi bi-award-fill"></i>
+                  <span>ROL: <strong>{{ sol.rol_solicitado }}</strong></span>
+                </div>
+              </div>
+
+              <!-- 2. Cuerpo de la Tarjeta -->
+              <div class="card-body-content" style="padding: 1.15rem 1.25rem;">
+                
+                <!-- Mensaje con comillas -->
                 {% if sol.mensaje %}
-                  <div class="p-2 px-3 bg-white rounded-3 border text-muted extra-small" style="font-style: italic;">
-                    <i class="bi bi-chat-quote me-1 text-primary"></i> "{{ sol.mensaje }}"
+                  <div class="quote-message-block mb-3" style="padding: 0.75rem 1rem; font-size: 0.84rem;">
+                    <i class="bi bi-quote fs-5 text-primary lh-1"></i>
+                    <span>"{{ sol.mensaje }}"</span>
                   </div>
                 {% endif %}
 
-                <!-- Formulario de Aprobación / Cambio de Rol -->
-                <div class="d-flex align-items-center justify-content-between gap-3 pt-2 border-top mt-1 flex-wrap">
-                  <form id="formModalAprobar{{ sol.id }}" method="POST" action="{% url 'aprobar_solicitud' sol.id %}" class="d-flex align-items-center gap-2 flex-grow-1">
-                    {% csrf_token %}
-                    <label class="extra-small fw-bold text-muted text-nowrap mb-0">Asignar Rol:</label>
-                    <select name="rol_id" class="form-select form-select-sm fw-bold border-primary-subtle" style="max-width: 220px; border-radius:8px; font-size:0.82rem; background-color:#ffffff;">
-                      {% for r in roles_colegio %}
-                        <option value="{{ r.id }}" {% if r.nombre|lower == sol.rol_solicitado|lower %}selected{% endif %}>
-                          {{ r.nombre }}
-                        </option>
-                      {% empty %}
-                        <option value="profesor" selected>Profesor</option>
-                        <option value="inspector">Inspector</option>
-                        <option value="director">Director</option>
-                        <option value="administrativo">Administrativo</option>
-                      {% endfor %}
-                    </select>
-                  </form>
-
-                  <div class="d-flex align-items-center gap-2">
-                    <button type="submit" form="formModalAprobar{{ sol.id }}" class="btn btn-sm btn-success fw-bold px-3 py-1.5" style="border-radius:8px; font-size:0.82rem;">
-                      <i class="bi bi-check-lg me-1"></i> Aprobar con este Rol
-                    </button>
-                    <form method="POST" action="{% url 'rechazar_solicitud' sol.id %}" class="d-inline" onsubmit="return confirm('¿Seguro que deseas rechazar esta solicitud?');">
-                      {% csrf_token %}
-                      <button type="submit" class="btn btn-sm btn-outline-danger fw-bold px-2.5 py-1.5" style="border-radius:8px; font-size:0.82rem;">
-                        <i class="bi bi-x-lg me-1"></i> Rechazar
-                      </button>
-                    </form>
+                <!-- Formulario con workflow iterativo (Paso 1 y Paso 2) -->
+                <form id="formModalAprobar{{ sol.id }}" method="POST" action="{% url 'aprobar_solicitud' sol.id %}">
+                  {% csrf_token %}
+                  
+                  <!-- PASO 1: Confirme o Asigne el Rol -->
+                  <div class="step-workflow-container mb-2.5 p-2.5 px-3">
+                    <div class="step-header-label mb-1.5" style="font-size: 0.8rem;">
+                      <i class="bi bi-tag-fill text-primary"></i>
+                      <span>Paso 1: Confirme o Asigne el Rol</span>
+                      <i class="bi bi-pencil-fill text-muted ms-1" style="font-size:0.68rem;" title="Puedes cambiar el rol antes de aprobar"></i>
+                    </div>
+                    
+                    <div class="role-input-group">
+                      <select name="rol_id" class="role-input-field form-select form-select-sm" style="font-size: 0.84rem; padding: 0.45rem 0.85rem;">
+                        {% for r in roles_colegio %}
+                          <option value="{{ r.id }}" {% if r.nombre|lower == sol.rol_solicitado|lower %}selected{% endif %}>
+                            {{ r.nombre }} {% if r.nombre|lower == sol.rol_solicitado|lower %}(Solicitado por el docente){% endif %}
+                          </option>
+                        {% empty %}
+                          <option value="profesor" selected>Profesor</option>
+                          <option value="inspector">Inspector</option>
+                          <option value="director">Director</option>
+                          <option value="administrativo">Administrativo</option>
+                        {% endfor %}
+                      </select>
+                    </div>
                   </div>
-                </div>
+
+                  <!-- PASO 2: Tome una Decisión -->
+                  <div class="step-workflow-container mb-0 p-2.5 px-3">
+                    <div class="step-header-label mb-2" style="font-size: 0.8rem;">
+                      <i class="bi bi-shield-check text-success"></i>
+                      <span>Paso 2: Tome una Decisión</span>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2.5 flex-wrap">
+                      <button type="submit" class="btn-approve-wide py-2" style="font-size: 0.82rem;">
+                        <i class="bi bi-check-circle-fill"></i>
+                        <span>Aprobar Solicitud</span>
+                      </button>
+
+                      <button type="button" class="btn-reject-pill py-2" style="font-size: 0.82rem;" onclick="mostrarCajaRechazoInline('{{ sol.id }}')">
+                        <i class="bi bi-x-circle-fill"></i>
+                        <span>Rechazar Solicitud</span>
+                      </button>
+                    </div>
+
+                    <!-- CAJA DE MOTIVO DE RECHAZO INLINE DENTRO DE LA TARJETA -->
+                    <div id="boxRechazoModal{{ sol.id }}" class="d-none mt-3 p-3 rounded-3" style="background:#FFF1F2; border:1.5px solid #FECDD3;">
+                      <label class="form-label fw-bold extra-small text-uppercase text-danger d-flex align-items-center gap-1.5 mb-1.5">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <span>Motivo del Rechazo (se notificará al docente por correo):</span>
+                      </label>
+                      <textarea id="textMotivoModal{{ sol.id }}" class="form-control mb-3" rows="3" placeholder="Escribe aquí el motivo del rechazo para informar formalmente al solicitante..." style="border-radius: 10px; font-size: 0.85rem; border-color: #FECDD3; padding: 0.65rem;"></textarea>
+                      
+                      <!-- BOTONES CON ESPACIADO CÓMODO Y SEPARADO -->
+                      <div class="d-flex justify-content-end align-items-center gap-3">
+                        <button type="button" class="btn btn-sm btn-outline-secondary fw-semibold px-3.5 py-1.5" style="border-radius: 8px; font-size: 0.82rem; background: #FFFFFF;" onclick="ocultarCajaRechazoInline('{{ sol.id }}')">
+                          Cancelar
+                        </button>
+                        <button type="button" class="btn btn-sm fw-bold px-3.5 py-1.5 d-flex align-items-center gap-1.5 shadow-sm" style="border-radius: 8px; font-size: 0.82rem; background: #DC2626; color: #FFFFFF; border: none;" onclick="ejecutarRechazoInline('{{ sol.id }}', '{{ sol.usuario.perfil.nombre_completo|default:sol.usuario.email|escapejs }}')">
+                          <i class="bi bi-x-circle-fill"></i>
+                          <span>Confirmar Rechazo y Enviar Correo</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+
+                <!-- Formulario oculto de rechazo -->
+                <form id="formModalRechazar{{ sol.id }}" method="POST" action="{% url 'rechazar_solicitud' sol.id %}">
+                  {% csrf_token %}
+                  <input type="hidden" name="motivo_rechazo" id="inputMotivoRechazoModal{{ sol.id }}" value="">
+                </form>
 
               </div>
-            {% endfor %}
-          </div>
+
+              <!-- 3. Pie sutil con Fecha -->
+              <div class="card-footer-subtle border-top py-2 px-3">
+                <span style="font-size: 0.72rem;"><i class="bi bi-shield-lock text-primary me-1"></i> La cuenta tendrá acceso de inmediato a los módulos de su rol.</span>
+                <span style="font-size: 0.72rem;"><i class="bi bi-clock-history me-1"></i> {{ sol.fecha_solicitud|date:"d/m/Y H:i \h\\r\s" }}</span>
+              </div>
+
+            </div>
+          {% endfor %}
         </div>
 
-        <div class="modal-footer p-3 px-4 bg-light border-top d-flex justify-content-between">
-          <span class="extra-small text-muted"><i class="bi bi-shield-check me-1"></i> También puedes gestionar estas solicitudes directamente desde la tabla de tu panel.</span>
-          <button type="button" class="btn btn-secondary fw-bold rounded-3 px-3 py-1.5" data-bs-dismiss="modal" style="font-size:0.85rem;">
-            Cerrar Ventana
+        <!-- Footer -->
+        <div class="modal-footer p-2.5 px-3.5 bg-white border-top d-flex justify-content-between align-items-center">
+          <span class="extra-small text-muted d-flex align-items-center gap-1">
+            <i class="bi bi-info-circle-fill text-primary"></i> Notificaciones automáticas por correo activas.
+          </span>
+          <button type="button" class="btn btn-sm btn-outline-secondary fw-bold px-3 py-1.5" data-bs-dismiss="modal" style="border-radius:8px; font-size:0.82rem;">
+            Cerrar
           </button>
         </div>
 
@@ -1268,15 +2477,366 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Abrir popup emergente automáticamente para el administrador
       const modalEl = document.getElementById('modalSolicitudesPendientes');
       if (modalEl) {
         const modalInstance = new bootstrap.Modal(modalEl);
         modalInstance.show();
       }
     });
+
+    function mostrarCajaRechazoInline(solId) {
+      const box = document.getElementById('boxRechazoModal' + solId);
+      if (box) {
+        box.classList.remove('d-none');
+        const textarea = document.getElementById('textMotivoModal' + solId);
+        if (textarea) {
+          textarea.focus();
+        }
+      }
+    }
+
+    function ocultarCajaRechazoInline(solId) {
+      const box = document.getElementById('boxRechazoModal' + solId);
+      if (box) box.classList.add('d-none');
+    }
+
+    function ejecutarRechazoInline(solId, nombre) {
+      const textarea = document.getElementById('textMotivoModal' + solId);
+      const motivo = textarea ? textarea.value.trim() : '';
+
+      if (!motivo) {
+        if (typeof Swal !== 'undefined') {
+          Swal.fire({
+            title: 'Motivo requerido',
+            text: 'Por favor escribe el motivo del rechazo para notificar al solicitante por correo.',
+            icon: 'info',
+            confirmButtonColor: '#7C5CFC',
+            confirmButtonText: 'Entendido'
+          });
+        } else {
+          alert('Por favor escribe el motivo del rechazo.');
+        }
+        if (textarea) textarea.focus();
+        return;
+      }
+
+      // Alerta moderna con SweetAlert2 (sin usar alert/confirm nativo del navegador)
+      if (typeof Swal !== 'undefined') {
+        Swal.fire({
+          title: '¿Confirmar Rechazo Definitivo?',
+          html: `<p class="text-muted small mb-0">Se denegará la solicitud y se enviará un correo a <strong>${nombre}</strong> indicando el motivo ingresado.</p>`,
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#DC2626',
+          cancelButtonColor: '#64748B',
+          confirmButtonText: '<i class="bi bi-x-circle-fill me-1"></i> Sí, Rechazar y Notificar',
+          cancelButtonText: 'Volver a revisar',
+          reverseButtons: true
+        }).then((result) => {
+          if (result.isConfirmed) {
+            const form = document.getElementById('formModalRechazar' + solId);
+            const input = document.getElementById('inputMotivoRechazoModal' + solId);
+            if (form && input) {
+              input.value = motivo;
+              form.submit();
+            }
+          }
+        });
+      } else {
+        const form = document.getElementById('formModalRechazar' + solId);
+        const input = document.getElementById('inputMotivoRechazoModal' + solId);
+        if (form && input) {
+          input.value = motivo;
+          form.submit();
+        }
+      }
+    }
   </script>
   {% endif %}
+  
+  <div class="modal fade" id="modalHorarioSemanal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+        
+        <!-- Header -->
+        <div class="modal-header text-white p-3 px-4" style="background: linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #4338CA 100%); border-bottom: 2px solid rgba(124, 92, 252, 0.3);">
+          <div class="d-flex align-items-center gap-2.5">
+            <span class="rounded-3 d-flex align-items-center justify-content-center" style="width:36px; height:36px; background:rgba(255,255,255,0.15); font-size:1.1rem;">
+              📅
+            </span>
+            <div>
+              <h5 class="modal-title fw-extrabold text-white mb-0 fs-6">Horario Semanal Docente • Período {{ hoy|date:"Y" }}</h5>
+              <span class="text-white-50 extra-small">Docente: <strong>{{ horario_docente_data.nombre_docente }}</strong> • {{ horario_docente_data.total_horas_semanales }} horas pedagógicas semanales</span>
+            </div>
+          </div>
+
+          <div class="d-flex align-items-center gap-2">
+            {% if docente_mostrar %}
+            <a href="{% url 'horario_docente_imprimible' docente_mostrar.id %}" target="_blank" class="btn btn-sm btn-light fw-bold px-3 py-1.5 shadow-sm" style="border-radius: 10px; font-size: 0.78rem; color:#4338CA;">
+              <i class="bi bi-printer-fill me-1"></i> Imprimir PDF
+            </a>
+            {% endif %}
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body p-4 bg-light">
+          <div class="card p-0 border-0 shadow-sm rounded-4 overflow-hidden mb-3">
+            <div class="table-responsive">
+              <table class="table-schedule-modal mb-0">
+                <thead>
+                  <tr>
+                    <th class="col-block-m">Bloque / Hora</th>
+                    {% for dia_num, dia_nom in horario_docente_data.dias_semana_columnas %}
+                      <th style="{% if dia_num == horario_docente_data.dia_actual_num %}background:#3730A3; border-bottom: 3px solid #7C5CFC;{% endif %}">
+                        {{ dia_nom }}
+                        {% if dia_num == horario_docente_data.dia_actual_num %}
+                          <span class="badge bg-success text-white extra-small ms-1" style="font-size:0.62rem; padding: 2px 4px;">Hoy</span>
+                        {% endif %}
+                      </th>
+                    {% endfor %}
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for fila in horario_docente_data.matriz_semanal %}
+                    {% if fila.es_recreo %}
+                      <tr style="background:#F1F5F9; color:#64748B; font-weight:700; font-size:0.75rem; text-transform:uppercase;">
+                        <td class="fw-extrabold">{{ fila.bloque.hora_inicio|time:"H:i" }} - {{ fila.bloque.hora_fin|time:"H:i" }}</td>
+                        <td colspan="5"><i class="bi bi-cup-hot me-1 text-primary"></i> {{ fila.bloque.nombre }}</td>
+                      </tr>
+                    {% elif fila.es_almuerzo %}
+                      <tr style="background:#FEF3C7; color:#92400E; font-weight:800; font-size:0.76rem; text-transform:uppercase;">
+                        <td class="fw-extrabold">{{ fila.bloque.hora_inicio|time:"H:i" }} - {{ fila.bloque.hora_fin|time:"H:i" }}</td>
+                        <td colspan="5"><i class="bi bi-egg-fried me-1 text-warning"></i> {{ fila.bloque.nombre }}</td>
+                      </tr>
+                    {% else %}
+                      <tr>
+                        <td class="fw-extrabold text-muted small" style="background:#F8FAFC;">
+                          <div class="text-dark fw-bold" style="font-size:0.8rem;">{{ fila.bloque.nombre }}</div>
+                          <div class="extra-small font-monospace">{{ fila.bloque.hora_inicio|time:"H:i" }} - {{ fila.bloque.hora_fin|time:"H:i" }}</div>
+                        </td>
+                        {% for celda in fila.celdas %}
+                          <td style="{% if celda.es_hoy %}background:rgba(124,92,252,0.03);{% endif %}">
+                            {% if celda.clase %}
+                              <div class="slot-box position-relative" style="border-left-color: {{ celda.clase.color|default:'#7C5CFC' }};">
+                                <div class="fw-extrabold text-dark" style="font-size:0.84rem; line-height:1.2;">{{ celda.clase.asignatura.nombre }}</div>
+                                <div class="text-muted extra-small mt-0.5">
+                                  <span class="fw-bold text-primary"><i class="bi bi-people-fill me-0.5"></i>{{ celda.clase.seccion.nombre }}</span>
+                                  {% if celda.clase.sala %}
+                                    <span class="ms-1 text-dark">• {{ celda.clase.sala }}</span>
+                                  {% endif %}
+                                </div>
+
+                                {% if is_admin %}
+                                  <div class="mt-1 pt-1 border-top d-flex justify-content-end gap-1">
+                                    <a href="{% url 'eliminar_horario_clase' celda.clase.id %}" class="btn btn-sm btn-outline-danger py-0 px-1" style="font-size:0.68rem; border-radius:4px;" title="Eliminar bloque" onclick="return confirm('¿Eliminar esta clase del horario?')">
+                                      <i class="bi bi-trash"></i>
+                                    </a>
+                                  </div>
+                                {% endif %}
+                              </div>
+                            {% else %}
+                              <span class="text-muted extra-small opacity-50">-</span>
+                            {% endif %}
+                          </td>
+                        {% endfor %}
+                      </tr>
+                    {% endif %}
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 pt-1 text-muted extra-small">
+            <span><i class="bi bi-info-circle-fill text-primary me-1"></i> Cada bloque corresponde a 45 minutos pedagógicos reglamentarios.</span>
+            {% if is_admin %}
+              <button type="button" class="btn btn-sm btn-primary fw-bold" style="border-radius:8px; font-size:0.78rem; background:#7C5CFC; border:none;" data-bs-toggle="modal" data-bs-target="#modalAsignarHorarioClase">
+                <i class="bi bi-plus-circle me-1"></i> Asignar Nueva Clase
+              </button>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer p-2.5 px-4 bg-white border-top">
+          <button type="button" class="btn btn-sm btn-outline-secondary fw-bold px-3 py-1.5" data-bs-dismiss="modal" style="border-radius:8px;">
+            Cerrar
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  
+  {% if is_admin %}
+  <div class="modal fade" id="modalAsignarHorarioClase" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg" style="border-radius: 18px; overflow: hidden;">
+        <div class="modal-header p-3.5 px-4 border-bottom-0" style="background:#FAF5FF;">
+          <h5 class="modal-title fw-extrabold text-dark fs-6 d-flex align-items-center gap-2">
+            <span class="rounded-circle d-flex align-items-center justify-content-center" style="width:32px; height:32px; background:#EDE9FE; color:#7C5CFC;">
+              <i class="bi bi-plus-lg fs-6"></i>
+            </span>
+            Asignar Clase al Horario Escolar
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <form method="POST" action="{% url 'guardar_horario_clase' %}">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="dashboard_usuario">
+          <div class="modal-body p-4 pt-2">
+            
+            <div class="row g-2 mb-3">
+              <div class="col-6">
+                <label class="form-label fw-bold text-dark small">Día de la Semana *</label>
+                <select name="dia_semana" class="form-select fw-bold" style="border-radius:10px;" required>
+                  <option value="1">Lunes</option>
+                  <option value="2">Martes</option>
+                  <option value="3">Miércoles</option>
+                  <option value="4">Jueves</option>
+                  <option value="5">Viernes</option>
+                </select>
+              </div>
+              <div class="col-6">
+                <label class="form-label fw-bold text-dark small">Bloque Horario *</label>
+                <select name="bloque_id" class="form-select fw-bold" style="border-radius:10px;" required>
+                  {% for b in bloques_colegio %}
+                    {% if b.tipo == 'clase' %}
+                      <option value="{{ b.id }}">{{ b.nombre }} ({{ b.hora_inicio|time:"H:i" }} - {{ b.hora_fin|time:"H:i" }})</option>
+                    {% endif %}
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold text-dark small">Curso y Sección *</label>
+              <select name="seccion_id" class="form-select fw-bold" style="border-radius:10px;" required>
+                {% for sec in secciones_colegio %}
+                  <option value="{{ sec.id }}">{{ sec.curso.nombre }} - Sección {{ sec.letra }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold text-dark small">Asignatura *</label>
+              <select name="asignatura_id" class="form-select fw-bold" style="border-radius:10px;" required>
+                {% for asig in asignaturas_colegio %}
+                  <option value="{{ asig.id }}">{{ asig.nombre }} ({{ asig.curso.nombre }})</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold text-dark small">Docente Responsable</label>
+              <select name="docente_id" class="form-select" style="border-radius:10px;">
+                {% for p in profesores_colegio %}
+                  <option value="{{ p.id }}" {% if docente_mostrar.id == p.id %}selected{% endif %}>
+                    {{ p.get_full_name|default:p.username }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="row g-2 mb-2">
+              <div class="col-7">
+                <label class="form-label fw-bold text-dark small">Sala o Ubicación</label>
+                <input type="text" name="sala" class="form-control" placeholder="Ej: Sala 102, Lab Ciencias" style="border-radius:10px;">
+              </div>
+              <div class="col-5">
+                <label class="form-label fw-bold text-dark small">Color Etiqueta</label>
+                <select name="color" class="form-select" style="border-radius:10px;">
+                  <option value="#7C5CFC">🟣 Violeta</option>
+                  <option value="#3B82F6">🔵 Azul</option>
+                  <option value="#10B981">🟢 Verde</option>
+                  <option value="#F59E0B">🟡 Ámbar</option>
+                  <option value="#EF4444">🔴 Rojo</option>
+                  <option value="#EC4899">🌸 Rosa</option>
+                </select>
+              </div>
+            </div>
+
+          </div>
+          <div class="modal-footer border-top-0 p-4 pt-0">
+            <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary fw-extrabold px-4" style="border-radius:10px; background:linear-gradient(135deg, #7C5CFC 0%, #6344CE 100%); border:none;">
+              Guardar Clase
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+  <script>
+    function cambiarDiaHorarioVisual(diaNum) {
+      // 1. Actualizar estado activo en botones de días
+      document.querySelectorAll('.schedule-seg-btn, .schedule-day-tab-btn').forEach(function(btn) {
+        btn.classList.remove('active');
+      });
+      const activeBtn = document.getElementById('tabBtnDia' + diaNum);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      // 2. Mostrar contenedor correspondiente y ocultar los demás
+      document.querySelectorAll('.schedule-day-view-panel').forEach(function(panel) {
+        panel.classList.add('d-none');
+      });
+      const targetPanel = document.getElementById('panelHorarioDia' + diaNum);
+      if (targetPanel) {
+        targetPanel.classList.remove('d-none');
+      }
+    }
+
+    // Buscador rápido centrado
+    document.addEventListener('DOMContentLoaded', function() {
+      const searchInput = document.getElementById('dashboardQuickSearch');
+      
+      // Atajo de teclado Ctrl+K o Cmd+K
+      document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+          e.preventDefault();
+          if (searchInput) {
+            searchInput.focus();
+            searchInput.select();
+          }
+        }
+      });
+
+      if (searchInput) {
+        searchInput.addEventListener('input', function() {
+          const q = this.value.toLowerCase().trim();
+          const cards = document.querySelectorAll('.shortcut-item-card, .schedule-clean-card');
+          
+          cards.forEach(function(card) {
+            const text = card.textContent.toLowerCase();
+            if (q === '' || text.includes(q)) {
+              card.style.display = '';
+            } else {
+              card.style.display = 'none';
+            }
+          });
+        });
+      }
+    });
+
+    // Marcar notificaciones como leídas
+    function marcarTodasNotificacionesLeidas() {
+      const badge = document.getElementById('notifBadgeCounter');
+      if (badge) {
+        badge.style.display = 'none';
+      }
+      const notifContainer = document.getElementById('notifListContainer');
+      if (notifContainer) {
+        notifContainer.style.opacity = '0.6';
+      }
+    }
+  </script>
+
+  {% include 'colegios/_modal_pin_firma.html' %}
 </body>
 
 </html>
