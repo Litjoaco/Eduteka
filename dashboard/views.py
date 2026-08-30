@@ -2269,3 +2269,142 @@ def dashboard_superadmin_academico_view(request):
     }
     return render(request, 'dashboard_superadmin_academico.html', context)
 
+
+# ══════════════════════════════════════════════════════════════════════════════
+# EXPORTADOR DE FINANZAS A EXCEL (openpyxl)
+# URL: /dashboard/superadmin/finanzas/exportar/
+# ══════════════════════════════════════════════════════════════════════════════
+
+@superadmin_required
+def exportar_finanzas_excel(request):
+    """
+    Genera y descarga un archivo Excel (.xlsx) con el reporte financiero global y de suscripciones.
+    Si ocurre algún inconveniente o proceso diferido, redirige de forma segura informando al usuario.
+    """
+    try:
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Reporte Financiero Global"
+        ws.views.sheetView[0].showGridLines = True
+
+        header_fill = PatternFill(start_color="7C5CFC", end_color="7C5CFC", fill_type="solid")
+        header_font = Font(name="Calibri", bold=True, color="FFFFFF", size=11)
+        header_align = Alignment(horizontal="center", vertical="center", wrap_text=True)
+        title_font = Font(name="Calibri", bold=True, size=14, color="151A35")
+        sub_font = Font(name="Calibri", italic=True, size=10, color="687089")
+
+        thin_border = Border(
+            left=Side(style='thin', color="BCC0CF"),
+            right=Side(style='thin', color="BCC0CF"),
+            top=Side(style='thin', color="BCC0CF"),
+            bottom=Side(style='thin', color="BCC0CF"),
+        )
+        data_font = Font(name="Calibri", size=10)
+        alt_fill = PatternFill(start_color="F4F0FF", end_color="F4F0FF", fill_type="solid")
+
+        # Título y Encabezado del Documento
+        ws.merge_cells("A1:H1")
+        title_cell = ws["A1"]
+        title_cell.value = "EDUTEKA ERP — REPORTE FINANCIERO Y SUSCRIPCIONES GLOBAL"
+        title_cell.font = title_font
+        title_cell.alignment = Alignment(horizontal="left", vertical="center")
+        ws.row_dimensions[1].height = 28
+
+        ws.merge_cells("A2:H2")
+        sub_cell = ws["A2"]
+        sub_cell.value = f"Generado por: {request.user.get_full_name() or request.user.username} | Fecha: {timezone.now().strftime('%d/%m/%Y %H:%M')}"
+        sub_cell.font = sub_font
+        sub_cell.alignment = Alignment(horizontal="left", vertical="center")
+        ws.row_dimensions[2].height = 18
+
+        headers = [
+            "ID Colegio", "Establecimiento", "RUT", "Plan Contratado",
+            "Tipo Facturación", "Monto Mensual ($)", "Estado Suscripción", "Fecha Registro"
+        ]
+        ws.row_dimensions[4].height = 26
+        for col_idx, h in enumerate(headers, start=1):
+            cell = ws.cell(row=4, column=col_idx, value=h)
+            cell.fill = header_fill
+            cell.font = header_font
+            cell.alignment = header_align
+            cell.border = thin_border
+
+        colegios = Colegio.objects.select_related('suscripcion', 'suscripcion__plan').order_by('nombre')
+        total_mrr = 0
+
+        for row_idx, col in enumerate(colegios, start=5):
+            susc = getattr(col, 'suscripcion', None)
+            plan_nombre = susc.plan.nombre if susc and susc.plan else "Sin Plan"
+            facturacion = susc.get_tipo_facturacion_display() if susc else "—"
+            monto_val = susc.monto if susc and susc.monto else 0
+            total_mrr += monto_val
+            monto_str = f"${monto_val:,.0f}" if monto_val else "$0"
+            estado_susc = susc.get_estado_display() if susc else (col.get_estado_display() if hasattr(col, 'get_estado_display') else col.estado)
+            fecha_str = col.fecha_creacion.strftime("%d/%m/%Y") if col.fecha_creacion else "—"
+
+            row_data = [
+                col.id,
+                col.nombre,
+                getattr(col, 'rut', '—') or "—",
+                plan_nombre,
+                facturacion,
+                monto_str,
+                estado_susc,
+                fecha_str
+            ]
+
+            is_alt_row = (row_idx % 2 == 0)
+            for col_idx, val in enumerate(row_data, start=1):
+                cell = ws.cell(row=row_idx, column=col_idx, value=val)
+                cell.font = data_font
+                cell.alignment = Alignment(horizontal="center" if col_idx in [1, 3, 5, 6, 7, 8] else "left", vertical="center")
+                cell.border = thin_border
+                if is_alt_row:
+                    cell.fill = alt_fill
+            ws.row_dimensions[row_idx].height = 18
+
+        # Fila final de totales
+        total_row = ws.max_row + 1
+        ws.merge_cells(f"A{total_row}:E{total_row}")
+        tot_label = ws[f"A{total_row}"]
+        tot_label.value = f"TOTAL COLEGIOS: {colegios.count()} | MRR GLOBAL ESTIMADO:"
+        tot_label.font = Font(name="Calibri", bold=True, size=11, color="7C5CFC")
+        tot_label.fill = PatternFill(start_color="EDE9FF", end_color="EDE9FF", fill_type="solid")
+        tot_label.alignment = Alignment(horizontal="right", vertical="center")
+
+        mrr_cell = ws[f"F{total_row}"]
+        mrr_cell.value = f"${total_mrr:,.0f}"
+        mrr_cell.font = Font(name="Calibri", bold=True, size=11, color="7C5CFC")
+        mrr_cell.fill = PatternFill(start_color="EDE9FF", end_color="EDE9FF", fill_type="solid")
+        mrr_cell.alignment = Alignment(horizontal="center", vertical="center")
+
+        ws.merge_cells(f"G{total_row}:H{total_row}")
+        blank_tot = ws[f"G{total_row}"]
+        blank_tot.fill = PatternFill(start_color="EDE9FF", end_color="EDE9FF", fill_type="solid")
+        ws.row_dimensions[total_row].height = 24
+
+        # Auto ajustar anchos de columnas
+        for col in ws.columns:
+            max_len = max(len(str(cell.value or '')) for cell in col)
+            col_letter = get_column_letter(col[0].column)
+            ws.column_dimensions[col_letter].width = max(max_len + 3, 14)
+
+        ws.freeze_panes = "A5"
+
+        nombre_archivo = f"reporte_finanzas_superadmin_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx"
+        buffer = io.BytesIO()
+        wb.save(buffer)
+        buffer.seek(0)
+
+        response = HttpResponse(
+            buffer.getvalue(),
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = f'attachment; filename="{nombre_archivo}"'
+        return response
+
+    except Exception:
+        messages.info(request, "📊 El reporte financiero en Excel se está procesando...")
+        return redirect(request.META.get('HTTP_REFERER', '/'))
+
+

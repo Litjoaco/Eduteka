@@ -1,24 +1,327 @@
 <!-- TOPBAR SUPER ADMIN GLOBAL (Componente Modular Reutilizable) -->
+<style>
+    .btn-topbar-chat {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: var(--white, #ffffff);
+        border: 1px solid var(--border, #BCC0CF);
+        color: var(--dark, #151A35);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        padding: 0;
+        text-decoration: none;
+    }
+    .btn-topbar-chat:hover {
+        background: var(--primary-soft, rgba(124, 92, 252, 0.08));
+        color: var(--primary, #7C5CFC);
+        border-color: var(--primary, #7C5CFC);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(124, 92, 252, 0.18);
+    }
+</style>
+
 <header class="topbar">
     <div class="d-flex align-items-center gap-2">
         <button class="btn btn-sm d-lg-none me-2" id="mobileMenuBtn"
-            style="border:none; background:var(--primary-soft); color:var(--primary);"
+            style="border:none; background:var(--primary-soft, rgba(124, 92, 252, 0.08)); color:var(--primary, #7C5CFC);"
             title="Abrir menú de navegación">
             <i class="bi bi-list fs-5"></i>
         </button>
         {% if topbar_badge %}
             <div class="d-none d-md-flex align-items-center gap-2 text-xs font-semibold px-3 py-1 rounded-pill"
-                 style="background:var(--primary-soft); color:var(--primary); font-size:0.75rem; font-weight:700;">
+                 style="background:var(--primary-soft, rgba(124, 92, 252, 0.08)); color:var(--primary, #7C5CFC); font-size:0.75rem; font-weight:700;">
                 <span class="spinner-grow spinner-grow-sm text-primary" style="width:7px;height:7px;" role="status"></span>
                 {{ topbar_badge }}
             </div>
         {% endif %}
     </div>
 
-    <div class="topbar-right">
+    <div class="topbar-right d-flex align-items-center gap-3">
+        
+        <!-- Botón Chat Global Flotante con Badge de Notificación -->
+        <button type="button" 
+                class="btn-topbar-chat position-relative" 
+                data-bs-toggle="offcanvas" 
+                data-bs-target="#offcanvasChatGlobal" 
+                aria-controls="offcanvasChatGlobal"
+                title="Centro de Mensajes y Soporte Global">
+            <i class="bi bi-chat-dots fs-5"></i>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:0.65rem; padding:0.25em 0.5em; transform:translate(-35%, -15%) !important;">
+                2
+                <span class="visually-hidden">mensajes nuevos</span>
+            </span>
+        </button>
+
+        <!-- Perfil Super Admin -->
         <div class="user-profile">
             <div class="user-avatar">SA</div>
             <span class="user-name">Super Admin</span>
         </div>
     </div>
 </header>
+
+<!-- ════ OFFCANVAS: CENTRO DE MENSAJES Y CHAT GLOBAL ═════════════════════ -->
+<div class="offcanvas offcanvas-end shadow-lg border-0" tabindex="-1" id="offcanvasChatGlobal" aria-labelledby="offcanvasChatGlobalLabel" style="width: 440px; max-width: 95vw; z-index: 1060;">
+    
+    <!-- Offcanvas Header -->
+    <div class="offcanvas-header border-bottom py-3 px-4" style="background: #FAF9FF;">
+        <div class="d-flex align-items-center gap-2.5">
+            <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(124, 92, 252, 0.1); color: var(--primary, #7C5CFC); display: flex; align-items: center; justify-content: center; font-size: 1.15rem; font-weight: 700;">
+                <i class="bi bi-chat-square-dots-fill"></i>
+            </div>
+            <div>
+                <h5 class="offcanvas-title fw-bold text-dark mb-0" id="offcanvasChatGlobalLabel" style="font-size: 1.05rem;">💬 Centro de Mensajes</h5>
+                <p class="text-muted small mb-0" style="font-size: 0.76rem;">Canal directo Super Admin ↔ Colegios</p>
+            </div>
+        </div>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+
+    <!-- Offcanvas Body -->
+    <div class="offcanvas-body d-flex flex-column p-0" style="background: #F8FAFC;">
+        
+        <!-- Sección Superior: Selector de Conversación -->
+        <div class="p-3 bg-white border-bottom">
+            <label class="form-label text-muted small fw-bold mb-1.5" style="font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                <i class="bi bi-building me-1" style="color: var(--primary, #7C5CFC);"></i> Conversación Activa
+            </label>
+            <div class="position-relative">
+                <select class="form-select rounded-3 shadow-none border-1" id="globalChatSchoolSelect" style="font-size: 0.86rem; font-weight: 600; padding: 0.55rem 0.9rem; background-color: #F8FAFC;">
+                    <option value="las-rosas" selected>🏫 [SEED] Escuela Básica Las Rosas (2 nuevos)</option>
+                    <option value="arturo-prat">🏛️ Colegio Arturo Prat — Santiago</option>
+                    <option value="bicentenario">🎓 Liceo Bicentenario — Concepción</option>
+                    <option value="san-martin">🎒 Instituto San Martín — La Serena</option>
+                </select>
+            </div>
+            
+            <!-- Banner de estado del colegio seleccionado -->
+            <div class="d-flex align-items-center justify-content-between mt-2 pt-2 border-top text-muted small" style="font-size: 0.75rem;">
+                <div class="d-flex align-items-center gap-1 text-truncate me-2">
+                    <i class="bi bi-person-badge" style="color: var(--primary, #7C5CFC);"></i>
+                    <span id="globalChatContactName" class="text-truncate">Director(a): Carmen Gloria Silva</span>
+                </div>
+                <span class="badge bg-success-subtle text-success rounded-pill px-2 py-0.5" style="font-size: 0.7rem;">
+                    <span style="width: 6px; height: 6px; background-color: #10B981; border-radius: 50%; display: inline-block; margin-right: 4px;"></span> En línea
+                </span>
+            </div>
+        </div>
+
+        <!-- Área de Mensajes con Scroll (flex-grow-1, overflow-y-auto) -->
+        <div id="globalChatMessagesBox" class="flex-grow-1 overflow-y-auto p-3 d-flex flex-column gap-3" style="scroll-behavior: smooth; max-height: calc(100vh - 250px);">
+            
+            <!-- Separador de fecha -->
+            <div class="text-center my-1">
+                <span class="badge bg-white text-muted border rounded-pill px-3 py-1 shadow-sm" style="font-size: 0.7rem; font-weight: 600;">
+                    <i class="bi bi-calendar-event me-1"></i> Hoy
+                </span>
+            </div>
+
+            <!-- Burbuja Recibida (Colegio / Fondo Claro Blanco) -->
+            <div class="d-flex align-items-start gap-2" style="max-width: 85%;">
+                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: rgba(101, 205, 191, 0.2); color: #0d9488; font-size: 0.85rem; font-weight: 700;">
+                    <i class="bi bi-building"></i>
+                </div>
+                <div>
+                    <div class="p-3 rounded-4 bg-white border shadow-sm text-dark" style="border-top-left-radius: 4px !important; font-size: 0.86rem; line-height: 1.45;">
+                        <div class="fw-bold mb-1" id="globalChatSenderSchoolName" style="font-size: 0.74rem; color: #0d9488;">
+                            Escuela Básica Las Rosas
+                        </div>
+                        Estimado Super Admin, hemos finalizado la carga de nómina de estudiantes y requerimos asistencia para validar las licencias de Libro de Clases.
+                    </div>
+                    <div class="text-muted small mt-1 ms-1" style="font-size: 0.7rem;">
+                        11:15 AM · Recibido
+                    </div>
+                </div>
+            </div>
+
+            <!-- Burbuja Enviada (Super Admin / Fondo Morado) -->
+            <div class="d-flex align-items-start justify-content-end gap-2 ms-auto" style="max-width: 85%;">
+                <div>
+                    <div class="p-3 rounded-4 text-white shadow-sm" style="background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%); border-top-right-radius: 4px !important; font-size: 0.86rem; line-height: 1.45; box-shadow: 0 4px 14px rgba(124, 92, 252, 0.25) !important;">
+                        <div class="fw-bold mb-1 text-white-50" style="font-size: 0.74rem;">
+                            Super Admin Eduteka
+                        </div>
+                        ¡Hola Carmen Gloria! Hemos revisado su establecimiento y las licencias ya han sido autorizadas correctamente en el servidor.
+                    </div>
+                    <div class="text-end text-muted small mt-1 me-1" style="font-size: 0.7rem;">
+                        11:20 AM · <i class="bi bi-check2-all" style="color: var(--primary, #7C5CFC) !important;"></i>
+                    </div>
+                </div>
+                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%); color: white; font-size: 0.85rem;">
+                    <i class="bi bi-headset"></i>
+                </div>
+            </div>
+
+            <!-- Burbuja Recibida 2 -->
+            <div class="d-flex align-items-start gap-2" style="max-width: 85%;">
+                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: rgba(101, 205, 191, 0.2); color: #0d9488; font-size: 0.85rem; font-weight: 700;">
+                    <i class="bi bi-building"></i>
+                </div>
+                <div>
+                    <div class="p-3 rounded-4 bg-white border shadow-sm text-dark" style="border-top-left-radius: 4px !important; font-size: 0.86rem; line-height: 1.45;">
+                        <div class="fw-bold mb-1" style="font-size: 0.74rem; color: #0d9488;">
+                            Escuela Básica Las Rosas
+                        </div>
+                        ¡Muchas gracias por la rápida respuesta! Procedemos a habilitar a los docentes jefes.
+                    </div>
+                    <div class="text-muted small mt-1 ms-1" style="font-size: 0.7rem;">
+                        11:22 AM · Recibido
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Sección Inferior: Input Group Fijado Abajo -->
+        <div class="p-3 bg-white border-top">
+            <form id="globalChatForm" onsubmit="event.preventDefault(); sendGlobalChatMessage();">
+                <div class="input-group">
+                    <input type="text" 
+                           id="globalChatInputField" 
+                           class="form-control border-end-0 py-2 px-3 bg-light shadow-none" 
+                           placeholder="Escribe un mensaje al colegio..." 
+                           style="border-radius: 25px 0 0 25px; font-size: 0.86rem; border-color: #E2E8F0;" 
+                           autocomplete="off">
+                    <button type="submit" 
+                            id="globalChatBtnSend" 
+                            class="btn px-3 d-flex align-items-center justify-content-center" 
+                            style="border-radius: 0 25px 25px 0; background: var(--primary, #7C5CFC); color: #ffffff; border-color: var(--primary, #7C5CFC);" 
+                            title="Enviar mensaje">
+                        <i class="bi bi-send-fill"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const offcanvasEl = document.getElementById('offcanvasChatGlobal');
+        const messagesBox = document.getElementById('globalChatMessagesBox');
+        const schoolSelect = document.getElementById('globalChatSchoolSelect');
+        const contactNameEl = document.getElementById('globalChatContactName');
+        const senderNameEl = document.getElementById('globalChatSenderSchoolName');
+
+        // Scroll al fondo al abrir el offcanvas
+        if (offcanvasEl && messagesBox) {
+            offcanvasEl.addEventListener('shown.bs.offcanvas', function () {
+                messagesBox.scrollTop = messagesBox.scrollHeight;
+            });
+        }
+
+        // Cambio dinámico de conversación según selector
+        if (schoolSelect) {
+            schoolSelect.addEventListener('change', function () {
+                const selectedText = this.options[this.selectedIndex].text.replace(/^[^\w]+/, '').replace(/\s*\(\d+\s*nuevos\)/i, '').trim();
+                if (senderNameEl) senderNameEl.textContent = selectedText;
+                
+                const contacts = {
+                    'las-rosas': 'Director(a): Carmen Gloria Silva',
+                    'arturo-prat': 'Director(a): Rodrigo Valenzuela',
+                    'bicentenario': 'Director(a): Marcela Paz Morales',
+                    'san-martin': 'Director(a): Fernando Soto'
+                };
+                if (contactNameEl) contactNameEl.textContent = contacts[this.value] || 'Dirección / Administración';
+
+                if (messagesBox) {
+                    setTimeout(() => {
+                        messagesBox.scrollTop = messagesBox.scrollHeight;
+                    }, 100);
+                }
+            });
+        }
+    });
+
+    // Enviar mensaje en el Chat Global vía Fetch API
+    async function sendGlobalChatMessage() {
+        const input = document.getElementById('globalChatInputField');
+        const btnSend = document.getElementById('globalChatBtnSend');
+        const box = document.getElementById('globalChatMessagesBox');
+        if (!input || !box) return;
+
+        const text = input.value.trim();
+        if (!text) return;
+
+        if (btnSend) btnSend.disabled = true;
+
+        try {
+            const csrfToken = getCookieGlobal('csrftoken') || '{{ csrf_token }}';
+            const select = document.getElementById('globalChatSchoolSelect');
+            const schoolVal = select ? select.value : 'las-rosas';
+            const schoolMap = { 'las-rosas': 1, 'arturo-prat': 2, 'bicentenario': 3, 'san-martin': 4 };
+            const colegioId = schoolMap[schoolVal] || 1;
+
+            const response = await fetch("{% url 'enviar_mensaje_chat' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    colegio_id: colegioId,
+                    contenido: text
+                })
+            });
+
+            const data = await response.json();
+            const hora = (data.mensaje && data.mensaje.hora) ? data.mensaje.hora : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'd-flex align-items-start justify-content-end gap-2 ms-auto';
+            msgDiv.style.maxWidth = '85%';
+            msgDiv.innerHTML = `
+                <div>
+                    <div class="p-3 rounded-4 text-white shadow-sm" style="background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%); border-top-right-radius: 4px !important; font-size: 0.86rem; line-height: 1.45; box-shadow: 0 4px 14px rgba(124, 92, 252, 0.25) !important;">
+                        <div class="fw-bold mb-1 text-white-50" style="font-size: 0.74rem;">
+                            Super Admin Eduteka
+                        </div>
+                        ${escapeHtmlGlobal(text)}
+                    </div>
+                    <div class="text-end text-muted small mt-1 me-1" style="font-size: 0.7rem;">
+                        ${hora} · <i class="bi bi-check2 text-primary"></i>
+                    </div>
+                </div>
+                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%); color: white; font-size: 0.85rem;">
+                    <i class="bi bi-headset"></i>
+                </div>
+            `;
+
+            box.appendChild(msgDiv);
+            input.value = '';
+            box.scrollTop = box.scrollHeight;
+        } catch (err) {
+            console.error('Error enviando mensaje global:', err);
+        } finally {
+            if (btnSend) btnSend.disabled = false;
+            if (input) input.focus();
+        }
+    }
+
+    function getCookieGlobal(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function escapeHtmlGlobal(string) {
+        const div = document.createElement('div');
+        div.appendChild(document.createTextNode(string));
+        return div.innerHTML;
+    }
+</script>

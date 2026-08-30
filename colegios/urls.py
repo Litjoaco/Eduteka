@@ -170,5 +170,9 @@ urlpatterns = [
     path('pie/estudiante/<int:ficha_id>/guardar-paci/', views.guardar_paci_view, name='guardar_paci'),
     path('pie/paci/<int:paci_id>/aprobar/', views.aprobar_paci_view, name='aprobar_paci'),
     path('pie/estudiante/<int:ficha_id>/imprimir-paci/', views.paci_imprimible_view, name='paci_imprimible'),
+
+    # Chat de Soporte (Super Admin ↔ Colegio)
+    path('chat/enviar/', views.enviar_mensaje_chat, name='enviar_mensaje_chat'),
 ]
+
 

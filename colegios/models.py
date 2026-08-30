@@ -1575,6 +1575,50 @@ class PlanAdecuacionCurricular(models.Model):
         return f"PACI {self.anio_lectivo} - {self.ficha_pie.estudiante.nombre_completo}"
 
 
+# ══════════════════════════════════════════════════════════════════════════════
+# MODELO: MENSAJES DE CHAT DE SOPORTE (Super Admin ↔ Colegio)
+# ══════════════════════════════════════════════════════════════════════════════
+
+class MensajeChat(models.Model):
+    REMITENTE_CHOICES = [
+        ('superadmin', 'Super Admin'),
+        ('colegio', 'Colegio'),
+    ]
+
+    colegio = models.ForeignKey(
+        Colegio,
+        on_delete=models.CASCADE,
+        related_name='mensajes_chat',
+        verbose_name="Colegio"
+    )
+    remitente = models.CharField(
+        max_length=20,
+        choices=REMITENTE_CHOICES,
+        default='superadmin',
+        verbose_name="Remitente"
+    )
+    usuario = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='mensajes_chat_enviados',
+        verbose_name="Usuario Remitente"
+    )
+    contenido = models.TextField(verbose_name="Contenido del Mensaje")
+    leido = models.BooleanField(default=False, verbose_name="¿Leído?")
+    fecha_creacion = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de Envío")
+
+    class Meta:
+        verbose_name = "Mensaje de Chat"
+        verbose_name_plural = "Mensajes de Chat"
+        ordering = ['fecha_creacion']
+
+    def __str__(self):
+        return f"[{self.get_remitente_display()}] {self.colegio.nombre} ({self.fecha_creacion.strftime('%d/%m/%Y %H:%M')}): {self.contenido[:40]}"
+
+
+
 
 
 

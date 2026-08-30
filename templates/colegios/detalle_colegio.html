@@ -1,97 +1,761 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalles de {{ colegio.nombre }} - Eduteka</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Ficha de {{ colegio.nombre }} - Super Admin Eduteka</title>
+    
+    <!-- Bootstrap CSS local static / CDN fallback -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css';">
+    
+    <!-- Fuentes e Iconos -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
     <style>
-        body { font-family: 'Outfit', sans-serif; background-color: #f8fafc; color: #1e293b; }
-        .card-custom { border: none; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        /* ══ DESIGN TOKENS (Super Admin Eduteka) ═════════════════════════════ */
+        :root {
+            --primary:        #7C5CFC;
+            --primary-soft:   rgba(124, 92, 252, 0.08);
+            --primary-hover:  #6747E3;
+            --secondary:      #65CDBF;
+            --secondary-soft: rgba(101, 205, 191, 0.08);
+            --bg:             #F8F9FD;
+            --white:          #FFFFFF;
+            --dark:           #151A35;
+            --gray-text:      #687089;
+            --border:         #E2E8F0;
+            --radius-lg:      16px;
+            --radius-md:      12px;
+            --radius-sm:      8px;
+        }
+
+        * {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--dark);
+            min-height: 100vh;
+            margin: 0;
+            padding: 2rem 1.5rem;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -15%; left: 65%;
+            width: 50vw; height: 50vw;
+            background: radial-gradient(circle, rgba(124, 92, 252, 0.06) 0%, rgba(255,255,255,0) 70%);
+            z-index: -2; pointer-events: none;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            top: 45%; left: -15%;
+            width: 40vw; height: 40vw;
+            background: radial-gradient(circle, rgba(101, 205, 191, 0.05) 0%, rgba(255,255,255,0) 70%);
+            z-index: -2; pointer-events: none;
+        }
+
+        .container-custom {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* ── CARDS & PANELS ────────────────────────────────────────────── */
+        .card-custom {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            transition: box-shadow 0.2s ease, transform 0.2s ease;
+        }
+
+        /* ── NAV TABS STYLING ──────────────────────────────────────────── */
+        .nav-tabs-custom {
+            border-bottom: 2px solid var(--border);
+            gap: 0.5rem;
+        }
+        .nav-tabs-custom .nav-link {
+            border: none;
+            color: var(--gray-text);
+            font-weight: 600;
+            font-size: 0.92rem;
+            padding: 0.85rem 1.4rem;
+            border-radius: var(--radius-md) var(--radius-md) 0 0;
+            background: transparent;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+        }
+        .nav-tabs-custom .nav-link:hover {
+            color: var(--primary);
+            background: var(--primary-soft);
+        }
+        .nav-tabs-custom .nav-link.active {
+            color: var(--primary);
+            background: var(--white);
+            border-bottom: 3px solid var(--primary);
+            font-weight: 700;
+        }
+
+        /* ── BUTTONS ───────────────────────────────────────────────────── */
+        .btn-primary-custom {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: var(--radius-md);
+            padding: 0.55rem 1.25rem;
+            font-weight: 600;
+            font-size: 0.88rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            text-decoration: none;
+            box-shadow: 0 4px 14px rgba(124, 92, 252, 0.25);
+            transition: all 0.2s ease;
+        }
+        .btn-primary-custom:hover {
+            background: var(--primary-hover);
+            color: var(--white);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(124, 92, 252, 0.35);
+        }
+
+        .btn-outline-custom {
+            background: var(--white);
+            color: var(--dark);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            font-size: 0.84rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        .btn-outline-custom:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-soft);
+        }
+
+        /* ── CHAT STYLING ──────────────────────────────────────────────── */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            background: var(--white);
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+        }
+
+        .chat-header {
+            padding: 1.1rem 1.5rem;
+            background: #FAF9FF;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        .chat-avatar.school {
+            background: linear-gradient(135deg, rgba(101, 205, 191, 0.2) 0%, rgba(101, 205, 191, 0.4) 100%);
+            color: #0d9488;
+            border: 1px solid rgba(101, 205, 191, 0.3);
+        }
+        .chat-avatar.admin {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+            color: white;
+        }
+
+        #chat-messages-box {
+            height: 420px;
+            max-height: 420px;
+            overflow-y: auto;
+            background-color: #F8FAFC;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            scroll-behavior: smooth;
+        }
+
+        /* Custom Scrollbar */
+        #chat-messages-box::-webkit-scrollbar {
+            width: 6px;
+        }
+        #chat-messages-box::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        #chat-messages-box::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 10px;
+        }
+        #chat-messages-box::-webkit-scrollbar-thumb:hover {
+            background: #94A3B8;
+        }
+
+        .message-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            max-width: 82%;
+        }
+        .message-row.received {
+            align-self: flex-start;
+        }
+        .message-row.sent {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .message-bubble {
+            padding: 0.9rem 1.15rem;
+            border-radius: var(--radius-lg);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            position: relative;
+            word-wrap: break-word;
+        }
+
+        .message-row.received .message-bubble {
+            background: var(--white);
+            color: var(--dark);
+            border: 1px solid var(--border);
+            border-top-left-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        }
+
+        .message-row.sent .message-bubble {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+            color: var(--white);
+            border-top-right-radius: 4px;
+            box-shadow: 0 4px 14px rgba(124, 92, 252, 0.25);
+        }
+
+        .message-meta {
+            font-size: 0.72rem;
+            margin-top: 0.35rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .message-row.received .message-meta {
+            color: var(--gray-text);
+        }
+        .message-row.sent .message-meta {
+            color: rgba(255, 255, 255, 0.8);
+            justify-content: flex-end;
+        }
+
+        .chat-input-bar {
+            padding: 1.1rem 1.5rem;
+            background: var(--white);
+            border-top: 1px solid var(--border);
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: #F8FAFC;
+            border: 1.5px solid var(--border);
+            border-radius: 30px;
+            padding: 0.35rem 0.5rem 0.35rem 1.25rem;
+            transition: all 0.2s ease;
+        }
+        .chat-input-wrapper:focus-within {
+            border-color: var(--primary);
+            background: var(--white);
+            box-shadow: 0 0 0 3px rgba(124, 92, 252, 0.12);
+        }
+
+        #chat-input-field {
+            border: none;
+            background: transparent;
+            width: 100%;
+            outline: none;
+            font-size: 0.9rem;
+            color: var(--dark);
+        }
+        #chat-input-field::placeholder {
+            color: var(--gray-text);
+            font-size: 0.88rem;
+        }
+
+        #chat-btn-send {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: 25px;
+            padding: 0.55rem 1.25rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+        #chat-btn-send:hover {
+            background: var(--primary-hover);
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(124, 92, 252, 0.3);
+        }
+
+        /* ── BADGES ────────────────────────────────────────────────────── */
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .status-dot.online {
+            background-color: #10B981;
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+        }
+
+        .badge-soft-primary {
+            background: var(--primary-soft);
+            color: var(--primary);
+            font-weight: 600;
+        }
+        .badge-soft-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+            font-weight: 600;
+        }
     </style>
 </head>
-<body class="p-4">
-    <div class="container max-width-lg">
-        <div class="d-flex justify-content-between align-items-center mb-4">
+<body>
+
+    <div class="container-custom">
+
+        <!-- ── HEADER & ACCIONES ────────────────────────────────────────── -->
+        <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
             <div>
-                <a href="{% url 'dashboard_superadmin_colegios' %}" class="btn btn-outline-secondary btn-sm mb-2 rounded-pill">
-                    <i class="bi bi-arrow-left"></i> Volver a Colegios
+                <a href="{% url 'dashboard_superadmin_colegios' %}" class="btn-outline-custom mb-2">
+                    <i class="bi bi-arrow-left"></i> Volver a Colegios Clientes
                 </a>
-                <h1 class="fw-bold fs-3 mb-0">{{ colegio.nombre }}</h1>
-                <p class="text-muted small mb-0">{{ colegio.ciudad_comuna }} · {{ colegio.get_tipo_institucion_display }}</p>
+                <div class="d-flex align-items-center gap-3 mt-1 flex-wrap">
+                    <div class="chat-avatar school" style="width:48px;height:48px;font-size:1.2rem;">
+                        <i class="bi bi-building"></i>
+                    </div>
+                    <div>
+                        <h1 class="fw-bold fs-3 mb-0" style="color:var(--dark);">{{ colegio.nombre }}</h1>
+                        <p class="text-muted small mb-0 d-flex align-items-center gap-2 mt-0.5">
+                            <span><i class="bi bi-geo-alt me-1"></i>{{ colegio.ciudad_comuna|default:"Chile" }}</span>
+                            <span>•</span>
+                            <span><i class="bi bi-mortarboard me-1"></i>{{ colegio.get_tipo_institucion_display }}</span>
+                            <span>•</span>
+                            <span class="badge badge-soft-success rounded-pill px-2.5 py-1">
+                                <i class="bi bi-check-circle-fill me-1"></i>{{ colegio.get_estado_display }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
             </div>
-            <div>
-                <a href="{% url 'editar_colegio' colegio.id %}" class="btn btn-primary rounded-pill px-4">
-                    <i class="bi bi-pencil me-1"></i> Editar Colegio
+            <div class="d-flex gap-2">
+                <a href="{% url 'editar_suscripcion_colegio' colegio.id %}" class="btn-outline-custom">
+                    <i class="bi bi-credit-card"></i> Suscripción
+                </a>
+                <a href="{% url 'editar_colegio' colegio.id %}" class="btn-primary-custom">
+                    <i class="bi bi-pencil-square"></i> Editar Colegio
                 </a>
             </div>
         </div>
 
-        <div class="row g-4">
-            <div class="col-md-6">
-                <div class="card card-custom p-4 bg-white">
-                    <h5 class="fw-bold mb-3"><i class="bi bi-building text-primary me-2"></i> Información General</h5>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item d-flex justify-content-between px-0">
-                            <span class="text-muted">Nombre Corto:</span>
-                            <span class="fw-semibold">{{ colegio.nombre_corto|default:"Sin especificar" }}</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between px-0">
-                            <span class="text-muted">Correo Institucional:</span>
-                            <span class="fw-semibold">{{ colegio.correo_institucional }}</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between px-0">
-                            <span class="text-muted">Teléfono:</span>
-                            <span class="fw-semibold">{{ colegio.telefono }}</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between px-0">
-                            <span class="text-muted">Dirección:</span>
-                            <span class="fw-semibold">{{ colegio.direccion|default:"No informada" }}</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between px-0">
-                            <span class="text-muted">Cantidad Alumnos:</span>
-                            <span class="fw-semibold">{{ colegio.get_cantidad_alumnos_display }}</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between px-0">
-                            <span class="text-muted">Estado del Colegio:</span>
-                            <span class="badge bg-success rounded-pill px-3">{{ colegio.get_estado_display }}</span>
-                        </li>
-                    </ul>
+        <!-- ── NAVEGACIÓN POR PESTAÑAS (TABS) ───────────────────────────── -->
+        <ul class="nav nav-tabs nav-tabs-custom mb-4" id="colegioTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="tab-datos-nav" data-bs-toggle="tab" data-bs-target="#tab-datos" type="button" role="tab" aria-controls="tab-datos" aria-selected="true">
+                    <i class="bi bi-card-heading"></i> Datos y Suscripción
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="tab-chat-nav" data-bs-toggle="tab" data-bs-target="#tab-chat" type="button" role="tab" aria-controls="tab-chat" aria-selected="false">
+                    <span>💬 Chat de Soporte</span>
+                    <span class="badge bg-primary rounded-pill ms-1" style="font-size:0.7rem; background-color: var(--primary) !important;">En vivo</span>
+                </button>
+            </li>
+        </ul>
+
+        <!-- ── CONTENIDO DE LAS PESTAÑAS (TAB CONTENT) ──────────────────── -->
+        <div class="tab-content" id="colegioTabContent">
+
+            <!-- ══ PANEL 1: DATOS GENERALES Y SUSCRIPCIÓN ══════════════════ -->
+            <div class="tab-pane fade show active" id="tab-datos" role="tabpanel" aria-labelledby="tab-datos-nav">
+                <div class="row g-4">
+                    <div class="col-lg-6">
+                        <div class="card card-custom p-4">
+                            <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
+                                <h5 class="fw-bold mb-0" style="font-size:1.05rem;">
+                                    <i class="bi bi-building text-primary me-2"></i> Información General
+                                </h5>
+                                <span class="badge badge-soft-primary rounded-pill px-2.5 py-1">Institución</span>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between px-0 py-2.5">
+                                    <span class="text-muted small fw-semibold">Nombre Corto / Alias:</span>
+                                    <span class="fw-bold text-dark">{{ colegio.nombre_corto|default:"Sin especificar" }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between px-0 py-2.5">
+                                    <span class="text-muted small fw-semibold">Correo Institucional:</span>
+                                    <span class="fw-bold text-dark text-break">{{ colegio.correo_institucional }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between px-0 py-2.5">
+                                    <span class="text-muted small fw-semibold">Teléfono de Contacto:</span>
+                                    <span class="fw-bold text-dark">{{ colegio.telefono }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between px-0 py-2.5">
+                                    <span class="text-muted small fw-semibold">Dirección:</span>
+                                    <span class="fw-bold text-dark text-end">{{ colegio.direccion|default:"No informada" }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between px-0 py-2.5">
+                                    <span class="text-muted small fw-semibold">Matrícula Estimada:</span>
+                                    <span class="fw-bold text-dark">{{ colegio.get_cantidad_alumnos_display }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between px-0 py-2.5 border-bottom-0">
+                                    <span class="text-muted small fw-semibold">Estado del Establecimiento:</span>
+                                    <span class="badge bg-success-subtle text-success rounded-pill px-3 py-1.5 fw-bold">
+                                        {{ colegio.get_estado_display }}
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <!-- Card: Suscripción -->
+                        <div class="card card-custom p-4 mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                                <h5 class="fw-bold mb-0" style="font-size:1.05rem;">
+                                    <i class="bi bi-credit-card text-success me-2"></i> Plan y Suscripción
+                                </h5>
+                                <a href="{% url 'editar_suscripcion_colegio' colegio.id %}" class="btn-outline-custom" style="padding:0.35rem 0.85rem; font-size:0.78rem;">
+                                    <i class="bi bi-pencil me-1"></i> Modificar
+                                </a>
+                            </div>
+                            {% if suscripcion %}
+                                <div class="p-3 rounded-3 mb-2" style="background:#FAF9FF; border:1px solid rgba(124, 92, 252, 0.15);">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <div class="text-muted small fw-bold uppercase">Plan Contratado</div>
+                                            <div class="fw-bold fs-5 text-primary">{{ suscripcion.plan.nombre }}</div>
+                                        </div>
+                                        <span class="badge bg-primary rounded-pill px-3 py-2">
+                                            {{ suscripcion.get_tipo_facturacion_display }}
+                                        </span>
+                                    </div>
+                                    <div class="mt-2 pt-2 border-top d-flex justify-content-between align-items-center text-muted small">
+                                        <span>Estado del Servicio:</span>
+                                        <strong class="text-success">{{ suscripcion.get_estado_display }}</strong>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="text-center py-3 text-muted">
+                                    <i class="bi bi-exclamation-circle fs-3 d-block mb-1 text-warning"></i>
+                                    <p class="mb-2 small">Sin suscripción activa registrada.</p>
+                                    <a href="{% url 'editar_suscripcion_colegio' colegio.id %}" class="btn btn-sm btn-primary rounded-pill px-3">
+                                        Asignar Plan Ahora
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Card: Módulos -->
+                        <div class="card card-custom p-4">
+                            <h5 class="fw-bold mb-3 border-bottom pb-2" style="font-size:1.05rem;">
+                                <i class="bi bi-cpu text-primary me-2"></i> Módulos Habilitados
+                            </h5>
+                            <div class="d-flex flex-wrap gap-2">
+                                <span class="badge {% if config_modulos.libro_clases %}bg-success-subtle text-success border border-success-subtle{% else %}bg-light text-muted border{% endif %} rounded-pill px-3 py-2">
+                                    <i class="bi {% if config_modulos.libro_clases %}bi-check2-circle{% else %}bi-dash-circle{% endif %} me-1"></i> Libro de Clases
+                                </span>
+                                <span class="badge {% if config_modulos.contabilidad %}bg-success-subtle text-success border border-success-subtle{% else %}bg-light text-muted border{% endif %} rounded-pill px-3 py-2">
+                                    <i class="bi {% if config_modulos.contabilidad %}bi-check2-circle{% else %}bi-dash-circle{% endif %} me-1"></i> Contabilidad
+                                </span>
+                                <span class="badge {% if config_modulos.proveedores %}bg-success-subtle text-success border border-success-subtle{% else %}bg-light text-muted border{% endif %} rounded-pill px-3 py-2">
+                                    <i class="bi {% if config_modulos.proveedores %}bi-check2-circle{% else %}bi-dash-circle{% endif %} me-1"></i> Proveedores
+                                </span>
+                                <span class="badge {% if config_modulos.simce %}bg-success-subtle text-success border border-success-subtle{% else %}bg-light text-muted border{% endif %} rounded-pill px-3 py-2">
+                                    <i class="bi {% if config_modulos.simce %}bi-check2-circle{% else %}bi-dash-circle{% endif %} me-1"></i> SIMCE
+                                </span>
+                                <span class="badge {% if config_modulos.mercado_publico %}bg-success-subtle text-success border border-success-subtle{% else %}bg-light text-muted border{% endif %} rounded-pill px-3 py-2">
+                                    <i class="bi {% if config_modulos.mercado_publico %}bi-check2-circle{% else %}bi-dash-circle{% endif %} me-1"></i> Mercado Público
+                                </span>
+                                <span class="badge {% if config_modulos.comunidad %}bg-success-subtle text-success border border-success-subtle{% else %}bg-light text-muted border{% endif %} rounded-pill px-3 py-2">
+                                    <i class="bi {% if config_modulos.comunidad %}bi-check2-circle{% else %}bi-dash-circle{% endif %} me-1"></i> Comunidad
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="col-md-6">
-                <div class="card card-custom p-4 bg-white mb-4">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="fw-bold mb-0"><i class="bi bi-credit-card text-success me-2"></i> Suscripción</h5>
-                        <a href="{% url 'editar_suscripcion_colegio' colegio.id %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
-                            <i class="bi bi-pencil me-1"></i> Editar Plan y Suscripción
-                        </a>
+            <!-- ══ PANEL 2: CHAT DE SOPORTE DIRECTO ════════════════════════ -->
+            <div class="tab-pane fade" id="tab-chat" role="tabpanel" aria-labelledby="tab-chat-nav">
+                
+                <div class="chat-container">
+                    
+                    <!-- Chat Header -->
+                    <div class="chat-header">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="chat-avatar school">
+                                <i class="bi bi-mortarboard-fill"></i>
+                            </div>
+                            <div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <h6 class="fw-bold mb-0 text-dark" style="font-size:0.95rem;">Canal de Soporte — {{ colegio.nombre }}</h6>
+                                    <span class="badge bg-success-subtle text-success rounded-pill px-2 py-0.5" style="font-size:0.72rem;">
+                                        <span class="status-dot online me-1"></span> En línea
+                                    </span>
+                                </div>
+                                <p class="text-muted small mb-0" style="font-size:0.78rem;">
+                                    Contacto directo con la Dirección y Administrador: <strong>{{ colegio.correo_institucional }}</strong>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 text-muted" onclick="document.getElementById('chat-messages-box').scrollTop = document.getElementById('chat-messages-box').scrollHeight;" title="Ir al final">
+                                <i class="bi bi-arrow-down-circle"></i>
+                            </button>
+                        </div>
                     </div>
-                    {% if suscripcion %}
-                        <p class="mb-1"><strong>Plan:</strong> {{ suscripcion.plan.nombre }}</p>
-                        <p class="mb-1"><strong>Facturación:</strong> {{ suscripcion.get_tipo_facturacion_display }}</p>
-                        <p class="mb-0"><strong>Estado:</strong> {{ suscripcion.get_estado_display }}</p>
-                    {% else %}
-                        <p class="text-muted mb-0">Sin suscripción activa actualmente.</p>
-                    {% endif %}
+
+                    <!-- Chat Messages History Box (Altura fija 400px con scroll) -->
+                    <div id="chat-messages-box">
+                        
+                        <!-- Separador de fecha -->
+                        <div class="text-center my-1">
+                            <span class="badge bg-white text-muted border rounded-pill px-3 py-1 shadow-sm" style="font-size:0.72rem; font-weight:600;">
+                                <i class="bi bi-calendar-event me-1"></i> Historial de Soporte
+                            </span>
+                        </div>
+
+                        {% for mensaje in mensajes %}
+                            {% if mensaje.remitente == 'superadmin' %}
+                                <!-- Mensaje Enviado (Super Admin - Burbuja Morada a la Derecha) -->
+                                <div class="message-row sent">
+                                    <div class="chat-avatar admin" style="width:34px;height:34px;font-size:0.85rem;" title="Super Admin Eduteka">
+                                        <i class="bi bi-headset"></i>
+                                    </div>
+                                    <div>
+                                        <div class="message-bubble">
+                                            <div class="fw-bold mb-1 text-white-50" style="font-size:0.78rem;">
+                                                Super Admin Eduteka
+                                            </div>
+                                            {{ mensaje.contenido }}
+                                        </div>
+                                        <div class="message-meta">
+                                            <span>{{ mensaje.fecha_creacion|date:"H:i" }}</span>
+                                            <i class="bi bi-check2-all text-white ms-1"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <!-- Mensaje Recibido (Colegio - Burbuja Blanca a la Izquierda) -->
+                                <div class="message-row received">
+                                    <div class="chat-avatar school" style="width:34px;height:34px;font-size:0.85rem;" title="{{ colegio.nombre }}">
+                                        <i class="bi bi-person-fill"></i>
+                                    </div>
+                                    <div>
+                                        <div class="message-bubble">
+                                            <div class="fw-bold mb-1" style="font-size:0.78rem; color: #0d9488;">
+                                                {{ colegio.nombre }}
+                                            </div>
+                                            {{ mensaje.contenido }}
+                                        </div>
+                                        <div class="message-meta">
+                                            <span>{{ mensaje.fecha_creacion|date:"H:i" }}</span>
+                                            <span>•</span>
+                                            <span>Recibido</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% empty %}
+                            <!-- Estado vacío: Sin mensajes registrados aún -->
+                            <div class="text-center py-5 text-muted" id="chat-empty-state">
+                                <i class="bi bi-chat-dots fs-2 text-primary opacity-50 d-block mb-2"></i>
+                                <p class="mb-1 fw-bold text-dark small">No hay mensajes previos en este canal.</p>
+                                <p class="small text-muted mb-0">Escribe a continuación para iniciar la comunicación con la institución.</p>
+                            </div>
+                        {% endfor %}
+
+                    </div>
+
+                    <!-- Chat Send Bar (Input Group & Enviar) -->
+                    <div class="chat-input-bar">
+                        <form id="chat-form" onsubmit="event.preventDefault(); handleSendMessage();">
+                            {% csrf_token %}
+                            <div class="chat-input-wrapper">
+                                <i class="bi bi-chat-dots text-muted ms-1" style="font-size:1.1rem;"></i>
+                                <input type="text" id="chat-input-field" placeholder="Escribe un mensaje al colegio..." autocomplete="off">
+                                <button type="submit" id="chat-btn-send">
+                                    <i class="bi bi-send-fill"></i>
+                                    <span>Enviar</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
                 </div>
 
-                <div class="card card-custom p-4 bg-white">
-                    <h5 class="fw-bold mb-3"><i class="bi bi-cpu text-purple me-2"></i> Módulos Habilitados</h5>
-                    <div class="d-flex flex-wrap gap-2">
-                        <span class="badge {% if config_modulos.libro_clases %}bg-success{% else %}bg-secondary{% endif %} rounded-pill px-3 py-2">Libro de Clases</span>
-                        <span class="badge {% if config_modulos.contabilidad %}bg-success{% else %}bg-secondary{% endif %} rounded-pill px-3 py-2">Contabilidad</span>
-                        <span class="badge {% if config_modulos.proveedores %}bg-success{% else %}bg-secondary{% endif %} rounded-pill px-3 py-2">Proveedores</span>
-                        <span class="badge {% if config_modulos.simce %}bg-success{% else %}bg-secondary{% endif %} rounded-pill px-3 py-2">SIMCE</span>
-                        <span class="badge {% if config_modulos.mercado_publico %}bg-success{% else %}bg-secondary{% endif %} rounded-pill px-3 py-2">Mercado Público</span>
-                        <span class="badge {% if config_modulos.comunidad %}bg-success{% else %}bg-secondary{% endif %} rounded-pill px-3 py-2">Comunidad</span>
-                    </div>
-                </div>
             </div>
+
         </div>
+
     </div>
+
+    <!-- Bootstrap 5 Bundle JS -->
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js';"></script>
+
+    <script>
+        // ── Scroll al final del historial de chat al cargar y al cambiar de pestaña ────
+        document.addEventListener('DOMContentLoaded', () => {
+            const chatTab = document.getElementById('tab-chat-nav');
+            const messagesBox = document.getElementById('chat-messages-box');
+
+            if (messagesBox) {
+                messagesBox.scrollTop = messagesBox.scrollHeight;
+            }
+
+            if (chatTab && messagesBox) {
+                chatTab.addEventListener('shown.bs.tab', () => {
+                    messagesBox.scrollTop = messagesBox.scrollHeight;
+                });
+            }
+        });
+
+        // ── Función para enviar mensaje vía Fetch API a Django ───────────────
+        async function handleSendMessage() {
+            const input = document.getElementById('chat-input-field');
+            const sendBtn = document.getElementById('chat-btn-send');
+            const box = document.getElementById('chat-messages-box');
+            
+            if (!input || !box) return;
+            const text = input.value.trim();
+            if (!text) return;
+
+            // Deshabilitar botón temporalmente mientras se envía
+            if (sendBtn) {
+                sendBtn.disabled = true;
+                sendBtn.style.opacity = '0.7';
+            }
+
+            try {
+                const csrfToken = getCookie('csrftoken') || document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+                
+                const response = await fetch("{% url 'enviar_mensaje_chat' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        colegio_id: {{ colegio.id }},
+                        contenido: text
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error en el servidor: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    const emptyState = document.getElementById('chat-empty-state');
+                    if (emptyState) {
+                        emptyState.remove();
+                    }
+
+                    const hora = data.mensaje.hora || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    
+                    // Crear dinámicamente la burbuja morada de mensaje enviado
+                    const msgRow = document.createElement('div');
+                    msgRow.className = 'message-row sent';
+                    msgRow.innerHTML = `
+                        <div class="chat-avatar admin" style="width:34px;height:34px;font-size:0.85rem;" title="Super Admin Eduteka">
+                            <i class="bi bi-headset"></i>
+                        </div>
+                        <div>
+                            <div class="message-bubble">
+                                <div class="fw-bold mb-1 text-white-50" style="font-size:0.78rem;">
+                                    Super Admin Eduteka
+                                </div>
+                                ${escapeHtml(data.mensaje.contenido || text)}
+                            </div>
+                            <div class="message-meta">
+                                <span>${hora}</span>
+                                <i class="bi bi-check2-all text-white ms-1"></i>
+                            </div>
+                        </div>
+                    `;
+
+                    box.appendChild(msgRow);
+                    input.value = '';
+                    box.scrollTop = box.scrollHeight;
+                } else {
+                    alert(data.error || 'No se pudo guardar el mensaje.');
+                }
+            } catch (err) {
+                console.error('Error al enviar mensaje:', err);
+                alert('Ocurrió un error al enviar el mensaje. Intente nuevamente.');
+            } finally {
+                if (sendBtn) {
+                    sendBtn.disabled = false;
+                    sendBtn.style.opacity = '1';
+                }
+                if (input) input.focus();
+            }
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Sanitización básica para preview seguro
+        function escapeHtml(string) {
+            const div = document.createElement('div');
+            div.appendChild(document.createTextNode(string));
+            return div.innerHTML;
+        }
+    </script>
 </body>
 </html>

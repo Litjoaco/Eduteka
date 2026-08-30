@@ -37,6 +37,7 @@ urlpatterns = [
     # Generador de Reportes Personalizables (openpyxl)
     path('superadmin/reportes/', views.dashboard_superadmin_reportes_view, name='dashboard_superadmin_reportes'),
     path('superadmin/reportes/descargar/', views.exportar_reporte_colegios_excel, name='descargar_excel'),
+    path('superadmin/finanzas/exportar/', views.exportar_finanzas_excel, name='exportar_finanzas_excel'),
     path('solicitudes/<int:solicitud_id>/aprobar/', views.aprobar_solicitud, name='aprobar_solicitud'),
     path('solicitudes/<int:solicitud_id>/rechazar/', views.rechazar_solicitud, name='rechazar_solicitud'),
 ]

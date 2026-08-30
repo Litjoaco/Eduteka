@@ -18,7 +18,7 @@ from solicitudes.models import MiembroColegio
 from .models import (
     Colegio, Suscripcion, ColegioModulo, ConfiguracionAcademica, 
     RolColegio, Permiso, RolPermiso, CursoColegio, SeccionCurso, 
-    Asignatura, ConfiguracionModulos
+    Asignatura, ConfiguracionModulos, MensajeChat
 )
 from .forms import RegistroColegioPaso1Form, RegistroColegioPaso2Form
 
@@ -3483,12 +3483,76 @@ def ver_detalle_colegio(request, pk):
     colegio = get_object_or_404(Colegio, pk=pk)
     suscripcion = getattr(colegio, 'suscripcion', None)
     config_modulos, _ = ConfiguracionModulos.objects.get_or_create(colegio=colegio)
+    mensajes = MensajeChat.objects.filter(colegio=colegio).order_by('fecha_creacion')
     context = {
         'colegio': colegio,
         'suscripcion': suscripcion,
         'config_modulos': config_modulos,
+        'mensajes': mensajes,
     }
     return render(request, 'colegios/detalle_colegio.html', context)
+
+
+@login_required
+@require_POST
+def enviar_mensaje_chat(request):
+    """
+    Recibe un mensaje de chat vía JSON o FormData (Fetch API),
+    guarda la instancia en el modelo MensajeChat y retorna un JsonResponse.
+    """
+    try:
+        colegio_id = None
+        contenido = ""
+
+        if request.content_type == 'application/json':
+            try:
+                data = json.loads(request.body.decode('utf-8'))
+                colegio_id = data.get('colegio_id')
+                contenido = data.get('contenido', '').strip()
+            except Exception:
+                pass
+
+        if not colegio_id:
+            colegio_id = request.POST.get('colegio_id')
+        if not contenido:
+            contenido = request.POST.get('contenido', '').strip()
+
+        if not colegio_id or not contenido:
+            return JsonResponse({
+                'status': 'error',
+                'error': 'Falta el ID del colegio o el contenido del mensaje.'
+            }, status=400)
+
+        colegio = get_object_or_404(Colegio, id=colegio_id)
+
+        # Determinar el tipo de remitente
+        if request.user.is_superuser or request.user.is_staff:
+            remitente = 'superadmin'
+        else:
+            remitente = 'colegio'
+
+        mensaje_obj = MensajeChat.objects.create(
+            colegio=colegio,
+            remitente=remitente,
+            usuario=request.user,
+            contenido=contenido
+        )
+
+        return JsonResponse({
+            'status': 'success',
+            'mensaje': {
+                'id': mensaje_obj.id,
+                'contenido': mensaje_obj.contenido,
+                'remitente': mensaje_obj.remitente,
+                'remitente_display': mensaje_obj.get_remitente_display(),
+                'hora': mensaje_obj.fecha_creacion.strftime('%H:%M'),
+                'fecha': mensaje_obj.fecha_creacion.strftime('%d/%m/%Y'),
+                'colegio_id': colegio.id,
+            }
+        })
+
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'error': str(e)}, status=500)
 
 
 @login_required
