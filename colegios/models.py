@@ -80,6 +80,10 @@ class Colegio(models.Model):
     def __str__(self):
         return self.nombre
 
+    @property
+    def mensajechat_set(self):
+        return self.mensajes_chat
+
 
 class Suscripcion(models.Model):
     FACTURACION_CHOICES = [
