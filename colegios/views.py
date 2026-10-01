@@ -3498,6 +3498,7 @@ def ver_detalle_colegio(request, pk):
 def enviar_mensaje_chat(request):
     """
     Recibe un mensaje de chat vía JSON o FormData (Fetch API),
+    valida la autorización del usuario respecto al colegio (prevención BOLA/IDOR),
     guarda la instancia en el modelo MensajeChat y retorna un JsonResponse.
     """
     try:
@@ -3525,10 +3526,29 @@ def enviar_mensaje_chat(request):
 
         colegio = get_object_or_404(Colegio, id=colegio_id)
 
-        # Determinar el tipo de remitente
+        # ── Control de Autorización y Prevención de IDOR ─────────────────────────
         if request.user.is_superuser or request.user.is_staff:
             remitente = 'superadmin'
         else:
+            from solicitudes.models import MiembroColegio
+
+            # Verificar pertenencia activa a la institución (o si es el administrador titular)
+            pertenece = (
+                colegio.administrador_id == request.user.id
+                or MiembroColegio.objects.filter(
+                    usuario=request.user,
+                    colegio=colegio,
+                    activo=True
+                ).exists()
+            )
+
+            if not pertenece:
+                return JsonResponse({
+                    'status': 'error',
+                    'error': 'Acceso denegado: No perteneces a esta institución',
+                    'message': 'Acceso denegado: No perteneces a esta institución'
+                }, status=403)
+
             remitente = 'colegio'
 
         mensaje_obj = MensajeChat.objects.create(
