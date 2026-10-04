@@ -100,8 +100,13 @@ ipython_config.py
 #   Similar to Pipfile.lock, it is generally recommended to include pdm.lock in version control.
 # pdm.lock
 
-# virtualenv
+# Environment variables
 .env
+.env.*
+.env.local
+!.env.example
+
+# virtualenv
 .venv
 env/
 venv/
