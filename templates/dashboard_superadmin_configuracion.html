@@ -194,8 +194,130 @@
             border-radius: var(--radius-lg); padding: 1.75rem;
         }
 
+        /* ── Acordeón de Integraciones Moderno & Minimalista ── */
+        .integration-item {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow: hidden;
+        }
+        .integration-item:hover {
+            border-color: #9DA3B4;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+        }
+        .integration-item.is-open {
+            border-color: var(--primary);
+            box-shadow: 0 6px 20px rgba(124, 92, 252, 0.08);
+        }
+
+        .integration-header {
+            padding: 1.15rem 1.4rem;
+            background: var(--white);
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.2s ease;
+        }
+        .integration-header:hover {
+            background-color: #FAFBFF;
+        }
+
+        .integration-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+            transition: transform 0.2s ease;
+        }
+        .integration-header:hover .integration-icon {
+            transform: scale(1.05);
+        }
+
+        .integration-title {
+            font-size: 0.98rem;
+            font-weight: 700;
+            color: var(--dark);
+            line-height: 1.3;
+        }
+        .integration-subtitle {
+            font-size: 0.79rem;
+            color: var(--gray-text);
+            margin-top: 2px;
+        }
+
+        /* Badge de estado */
+        .badge-status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.4rem 0.85rem;
+            background: rgba(16, 185, 129, 0.09);
+            color: #059669;
+            font-size: 0.77rem;
+            font-weight: 700;
+            border-radius: 20px;
+            border: 1px solid rgba(16, 185, 129, 0.22);
+            white-space: nowrap;
+        }
+
+        /* Botón Configurar */
+        .btn-configurar {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.42rem 0.95rem;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: var(--white);
+            color: var(--dark);
+            font-size: 0.82rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+        .btn-configurar .chevron-icon {
+            font-size: 0.75rem;
+            transition: transform 0.25s ease;
+        }
+        .integration-header:hover .btn-configurar {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-soft);
+        }
+        .integration-header[aria-expanded="true"] .btn-configurar,
+        .integration-item.is-open .btn-configurar {
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+            box-shadow: 0 2px 8px rgba(124, 92, 252, 0.25);
+        }
+        .integration-header[aria-expanded="true"] .chevron-icon,
+        .integration-item.is-open .chevron-icon {
+            transform: rotate(180deg);
+        }
+
+        .integration-body {
+            background: #FAFBFD;
+            border-top: 1px solid #ECEEF3;
+        }
+
+        .tab-panel {
+            animation: fadeInTab 0.2s ease-in-out;
+        }
+        @keyframes fadeInTab {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         @media (max-width: 991.98px) {
             .content-area { padding: 1.25rem 1rem; }
+            .integration-header { padding: 1rem; }
         }
     </style>
 </head>
@@ -244,16 +366,16 @@
 
                 <!-- NAVEGACIÓN DE PESTAÑAS LATERAL (3 Cols en desktop) -->
                 <div class="col-12 col-lg-3">
-                    <div class="config-nav">
-                        <button class="config-tab-btn active" onclick="switchTab('integraciones', this)">
+                    <div class="config-nav" role="tablist" aria-orientation="vertical">
+                        <button type="button" class="config-tab-btn active" data-tab="integraciones" role="tab" aria-selected="true" aria-controls="tab-integraciones" onclick="switchTab('integraciones', this)">
                             <i class="bi bi-cpu-fill"></i>
                             <div>
                                 <div>Integraciones y APIs</div>
-                                <div style="font-size:.7rem;font-weight:400;opacity:.8;">SII, MercadoPago, SendGrid</div>
+                                <div style="font-size:.7rem;font-weight:400;opacity:.8;">MercadoPago, SII, SendGrid</div>
                             </div>
                         </button>
 
-                        <button class="config-tab-btn" onclick="switchTab('seguridad', this)">
+                        <button type="button" class="config-tab-btn" data-tab="seguridad" role="tab" aria-selected="false" aria-controls="tab-seguridad" onclick="switchTab('seguridad', this)">
                             <i class="bi bi-shield-lock-fill"></i>
                             <div>
                                 <div>Seguridad y Accesos</div>
@@ -261,7 +383,7 @@
                             </div>
                         </button>
 
-                        <button class="config-tab-btn" onclick="switchTab('features', this)">
+                        <button type="button" class="config-tab-btn" data-tab="features" role="tab" aria-selected="false" aria-controls="tab-features" onclick="switchTab('features', this)">
                             <i class="bi bi-toggle-on"></i>
                             <div>
                                 <div>Feature Flags</div>
@@ -269,7 +391,7 @@
                             </div>
                         </button>
 
-                        <button class="config-tab-btn danger-tab" onclick="switchTab('sistema', this)">
+                        <button type="button" class="config-tab-btn danger-tab" data-tab="sistema" role="tab" aria-selected="false" aria-controls="tab-sistema" onclick="switchTab('sistema', this)">
                             <i class="bi bi-exclamation-triangle-fill"></i>
                             <div>
                                 <div>Estado del Sistema</div>
@@ -282,160 +404,290 @@
                 <!-- CONTENIDO DE LAS PESTAÑAS (9 Cols en desktop) -->
                 <div class="col-12 col-lg-9">
 
-                    
-                    <div id="tab-integraciones" class="tab-panel">
+                    <!-- PESTAÑA: INTEGRACIONES Y APIS (ACORDEÓN REDISEÑADO) -->
+                    <div id="tab-integraciones" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-integraciones">
 
-                        <!-- Sección 1: Integración SII -->
-                        <div class="panel-box">
-                            <div class="panel-box-header">
-                                <div>
-                                    <h2 class="panel-box-title d-flex align-items-center gap-2">
-                                        <i class="bi bi-receipt text-primary"></i>
-                                        Integración SII (Servicio de Impuestos Internos)
-                                    </h2>
-                                    <div class="panel-box-desc">Emisión automática de boletas y facturas electrónicas de los clientes.</div>
-                                </div>
-                                <span class="badge" style="background:rgba(16,185,129,.1);color:#059669;font-weight:700;padding:.4rem .75rem;border-radius:20px;font-size:.75rem;">
-                                    <i class="bi bi-circle-fill me-1" style="font-size:.45rem;"></i> Conectado
-                                </span>
+                        <!-- Encabezado sutil de la sección -->
+                        <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                            <div>
+                                <h2 class="h5 fw-bold mb-1" style="color:var(--dark);">
+                                    <i class="bi bi-cpu text-primary me-1"></i> Integraciones y Conectores Externos
+                                </h2>
+                                <p class="text-muted small mb-0">
+                                    Configura credenciales y servicios SaaS. Haz clic en <strong>Configurar</strong> para expandir y editar.
+                                </p>
                             </div>
-
-                            <form method="POST" action="{% url 'dashboard_superadmin_configuracion' %}" id="form-sii">
-                                {% csrf_token %}
-                                <div class="row g-3">
-                                    <div class="col-12 col-md-6">
-                                        <label class="form-label-custom" for="sii_rut">RUT Emisor de la Empresa</label>
-                                        <input type="text" id="sii_rut" name="sii_rut" class="form-control-custom"
-                                               placeholder="77.123.456-K"
-                                               value="{{ config.sii_rut|default:'' }}">
-                                    </div>
-                                    <div class="col-12 col-md-6">
-                                        <label class="form-label-custom" for="sii_razon_social">Razón Social Registrada</label>
-                                        <input type="text" id="sii_razon_social" name="sii_razon_social" class="form-control-custom"
-                                               placeholder="Eduteka SpA"
-                                               value="{{ config.sii_razon_social|default:'' }}">
-                                    </div>
-                                    <div class="col-12 col-md-6">
-                                        <label class="form-label-custom" for="sii_ambiente">Ambiente SII</label>
-                                        <select id="sii_ambiente" name="sii_ambiente" class="form-control-custom">
-                                            <option value="produccion" {% if config.sii_ambiente == 'produccion' %}selected{% endif %}>Producción (Oficial)</option>
-                                            <option value="certificacion" {% if config.sii_ambiente == 'certificacion' or not config.sii_ambiente %}selected{% endif %}>Certificación / Staging (Testing)</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-12 col-md-6">
-                                        <label class="form-label-custom" for="sii_token">Token API Facturación Electrónica</label>
-                                        <input type="password" id="sii_token" name="sii_token" class="form-control-custom"
-                                               placeholder="sii_live_token_..."
-                                               value="{{ config.sii_token|default:'' }}">
-                                    </div>
-                                </div>
-                                <!-- Campos MP ocultos para enviar todo en un solo POST -->
-                                <input type="hidden" name="mp_public_key"   value="{{ config.mp_public_key|default:'' }}">
-                                <input type="hidden" name="mp_access_token" value="{{ config.mp_access_token|default:'' }}">
-                                <input type="hidden" name="mp_modo"         value="{{ config.mp_modo|default:'sandbox' }}">
-                                <div class="mt-3 text-end">
-                                    <button type="submit" class="btn-primary-custom" id="btn-guardar-sii">
-                                        <i class="bi bi-save"></i> Guardar Credenciales SII
-                                    </button>
-                                </div>
-                            </form>
+                            <span class="badge" style="background:rgba(16,185,129,.1);color:#059669;font-weight:700;padding:.45rem .85rem;border-radius:20px;font-size:.76rem;">
+                                <i class="bi bi-check-circle-fill me-1"></i> 3 Servicios Conectados
+                            </span>
                         </div>
 
-                        <!-- Sección 2: Pasarela de Pagos -->
-                        <div class="panel-box">
-                            <div class="panel-box-header">
-                                <div>
-                                    <h2 class="panel-box-title d-flex align-items-center gap-2">
-                                        <i class="bi bi-credit-card-2-front text-primary"></i>
-                                        Pasarela de Pagos (MercadoPago / Transbank Webpay)
-                                    </h2>
-                                    <div class="panel-box-desc">Procesamiento automatizado de cobros recurrentes y suscripciones SaaS.</div>
-                                </div>
-                                <span class="badge" style="background:rgba(16,185,129,.1);color:#059669;font-weight:700;padding:.4rem .75rem;border-radius:20px;font-size:.75rem;">
-                                    <i class="bi bi-circle-fill me-1" style="font-size:.45rem;"></i> Activo
-                                </span>
-                            </div>
+                        <!-- Acordeón de Integraciones -->
+                        <div class="accordion d-flex flex-column gap-3" id="accordionIntegraciones">
 
-                            <form method="POST" action="{% url 'dashboard_superadmin_configuracion' %}" id="form-mp">
-                                {% csrf_token %}
-                                <div class="row g-3">
-                                    <div class="col-12 col-md-6">
-                                        <label class="form-label-custom" for="mp_public_key">Public Key (MercadoPago / Webpay)</label>
-                                        <input type="text" id="mp_public_key" name="mp_public_key" class="form-control-custom"
-                                               placeholder="APP_USR-..."
-                                               value="{{ config.mp_public_key|default:'' }}">
+                            <!-- INTEGRACIÓN 1: Pasarela de Pagos (MercadoPago / Webpay) -->
+                            <div class="integration-item card border shadow-xs">
+                                <div class="integration-header d-flex align-items-center justify-content-between p-3 p-md-4"
+                                     role="button"
+                                     tabindex="0"
+                                     onclick="if(!event.target.closest('.btn-configurar') && !event.target.closest('a')){ document.getElementById('btnConfigMP').click(); }">
+                                    
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="integration-icon" style="background: rgba(14, 165, 233, 0.12); color: #0284C7;">
+                                            <i class="bi bi-credit-card-2-front-fill"></i>
+                                        </div>
+                                        <div>
+                                            <div class="integration-title">MercadoPago / Transbank Webpay</div>
+                                            <div class="integration-subtitle">Cobros recurrentes, suscripciones SaaS y pasarela de checkout</div>
+                                        </div>
                                     </div>
-                                    <div class="col-12 col-md-6">
-                                        <label class="form-label-custom" for="mp_access_token">Access Token (Secret Key)</label>
-                                        <input type="password" id="mp_access_token" name="mp_access_token" class="form-control-custom"
-                                               placeholder="APP_USR-..."
-                                               value="{{ config.mp_access_token|default:'' }}">
-                                    </div>
-                                    <div class="col-12 col-md-6">
-                                        <label class="form-label-custom" for="mp_modo">Modo de Procesamiento</label>
-                                        <select id="mp_modo" name="mp_modo" class="form-control-custom">
-                                            <option value="live"    {% if config.mp_modo == 'live'    %}selected{% endif %}>Live / Producción</option>
-                                            <option value="sandbox" {% if config.mp_modo == 'sandbox' or not config.mp_modo %}selected{% endif %}>Sandbox / Pruebas</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-12 col-md-6">
-                                        <label class="form-label-custom">URL Webhook de Notificaciones IPN</label>
-                                        <input type="text" class="form-control-custom" readonly value="https://eduteka.cl/api/payments/webhook/">
-                                    </div>
-                                </div>
-                                <!-- Campos SII ocultos para enviar todo en un solo POST -->
-                                <input type="hidden" name="sii_rut"          value="{{ config.sii_rut|default:'' }}">
-                                <input type="hidden" name="sii_razon_social" value="{{ config.sii_razon_social|default:'' }}">
-                                <input type="hidden" name="sii_ambiente"     value="{{ config.sii_ambiente|default:'certificacion' }}">
-                                <input type="hidden" name="sii_token"        value="{{ config.sii_token|default:'' }}">
-                                <div class="mt-3 text-end">
-                                    <button type="submit" class="btn-primary-custom" id="btn-guardar-mp">
-                                        <i class="bi bi-save"></i> Guardar Pasarela de Pagos
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
 
-                        <!-- Sección 3: Proveedor de Correo -->
-                        <div class="panel-box mb-0">
-                            <div class="panel-box-header">
-                                <div>
-                                    <h2 class="panel-box-title d-flex align-items-center gap-2">
-                                        <i class="bi bi-envelope-paper text-primary"></i>
-                                        Proveedor de Correo Electrónico (SendGrid / AWS SES)
-                                    </h2>
-                                    <div class="panel-box-desc">Infraestructura de correo transaccional para boletines, clave y comprobantes.</div>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <span class="badge-status-pill">
+                                            🟢 Conectado ({% if config.mp_modo == 'live' %}Producción{% else %}Sandbox{% endif %})
+                                        </span>
+                                        <button type="button" class="btn-configurar" id="btnConfigMP"
+                                                data-bs-toggle="collapse"
+                                                data-bs-target="#collapseMP"
+                                                aria-expanded="false"
+                                                aria-controls="collapseMP"
+                                                onclick="event.stopPropagation();">
+                                            <span>Configurar</span>
+                                            <i class="bi bi-chevron-down chevron-icon"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div id="collapseMP" class="collapse" data-bs-parent="#accordionIntegraciones">
+                                    <div class="integration-body p-4">
+                                        <form method="POST" action="{% url 'dashboard_superadmin_configuracion' %}" id="form-mp">
+                                            {% csrf_token %}
+                                            <div class="row g-3">
+                                                <div class="col-12 col-md-6">
+                                                    <label class="form-label-custom" for="mp_public_key">Public Key (MercadoPago / Webpay)</label>
+                                                    <input type="text" id="mp_public_key" name="mp_public_key" class="form-control-custom"
+                                                           placeholder="APP_USR-..."
+                                                           value="{{ config.mp_public_key|default:'' }}">
+                                                </div>
+                                                <div class="col-12 col-md-6">
+                                                    <label class="form-label-custom" for="mp_access_token">Access Token (Secret Key)</label>
+                                                    <div class="position-relative">
+                                                        <input type="password" id="mp_access_token" name="mp_access_token" class="form-control-custom pe-5"
+                                                               placeholder="APP_USR-..."
+                                                               value="{{ config.mp_access_token|default:'' }}">
+                                                        <button type="button" class="btn btn-sm text-muted position-absolute end-0 top-50 translate-middle-y me-2 border-0 bg-transparent"
+                                                                onclick="togglePasswordVisibility('mp_access_token', this)" title="Mostrar / Ocultar">
+                                                            <i class="bi bi-eye"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12 col-md-6">
+                                                    <label class="form-label-custom" for="mp_modo">Modo de Procesamiento</label>
+                                                    <select id="mp_modo" name="mp_modo" class="form-control-custom">
+                                                        <option value="live"    {% if config.mp_modo == 'live'    %}selected{% endif %}>Live / Producción</option>
+                                                        <option value="sandbox" {% if config.mp_modo == 'sandbox' or not config.mp_modo %}selected{% endif %}>Sandbox / Pruebas</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-12 col-md-6">
+                                                    <label class="form-label-custom" for="mp_webhook">URL Webhook de Notificaciones IPN</label>
+                                                    <div class="input-group">
+                                                        <input type="text" id="mp_webhook" class="form-control-custom" readonly value="https://eduteka.cl/api/payments/webhook/">
+                                                        <button type="button" class="btn btn-outline-secondary px-3" style="border-color:var(--border);"
+                                                                onclick="copiarAlPortapapeles('mp_webhook', this)" title="Copiar al portapapeles">
+                                                            <i class="bi bi-clipboard"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Campos SII ocultos para evitar sobreescritura al enviar -->
+                                            <input type="hidden" name="sii_rut"          value="{{ config.sii_rut|default:'' }}">
+                                            <input type="hidden" name="sii_razon_social" value="{{ config.sii_razon_social|default:'' }}">
+                                            <input type="hidden" name="sii_ambiente"     value="{{ config.sii_ambiente|default:'certificacion' }}">
+                                            <input type="hidden" name="sii_token"        value="{{ config.sii_token|default:'' }}">
+
+                                            <div class="mt-4 pt-3 border-top d-flex justify-content-end align-items-center gap-2">
+                                                <button type="button" class="btn btn-light border px-3" style="border-radius:var(--radius-md);font-size:.85rem;font-weight:600;"
+                                                        data-bs-toggle="collapse" data-bs-target="#collapseMP">
+                                                    Cancelar
+                                                </button>
+                                                <button type="submit" class="btn-primary-custom" id="btn-guardar-mp">
+                                                    <i class="bi bi-check2-circle"></i> Guardar Pasarela de Pagos
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
 
-                            <form onsubmit="handleSaveConfig(event, 'Proveedor de Correo')">
-                                <div class="row g-3">
-                                    <div class="col-12 col-md-6">
-                                        <label class="form-label-custom">API Key SendGrid / AWS Secret</label>
-                                        <input type="password" class="form-control-custom" value="SG.293819283719283719283">
+                            <!-- INTEGRACIÓN 2: SII (Servicio de Impuestos Internos) -->
+                            <div class="integration-item card border shadow-xs">
+                                <div class="integration-header d-flex align-items-center justify-content-between p-3 p-md-4"
+                                     role="button"
+                                     tabindex="0"
+                                     onclick="if(!event.target.closest('.btn-configurar') && !event.target.closest('a')){ document.getElementById('btnConfigSII').click(); }">
+                                    
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="integration-icon" style="background: rgba(124, 92, 252, 0.12); color: var(--primary);">
+                                            <i class="bi bi-receipt-cutoff"></i>
+                                        </div>
+                                        <div>
+                                            <div class="integration-title">Servicio de Impuestos Internos (SII)</div>
+                                            <div class="integration-subtitle">Emisión automática de boletas y facturas electrónicas de los clientes</div>
+                                        </div>
                                     </div>
-                                    <div class="col-12 col-md-6">
-                                        <label class="form-label-custom">Email Remitente Corporativo</label>
-                                        <input type="email" class="form-control-custom" value="notificaciones@eduteka.cl">
-                                    </div>
-                                    <div class="col-12 col-md-6">
-                                        <label class="form-label-custom">Nombre de Remitente</label>
-                                        <input type="text" class="form-control-custom" value="Plataforma Eduteka SaaS">
-                                    </div>
-                                    <div class="col-12 col-md-6">
-                                        <label class="form-label-custom">Límite Diario de Envíos</label>
-                                        <input type="number" class="form-control-custom" value="50000">
-                                    </div>
-                                </div>
-                                <div class="mt-3 text-end">
-                                    <button type="submit" class="btn-primary-custom">
-                                        <i class="bi bi-save"></i> Guardar Proveedor de Correo
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
 
-                    </div>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <span class="badge-status-pill">
+                                            🟢 Conectado ({% if config.sii_ambiente == 'produccion' %}Producción{% else %}Sandbox{% endif %})
+                                        </span>
+                                        <button type="button" class="btn-configurar" id="btnConfigSII"
+                                                data-bs-toggle="collapse"
+                                                data-bs-target="#collapseSII"
+                                                aria-expanded="false"
+                                                aria-controls="collapseSII"
+                                                onclick="event.stopPropagation();">
+                                            <span>Configurar</span>
+                                            <i class="bi bi-chevron-down chevron-icon"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div id="collapseSII" class="collapse" data-bs-parent="#accordionIntegraciones">
+                                    <div class="integration-body p-4">
+                                        <form method="POST" action="{% url 'dashboard_superadmin_configuracion' %}" id="form-sii">
+                                            {% csrf_token %}
+                                            <div class="row g-3">
+                                                <div class="col-12 col-md-6">
+                                                    <label class="form-label-custom" for="sii_rut">RUT Emisor de la Empresa</label>
+                                                    <input type="text" id="sii_rut" name="sii_rut" class="form-control-custom"
+                                                           placeholder="77.123.456-K"
+                                                           value="{{ config.sii_rut|default:'' }}">
+                                                </div>
+                                                <div class="col-12 col-md-6">
+                                                    <label class="form-label-custom" for="sii_razon_social">Razón Social Registrada</label>
+                                                    <input type="text" id="sii_razon_social" name="sii_razon_social" class="form-control-custom"
+                                                           placeholder="Eduteka SpA"
+                                                           value="{{ config.sii_razon_social|default:'' }}">
+                                                </div>
+                                                <div class="col-12 col-md-6">
+                                                    <label class="form-label-custom" for="sii_ambiente">Ambiente SII</label>
+                                                    <select id="sii_ambiente" name="sii_ambiente" class="form-control-custom">
+                                                        <option value="produccion"    {% if config.sii_ambiente == 'produccion' %}selected{% endif %}>Producción (Oficial)</option>
+                                                        <option value="certificacion" {% if config.sii_ambiente == 'certificacion' or not config.sii_ambiente %}selected{% endif %}>Certificación / Staging (Testing)</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-12 col-md-6">
+                                                    <label class="form-label-custom" for="sii_token">Token API Facturación Electrónica</label>
+                                                    <div class="position-relative">
+                                                        <input type="password" id="sii_token" name="sii_token" class="form-control-custom pe-5"
+                                                               placeholder="sii_live_token_..."
+                                                               value="{{ config.sii_token|default:'' }}">
+                                                        <button type="button" class="btn btn-sm text-muted position-absolute end-0 top-50 translate-middle-y me-2 border-0 bg-transparent"
+                                                                onclick="togglePasswordVisibility('sii_token', this)" title="Mostrar / Ocultar">
+                                                            <i class="bi bi-eye"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Campos MP ocultos para evitar sobreescritura al enviar -->
+                                            <input type="hidden" name="mp_public_key"   value="{{ config.mp_public_key|default:'' }}">
+                                            <input type="hidden" name="mp_access_token" value="{{ config.mp_access_token|default:'' }}">
+                                            <input type="hidden" name="mp_modo"         value="{{ config.mp_modo|default:'sandbox' }}">
+
+                                            <div class="mt-4 pt-3 border-top d-flex justify-content-end align-items-center gap-2">
+                                                <button type="button" class="btn btn-light border px-3" style="border-radius:var(--radius-md);font-size:.85rem;font-weight:600;"
+                                                        data-bs-toggle="collapse" data-bs-target="#collapseSII">
+                                                    Cancelar
+                                                </button>
+                                                <button type="submit" class="btn-primary-custom" id="btn-guardar-sii">
+                                                    <i class="bi bi-check2-circle"></i> Guardar Credenciales SII
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- INTEGRACIÓN 3: Proveedor de Correo Electrónico (SendGrid / AWS SES) -->
+                            <div class="integration-item card border shadow-xs">
+                                <div class="integration-header d-flex align-items-center justify-content-between p-3 p-md-4"
+                                     role="button"
+                                     tabindex="0"
+                                     onclick="if(!event.target.closest('.btn-configurar') && !event.target.closest('a')){ document.getElementById('btnConfigEmail').click(); }">
+                                    
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="integration-icon" style="background: rgba(245, 158, 11, 0.12); color: #D97706;">
+                                            <i class="bi bi-envelope-paper-fill"></i>
+                                        </div>
+                                        <div>
+                                            <div class="integration-title">SendGrid / AWS SES</div>
+                                            <div class="integration-subtitle">Infraestructura de correo transaccional para boletines, clave y comprobantes</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex align-items-center gap-3">
+                                        <span class="badge-status-pill">
+                                            🟢 Conectado (API)
+                                        </span>
+                                        <button type="button" class="btn-configurar" id="btnConfigEmail"
+                                                data-bs-toggle="collapse"
+                                                data-bs-target="#collapseEmail"
+                                                aria-expanded="false"
+                                                aria-controls="collapseEmail"
+                                                onclick="event.stopPropagation();">
+                                            <span>Configurar</span>
+                                            <i class="bi bi-chevron-down chevron-icon"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div id="collapseEmail" class="collapse" data-bs-parent="#accordionIntegraciones">
+                                    <div class="integration-body p-4">
+                                        <form onsubmit="handleSaveConfig(event, 'Proveedor de Correo')">
+                                            <div class="row g-3">
+                                                <div class="col-12 col-md-6">
+                                                    <label class="form-label-custom" for="email_api_key">API Key SendGrid / AWS Secret</label>
+                                                    <div class="position-relative">
+                                                        <input type="password" id="email_api_key" class="form-control-custom pe-5" value="SG.293819283719283719283">
+                                                        <button type="button" class="btn btn-sm text-muted position-absolute end-0 top-50 translate-middle-y me-2 border-0 bg-transparent"
+                                                                onclick="togglePasswordVisibility('email_api_key', this)" title="Mostrar / Ocultar">
+                                                            <i class="bi bi-eye"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12 col-md-6">
+                                                    <label class="form-label-custom" for="email_remitente">Email Remitente Corporativo</label>
+                                                    <input type="email" id="email_remitente" class="form-control-custom" value="notificaciones@eduteka.cl">
+                                                </div>
+                                                <div class="col-12 col-md-6">
+                                                    <label class="form-label-custom" for="email_nombre">Nombre de Remitente</label>
+                                                    <input type="text" id="email_nombre" class="form-control-custom" value="Plataforma Eduteka SaaS">
+                                                </div>
+                                                <div class="col-12 col-md-6">
+                                                    <label class="form-label-custom" for="email_limite">Límite Diario de Envíos</label>
+                                                    <input type="number" id="email_limite" class="form-control-custom" value="50000">
+                                                </div>
+                                            </div>
+
+                                            <div class="mt-4 pt-3 border-top d-flex justify-content-end align-items-center gap-2">
+                                                <button type="button" class="btn btn-light border px-3" style="border-radius:var(--radius-md);font-size:.85rem;font-weight:600;"
+                                                        data-bs-toggle="collapse" data-bs-target="#collapseEmail">
+                                                    Cancelar
+                                                </button>
+                                                <button type="submit" class="btn-primary-custom">
+                                                    <i class="bi bi-check2-circle"></i> Guardar Proveedor de Correo
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div><!-- /accordionIntegraciones -->
+
+                    </div><!-- /tab-integraciones -->
 
                     
                     <div id="tab-seguridad" class="tab-panel d-none">
@@ -697,68 +949,141 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    
     document.addEventListener('DOMContentLoaded', () => {
+        // Toggle menú lateral móvil
         const btn = document.getElementById('mobileMenuBtn');
         const sb  = document.getElementById('sidebar');
         if (btn && sb) btn.addEventListener('click', () => sb.classList.toggle('active'));
+
+        // Restaurar pestaña activa según el hash de la URL (ej: #seguridad)
+        const hash = window.location.hash.replace('#', '');
+        if (hash && document.getElementById('tab-' + hash)) {
+            const targetBtn = document.querySelector(`.config-tab-btn[data-tab="${hash}"]`);
+            if (targetBtn) {
+                switchTab(hash, targetBtn);
+            }
+        }
+
+        // Listener para estilizar dinámicamente tarjetas del acordeón cuando se expanden/contraen
+        document.querySelectorAll('.integration-item .collapse').forEach(collapseEl => {
+            collapseEl.addEventListener('show.bs.collapse', function () {
+                const item = this.closest('.integration-item');
+                if (item) item.classList.add('is-open');
+            });
+            collapseEl.addEventListener('hide.bs.collapse', function () {
+                const item = this.closest('.integration-item');
+                if (item) item.classList.remove('is-open');
+            });
+        });
+
+        // Buscador de parámetros en la vista (si está presente)
+        const searchInput = document.getElementById('configSearch');
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const q = this.value.toLowerCase().trim();
+                if (!q) {
+                    resetHighlights();
+                    return;
+                }
+                const boxes = document.querySelectorAll('.panel-box, .flag-card, .danger-panel, .integration-item');
+                boxes.forEach(box => {
+                    const text = box.innerText.toLowerCase();
+                    if (text.includes(q)) {
+                        box.style.opacity = '1';
+                        box.style.border = '2px solid var(--primary)';
+                    } else {
+                        box.style.opacity = '0.35';
+                        box.style.border = '';
+                    }
+                });
+            });
+
+            searchInput.addEventListener('blur', function() {
+                if (!this.value) resetHighlights();
+            });
+
+            function resetHighlights() {
+                document.querySelectorAll('.panel-box, .flag-card, .danger-panel, .integration-item').forEach(box => {
+                    box.style.opacity = '1';
+                    box.style.border = '';
+                });
+            }
+        }
     });
 
-    
+    // ── Sistema de Tabs Funcionales ──────────────────────────────────────
     function switchTab(tabId, btn) {
-        // Ocultar todos los paneles
+        // 1. Ocultar todos los paneles de pestañas
         document.querySelectorAll('.tab-panel').forEach(panel => {
             panel.classList.add('d-none');
         });
 
-        // Desactivar todos los botones de pestaña
+        // 2. Desactivar todos los botones del menú lateral
         document.querySelectorAll('.config-tab-btn').forEach(b => {
             b.classList.remove('active');
+            b.setAttribute('aria-selected', 'false');
         });
 
-        // Mostrar panel seleccionado y activar botón
+        // 3. Mostrar panel seleccionado
         const targetPanel = document.getElementById('tab-' + tabId);
         if (targetPanel) {
             targetPanel.classList.remove('d-none');
         }
+
+        // 4. Activar botón seleccionado
         if (btn) {
             btn.classList.add('active');
+            btn.setAttribute('aria-selected', 'true');
+        }
+
+        // 5. Guardar pestaña en hash de URL sin recargar
+        if (window.history.replaceState) {
+            window.history.replaceState(null, null, '#' + tabId);
         }
     }
 
-    
+    // ── Utilidad para mostrar/ocultar campos tipo password ───────────────
+    function togglePasswordVisibility(inputId, btn) {
+        const input = document.getElementById(inputId);
+        if (!input) return;
+        const icon = btn.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            if (icon) {
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+            }
+        } else {
+            input.type = 'password';
+            if (icon) {
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+            }
+        }
+    }
+
+    // ── Utilidad para copiar URL o Tokens al portapapeles ────────────────
+    function copiarAlPortapapeles(inputId, btn) {
+        const input = document.getElementById(inputId);
+        if (!input) return;
+        navigator.clipboard.writeText(input.value).then(() => {
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="bi bi-check2 text-success"></i>';
+            btn.classList.add('border-success');
+            setTimeout(() => {
+                btn.innerHTML = originalHtml;
+                btn.classList.remove('border-success');
+            }, 2000);
+        }).catch(err => {
+            console.error('Error al copiar al portapapeles:', err);
+        });
+    }
+
+    // ── Handler genérico para guardar secciones simuladas ───────────────
     function handleSaveConfig(e, seccion) {
         e.preventDefault();
         alert('¡Configuración de "' + seccion + '" actualizada correctamente!\nLos cambios han sido aplicados al entorno del sistema.');
     }
-
-    
-    document.getElementById('configSearch').addEventListener('input', function() {
-        const q = this.value.toLowerCase().trim();
-        if (!q) return;
-
-        // Buscar texto en tarjetas y paneles
-        const boxes = document.querySelectorAll('.panel-box, .flag-card, .danger-panel');
-        boxes.forEach(box => {
-            const text = box.innerText.toLowerCase();
-            if (text.includes(q)) {
-                box.style.opacity = '1';
-                box.style.border = '2px solid var(--primary)';
-            } else {
-                box.style.opacity = '0.4';
-                box.style.border = '';
-            }
-        });
-    });
-
-    document.getElementById('configSearch').addEventListener('blur', function() {
-        if (!this.value) {
-            document.querySelectorAll('.panel-box, .flag-card, .danger-panel').forEach(box => {
-                box.style.opacity = '1';
-                box.style.border = '';
-            });
-        }
-    });
 </script>
 
 </body>
