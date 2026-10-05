@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from inicio import views
 from colegios import views as colegios_views
+from dashboard import views as dashboard_views
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -33,6 +34,8 @@ urlpatterns = [
     path('calificaciones/', include('calificaciones.urls')),
     path('planes/', include('planes.urls')),
     path('api/buscar-colegios/', colegios_views.api_buscar_colegios, name='api_buscar_colegios'),
+    path('superadmin/api/chat/colegios/', dashboard_views.api_buscar_colegios_chat, name='api_buscar_colegios_chat_direct'),
+    path('superadmin/api/chat/mensajes/<int:colegio_id>/', dashboard_views.api_historial_chat, name='api_historial_chat_direct'),
     path('terminos-y-condiciones/', views.terminos_privacidad_view, name='terminos_condiciones'),
     path('politica-privacidad/', views.terminos_privacidad_view, name='politica_privacidad'),
 ]

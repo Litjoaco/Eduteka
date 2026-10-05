@@ -22,6 +22,302 @@
         transform: translateY(-1px);
         box-shadow: 0 4px 12px rgba(124, 92, 252, 0.18);
     }
+
+    /* ── Buscador Global Spotlight ────────────────────────────────────────── */
+    .spotlight-wrapper {
+        position: relative;
+        width: 100%;
+        max-width: 440px;
+    }
+    .spotlight-input-box {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 100%;
+    }
+    .spotlight-input-box i.search-icon {
+        position: absolute;
+        left: 14px;
+        color: var(--gray-text, #687089);
+        font-size: 0.92rem;
+        pointer-events: none;
+        transition: color 0.2s ease;
+    }
+    .spotlight-input {
+        width: 100%;
+        padding: 0.48rem 2.4rem 0.48rem 2.45rem;
+        border: 1px solid var(--border, #E4E7EF);
+        border-radius: 22px;
+        background: var(--bg, #F4F6FB);
+        font-size: 0.84rem;
+        font-weight: 500;
+        color: var(--dark, #151A35);
+        outline: none;
+        transition: all 0.25s ease;
+    }
+    .spotlight-input:focus {
+        border-color: var(--primary, #7C5CFC);
+        background: #ffffff;
+        box-shadow: 0 0 0 3px rgba(124, 92, 252, 0.14);
+    }
+    .spotlight-input-box:focus-within i.search-icon {
+        color: var(--primary, #7C5CFC);
+    }
+    .spotlight-shortcut-badge {
+        position: absolute;
+        right: 12px;
+        font-size: 0.68rem;
+        font-weight: 700;
+        padding: 0.15rem 0.45rem;
+        border-radius: 6px;
+        background: rgba(0, 0, 0, 0.05);
+        color: var(--gray-text, #687089);
+        pointer-events: none;
+        border: 1px solid rgba(0, 0, 0, 0.04);
+    }
+    .spotlight-results {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        right: 0;
+        background: #ffffff;
+        border-radius: 14px;
+        border: 1px solid var(--border, #E4E7EF);
+        box-shadow: 0 14px 40px rgba(21, 26, 53, 0.12) !important;
+        z-index: 1050;
+        overflow: hidden;
+        display: none;
+        max-height: 420px;
+        overflow-y: auto;
+        animation: spotlightDrop 0.2s ease-out;
+    }
+    @keyframes spotlightDrop {
+        from { opacity: 0; transform: translateY(-6px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    .spotlight-category-header {
+        font-size: 0.68rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        color: var(--gray-text, #687089);
+        padding: 0.65rem 1rem 0.35rem 1rem;
+        background: #FAF9FF;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .spotlight-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.65rem 1rem;
+        text-decoration: none;
+        color: var(--dark, #151A35);
+        transition: all 0.15s ease;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+    }
+    .spotlight-item:hover, .spotlight-item:focus {
+        background: rgba(124, 92, 252, 0.06);
+        color: var(--primary, #7C5CFC);
+    }
+    .spotlight-item:last-child {
+        border-bottom: none;
+    }
+    .spotlight-item-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.05rem;
+        flex-shrink: 0;
+    }
+    .spotlight-item-title {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: inherit;
+        line-height: 1.25;
+    }
+    .spotlight-item-sub {
+        font-size: 0.72rem;
+        color: var(--gray-text, #687089);
+        margin-top: 0.1rem;
+    }
+    .spotlight-empty {
+        padding: 2rem 1.5rem;
+        text-align: center;
+        color: var(--gray-text, #687089);
+        font-size: 0.85rem;
+    }
+    .spotlight-loading {
+        padding: 1.5rem;
+        text-align: center;
+        color: var(--primary, #7C5CFC);
+        font-size: 0.82rem;
+        font-weight: 600;
+    }
+
+    /* ── Centro de Mensajes WhatsApp Web / Messenger (2 Columnas) ────────── */
+    #offcanvasChatGlobal {
+        width: 880px !important;
+        max-width: 96vw !important;
+        border-radius: 16px 0 0 16px;
+        box-shadow: -10px 0 35px rgba(0, 0, 0, 0.15) !important;
+    }
+    .chat-layout-wrapper {
+        display: flex;
+        flex-direction: row;
+        height: calc(100vh - 65px);
+        background: #F8FAFC;
+        overflow: hidden;
+    }
+    .chat-contacts-col {
+        width: 320px;
+        min-width: 280px;
+        max-width: 340px;
+        background: #ffffff;
+        border-right: 1px solid #E2E8F0;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        transition: all 0.25s ease;
+    }
+    .chat-conversation-col {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        background: #F8FAFC;
+        min-width: 0;
+    }
+    .chat-search-wrapper {
+        position: relative;
+    }
+    .chat-search-input {
+        width: 100%;
+        padding: 0.55rem 1rem 0.55rem 2.4rem;
+        border-radius: 20px;
+        border: 1px solid #E2E8F0;
+        background: #F8FAFC;
+        font-size: 0.83rem;
+        outline: none;
+        transition: all 0.2s ease;
+    }
+    .chat-search-input:focus {
+        background: #ffffff;
+        border-color: var(--primary, #7C5CFC);
+        box-shadow: 0 0 0 3px rgba(124, 92, 252, 0.12);
+    }
+    .chat-search-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94A3B8;
+        font-size: 0.88rem;
+        pointer-events: none;
+    }
+    .chat-contact-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #F1F5F9;
+        cursor: pointer;
+        transition: background-color 0.18s ease, border-color 0.18s ease;
+        border-left: 3px solid transparent;
+        text-decoration: none;
+        color: inherit;
+        user-select: none;
+    }
+    .chat-contact-item:hover {
+        background-color: #F8FAFC;
+    }
+    .chat-contact-item.active {
+        background-color: rgba(124, 92, 252, 0.08) !important;
+        border-left: 4px solid var(--primary, #7C5CFC) !important;
+    }
+    .chat-contact-item.active .chat-contact-title {
+        color: var(--primary, #7C5CFC) !important;
+    }
+    .chat-contact-avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.84rem;
+        font-weight: 700;
+        color: #ffffff;
+        flex-shrink: 0;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+    .chat-contact-title {
+        font-size: 0.86rem;
+        font-weight: 600;
+        color: #1E293B;
+        line-height: 1.25;
+    }
+    .chat-contact-snippet {
+        font-size: 0.74rem;
+        color: #64748B;
+        line-height: 1.3;
+    }
+    .chat-contact-time {
+        font-size: 0.68rem;
+        color: #94A3B8;
+        font-weight: 500;
+    }
+    .chat-bubble-received {
+        max-width: 82%;
+    }
+    .chat-bubble-sent {
+        max-width: 82%;
+        margin-left: auto;
+    }
+    .chat-scroll-area {
+        overflow-y: auto;
+        scroll-behavior: smooth;
+    }
+    .chat-scroll-area::-webkit-scrollbar {
+        width: 5px;
+    }
+    .chat-scroll-area::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .chat-scroll-area::-webkit-scrollbar-thumb {
+        background: #CBD5E1;
+        border-radius: 10px;
+    }
+    .chat-scroll-area::-webkit-scrollbar-thumb:hover {
+        background: #94A3B8;
+    }
+    @media (max-width: 767.98px) {
+        #offcanvasChatGlobal {
+            width: 100vw !important;
+            max-width: 100vw !important;
+            border-radius: 0;
+        }
+        .chat-contacts-col {
+            width: 100%;
+            max-width: 100%;
+            border-right: none;
+        }
+        .chat-contacts-col.mobile-hide {
+            display: none !important;
+        }
+        .chat-conversation-col {
+            display: none;
+            width: 100%;
+        }
+        .chat-conversation-col.mobile-show {
+            display: flex !important;
+        }
+    }
 </style>
 
 <header class="topbar">
@@ -38,6 +334,25 @@
                 {{ topbar_badge }}
             </div>
         {% endif %}
+    </div>
+
+    <!-- ── Buscador Global Inteligente (Spotlight) ────────────────────────── -->
+    <div class="spotlight-wrapper position-relative mx-auto mx-md-3 flex-grow-1 d-none d-sm-block">
+        <div class="spotlight-input-box">
+            <i class="bi bi-search search-icon"></i>
+            <input type="search" 
+                   id="globalSpotlightInput" 
+                   class="spotlight-input" 
+                   placeholder="Buscar colegios, administradores, usuarios... (Ctrl + K)" 
+                   autocomplete="off" 
+                   spellcheck="false">
+            <span class="spotlight-shortcut-badge d-none d-md-inline" title="Presiona Ctrl + K para buscar">⌘K</span>
+        </div>
+
+        <!-- Contenedor Flotante de Resultados Spotlight -->
+        <div id="globalSpotlightResults" class="spotlight-results">
+            <!-- Inyección dinámica de resultados vía JS -->
+        </div>
     </div>
 
     <div class="topbar-right d-flex align-items-center gap-3">
@@ -64,246 +379,146 @@
     </div>
 </header>
 
-<!-- ════ OFFCANVAS: CENTRO DE MENSAJES Y CHAT GLOBAL ═════════════════════ -->
-<div class="offcanvas offcanvas-end shadow-lg border-0" tabindex="-1" id="offcanvasChatGlobal" aria-labelledby="offcanvasChatGlobalLabel" style="width: 440px; max-width: 95vw; z-index: 1060;">
+<!-- ════ OFFCANVAS: CENTRO DE MENSAJES Y CHAT GLOBAL (ESTILO WHATSAPP WEB) ═════════════════════ -->
+<div class="offcanvas offcanvas-end shadow-lg border-0" tabindex="-1" id="offcanvasChatGlobal" aria-labelledby="offcanvasChatGlobalLabel" style="z-index: 1060;">
     
     <!-- Offcanvas Header -->
-    <div class="offcanvas-header border-bottom py-3 px-4" style="background: #FAF9FF;">
+    <div class="offcanvas-header border-bottom py-2.5 px-4" style="background: #FAF9FF;">
         <div class="d-flex align-items-center gap-2.5">
             <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(124, 92, 252, 0.1); color: var(--primary, #7C5CFC); display: flex; align-items: center; justify-content: center; font-size: 1.15rem; font-weight: 700;">
                 <i class="bi bi-chat-square-dots-fill"></i>
             </div>
             <div>
                 <h5 class="offcanvas-title fw-bold text-dark mb-0" id="offcanvasChatGlobalLabel" style="font-size: 1.05rem;">💬 Centro de Mensajes</h5>
-                <p class="text-muted small mb-0" style="font-size: 0.76rem;">Canal directo Super Admin ↔ Colegios</p>
+                <p class="text-muted small mb-0" style="font-size: 0.74rem;">Canal directo e interactivo · Soporte Super Admin ↔ Colegios</p>
             </div>
         </div>
-        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-success-subtle text-success rounded-pill px-2.5 py-1 small fw-semibold d-none d-sm-inline-flex align-items-center gap-1.5" style="font-size: 0.72rem;">
+                <span style="width: 6px; height: 6px; background-color: #10B981; border-radius: 50%; display: inline-block;"></span> Conexión en Vivo
+            </span>
+            <button type="button" class="btn-close text-reset ms-2" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
     </div>
 
-    <!-- Offcanvas Body -->
-    <div class="offcanvas-body d-flex flex-column p-0" style="background: #F8FAFC;">
-        
-        <!-- Sección Superior: Selector de Conversación -->
-        <div class="p-3 bg-white border-bottom">
-            <label class="form-label text-muted small fw-bold mb-1.5" style="font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.5px;">
-                <i class="bi bi-building me-1" style="color: var(--primary, #7C5CFC);"></i> Conversación Activa
-            </label>
-            <div class="position-relative">
-                <select class="form-select rounded-3 shadow-none border-1" id="globalChatSchoolSelect" style="font-size: 0.86rem; font-weight: 600; padding: 0.55rem 0.9rem; background-color: #F8FAFC;">
-                    <option value="las-rosas" selected>🏫 [SEED] Escuela Básica Las Rosas (2 nuevos)</option>
-                    <option value="arturo-prat">🏛️ Colegio Arturo Prat — Santiago</option>
-                    <option value="bicentenario">🎓 Liceo Bicentenario — Concepción</option>
-                    <option value="san-martin">🎒 Instituto San Martín — La Serena</option>
-                </select>
-            </div>
+    <!-- Offcanvas Body: Estructura de 2 Columnas estilo WhatsApp Web / Messenger -->
+    <div class="offcanvas-body p-0">
+        <div class="chat-layout-wrapper">
             
-            <!-- Banner de estado del colegio seleccionado -->
-            <div class="d-flex align-items-center justify-content-between mt-2 pt-2 border-top text-muted small" style="font-size: 0.75rem;">
-                <div class="d-flex align-items-center gap-1 text-truncate me-2">
-                    <i class="bi bi-person-badge" style="color: var(--primary, #7C5CFC);"></i>
-                    <span id="globalChatContactName" class="text-truncate">Director(a): Carmen Gloria Silva</span>
+            <!-- ════ PANEL IZQUIERDO: Directorio y Búsqueda de Contactos ════ -->
+            <div class="chat-contacts-col" id="chatContactsCol">
+                
+                <!-- Buscador Fijo Superior -->
+                <div class="p-3 border-bottom bg-white flex-shrink-0">
+                    <div class="chat-search-wrapper">
+                        <i class="bi bi-search chat-search-icon"></i>
+                        <input type="search" 
+                               id="chatContactSearchInput" 
+                               class="chat-search-input" 
+                               placeholder="Buscar por colegio, ciudad o admin..." 
+                               autocomplete="off">
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between mt-2.5 px-1 text-muted" style="font-size: 0.72rem;">
+                        <span class="fw-bold text-uppercase" style="letter-spacing: 0.5px; color: #64748B;">
+                            <i class="bi bi-buildings me-1 text-primary"></i> Colegios
+                        </span>
+                        <span id="chatContactsCounter" class="badge bg-light text-secondary border rounded-pill px-2 py-0.5">
+                            Cargando...
+                        </span>
+                    </div>
                 </div>
-                <span class="badge bg-success-subtle text-success rounded-pill px-2 py-0.5" style="font-size: 0.7rem;">
-                    <span style="width: 6px; height: 6px; background-color: #10B981; border-radius: 50%; display: inline-block; margin-right: 4px;"></span> En línea
-                </span>
-            </div>
-        </div>
 
-        <!-- Área de Mensajes con Scroll (flex-grow-1, overflow-y-auto) -->
-        <div id="globalChatMessagesBox" class="flex-grow-1 overflow-y-auto p-3 d-flex flex-column gap-3" style="scroll-behavior: smooth; max-height: calc(100vh - 250px);">
-            
-            <!-- Separador de fecha -->
-            <div class="text-center my-1">
-                <span class="badge bg-white text-muted border rounded-pill px-3 py-1 shadow-sm" style="font-size: 0.7rem; font-weight: 600;">
-                    <i class="bi bi-calendar-event me-1"></i> Hoy
-                </span>
-            </div>
-
-            <!-- Burbuja Recibida (Colegio / Fondo Claro Blanco) -->
-            <div class="d-flex align-items-start gap-2" style="max-width: 85%;">
-                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: rgba(101, 205, 191, 0.2); color: #0d9488; font-size: 0.85rem; font-weight: 700;">
-                    <i class="bi bi-building"></i>
+                <!-- Lista de Contactos con Scroll Vertical -->
+                <div id="chatContactsListContainer" class="flex-grow-1 chat-scroll-area">
+                    <div class="text-center py-5 text-muted">
+                        <div class="spinner-border spinner-border-sm text-primary mb-2" role="status"></div>
+                        <p class="small mb-0">Cargando directorio de colegios...</p>
+                    </div>
                 </div>
-                <div>
-                    <div class="p-3 rounded-4 bg-white border shadow-sm text-dark" style="border-top-left-radius: 4px !important; font-size: 0.86rem; line-height: 1.45;">
-                        <div class="fw-bold mb-1" id="globalChatSenderSchoolName" style="font-size: 0.74rem; color: #0d9488;">
-                            Escuela Básica Las Rosas
+            </div>
+
+            <!-- ════ PANEL DERECHO: Conversación y Chat Activo ═══════════════ -->
+            <div class="chat-conversation-col" id="chatConversationCol">
+                
+                <!-- Encabezado de la Conversación Activa -->
+                <div class="p-3 bg-white border-bottom d-flex align-items-center justify-content-between shadow-xs z-1 flex-shrink-0">
+                    <div class="d-flex align-items-center gap-2.5 min-w-0">
+                        <button type="button" class="btn btn-sm btn-light border-0 d-md-none me-1 p-1" id="chatMobileBackBtn" title="Volver a contactos">
+                            <i class="bi bi-arrow-left fs-5"></i>
+                        </button>
+                        <div id="chatActiveAvatar" class="chat-contact-avatar" style="background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%);">
+                            🏫
                         </div>
-                        Estimado Super Admin, hemos finalizado la carga de nómina de estudiantes y requerimos asistencia para validar las licencias de Libro de Clases.
-                    </div>
-                    <div class="text-muted small mt-1 ms-1" style="font-size: 0.7rem;">
-                        11:15 AM · Recibido
-                    </div>
-                </div>
-            </div>
-
-            <!-- Burbuja Enviada (Super Admin / Fondo Morado) -->
-            <div class="d-flex align-items-start justify-content-end gap-2 ms-auto" style="max-width: 85%;">
-                <div>
-                    <div class="p-3 rounded-4 text-white shadow-sm" style="background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%); border-top-right-radius: 4px !important; font-size: 0.86rem; line-height: 1.45; box-shadow: 0 4px 14px rgba(124, 92, 252, 0.25) !important;">
-                        <div class="fw-bold mb-1 text-white-50" style="font-size: 0.74rem;">
-                            Super Admin Eduteka
+                        <div class="min-w-0">
+                            <h6 id="chatActiveSchoolName" class="mb-0 text-truncate fw-bold text-dark" style="font-size: 0.92rem;">
+                                Selecciona un colegio
+                            </h6>
+                            <div class="d-flex align-items-center gap-1.5 text-muted small text-truncate" style="font-size: 0.73rem;">
+                                <i class="bi bi-person-badge" style="color: var(--primary, #7C5CFC);"></i>
+                                <span id="chatActiveAdminName" class="text-truncate">Cargando...</span>
+                                <span class="mx-1">·</span>
+                                <span id="chatActiveLocation" class="text-truncate">Chile</span>
+                            </div>
                         </div>
-                        ¡Hola Carmen Gloria! Hemos revisado su establecimiento y las licencias ya han sido autorizadas correctamente en el servidor.
                     </div>
-                    <div class="text-end text-muted small mt-1 me-1" style="font-size: 0.7rem;">
-                        11:20 AM · <i class="bi bi-check2-all" style="color: var(--primary, #7C5CFC) !important;"></i>
+                    <div class="d-flex align-items-center gap-2 flex-shrink-0">
+                        <span class="badge bg-success-subtle text-success rounded-pill px-2.5 py-1" style="font-size: 0.7rem;">
+                            <span style="width: 6px; height: 6px; background-color: #10B981; border-radius: 50%; display: inline-block; margin-right: 4px;"></span> En línea
+                        </span>
                     </div>
                 </div>
-                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%); color: white; font-size: 0.85rem;">
-                    <i class="bi bi-headset"></i>
-                </div>
-            </div>
 
-            <!-- Burbuja Recibida 2 -->
-            <div class="d-flex align-items-start gap-2" style="max-width: 85%;">
-                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: rgba(101, 205, 191, 0.2); color: #0d9488; font-size: 0.85rem; font-weight: 700;">
-                    <i class="bi bi-building"></i>
+                <!-- Historial de Mensajes (Burbujas en el Centro) -->
+                <div id="globalChatMessagesBox" class="flex-grow-1 chat-scroll-area p-3 p-md-4 d-flex flex-column gap-3" style="background: #F8FAFC;">
+                    <div class="text-center py-5 my-auto text-muted">
+                        <div class="spinner-border spinner-border-sm text-primary mb-2" role="status"></div>
+                        <p class="small mb-0">Cargando conversación...</p>
+                    </div>
                 </div>
-                <div>
-                    <div class="p-3 rounded-4 bg-white border shadow-sm text-dark" style="border-top-left-radius: 4px !important; font-size: 0.86rem; line-height: 1.45;">
-                        <div class="fw-bold mb-1" style="font-size: 0.74rem; color: #0d9488;">
-                            Escuela Básica Las Rosas
+
+                <!-- Input Fijo en la Parte Inferior -->
+                <div class="p-3 bg-white border-top shadow-xs z-1 flex-shrink-0">
+                    <form id="globalChatForm" onsubmit="event.preventDefault(); sendGlobalChatMessage();">
+                        <input type="hidden" id="globalChatActiveColegioId" value="">
+                        <div class="input-group">
+                            <input type="text" 
+                                   id="globalChatInputField" 
+                                   class="form-control border-end-0 py-2.5 px-3 bg-light shadow-none" 
+                                   placeholder="Escribe un mensaje al colegio..." 
+                                   style="border-radius: 25px 0 0 25px; font-size: 0.86rem; border-color: #E2E8F0;" 
+                                   autocomplete="off">
+                            <button type="submit" 
+                                    id="globalChatBtnSend" 
+                                    class="btn px-3.5 d-flex align-items-center justify-content-center" 
+                                    style="border-radius: 0 25px 25px 0; background: var(--primary, #7C5CFC); color: #ffffff; border-color: var(--primary, #7C5CFC); transition: all 0.2s ease;" 
+                                    title="Enviar mensaje">
+                                <i class="bi bi-send-fill" style="font-size: 0.95rem;"></i>
+                            </button>
                         </div>
-                        ¡Muchas gracias por la rápida respuesta! Procedemos a habilitar a los docentes jefes.
-                    </div>
-                    <div class="text-muted small mt-1 ms-1" style="font-size: 0.7rem;">
-                        11:22 AM · Recibido
-                    </div>
+                    </form>
                 </div>
+
             </div>
 
         </div>
-
-        <!-- Sección Inferior: Input Group Fijado Abajo -->
-        <div class="p-3 bg-white border-top">
-            <form id="globalChatForm" onsubmit="event.preventDefault(); sendGlobalChatMessage();">
-                <div class="input-group">
-                    <input type="text" 
-                           id="globalChatInputField" 
-                           class="form-control border-end-0 py-2 px-3 bg-light shadow-none" 
-                           placeholder="Escribe un mensaje al colegio..." 
-                           style="border-radius: 25px 0 0 25px; font-size: 0.86rem; border-color: #E2E8F0;" 
-                           autocomplete="off">
-                    <button type="submit" 
-                            id="globalChatBtnSend" 
-                            class="btn px-3 d-flex align-items-center justify-content-center" 
-                            style="border-radius: 0 25px 25px 0; background: var(--primary, #7C5CFC); color: #ffffff; border-color: var(--primary, #7C5CFC);" 
-                            title="Enviar mensaje">
-                        <i class="bi bi-send-fill"></i>
-                    </button>
-                </div>
-            </form>
-        </div>
-
     </div>
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const offcanvasEl = document.getElementById('offcanvasChatGlobal');
-        const messagesBox = document.getElementById('globalChatMessagesBox');
-        const schoolSelect = document.getElementById('globalChatSchoolSelect');
-        const contactNameEl = document.getElementById('globalChatContactName');
-        const senderNameEl = document.getElementById('globalChatSenderSchoolName');
+    // ── Estado Global del Chat ────────────────────────────────────────────────
+    let currentActiveColegioId = null;
+    let chatColegiosCache = [];
 
-        // Scroll al fondo al abrir el offcanvas
-        if (offcanvasEl && messagesBox) {
-            offcanvasEl.addEventListener('shown.bs.offcanvas', function () {
-                messagesBox.scrollTop = messagesBox.scrollHeight;
-            });
-        }
-
-        // Cambio dinámico de conversación según selector
-        if (schoolSelect) {
-            schoolSelect.addEventListener('change', function () {
-                const selectedText = this.options[this.selectedIndex].text.replace(/^[^\w]+/, '').replace(/\s*\(\d+\s*nuevos\)/i, '').trim();
-                if (senderNameEl) senderNameEl.textContent = selectedText;
-                
-                const contacts = {
-                    'las-rosas': 'Director(a): Carmen Gloria Silva',
-                    'arturo-prat': 'Director(a): Rodrigo Valenzuela',
-                    'bicentenario': 'Director(a): Marcela Paz Morales',
-                    'san-martin': 'Director(a): Fernando Soto'
-                };
-                if (contactNameEl) contactNameEl.textContent = contacts[this.value] || 'Dirección / Administración';
-
-                if (messagesBox) {
-                    setTimeout(() => {
-                        messagesBox.scrollTop = messagesBox.scrollHeight;
-                    }, 100);
-                }
-            });
-        }
-    });
-
-    // Enviar mensaje en el Chat Global vía Fetch API
-    async function sendGlobalChatMessage() {
-        const input = document.getElementById('globalChatInputField');
-        const btnSend = document.getElementById('globalChatBtnSend');
-        const box = document.getElementById('globalChatMessagesBox');
-        if (!input || !box) return;
-
-        const text = input.value.trim();
-        if (!text) return;
-
-        if (btnSend) btnSend.disabled = true;
-
-        try {
-            const csrfToken = getCookieGlobal('csrftoken') || '{{ csrf_token }}';
-            const select = document.getElementById('globalChatSchoolSelect');
-            const schoolVal = select ? select.value : 'las-rosas';
-            const schoolMap = { 'las-rosas': 1, 'arturo-prat': 2, 'bicentenario': 3, 'san-martin': 4 };
-            const colegioId = schoolMap[schoolVal] || 1;
-
-            const response = await fetch("{% url 'enviar_mensaje_chat' %}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken,
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify({
-                    colegio_id: colegioId,
-                    contenido: text
-                })
-            });
-
-            const data = await response.json();
-            const hora = (data.mensaje && data.mensaje.hora) ? data.mensaje.hora : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-            const msgDiv = document.createElement('div');
-            msgDiv.className = 'd-flex align-items-start justify-content-end gap-2 ms-auto';
-            msgDiv.style.maxWidth = '85%';
-            msgDiv.innerHTML = `
-                <div>
-                    <div class="p-3 rounded-4 text-white shadow-sm" style="background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%); border-top-right-radius: 4px !important; font-size: 0.86rem; line-height: 1.45; box-shadow: 0 4px 14px rgba(124, 92, 252, 0.25) !important;">
-                        <div class="fw-bold mb-1 text-white-50" style="font-size: 0.74rem;">
-                            Super Admin Eduteka
-                        </div>
-                        ${escapeHtmlGlobal(text)}
-                    </div>
-                    <div class="text-end text-muted small mt-1 me-1" style="font-size: 0.7rem;">
-                        ${hora} · <i class="bi bi-check2 text-primary"></i>
-                    </div>
-                </div>
-                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%); color: white; font-size: 0.85rem;">
-                    <i class="bi bi-headset"></i>
-                </div>
-            `;
-
-            box.appendChild(msgDiv);
-            input.value = '';
-            box.scrollTop = box.scrollHeight;
-        } catch (err) {
-            console.error('Error enviando mensaje global:', err);
-        } finally {
-            if (btnSend) btnSend.disabled = false;
-            if (input) input.focus();
-        }
+    // Helper: Debounce de búsqueda (300ms)
+    function debounceChat(func, delay = 300) {
+        let timer;
+        return function (...args) {
+            clearTimeout(timer);
+            timer = setTimeout(() => func.apply(this, args), delay);
+        };
     }
 
+    // Helper: Obtener Cookie CSRF
     function getCookieGlobal(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
@@ -319,9 +534,611 @@
         return cookieValue;
     }
 
+    // Helper: Sanitización XSS
     function escapeHtmlGlobal(string) {
+        if (!string) return '';
         const div = document.createElement('div');
         div.appendChild(document.createTextNode(string));
         return div.innerHTML;
     }
+
+    // ── Búsqueda de Colegios con Debounce (Fetch API) ─────────────────────────
+    async function buscarColegiosChat(termino = '') {
+        const listContainer = document.getElementById('chatContactsListContainer');
+        const counterBadge = document.getElementById('chatContactsCounter');
+        if (!listContainer) return;
+
+        if (termino.trim().length > 0) {
+            listContainer.innerHTML = `
+                <div class="text-center py-4 text-muted">
+                    <div class="spinner-border spinner-border-sm text-primary mb-2" role="status"></div>
+                    <p class="small mb-0">Buscando colegios...</p>
+                </div>
+            `;
+        }
+
+        try {
+            const response = await fetch(`{% url 'api_buscar_colegios_chat' %}?q=${encodeURIComponent(termino)}`);
+            if (!response.ok) throw new Error('Error al buscar colegios');
+            const data = await response.json();
+            chatColegiosCache = data.colegios || [];
+
+            if (counterBadge) {
+                counterBadge.textContent = `${chatColegiosCache.length} ${chatColegiosCache.length === 1 ? 'colegio' : 'colegios'}`;
+            }
+
+            renderizarListaColegios(chatColegiosCache);
+
+            // Restaurar colegio previo desde sessionStorage o seleccionar el primero automáticamente
+            let colegioInicial = null;
+            try {
+                const guardado = sessionStorage.getItem('eduteka_active_chat_school');
+                if (guardado) {
+                    colegioInicial = chatColegiosCache.find(c => c.id === parseInt(guardado, 10));
+                }
+            } catch (e) {}
+
+            if (!colegioInicial && chatColegiosCache.length > 0) {
+                colegioInicial = chatColegiosCache[0];
+            }
+
+            if (colegioInicial) {
+                seleccionarColegioChat(colegioInicial);
+            }
+        } catch (err) {
+            console.error('Error en búsqueda de chat:', err);
+            listContainer.innerHTML = `
+                <div class="text-center py-4 text-danger small">
+                    <i class="bi bi-exclamation-triangle d-block fs-4 mb-1"></i>
+                    Error al cargar colegios
+                </div>
+            `;
+        }
+    }
+
+    // ── Renderizado de la Lista de Colegios (Panel Izquierdo) ─────────────────
+    function renderizarListaColegios(colegios) {
+        const listContainer = document.getElementById('chatContactsListContainer');
+        if (!listContainer) return;
+
+        if (!colegios || colegios.length === 0) {
+            listContainer.innerHTML = `
+                <div class="text-center py-5 px-3 text-muted">
+                    <i class="bi bi-search fs-3 text-muted opacity-50 d-block mb-2"></i>
+                    <p class="fw-semibold mb-1 small text-dark">No se encontraron colegios</p>
+                    <p class="small text-muted mb-0">Prueba con otro término de búsqueda.</p>
+                </div>
+            `;
+            return;
+        }
+
+        const gradients = [
+            'linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%)',
+            'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+            'linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)',
+            'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
+            'linear-gradient(135deg, #EC4899 0%, #BE185D 100%)',
+            'linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%)',
+        ];
+
+        let html = '';
+        colegios.forEach((c) => {
+            const grad = gradients[c.id % gradients.length];
+            const isActive = currentActiveColegioId === c.id;
+            const lastMsg = c.ultimo_mensaje || (c.ciudad ? `📍 ${c.ciudad}` : 'Sin mensajes previos');
+
+            html += `
+                <div class="chat-contact-item ${isActive ? 'active' : ''}" 
+                     data-id="${c.id}" 
+                     onclick="handleColegioClick(${c.id})">
+                    <div class="chat-contact-avatar" style="background: ${grad};">
+                        ${escapeHtmlGlobal(c.iniciales || 'ED')}
+                    </div>
+                    <div class="flex-grow-1 min-w-0">
+                        <div class="d-flex align-items-center justify-content-between mb-0.5">
+                            <span class="chat-contact-title text-truncate">${escapeHtmlGlobal(c.nombre)}</span>
+                            <span class="chat-contact-time flex-shrink-0 ms-1">${escapeHtmlGlobal(c.hora || '')}</span>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="chat-contact-snippet text-truncate">${escapeHtmlGlobal(lastMsg)}</span>
+                            ${c.no_leidos > 0 ? `<span class="badge bg-danger rounded-pill flex-shrink-0 ms-1" style="font-size: 0.65rem;">${c.no_leidos}</span>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        listContainer.innerHTML = html;
+    }
+
+    // ── Selección de Colegio y Carga de Conversación ───────────────────────────
+    function handleColegioClick(colegioId) {
+        if (!colegioId) return;
+        const idNum = parseInt(colegioId, 10);
+        let colegio = chatColegiosCache.find(c => c.id === idNum);
+        if (!colegio) {
+            const domItem = document.querySelector(`.chat-contact-item[data-id="${idNum}"]`);
+            if (domItem) {
+                const nombre = domItem.querySelector('.chat-contact-title')?.textContent?.trim() || 'Colegio';
+                colegio = { id: idNum, nombre: nombre, admin: 'Dirección / Administración', ciudad: 'Chile', iniciales: 'ED' };
+            }
+        }
+        if (colegio) {
+            seleccionarColegioChat(colegio);
+        }
+    }
+
+    async function seleccionarColegioChat(colegio) {
+        if (!colegio) return;
+        currentActiveColegioId = colegio.id;
+        try {
+            sessionStorage.setItem('eduteka_active_chat_school', String(colegio.id));
+        } catch (e) {}
+
+        // Actualizar visualmente la selección en la lista de contactos
+        document.querySelectorAll('.chat-contact-item').forEach(item => {
+            if (parseInt(item.getAttribute('data-id'), 10) === colegio.id) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
+
+        // Actualizar Header Derecho
+        const nameEl = document.getElementById('chatActiveSchoolName');
+        const adminEl = document.getElementById('chatActiveAdminName');
+        const locationEl = document.getElementById('chatActiveLocation');
+        const avatarEl = document.getElementById('chatActiveAvatar');
+        const hiddenIdInput = document.getElementById('globalChatActiveColegioId');
+
+        if (nameEl) nameEl.textContent = colegio.nombre;
+        if (adminEl) adminEl.textContent = `Director(a): ${colegio.admin || 'Dirección / Administración'}`;
+        if (locationEl) locationEl.textContent = colegio.ciudad || 'Chile';
+        if (avatarEl) avatarEl.textContent = colegio.iniciales || 'ED';
+        if (hiddenIdInput) hiddenIdInput.value = colegio.id;
+
+        // En pantallas pequeñas, alternar a la vista de conversación
+        const contactsCol = document.getElementById('chatContactsCol');
+        const convoCol = document.getElementById('chatConversationCol');
+        if (contactsCol && convoCol && window.innerWidth < 768) {
+            contactsCol.classList.add('mobile-hide');
+            convoCol.classList.add('mobile-show');
+        }
+
+        // Cargar historial de mensajes desde la API
+        await cargarHistorialMensajes(colegio.id, colegio.nombre);
+    }
+
+    async function cargarHistorialMensajes(colegioId, colegioNombre) {
+        const box = document.getElementById('globalChatMessagesBox');
+        if (!box) return;
+
+        box.innerHTML = `
+            <div class="text-center py-5 my-auto text-muted">
+                <div class="spinner-border spinner-border-sm text-primary mb-2" role="status"></div>
+                <p class="small mb-0">Cargando mensajes con ${escapeHtmlGlobal(colegioNombre)}...</p>
+            </div>
+        `;
+
+        try {
+            // Intentar con la ruta invertida por Django y rutas de respaldo
+            const template = "{% url 'api_historial_chat' colegio_id=999999 %}";
+            const urlPrimaria = template.replace('999999', String(colegioId));
+            
+            let response = await fetch(urlPrimaria);
+            if (!response.ok) {
+                response = await fetch(`/dashboard/superadmin/api/chat/mensajes/${colegioId}/`);
+            }
+            if (!response.ok) {
+                response = await fetch(`/superadmin/api/chat/mensajes/${colegioId}/`);
+            }
+
+            if (!response.ok) {
+                throw new Error(`Error ${response.status} al consultar la API`);
+            }
+
+            const data = await response.json();
+            renderizarMensajes(data.mensajes, colegioNombre);
+        } catch (err) {
+            console.error('Error cargando historial de chat:', err);
+            renderizarMensajes([], colegioNombre);
+        }
+    }
+
+    // ── Renderizado de Burbujas de Chat ───────────────────────────────────────
+    function renderizarMensajes(mensajes, colegioNombre) {
+        const box = document.getElementById('globalChatMessagesBox');
+        if (!box) return;
+
+        if (!mensajes || mensajes.length === 0) {
+            box.innerHTML = `
+                <div class="text-center py-5 my-auto text-muted">
+                    <div class="mb-3 d-inline-flex p-3 rounded-circle" style="background: rgba(124, 92, 252, 0.08); color: var(--primary, #7C5CFC); font-size: 1.75rem;">
+                        <i class="bi bi-chat-dots-fill"></i>
+                    </div>
+                    <h6 class="fw-bold text-dark mb-1">Comienza una conversación con ${escapeHtmlGlobal(colegioNombre)}</h6>
+                    <p class="small text-muted mb-0" style="max-width: 320px; margin: 0 auto; line-height: 1.4;">
+                        Canal directo con la administración. Escribe un mensaje abajo para dar soporte inmediato a esta institución.
+                    </p>
+                </div>
+            `;
+            return;
+        }
+
+        let html = `
+            <div class="text-center my-1">
+                <span class="badge bg-white text-muted border rounded-pill px-3 py-1 shadow-xs" style="font-size: 0.7rem; font-weight: 600;">
+                    <i class="bi bi-calendar-event me-1"></i> Historial de Soporte · ${escapeHtmlGlobal(colegioNombre)}
+                </span>
+            </div>
+        `;
+
+        mensajes.forEach(m => {
+            const esSuperAdmin = m.remitente === 'superadmin';
+            if (esSuperAdmin) {
+                html += `
+                    <div class="d-flex align-items-start justify-content-end gap-2 ms-auto chat-bubble-sent">
+                        <div>
+                            <div class="p-3 rounded-4 text-white shadow-sm" style="background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%); border-top-right-radius: 4px !important; font-size: 0.86rem; line-height: 1.45; box-shadow: 0 4px 14px rgba(124, 92, 252, 0.2) !important;">
+                                <div class="fw-bold mb-1 text-white-50" style="font-size: 0.74rem;">
+                                    Super Admin Eduteka
+                                </div>
+                                ${escapeHtmlGlobal(m.contenido)}
+                            </div>
+                            <div class="text-end text-muted small mt-1 me-1" style="font-size: 0.68rem;">
+                                ${escapeHtmlGlobal(m.hora || '')} · <i class="bi bi-check2-all" style="color: var(--primary, #7C5CFC) !important;"></i>
+                            </div>
+                        </div>
+                        <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%); color: white; font-size: 0.85rem;">
+                            <i class="bi bi-headset"></i>
+                        </div>
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div class="d-flex align-items-start gap-2 chat-bubble-received">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: rgba(101, 205, 191, 0.2); color: #0d9488; font-size: 0.85rem; font-weight: 700;">
+                            <i class="bi bi-building"></i>
+                        </div>
+                        <div>
+                            <div class="p-3 rounded-4 bg-white border shadow-xs text-dark" style="border-top-left-radius: 4px !important; font-size: 0.86rem; line-height: 1.45;">
+                                <div class="fw-bold mb-1" style="font-size: 0.74rem; color: #0d9488;">
+                                    ${escapeHtmlGlobal(colegioNombre)}
+                                </div>
+                                ${escapeHtmlGlobal(m.contenido)}
+                            </div>
+                            <div class="text-muted small mt-1 ms-1" style="font-size: 0.68rem;">
+                                ${escapeHtmlGlobal(m.hora || '')} · Recibido
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+
+        box.innerHTML = html;
+        setTimeout(() => {
+            box.scrollTop = box.scrollHeight;
+        }, 50);
+    }
+
+    // ── Envío de Mensaje con Fetch API (enviar_mensaje_chat) ───────────────────
+    async function sendGlobalChatMessage() {
+        const input = document.getElementById('globalChatInputField');
+        const btnSend = document.getElementById('globalChatBtnSend');
+        const box = document.getElementById('globalChatMessagesBox');
+        const hiddenIdInput = document.getElementById('globalChatActiveColegioId');
+        if (!input || !box) return;
+
+        const text = input.value.trim();
+        if (!text) return;
+
+        const colegioId = currentActiveColegioId || (hiddenIdInput ? parseInt(hiddenIdInput.value, 10) : null);
+        if (!colegioId) {
+            alert("Por favor selecciona un colegio de la lista para enviar el mensaje.");
+            return;
+        }
+
+        if (btnSend) btnSend.disabled = true;
+
+        try {
+            const csrfToken = getCookieGlobal('csrftoken') || '{{ csrf_token }}';
+
+            const response = await fetch("{% url 'enviar_mensaje_chat' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    colegio_id: colegioId,
+                    contenido: text
+                })
+            });
+
+            const data = await response.json();
+            if (!response.ok || data.status === 'error') {
+                throw new Error(data.error || 'Error al enviar');
+            }
+
+            const hora = (data.mensaje && data.mensaje.hora) ? data.mensaje.hora : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            // Si había un empty-state previo en el contenedor, limpiarlo
+            const emptyNotice = box.querySelector('.bi-chat-dots-fill');
+            if (emptyNotice) {
+                box.innerHTML = '';
+            }
+
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'd-flex align-items-start justify-content-end gap-2 ms-auto chat-bubble-sent';
+            msgDiv.innerHTML = `
+                <div>
+                    <div class="p-3 rounded-4 text-white shadow-sm" style="background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%); border-top-right-radius: 4px !important; font-size: 0.86rem; line-height: 1.45; box-shadow: 0 4px 14px rgba(124, 92, 252, 0.2) !important;">
+                        <div class="fw-bold mb-1 text-white-50" style="font-size: 0.74rem;">
+                            Super Admin Eduteka
+                        </div>
+                        ${escapeHtmlGlobal(text)}
+                    </div>
+                    <div class="text-end text-muted small mt-1 me-1" style="font-size: 0.68rem;">
+                        ${hora} · <i class="bi bi-check2 text-primary"></i>
+                    </div>
+                </div>
+                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%); color: white; font-size: 0.85rem;">
+                    <i class="bi bi-headset"></i>
+                </div>
+            `;
+
+            box.appendChild(msgDiv);
+            input.value = '';
+            box.scrollTop = box.scrollHeight;
+
+            // Actualizar el extracto y hora en la tarjeta del colegio del panel izquierdo
+            const contactItem = document.querySelector(`.chat-contact-item[data-id="${colegioId}"]`);
+            if (contactItem) {
+                const snippetEl = contactItem.querySelector('.chat-contact-snippet');
+                const timeEl = contactItem.querySelector('.chat-contact-time');
+                if (snippetEl) snippetEl.textContent = `Tú: ${text.length > 35 ? text.substring(0, 35) + '...' : text}`;
+                if (timeEl) timeEl.textContent = hora;
+            }
+
+            // Actualizar en caché
+            const cachedCol = chatColegiosCache.find(c => c.id === colegioId);
+            if (cachedCol) {
+                cachedCol.ultimo_mensaje = `Tú: ${text}`;
+                cachedCol.hora = hora;
+            }
+        } catch (err) {
+            console.error('Error enviando mensaje global:', err);
+            alert('No se pudo enviar el mensaje. Inténtalo nuevamente.');
+        } finally {
+            if (btnSend) btnSend.disabled = false;
+            if (input) input.focus();
+        }
+    }
+
+    // Exportar funciones para acceso global
+    window.handleColegioClick = handleColegioClick;
+    window.seleccionarColegioChat = seleccionarColegioChat;
+    window.cargarHistorialMensajes = cargarHistorialMensajes;
+    window.renderizarMensajes = renderizarMensajes;
+    window.sendGlobalChatMessage = sendGlobalChatMessage;
+    window.buscarColegiosChat = buscarColegiosChat;
+
+    // ── Inicialización de Eventos del Chat ─────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', function () {
+        const offcanvasEl = document.getElementById('offcanvasChatGlobal');
+        const searchInput = document.getElementById('chatContactSearchInput');
+        const backBtn = document.getElementById('chatMobileBackBtn');
+        const listContainer = document.getElementById('chatContactsListContainer');
+        const chatForm = document.getElementById('globalChatForm');
+        const sendBtn = document.getElementById('globalChatBtnSend');
+        const inputField = document.getElementById('globalChatInputField');
+
+        // Delegación de clics en la lista de colegios (máxima reactividad)
+        if (listContainer) {
+            listContainer.addEventListener('click', function (e) {
+                const item = e.target.closest('.chat-contact-item');
+                if (item) {
+                    const id = parseInt(item.getAttribute('data-id'), 10);
+                    if (id) {
+                        handleColegioClick(id);
+                    }
+                }
+            });
+        }
+
+        // Eventos del formulario de envío
+        if (chatForm) {
+            chatForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                sendGlobalChatMessage();
+            });
+        }
+        if (sendBtn) {
+            sendBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                sendGlobalChatMessage();
+            });
+        }
+        if (inputField) {
+            inputField.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendGlobalChatMessage();
+                }
+            });
+        }
+
+        // Búsqueda en vivo con debounce de 300ms
+        if (searchInput) {
+            const debouncedSearch = debounceChat(function (query) {
+                buscarColegiosChat(query);
+            }, 300);
+
+            searchInput.addEventListener('input', function (e) {
+                debouncedSearch(e.target.value);
+            });
+        }
+
+        // Botón volver en móviles
+        if (backBtn) {
+            backBtn.addEventListener('click', function () {
+                const contactsCol = document.getElementById('chatContactsCol');
+                const convoCol = document.getElementById('chatConversationCol');
+                if (contactsCol && convoCol) {
+                    contactsCol.classList.remove('mobile-hide');
+                    convoCol.classList.remove('mobile-show');
+                }
+            });
+        }
+
+        // Cargar colegios e iniciar chat al abrir el offcanvas
+        if (offcanvasEl) {
+            offcanvasEl.addEventListener('show.bs.offcanvas', function () {
+                if (chatColegiosCache.length === 0) {
+                    buscarColegiosChat('');
+                } else if (currentActiveColegioId) {
+                    const activeCol = chatColegiosCache.find(c => c.id === currentActiveColegioId);
+                    if (activeCol) {
+                        cargarHistorialMensajes(activeCol.id, activeCol.nombre);
+                    }
+                }
+            });
+            offcanvasEl.addEventListener('shown.bs.offcanvas', function () {
+                const box = document.getElementById('globalChatMessagesBox');
+                if (box) box.scrollTop = box.scrollHeight;
+                if (searchInput) searchInput.focus();
+            });
+        }
+    });
+
+    // ── Buscador Global Spotlight (Debounce + Fetch API) ──────────────────────
+    (function () {
+        function debounce(func, delay = 300) {
+            let timer;
+            return function (...args) {
+                clearTimeout(timer);
+                timer = setTimeout(() => func.apply(this, args), delay);
+            };
+        }
+
+        const input = document.getElementById('globalSpotlightInput');
+        const box = document.getElementById('globalSpotlightResults');
+        const wrapper = document.querySelector('.spotlight-wrapper');
+        if (!input || !box) return;
+
+        const buscarEnServidor = debounce(async function (termino) {
+            if (!termino || termino.length < 2) {
+                box.style.display = 'none';
+                box.innerHTML = '';
+                return;
+            }
+
+            box.innerHTML = `
+                <div class="spotlight-loading d-flex align-items-center justify-content-center gap-2">
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    <span>Buscando en Eduteka...</span>
+                </div>
+            `;
+            box.style.display = 'block';
+
+            try {
+                const response = await fetch(`{% url 'api_buscador_global' %}?q=${encodeURIComponent(termino)}`);
+                if (!response.ok) throw new Error('Error en consulta');
+                const data = await response.json();
+                renderizarSpotlight(data.resultados, termino);
+            } catch (err) {
+                console.error("Error en búsqueda Spotlight:", err);
+                box.innerHTML = `
+                    <div class="spotlight-empty text-danger">
+                        <i class="bi bi-exclamation-circle me-1"></i> Ocurrió un error al buscar
+                    </div>
+                `;
+            }
+        }, 300);
+
+        function renderizarSpotlight(resultados, query) {
+            if (!resultados || resultados.length === 0) {
+                box.innerHTML = `
+                    <div class="spotlight-empty">
+                        <i class="bi bi-search fs-4 d-block mb-1 text-muted"></i>
+                        <div>No encontramos resultados para "<strong>${escapeHtmlGlobal(query)}</strong>"</div>
+                        <div class="small text-muted mt-1">Prueba con el nombre del colegio, comuna o username</div>
+                    </div>
+                `;
+                box.style.display = 'block';
+                return;
+            }
+
+            // Agrupar por categoría
+            const grupos = {};
+            resultados.forEach(item => {
+                if (!grupos[item.categoria]) grupos[item.categoria] = [];
+                grupos[item.categoria].push(item);
+            });
+
+            let html = '';
+            for (const [cat, items] of Object.entries(grupos)) {
+                const iconoCat = cat === 'Colegio' ? '🏫 Colegios' : '👤 Usuarios del Sistema';
+                html += `
+                    <div class="spotlight-category-header">
+                        <span>${iconoCat}</span>
+                        <span class="badge bg-secondary-subtle text-secondary rounded-pill">${items.length}</span>
+                    </div>
+                `;
+                items.forEach(item => {
+                    html += `
+                        <a href="${item.url}" class="spotlight-item">
+                            <div class="spotlight-item-icon" style="background:${item.color_bg}; color:${item.color_text};">
+                                <i class="bi ${item.icono}"></i>
+                            </div>
+                            <div class="flex-grow-1 min-w-0">
+                                <div class="d-flex align-items-center justify-content-between gap-2">
+                                    <span class="spotlight-item-title text-truncate">${escapeHtmlGlobal(item.titulo)}</span>
+                                    <span class="badge rounded-pill" style="background:${item.color_bg}; color:${item.color_text}; font-size:0.67rem; font-weight:700;">
+                                        ${escapeHtmlGlobal(item.badge)}
+                                    </span>
+                                </div>
+                                <div class="spotlight-item-sub text-truncate">${escapeHtmlGlobal(item.subtitulo)}</div>
+                            </div>
+                            <i class="bi bi-chevron-right text-muted small ms-1"></i>
+                        </a>
+                    `;
+                });
+            }
+
+            box.innerHTML = html;
+            box.style.display = 'block';
+        }
+
+        input.addEventListener('input', function (e) {
+            buscarEnServidor(e.target.value.trim());
+        });
+
+        input.addEventListener('focus', function () {
+            if (this.value.trim().length >= 2 && box.innerHTML.trim() !== '') {
+                box.style.display = 'block';
+            }
+        });
+
+        // Atajo de teclado global: Ctrl + K o Cmd + K
+        document.addEventListener('keydown', function (e) {
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+                e.preventDefault();
+                input.focus();
+                input.select();
+            }
+            if (e.key === 'Escape') {
+                box.style.display = 'none';
+            }
+        });
+
+        // Ocultar al hacer clic fuera del buscador
+        document.addEventListener('click', function (e) {
+            if (wrapper && !wrapper.contains(e.target)) {
+                box.style.display = 'none';
+            }
+        });
+    })();
 </script>

@@ -4,14 +4,14 @@ from django.views.decorators.http import require_POST
 from django.contrib import messages
 from django.db.models import Sum, Count, Q
 from solicitudes.models import SolicitudAcceso, MiembroColegio
-from colegios.models import Colegio, ColegioModulo, RolColegio, Estudiante, CursoColegio, Suscripcion
+from colegios.models import Colegio, ColegioModulo, RolColegio, Estudiante, CursoColegio, Suscripcion, MensajeChat
 from planes.models import Plan
 
 from django.contrib.auth.models import User
 from django.utils import timezone
 import csv
 import io
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from datetime import datetime
 
 # ── openpyxl: Generador de Reportes Excel ─────────────────────────────────────
@@ -2406,5 +2406,362 @@ def exportar_finanzas_excel(request):
     except Exception:
         messages.info(request, "📊 El reporte financiero en Excel se está procesando...")
         return redirect(request.META.get('HTTP_REFERER', '/'))
+
+
+@superadmin_required
+def api_crecimiento_ingresos_view(request):
+    """
+    Endpoint JSON para el gráfico interactivo de 'Crecimiento de Ingresos'.
+    Recibe el parámetro GET: ?rango=7dias | 30dias | este_ano | ano_anterior
+    """
+    from datetime import date, timedelta
+    from django.http import JsonResponse
+    from django.utils import timezone
+    from django.db.models import Sum
+    from django.db.models.functions import TruncDay, TruncMonth
+    from colegios.models import FacturaGasto
+
+    rango = request.GET.get('rango', '30dias')
+    hoy = timezone.now().date()
+    
+    labels = []
+    data = []
+    
+    # ── 1. Filtro: Últimos 7 Días ──────────────────────────────────────────────
+    if rango == '7dias':
+        fecha_inicio = hoy - timedelta(days=6)
+        registros = (
+            FacturaGasto.objects.filter(
+                estado_pago='pagado',
+                fecha_emision__range=[fecha_inicio, hoy]
+            )
+            .annotate(dia=TruncDay('fecha_emision'))
+            .values('dia')
+            .annotate(total=Sum('monto_total'))
+            .order_by('dia')
+        )
+        mapa_montos = {r['dia']: float(r['total']) for r in registros}
+        
+        dias_es = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
+        for i in range(7):
+            curr_date = fecha_inicio + timedelta(days=i)
+            labels.append(f"{dias_es[curr_date.weekday()]} {curr_date.strftime('%d/%m')}")
+            data.append(mapa_montos.get(curr_date, 0.0))
+
+    # ── 2. Filtro: Últimos 30 Días (Default) ──────────────────────────────────
+    elif rango == '30dias':
+        fecha_inicio = hoy - timedelta(days=29)
+        registros = (
+            FacturaGasto.objects.filter(
+                estado_pago='pagado',
+                fecha_emision__range=[fecha_inicio, hoy]
+            )
+            .annotate(dia=TruncDay('fecha_emision'))
+            .values('dia')
+            .annotate(total=Sum('monto_total'))
+            .order_by('dia')
+        )
+        mapa_montos = {r['dia']: float(r['total']) for r in registros}
+        
+        for i in range(30):
+            curr_date = fecha_inicio + timedelta(days=i)
+            labels.append(curr_date.strftime('%d/%m'))
+            data.append(mapa_montos.get(curr_date, 0.0))
+
+    # ── 3. Filtro: Este Año (Mes a Mes) ───────────────────────────────────────
+    elif rango == 'este_ano':
+        anio_actual = hoy.year
+        fecha_inicio = date(anio_actual, 1, 1)
+        fecha_fin = date(anio_actual, 12, 31)
+        registros = (
+            FacturaGasto.objects.filter(
+                estado_pago='pagado',
+                fecha_emision__range=[fecha_inicio, fecha_fin]
+            )
+            .annotate(mes=TruncMonth('fecha_emision'))
+            .values('mes')
+            .annotate(total=Sum('monto_total'))
+            .order_by('mes')
+        )
+        mapa_montos = {r['mes'].month: float(r['total']) for r in registros}
+        
+        nombres_meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+        labels = nombres_meses
+        for m in range(1, 13):
+            data.append(mapa_montos.get(m, 0.0))
+
+    # ── 4. Filtro: Año Anterior ───────────────────────────────────────────────
+    elif rango == 'ano_anterior':
+        anio_anterior = hoy.year - 1
+        fecha_inicio = date(anio_anterior, 1, 1)
+        fecha_fin = date(anio_anterior, 12, 31)
+        registros = (
+            FacturaGasto.objects.filter(
+                estado_pago='pagado',
+                fecha_emision__range=[fecha_inicio, fecha_fin]
+            )
+            .annotate(mes=TruncMonth('fecha_emision'))
+            .values('mes')
+            .annotate(total=Sum('monto_total'))
+            .order_by('mes')
+        )
+        mapa_montos = {r['mes'].month: float(r['total']) for r in registros}
+        
+        nombres_meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+        labels = nombres_meses
+        for m in range(1, 13):
+            data.append(mapa_montos.get(m, 0.0))
+
+    # ── 5. Filtro: Histórico (Desde siempre / All Time) ──────────────────────
+    elif rango in ['historico', 'all', 'todo']:
+        registros = (
+            FacturaGasto.objects.filter(estado_pago='pagado')
+            .annotate(mes=TruncMonth('fecha_emision'))
+            .values('mes')
+            .annotate(total=Sum('monto_total'))
+            .order_by('mes')
+        )
+        if registros.exists():
+            nombres_meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+            primer_mes = registros.first()['mes']
+            ultimo_mes = hoy.replace(day=1)
+
+            mapa_montos = {r['mes']: float(r['total']) for r in registros}
+            curr = primer_mes
+            while curr <= ultimo_mes:
+                labels.append(f"{nombres_meses[curr.month - 1]} {curr.year}")
+                data.append(mapa_montos.get(curr, 0.0))
+                if curr.month == 12:
+                    curr = curr.replace(year=curr.year + 1, month=1)
+                else:
+                    curr = curr.replace(month=curr.month + 1)
+        else:
+            labels = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+            data = [0.0] * 12
+
+    total_acumulado = sum(data)
+    
+    if total_acumulado >= 1_000_000:
+        total_formateado = f"${total_acumulado / 1_000_000:.1f}M CLP"
+    elif total_acumulado > 0:
+        total_formateado = f"${int(total_acumulado):,}".replace(',', '.') + " CLP"
+    else:
+        total_formateado = "$0 CLP"
+
+    return JsonResponse({
+        'rango': rango,
+        'labels': labels,
+        'data': data,
+        'total': total_acumulado,
+        'total_formateado': total_formateado,
+    })
+
+
+@superadmin_required
+def api_buscador_global_view(request):
+    """
+    Buscador Global Inteligente (Spotlight) para el panel de Super Admin.
+    Parámetro GET: ?q=termino_a_buscar
+    Busca de forma combinada en Colegios y Usuarios mediante consultas optimizadas con Q.
+    """
+    from django.http import JsonResponse
+    from django.db.models import Q
+    from django.contrib.auth.models import User
+    from django.urls import reverse
+    from colegios.models import Colegio
+
+    q = request.GET.get('q', '').strip()
+    if not q or len(q) < 2:
+        return JsonResponse({'total': 0, 'resultados': []})
+
+    resultados = []
+
+    # ── 1. Búsqueda en Colegios ──────────────────────────────────────────────
+    colegios_qs = Colegio.objects.filter(
+        Q(nombre__icontains=q) |
+        Q(ciudad_comuna__icontains=q) |
+        Q(nombre_administrador__icontains=q) |
+        Q(correo_institucional__icontains=q)
+    ).select_related('administrador')[:6]
+
+    for c in colegios_qs:
+        url_colegio = reverse('dashboard_superadmin_colegios') + f'?q={c.nombre}'
+        ciudad = c.ciudad_comuna or 'Chile'
+        estado_badge = dict(Colegio.ESTADOS).get(c.estado, c.estado.title()) if hasattr(Colegio, 'ESTADOS') else c.estado
+        resultados.append({
+            'categoria': 'Colegio',
+            'titulo': c.nombre,
+            'subtitulo': f"{ciudad} · Administrador: {c.nombre_administrador or 'N/A'}",
+            'icono': 'bi-building',
+            'color_bg': 'rgba(124, 92, 252, 0.12)',
+            'color_text': '#7C5CFC',
+            'badge': estado_badge,
+            'url': url_colegio,
+        })
+
+    # ── 2. Búsqueda en Usuarios ──────────────────────────────────────────────
+    usuarios_qs = User.objects.filter(
+        Q(username__icontains=q) |
+        Q(first_name__icontains=q) |
+        Q(last_name__icontains=q) |
+        Q(email__icontains=q)
+    )[:6]
+
+    for u in usuarios_qs:
+        nombre_completo = u.get_full_name().strip() or u.username
+        if u.is_superuser:
+            rol = 'Super Admin'
+        elif u.is_staff:
+            rol = 'Staff'
+        else:
+            rol = 'Usuario'
+
+        url_usuario = reverse('dashboard_superadmin_usuarios') + f'?q={u.username}'
+        resultados.append({
+            'categoria': 'Usuario',
+            'titulo': nombre_completo,
+            'subtitulo': f"{u.email or 'Sin correo'} · @{u.username}",
+            'icono': 'bi-person-circle',
+            'color_bg': 'rgba(16, 185, 129, 0.12)',
+            'color_text': '#10B981',
+            'badge': rol,
+            'url': url_usuario,
+        })
+
+    return JsonResponse({
+        'total': len(resultados),
+        'query': q,
+        'resultados': resultados
+    })
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# CENTRO DE MENSAJES SUPER ADMIN (ESTRUCTURA TIPO WHATSAPP WEB)
+# ══════════════════════════════════════════════════════════════════════════════
+
+@superadmin_required
+def api_buscar_colegios_chat(request):
+    """
+    API de búsqueda de colegios para el Centro de Mensajes del Super Admin.
+    Recibe un parámetro GET 'q' y devuelve un JSON con la lista de colegios coincidentes (id, nombre, etc.)
+    incluyendo el extracto del último mensaje y datos institucionales.
+    """
+    q = request.GET.get('q', '').strip()
+
+    colegios_qs = Colegio.objects.all()
+    if q:
+        colegios_qs = colegios_qs.filter(
+            Q(nombre__icontains=q) |
+            Q(ciudad_comuna__icontains=q) |
+            Q(nombre_administrador__icontains=q) |
+            Q(correo_institucional__icontains=q)
+        )
+
+    colegios_qs = colegios_qs.order_by('nombre')[:35]
+
+    colegios_data = []
+    for c in colegios_qs:
+        ultimo_msg = c.mensajes_chat.order_by('-fecha_creacion').first()
+        ultimo_texto = ""
+        ultimo_hora = ""
+        if ultimo_msg:
+            prefix = "Tú: " if ultimo_msg.remitente == 'superadmin' else ""
+            raw_txt = ultimo_msg.contenido.strip()
+            ultimo_texto = f"{prefix}{raw_txt[:38]}..." if len(raw_txt) > 38 else f"{prefix}{raw_txt}"
+            ultimo_hora = ultimo_msg.fecha_creacion.strftime('%H:%M')
+
+        no_leidos = c.mensajes_chat.filter(remitente='colegio', leido=False).count()
+
+        palabras = [p for p in c.nombre.split() if p.lower() not in ['de', 'la', 'el', 'los', 'las', 'y', 'del']]
+        if len(palabras) >= 2:
+            iniciales = (palabras[0][0] + palabras[1][0]).upper()
+        elif len(palabras) == 1:
+            iniciales = palabras[0][:2].upper()
+        else:
+            iniciales = "ED"
+
+        colegios_data.append({
+            'id': c.id,
+            'nombre': c.nombre,
+            'ciudad': c.ciudad_comuna or 'Chile',
+            'admin': c.nombre_administrador or 'Dirección / Administración',
+            'correo': c.correo_institucional or '',
+            'estado': c.estado,
+            'iniciales': iniciales,
+            'color': c.color_principal or '#7C5CFC',
+            'ultimo_mensaje': ultimo_texto,
+            'hora': ultimo_hora,
+            'no_leidos': no_leidos,
+        })
+
+    return JsonResponse({
+        'status': 'success',
+        'total': len(colegios_data),
+        'query': q,
+        'colegios': colegios_data
+    })
+
+
+@superadmin_required
+def api_historial_chat(request, colegio_id):
+    """
+    Retorna el historial completo de mensajes entre el Super Admin y el Colegio especificado.
+    Marca automáticamente como leídos los mensajes provenientes del colegio.
+    """
+    colegio = get_object_or_404(Colegio, id=colegio_id)
+
+    # Si es el colegio inicial (o Escuela Las Rosas) y aún no tiene mensajes en BD, inicializar los mensajes de prueba
+    if not colegio.mensajes_chat.exists() and (colegio.id == 1 or 'rosas' in colegio.nombre.lower()):
+        MensajeChat.objects.create(
+            colegio=colegio,
+            remitente='colegio',
+            contenido='Estimado Super Admin, hemos finalizado la carga de nómina de estudiantes y requerimos asistencia para validar las licencias de Libro de Clases.'
+        )
+        MensajeChat.objects.create(
+            colegio=colegio,
+            remitente='superadmin',
+            contenido='¡Hola Carmen Gloria! Hemos revisado su establecimiento y las licencias ya han sido autorizadas correctamente en el servidor.'
+        )
+        MensajeChat.objects.create(
+            colegio=colegio,
+            remitente='colegio',
+            contenido='¡Muchas gracias por la rápida respuesta! Procedemos a habilitar a los docentes jefes.'
+        )
+
+    # Marcar mensajes del colegio como leídos
+    colegio.mensajes_chat.filter(remitente='colegio', leido=False).update(leido=True)
+
+    mensajes_qs = colegio.mensajes_chat.all().order_by('fecha_creacion')
+    mensajes_data = []
+    for m in mensajes_qs:
+        mensajes_data.append({
+            'id': m.id,
+            'remitente': m.remitente,
+            'remitente_display': m.get_remitente_display(),
+            'contenido': m.contenido,
+            'hora': m.fecha_creacion.strftime('%H:%M'),
+            'fecha': m.fecha_creacion.strftime('%d/%m/%Y'),
+        })
+
+    palabras = [p for p in colegio.nombre.split() if p.lower() not in ['de', 'la', 'el', 'los', 'las', 'y', 'del']]
+    iniciales = (palabras[0][0] + palabras[1][0]).upper() if len(palabras) >= 2 else (palabras[0][:2].upper() if palabras else "ED")
+
+    return JsonResponse({
+        'status': 'success',
+        'colegio': {
+            'id': colegio.id,
+            'nombre': colegio.nombre,
+            'admin': colegio.nombre_administrador or 'Dirección / Administración',
+            'ciudad': colegio.ciudad_comuna or 'Chile',
+            'correo': colegio.correo_institucional or '',
+            'estado': colegio.estado,
+            'iniciales': iniciales,
+            'color': colegio.color_principal or '#7C5CFC',
+        },
+        'mensajes': mensajes_data
+    })
+
+
+
 
 

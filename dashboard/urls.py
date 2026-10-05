@@ -38,6 +38,13 @@ urlpatterns = [
     path('superadmin/reportes/', views.dashboard_superadmin_reportes_view, name='dashboard_superadmin_reportes'),
     path('superadmin/reportes/descargar/', views.exportar_reporte_colegios_excel, name='descargar_excel'),
     path('superadmin/finanzas/exportar/', views.exportar_finanzas_excel, name='exportar_finanzas_excel'),
+    # API Interactiva de Gráficos Superadmin
+    path('superadmin/api/ingresos/', views.api_crecimiento_ingresos_view, name='api_crecimiento_ingresos'),
+    # Buscador Global Inteligente (Spotlight)
+    path('superadmin/api/buscador/', views.api_buscador_global_view, name='api_buscador_global'),
+    # Centro de Mensajes Superadmin (Chat estilo WhatsApp Web)
+    path('superadmin/api/chat/colegios/', views.api_buscar_colegios_chat, name='api_buscar_colegios_chat'),
+    path('superadmin/api/chat/mensajes/<int:colegio_id>/', views.api_historial_chat, name='api_historial_chat'),
     path('solicitudes/<int:solicitud_id>/aprobar/', views.aprobar_solicitud, name='aprobar_solicitud'),
     path('solicitudes/<int:solicitud_id>/rechazar/', views.rechazar_solicitud, name='rechazar_solicitud'),
 ]

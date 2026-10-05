@@ -527,9 +527,29 @@
                 <!-- Line Chart Ingresos -->
                 <div class="col-12 col-lg-7">
                     <div class="panel" style="height:100%;">
-                        <div class="panel-header">
-                            <h2 class="panel-title"><i class="bi bi-graph-up text-success"></i> Crecimiento de Ingresos</h2>
-                            <span class="pill p-green"><i class="bi bi-arrow-up-right"></i> +5.8% YTD</span>
+                        <div class="panel-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <h2 class="panel-title m-0"><i class="bi bi-graph-up text-success"></i> Crecimiento de Ingresos</h2>
+                                <span id="revenueBadge" class="pill p-green"><i class="bi bi-arrow-up-right"></i> +5.8% YTD</span>
+                            </div>
+                            <!-- Dropdown Filtro de Tiempo -->
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-secondary rounded-pill dropdown-toggle d-flex align-items-center gap-1.5 py-1 px-3 shadow-none" 
+                                        type="button" id="dropdownRangoIngresos" data-bs-toggle="dropdown" aria-expanded="false" 
+                                        style="font-size: 0.78rem; font-weight: 600; border-color: var(--border);">
+                                    <i class="bi bi-calendar3 text-primary"></i>
+                                    <span id="labelRangoActivo">Últimos 30 días</span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3 mt-1 py-1" aria-labelledby="dropdownRangoIngresos" style="font-size: 0.82rem; min-width: 170px;">
+                                    <li><a class="dropdown-item filtro-rango py-1.5" href="#" data-rango="7dias"><i class="bi bi-clock-history me-2 text-muted"></i>Últimos 7 días</a></li>
+                                    <li><a class="dropdown-item filtro-rango py-1.5 active" href="#" data-rango="30dias"><i class="bi bi-calendar-event me-2 text-muted"></i>Últimos 30 días</a></li>
+                                    <li><hr class="dropdown-divider my-1"></li>
+                                    <li><a class="dropdown-item filtro-rango py-1.5" href="#" data-rango="este_ano"><i class="bi bi-calendar-check me-2 text-muted"></i>Este Año</a></li>
+                                    <li><a class="dropdown-item filtro-rango py-1.5" href="#" data-rango="ano_anterior"><i class="bi bi-calendar-x me-2 text-muted"></i>Año Anterior</a></li>
+                                    <li><hr class="dropdown-divider my-1"></li>
+                                    <li><a class="dropdown-item filtro-rango py-1.5" href="#" data-rango="historico"><i class="bi bi-infinity me-2 text-muted"></i>Histórico</a></li>
+                                </ul>
+                            </div>
                         </div>
                         <div class="chart-h260">
                             <canvas id="revenueChart"></canvas>
@@ -960,18 +980,19 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     
+    // ── Chart.js: Inicialización de Revenue Chart ──────────────────────────────
     const revCtx = document.getElementById('revenueChart').getContext('2d');
     const grad   = revCtx.createLinearGradient(0, 0, 0, 260);
     grad.addColorStop(0, 'rgba(124,92,252,0.20)');
     grad.addColorStop(1, 'rgba(124,92,252,0.0)');
 
-    new Chart(revCtx, {
+    const revenueChart = new Chart(revCtx, {
         type: 'line',
         data: {
             labels: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'],
             datasets: [{
-                label: 'Ingresos (MM CLP)',
-                data:  [2, 4, 5, 8, 9, 11, 12.5, 14, 16, 19, 22, 25],
+                label: 'Ingresos (CLP)',
+                data:  [2000000, 4000000, 5000000, 8000000, 9000000, 11000000, 12500000, 14000000, 16000000, 19000000, 22000000, 25000000],
                 borderColor: '#7C5CFC',
                 backgroundColor: grad,
                 borderWidth: 2.5,
@@ -987,7 +1008,7 @@ document.addEventListener('DOMContentLoaded', function () {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            animation: { duration: 800, easing: 'easeInOutQuart' },
+            animation: { duration: 600, easing: 'easeInOutQuart' },
             plugins: {
                 legend: { display: false },
                 tooltip: {
@@ -995,14 +1016,30 @@ document.addEventListener('DOMContentLoaded', function () {
                     titleFont: { family: 'Plus Jakarta Sans', size: 12 },
                     bodyFont:  { family: 'Plus Jakarta Sans', size: 13, weight: 'bold' },
                     displayColors: false,
-                    callbacks: { label: ctx => '$' + ctx.parsed.y + 'M CLP' }
+                    callbacks: {
+                        label: function (ctx) {
+                            return new Intl.NumberFormat('es-CL', {
+                                style: 'currency',
+                                currency: 'CLP',
+                                maximumFractionDigits: 0
+                            }).format(ctx.parsed.y);
+                        }
+                    }
                 }
             },
             scales: {
                 y: {
                     beginAtZero: true,
                     grid: { color: 'rgba(188,192,207,0.18)', drawBorder: false },
-                    ticks: { font: { family: 'Plus Jakarta Sans', size: 10 }, color: '#687089', callback: v => '$' + v + 'M' }
+                    ticks: {
+                        font: { family: 'Plus Jakarta Sans', size: 10 },
+                        color: '#687089',
+                        callback: function (val) {
+                            if (val >= 1000000) return '$' + (val / 1000000).toFixed(1) + 'M';
+                            if (val >= 1000) return '$' + (val / 1000).toFixed(0) + 'K';
+                            return '$' + val;
+                        }
+                    }
                 },
                 x: {
                     grid: { display: false, drawBorder: false },
@@ -1011,6 +1048,51 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     });
+
+    // ── Filtro Asíncrono de Ingresos (Fetch API + Chart.js Update) ─────────────
+    const filtroLinks = document.querySelectorAll('.filtro-rango');
+    const labelActivo = document.getElementById('labelRangoActivo');
+    const badgeIngresos = document.getElementById('revenueBadge');
+
+    async function cargarDatosIngresos(rango) {
+        const canvas = document.getElementById('revenueChart');
+        if (canvas) canvas.style.opacity = '0.5';
+
+        try {
+            const url = `{% url 'api_crecimiento_ingresos' %}?rango=${encodeURIComponent(rango)}`;
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const res = await response.json();
+
+            revenueChart.data.labels = res.labels;
+            revenueChart.data.datasets[0].data = res.data;
+            revenueChart.update();
+
+            if (badgeIngresos && res.total_formateado) {
+                badgeIngresos.innerHTML = `<i class="bi bi-cash-stack"></i> ${res.total_formateado}`;
+            }
+        } catch (err) {
+            console.error('Error al cargar ingresos:', err);
+        } finally {
+            if (canvas) canvas.style.opacity = '1';
+        }
+    }
+
+    filtroLinks.forEach(link => {
+        link.addEventListener('click', function (e) {
+            e.preventDefault();
+            const rango = this.getAttribute('data-rango');
+
+            filtroLinks.forEach(l => l.classList.remove('active'));
+            this.classList.add('active');
+            if (labelActivo) labelActivo.textContent = this.textContent.trim();
+
+            cargarDatosIngresos(rango);
+        });
+    });
+
+    // Carga inicial dinámica con el filtro por defecto (30 días)
+    cargarDatosIngresos('30dias');
 
     
     const planesRaw  = JSON.parse('{{ distribucion_planes_json|escapejs }}');
