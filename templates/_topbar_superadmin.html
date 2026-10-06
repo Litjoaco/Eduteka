@@ -1921,19 +1921,19 @@
             });
         }
 
-        // ── Lógica de Recepción de Parámetros URL (tab=usuarios & chat_id=...) ──
+        // ── Lógica de Recepción de Parámetros URL (tab=usuarios|colegios & chat_id=...) ──
         const urlParams = new URLSearchParams(window.location.search);
         const tabParam = urlParams.get('tab');
         const chatIdParam = urlParams.get('chat_id');
 
-        if (tabParam === 'usuarios' || chatIdParam) {
+        if (tabParam === 'usuarios' || tabParam === 'colegios' || chatIdParam) {
             // Abrir automáticamente el Offcanvas global si está disponible
             if (offcanvasEl && typeof bootstrap !== 'undefined' && bootstrap.Offcanvas) {
                 const bsOffcanvas = bootstrap.Offcanvas.getOrCreateInstance(offcanvasEl);
                 bsOffcanvas.show();
             }
 
-            // Si el parámetro tab es igual a usuarios, simular clic en la pestaña 'Usuarios'
+            // Si el parámetro tab es igual a usuarios o colegios, activar la pestaña correspondiente
             if (tabParam === 'usuarios') {
                 const tabBtnUsuarios = document.getElementById('tabBtnUsuarios');
                 if (tabBtnUsuarios) {
@@ -1941,22 +1941,41 @@
                 } else {
                     switchChatTab('usuarios');
                 }
+            } else if (tabParam === 'colegios') {
+                const tabBtnColegios = document.getElementById('tabBtnColegios');
+                if (tabBtnColegios) {
+                    tabBtnColegios.click();
+                } else {
+                    switchChatTab('colegios');
+                }
             }
 
             // Si existe el parámetro chat_id, buscar el elemento y simular un clic
             if (chatIdParam) {
                 setTimeout(() => {
-                    const targetEl = document.querySelector(
-                        `#lista-usuarios [data-chat-id="${chatIdParam}"], ` +
-                        `#lista-usuarios [data-usuario-id="${chatIdParam}"], ` +
-                        `#lista-usuarios [data-id="${chatIdParam}"]`
-                    );
-
-                    if (targetEl) {
-                        targetEl.click();
-                        targetEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    if (tabParam === 'colegios') {
+                        const targetCol = document.querySelector(
+                            `#lista-colegios [data-id="${chatIdParam}"]`
+                        );
+                        if (targetCol) {
+                            targetCol.click();
+                            targetCol.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        } else {
+                            handleColegioClick(chatIdParam);
+                        }
                     } else {
-                        cargarUsuarioDirecto(chatIdParam);
+                        const targetEl = document.querySelector(
+                            `#lista-usuarios [data-chat-id="${chatIdParam}"], ` +
+                            `#lista-usuarios [data-usuario-id="${chatIdParam}"], ` +
+                            `#lista-usuarios [data-id="${chatIdParam}"]`
+                        );
+
+                        if (targetEl) {
+                            targetEl.click();
+                            targetEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        } else {
+                            cargarUsuarioDirecto(chatIdParam);
+                        }
                     }
                 }, 350);
             }
