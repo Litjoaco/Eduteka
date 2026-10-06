@@ -46,6 +46,7 @@ urlpatterns = [
     path('superadmin/api/buscador/', views.api_buscador_global_view, name='api_buscador_global'),
     # Centro de Mensajes Superadmin (Chat estilo WhatsApp Web)
     path('superadmin/api/chat/colegios/', views.api_buscar_colegios_chat, name='api_buscar_colegios_chat'),
+    path('superadmin/api/chat/usuarios/', views.api_buscar_usuarios_chat, name='api_buscar_usuarios_chat'),
     path('superadmin/api/chat/mensajes/<int:colegio_id>/', views.api_historial_chat, name='api_historial_chat'),
     path('solicitudes/<int:solicitud_id>/aprobar/', views.aprobar_solicitud, name='aprobar_solicitud'),
     path('solicitudes/<int:solicitud_id>/rechazar/', views.rechazar_solicitud, name='rechazar_solicitud'),

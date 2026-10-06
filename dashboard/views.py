@@ -1995,12 +1995,20 @@ def dashboard_superadmin_comunicados_view(request):
         tipo_alerta__in=['mantenimiento', 'urgente']
     ).count()
 
+    # Usuarios del sistema para el directorio del Centro de Mensajes
+    usuarios_chat = User.objects.filter(is_active=True).select_related('perfil').prefetch_related(
+        'membresias_colegio__colegio',
+        'membresias_colegio__rol',
+        'colegios_administrados'
+    ).order_by('-date_joined')[:60]
+
     context = {
         'comunicados': comunicados_qs,
         'comunicados_mes': comunicados_mes,
         'tasa_lectura': tasa_lectura,
         'alertas_activas': alertas_activas,
         'total_comunicados': comunicados_qs.count(),
+        'usuarios': usuarios_chat,
     }
     return render(request, 'dashboard_superadmin_comunicados.html', context)
 
@@ -2982,6 +2990,70 @@ def api_historial_chat(request, colegio_id):
         },
         'mensajes': mensajes_data
     })
+
+
+@superadmin_required
+def api_buscar_usuarios_chat(request):
+    """
+    API de búsqueda y directorio de usuarios para el Centro de Mensajes Super Admin.
+    Permite filtrar por parámetro 'q' o buscar un usuario específico por 'id'.
+    """
+    user_id = request.GET.get('id')
+    q = request.GET.get('q', '').strip()
+
+    usuarios_qs = User.objects.all().select_related('perfil').prefetch_related(
+        'membresias_colegio__colegio',
+        'membresias_colegio__rol',
+        'colegios_administrados'
+    )
+
+    if user_id:
+        usuarios_qs = usuarios_qs.filter(id=user_id)
+    elif q:
+        usuarios_qs = usuarios_qs.filter(
+            Q(username__icontains=q) |
+            Q(first_name__icontains=q) |
+            Q(last_name__icontains=q) |
+            Q(email__icontains=q) |
+            Q(perfil__nombre_completo__icontains=q)
+        )[:30]
+    else:
+        usuarios_qs = usuarios_qs.order_by('-date_joined')[:60]
+
+    usuarios_data = []
+    for u in usuarios_qs:
+        nombre_completo = getattr(u, 'perfil', None) and u.perfil.nombre_completo or u.get_full_name() or u.username
+        col = u.colegios_administrados.first() or (u.membresias_colegio.first() and u.membresias_colegio.first().colegio)
+        col_nombre = col.nombre if col else 'Eduteka Global'
+
+        if u.is_superuser:
+            rol = 'Super Admin'
+        elif u.colegios_administrados.exists():
+            rol = 'Director'
+        elif u.membresias_colegio.first() and u.membresias_colegio.first().rol:
+            rol = u.membresias_colegio.first().rol.nombre
+        else:
+            rol = 'Docente'
+
+        partes = nombre_completo.split()
+        iniciales = (partes[0][0] + (partes[1][0] if len(partes) > 1 else '')).upper() if partes else 'US'
+
+        usuarios_data.append({
+            'id': u.id,
+            'nombre': nombre_completo,
+            'email': u.email or u.username,
+            'rol': rol,
+            'colegio': col_nombre,
+            'iniciales': iniciales,
+            'is_active': u.is_active,
+        })
+
+    return JsonResponse({
+        'status': 'success',
+        'total': len(usuarios_data),
+        'usuarios': usuarios_data
+    })
+
 
 
 

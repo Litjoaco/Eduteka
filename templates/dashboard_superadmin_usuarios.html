@@ -195,6 +195,8 @@
         .action-btn.del:hover   { color: #DC2626; border-color: #FCA5A5; background: #FEF2F2; }
         .action-btn.view:hover  { color: #2563EB; border-color: #93C5FD; background: #EFF6FF; }
         .action-btn.block:hover { color: #D97706; border-color: #FCD34D; background: #FEF3C7; }
+        .action-btn.chat        { color: var(--primary); }
+        .action-btn.chat:hover  { color: var(--primary-hover); border-color: var(--primary); background: var(--primary-soft); }
 
         
         .btn-primary-custom {
@@ -476,6 +478,11 @@
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center justify-content-center gap-1">
+                                        <a href="{% url 'dashboard_superadmin_comunicados' %}?tab=usuarios&chat_id={{ usuario.id }}" 
+                                           class="action-btn chat" 
+                                           title="Abrir chat en Centro de Mensajes">
+                                            <i class="bi bi-chat-dots-fill"></i>
+                                        </a>
                                         <button type="button" class="action-btn edit" title="Editar usuario"
                                             onclick="openEditUserModal('{{ usuario.id }}', '{{ usuario.perfil.nombre_completo|default:usuario.get_full_name|default:usuario.username|escapejs }}', '{{ usuario.perfil.rut|default:''|escapejs }}', '{{ usuario.email|default:usuario.username|escapejs }}', '{{ usuario.perfil.telefono|default:''|escapejs }}', '{% if usuario.colegios_administrados.first %}{{ usuario.colegios_administrados.first.id }}{% elif usuario.membresias_colegio.first %}{{ usuario.membresias_colegio.first.colegio.id }}{% endif %}', '{% if usuario.is_superuser %}Super Admin{% elif usuario.colegios_administrados.exists %}Director{% elif usuario.membresias_colegio.first.rol %}{{ usuario.membresias_colegio.first.rol.nombre|escapejs }}{% else %}Profesor{% endif %}', '{% if usuario.is_active %}Activo{% else %}Suspendido{% endif %}')">
                                             <i class="bi bi-pencil"></i>
@@ -624,6 +631,7 @@
     </div>
 </div>
 
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     
@@ -725,6 +733,7 @@
             countEl.innerHTML = 'Mostrando <strong>' + vis + '</strong> de <strong>' + rows.length + '</strong> usuarios';
         }
     }
+
 </script>
 
 </body>

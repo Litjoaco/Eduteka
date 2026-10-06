@@ -272,6 +272,40 @@
         color: #94A3B8;
         font-weight: 500;
     }
+
+    /* ── Pills Selector Colegios / Usuarios ───────────────────────────────── */
+    .chat-nav-pills {
+        display: inline-flex;
+        background: #F1F5F9;
+        border-radius: 30px;
+        padding: 3px;
+        gap: 3px;
+        border: 1px solid #E2E8F0;
+    }
+    .chat-tab-pill {
+        border: none;
+        background: transparent;
+        padding: 0.32rem 0.85rem;
+        border-radius: 20px;
+        font-size: 0.74rem;
+        font-weight: 600;
+        color: #64748B;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        cursor: pointer;
+        line-height: 1.2;
+    }
+    .chat-tab-pill:hover {
+        color: var(--primary, #7C5CFC);
+    }
+    .chat-tab-pill.active {
+        background: #FFFFFF;
+        color: var(--primary, #7C5CFC) !important;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    }
+
     .chat-bubble-received {
         max-width: 82%;
     }
@@ -423,22 +457,86 @@
                                placeholder="Buscar por colegio, ciudad o admin..." 
                                autocomplete="off">
                     </div>
-                    <div class="d-flex align-items-center justify-content-between mt-2.5 px-1 text-muted" style="font-size: 0.72rem;">
-                        <span class="fw-bold text-uppercase" style="letter-spacing: 0.5px; color: #64748B;">
-                            <i class="bi bi-buildings me-1 text-primary"></i> Colegios
-                        </span>
-                        <span id="chatContactsCounter" class="badge bg-light text-secondary border rounded-pill px-2 py-0.5">
+                    <div class="d-flex align-items-center justify-content-between mt-2.5 px-1">
+                        <div class="chat-nav-pills">
+                            <button type="button" 
+                                    id="tabBtnColegios" 
+                                    class="chat-tab-pill active" 
+                                    onclick="switchChatTab('colegios')">
+                                <i class="bi bi-buildings-fill"></i> Colegios
+                            </button>
+                            <button type="button" 
+                                    id="tabBtnUsuarios" 
+                                    class="chat-tab-pill" 
+                                    onclick="switchChatTab('usuarios')">
+                                <i class="bi bi-people-fill"></i> Usuarios
+                            </button>
+                        </div>
+                        <span id="chatContactsCounter" class="badge bg-light text-secondary border rounded-pill px-2 py-0.5" style="font-size: 0.7rem;">
                             Cargando...
                         </span>
                     </div>
                 </div>
 
-                <!-- Lista de Contactos con Scroll Vertical -->
-                <div id="chatContactsListContainer" class="flex-grow-1 chat-scroll-area">
-                    <div class="text-center py-5 text-muted">
-                        <div class="spinner-border spinner-border-sm text-primary mb-2" role="status"></div>
-                        <p class="small mb-0">Cargando directorio de colegios...</p>
+                <!-- ── Contenedor: Lista de Colegios (Código Actual) ── -->
+                <div id="lista-colegios" class="flex-grow-1 chat-scroll-area">
+                    <div id="chatContactsListContainer">
+                        <div class="text-center py-5 text-muted">
+                            <div class="spinner-border spinner-border-sm text-primary mb-2" role="status"></div>
+                            <p class="small mb-0">Cargando directorio de colegios...</p>
+                        </div>
                     </div>
+                </div>
+
+                <!-- ── Contenedor: Lista de Usuarios (Iteración sobre usuarios) ── -->
+                <div id="lista-usuarios" class="d-none flex-grow-1 chat-scroll-area">
+                    {% if usuarios %}
+                        {% for usuario in usuarios %}
+                        <div class="chat-contact-item chat-user-item" 
+                             data-chat-id="{{ usuario.id }}" 
+                             data-usuario-id="{{ usuario.id }}"
+                             data-id="{{ usuario.id }}"
+                             data-nombre="{{ usuario.perfil.nombre_completo|default:usuario.get_full_name|default:usuario.username|escape }}"
+                             data-email="{{ usuario.email|default:usuario.username|escape }}"
+                             data-rol="{% if usuario.is_superuser %}Super Admin{% elif usuario.colegios_administrados.exists %}Director{% elif usuario.membresias_colegio.first.rol %}{{ usuario.membresias_colegio.first.rol.nombre|escape }}{% else %}Docente{% endif %}"
+                             data-colegio="{% if usuario.colegios_administrados.first %}{{ usuario.colegios_administrados.first.nombre|escape }}{% elif usuario.membresias_colegio.first %}{{ usuario.membresias_colegio.first.colegio.nombre|escape }}{% else %}Eduteka Global{% endif %}"
+                             data-iniciales="{{ usuario.first_name|default:usuario.username|slice:':1'|upper }}{{ usuario.last_name|slice:':1'|upper|default:'' }}"
+                             onclick="handleUsuarioClick(this)">
+                            <div class="chat-contact-avatar" style="background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%);">
+                                {{ usuario.first_name|default:usuario.username|slice:":1"|upper }}{{ usuario.last_name|slice:":1"|upper|default:"" }}
+                            </div>
+                            <div class="flex-grow-1 min-w-0">
+                                <div class="d-flex align-items-center justify-content-between mb-0.5">
+                                    <span class="chat-contact-title text-truncate">
+                                        {{ usuario.perfil.nombre_completo|default:usuario.get_full_name|default:usuario.username }}
+                                    </span>
+                                    <span class="chat-contact-time flex-shrink-0 ms-1 text-muted" style="font-size: 0.68rem;">
+                                        {% if usuario.is_active %}<i class="bi bi-circle-fill text-success" style="font-size: 0.5rem;" title="Activo"></i>{% endif %}
+                                    </span>
+                                </div>
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="chat-contact-snippet text-truncate text-muted">
+                                        {% if usuario.colegios_administrados.first %}
+                                            {{ usuario.colegios_administrados.first.nombre }}
+                                        {% elif usuario.membresias_colegio.first %}
+                                            {{ usuario.membresias_colegio.first.colegio.nombre }}
+                                        {% else %}
+                                            {{ usuario.email|default:usuario.username }}
+                                        {% endif %}
+                                    </span>
+                                    <span class="badge rounded-pill flex-shrink-0 ms-1" style="font-size: 0.64rem; background: rgba(124, 92, 252, 0.1); color: var(--primary, #7C5CFC);">
+                                        {% if usuario.is_superuser %}Super Admin{% elif usuario.colegios_administrados.exists %}Director{% elif usuario.membresias_colegio.first.rol %}{{ usuario.membresias_colegio.first.rol.nombre }}{% else %}Docente{% endif %}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-5 text-muted" id="chatUsuariosLoadingPlaceholder">
+                            <div class="spinner-border spinner-border-sm text-primary mb-2" role="status"></div>
+                            <p class="small mb-0">Cargando directorio de usuarios...</p>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
 
@@ -512,7 +610,11 @@
 <script>
     // ── Estado Global del Chat ────────────────────────────────────────────────
     let currentActiveColegioId = null;
+    let currentActiveUserId = null;
+    let currentChatType = 'colegio'; // 'colegio' | 'usuario'
+    let chatActiveTab = 'colegios';   // 'colegios' | 'usuarios'
     let chatColegiosCache = [];
+    let chatUsuariosCache = [];
 
     // Helper: Debounce de búsqueda (300ms)
     function debounceChat(func, delay = 300) {
@@ -827,7 +929,7 @@
         }, 50);
     }
 
-    // ── Envío de Mensaje con Fetch API (enviar_mensaje_chat) ───────────────────
+    // ── Envío de Mensaje con Fetch API / Local (enviar_mensaje_chat) ─────────
     async function sendGlobalChatMessage() {
         const input = document.getElementById('globalChatInputField');
         const btnSend = document.getElementById('globalChatBtnSend');
@@ -838,6 +940,56 @@
         const text = input.value.trim();
         if (!text) return;
 
+        // Caso 1: Chat activo con Usuario
+        if (currentChatType === 'usuario') {
+            const userId = currentActiveUserId || (hiddenIdInput ? hiddenIdInput.value : null);
+            if (!userId) {
+                alert("Por favor selecciona un usuario de la lista.");
+                return;
+            }
+
+            const hora = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const emptyNotice = box.querySelector('.bi-chat-dots-fill');
+            if (emptyNotice) box.innerHTML = '';
+
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'd-flex align-items-start justify-content-end gap-2 ms-auto chat-bubble-sent';
+            msgDiv.innerHTML = `
+                <div>
+                    <div class="p-3 rounded-4 text-white shadow-sm" style="background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%); border-top-right-radius: 4px !important; font-size: 0.86rem; line-height: 1.45; box-shadow: 0 4px 14px rgba(124, 92, 252, 0.2) !important;">
+                        <div class="fw-bold mb-1 text-white-50" style="font-size: 0.74rem;">
+                            Super Admin Eduteka
+                        </div>
+                        ${escapeHtmlGlobal(text)}
+                    </div>
+                    <div class="text-end text-muted small mt-1 me-1" style="font-size: 0.68rem;">
+                        ${hora} · <i class="bi bi-check2 text-primary"></i>
+                    </div>
+                </div>
+                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%); color: white; font-size: 0.85rem;">
+                    <i class="bi bi-headset"></i>
+                </div>
+            `;
+
+            box.appendChild(msgDiv);
+            input.value = '';
+            box.scrollTop = box.scrollHeight;
+
+            const userItem = document.querySelector(
+                `#lista-usuarios [data-chat-id="${userId}"], ` +
+                `#lista-usuarios [data-usuario-id="${userId}"], ` +
+                `#lista-usuarios [data-id="${userId}"]`
+            );
+            if (userItem) {
+                const snippetEl = userItem.querySelector('.chat-contact-snippet');
+                const timeEl = userItem.querySelector('.chat-contact-time');
+                if (snippetEl) snippetEl.textContent = `Tú: ${text.length > 30 ? text.substring(0, 30) + '...' : text}`;
+                if (timeEl) timeEl.textContent = hora;
+            }
+            return;
+        }
+
+        // Caso 2: Chat activo con Colegio
         const colegioId = currentActiveColegioId || (hiddenIdInput ? parseInt(hiddenIdInput.value, 10) : null);
         if (!colegioId) {
             alert("Por favor selecciona un colegio de la lista para enviar el mensaje.");
@@ -869,7 +1021,6 @@
 
             const hora = (data.mensaje && data.mensaje.hora) ? data.mensaje.hora : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-            // Si había un empty-state previo en el contenedor, limpiarlo
             const emptyNotice = box.querySelector('.bi-chat-dots-fill');
             if (emptyNotice) {
                 box.innerHTML = '';
@@ -898,7 +1049,6 @@
             input.value = '';
             box.scrollTop = box.scrollHeight;
 
-            // Actualizar el extracto y hora en la tarjeta del colegio del panel izquierdo
             const contactItem = document.querySelector(`.chat-contact-item[data-id="${colegioId}"]`);
             if (contactItem) {
                 const snippetEl = contactItem.querySelector('.chat-contact-snippet');
@@ -907,7 +1057,6 @@
                 if (timeEl) timeEl.textContent = hora;
             }
 
-            // Actualizar en caché
             const cachedCol = chatColegiosCache.find(c => c.id === colegioId);
             if (cachedCol) {
                 cachedCol.ultimo_mensaje = `Tú: ${text}`;
@@ -922,6 +1071,379 @@
         }
     }
 
+    // ── Gestión de Tabs y Chat con Usuarios ──────────────────────────────────
+    function switchChatTab(tabName) {
+        const btnColegios = document.getElementById('tabBtnColegios');
+        const btnUsuarios = document.getElementById('tabBtnUsuarios');
+        const listaColegios = document.getElementById('lista-colegios');
+        const listaUsuarios = document.getElementById('lista-usuarios');
+        const searchInput = document.getElementById('chatContactSearchInput');
+        const counterBadge = document.getElementById('chatContactsCounter');
+
+        chatActiveTab = tabName;
+
+        if (tabName === 'usuarios') {
+            if (btnColegios) btnColegios.classList.remove('active');
+            if (btnUsuarios) btnUsuarios.classList.add('active');
+            if (listaColegios) listaColegios.classList.add('d-none');
+            if (listaUsuarios) listaUsuarios.classList.remove('d-none');
+            if (searchInput) searchInput.placeholder = "Buscar por usuario, correo o rol...";
+
+            const userItems = listaUsuarios ? listaUsuarios.querySelectorAll('.chat-user-item') : [];
+            const placeholder = document.getElementById('chatUsuariosLoadingPlaceholder');
+
+            if (userItems.length > 0) {
+                // Caso Pre-renderizado por Django: Ocultar spinner y mostrar lista existente
+                if (placeholder) placeholder.style.display = 'none';
+                userItems.forEach(it => it.style.display = '');
+                if (counterBadge) counterBadge.textContent = `${userItems.length} usuarios`;
+            } else {
+                // Caso Asíncrono (Fetch): Asegurar spinner visible y disparar petición
+                if (!placeholder && listaUsuarios) {
+                    listaUsuarios.innerHTML = `
+                        <div class="text-center py-5 text-muted" id="chatUsuariosLoadingPlaceholder">
+                            <div class="spinner-border spinner-border-sm text-primary mb-2" role="status"></div>
+                            <p class="small mb-0">Cargando directorio de usuarios...</p>
+                        </div>
+                    `;
+                } else if (placeholder) {
+                    placeholder.style.display = '';
+                }
+                if (counterBadge) counterBadge.textContent = 'Cargando...';
+                buscarUsuariosChat(searchInput ? searchInput.value : '');
+            }
+        } else {
+            if (btnColegios) btnColegios.classList.add('active');
+            if (btnUsuarios) btnUsuarios.classList.remove('active');
+            if (listaColegios) listaColegios.classList.remove('d-none');
+            if (listaUsuarios) listaUsuarios.classList.add('d-none');
+            if (searchInput) searchInput.placeholder = "Buscar por colegio, ciudad o admin...";
+            if (counterBadge) {
+                counterBadge.textContent = `${chatColegiosCache.length} colegios`;
+            }
+            if (chatColegiosCache.length === 0) {
+                buscarColegiosChat('');
+            }
+        }
+    }
+
+    function handleUsuarioClick(itemOrId) {
+        let item = null;
+        let userId = null;
+
+        if (typeof itemOrId === 'string' || typeof itemOrId === 'number') {
+            userId = String(itemOrId);
+            item = document.querySelector(
+                `#lista-usuarios [data-chat-id="${userId}"], ` +
+                `#lista-usuarios [data-usuario-id="${userId}"], ` +
+                `#lista-usuarios [data-id="${userId}"]`
+            );
+        } else if (itemOrId && itemOrId.nodeType) {
+            item = itemOrId;
+            userId = item.getAttribute('data-chat-id') || item.getAttribute('data-usuario-id') || item.getAttribute('data-id');
+        }
+
+        if (!item && userId) {
+            cargarUsuarioDirecto(userId);
+            return;
+        }
+
+        if (!item) return;
+
+        document.querySelectorAll('#lista-usuarios .chat-contact-item').forEach(el => el.classList.remove('active'));
+        item.classList.add('active');
+
+        const nombre = item.getAttribute('data-nombre') || item.querySelector('.chat-contact-title')?.textContent?.trim() || 'Usuario';
+        const email = item.getAttribute('data-email') || '';
+        const rol = item.getAttribute('data-rol') || 'Usuario';
+        const colegio = item.getAttribute('data-colegio') || 'Eduteka';
+        const iniciales = item.getAttribute('data-iniciales') || item.querySelector('.chat-contact-avatar')?.textContent?.trim() || 'US';
+
+        seleccionarUsuarioChat({
+            id: userId,
+            nombre: nombre,
+            email: email,
+            rol: rol,
+            colegio: colegio,
+            iniciales: iniciales
+        });
+    }
+
+    function seleccionarUsuarioChat(usuario) {
+        if (!usuario) return;
+        currentActiveUserId = String(usuario.id);
+        currentChatType = 'usuario';
+
+        const nameEl = document.getElementById('chatActiveSchoolName');
+        const adminEl = document.getElementById('chatActiveAdminName');
+        const locationEl = document.getElementById('chatActiveLocation');
+        const avatarEl = document.getElementById('chatActiveAvatar');
+        const hiddenIdInput = document.getElementById('globalChatActiveColegioId');
+        const inputField = document.getElementById('globalChatInputField');
+
+        if (nameEl) nameEl.textContent = usuario.nombre;
+        if (adminEl) adminEl.textContent = `Rol: ${usuario.rol} · ${usuario.email || ''}`;
+        if (locationEl) locationEl.textContent = usuario.colegio || 'Eduteka Global';
+        if (avatarEl) {
+            avatarEl.textContent = usuario.iniciales || '👤';
+            avatarEl.style.background = 'linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%)';
+        }
+        if (hiddenIdInput) hiddenIdInput.value = usuario.id;
+        if (inputField) inputField.placeholder = `Escribe un mensaje a ${usuario.nombre.split(' ')[0]}...`;
+
+        const contactsCol = document.getElementById('chatContactsCol');
+        const convoCol = document.getElementById('chatConversationCol');
+        if (contactsCol && convoCol && window.innerWidth < 768) {
+            contactsCol.classList.add('mobile-hide');
+            convoCol.classList.add('mobile-show');
+        }
+
+        cargarHistorialMensajesUsuario(usuario);
+    }
+
+    function cargarHistorialMensajesUsuario(usuario) {
+        const box = document.getElementById('globalChatMessagesBox');
+        if (!box) return;
+
+        const primerNombre = usuario.nombre.split(' ')[0];
+
+        box.innerHTML = `
+            <div class="text-center my-1">
+                <span class="badge bg-white text-muted border rounded-pill px-3 py-1 shadow-xs" style="font-size: 0.7rem; font-weight: 600;">
+                    <i class="bi bi-shield-lock-fill text-primary me-1"></i> Canal Directo Super Admin ↔ ${escapeHtmlGlobal(usuario.nombre)} (${escapeHtmlGlobal(usuario.rol)})
+                </span>
+            </div>
+
+            <div class="d-flex align-items-start gap-2 chat-bubble-received">
+                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: rgba(124, 92, 252, 0.15); color: var(--primary, #7C5CFC); font-size: 0.85rem; font-weight: 700;">
+                    ${escapeHtmlGlobal(usuario.iniciales || 'U')}
+                </div>
+                <div>
+                    <div class="p-3 rounded-4 bg-white border shadow-xs text-dark" style="border-top-left-radius: 4px !important; font-size: 0.86rem; line-height: 1.45;">
+                        <div class="fw-bold mb-1" style="font-size: 0.74rem; color: var(--primary, #7C5CFC);">
+                            ${escapeHtmlGlobal(usuario.nombre)}
+                        </div>
+                        Hola equipo de soporte Eduteka, tengo una duda sobre la actualización de las nóminas de este período en ${escapeHtmlGlobal(usuario.colegio || 'el colegio')}.
+                    </div>
+                    <div class="text-muted small mt-1 ms-1" style="font-size: 0.68rem;">
+                        Hoy · Recibido
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex align-items-start justify-content-end gap-2 ms-auto chat-bubble-sent">
+                <div>
+                    <div class="p-3 rounded-4 text-white shadow-sm" style="background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%); border-top-right-radius: 4px !important; font-size: 0.86rem; line-height: 1.45; box-shadow: 0 4px 14px rgba(124, 92, 252, 0.2) !important;">
+                        <div class="fw-bold mb-1 text-white-50" style="font-size: 0.74rem;">
+                            Super Admin Eduteka
+                        </div>
+                        ¡Hola ${escapeHtmlGlobal(primerNombre)}! Con gusto te apoyamos. ¿Nos confirmas si ya cargaron la planilla CSV de estudiantes o requieres que revisemos los permisos de tu perfil?
+                    </div>
+                    <div class="text-end text-muted small mt-1 me-1" style="font-size: 0.68rem;">
+                        Hoy · <i class="bi bi-check2-all" style="color: var(--primary, #7C5CFC) !important;"></i>
+                    </div>
+                </div>
+                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%); color: white; font-size: 0.85rem;">
+                    <i class="bi bi-headset"></i>
+                </div>
+            </div>
+        `;
+
+        setTimeout(() => {
+            box.scrollTop = box.scrollHeight;
+        }, 50);
+    }
+
+    async function buscarUsuariosChat(termino = '') {
+        const listaUsuarios = document.getElementById('lista-usuarios');
+        const counterBadge = document.getElementById('chatContactsCounter');
+        if (!listaUsuarios) return;
+
+        // Asegurar que el contenedor sea visible
+        listaUsuarios.classList.remove('d-none');
+
+        const items = listaUsuarios.querySelectorAll('.chat-user-item');
+        if (items.length > 0 && !termino) {
+            items.forEach(it => it.style.display = '');
+            const placeholder = document.getElementById('chatUsuariosLoadingPlaceholder');
+            if (placeholder) placeholder.style.display = 'none';
+            if (counterBadge) counterBadge.textContent = `${items.length} usuarios`;
+            return;
+        }
+
+        if (items.length > 0 && termino) {
+            let vis = 0;
+            const term = termino.toLowerCase();
+            items.forEach(it => {
+                const text = it.textContent.toLowerCase();
+                const show = text.includes(term);
+                it.style.display = show ? '' : 'none';
+                if (show) vis++;
+            });
+            if (counterBadge) counterBadge.textContent = `${vis} encontrados`;
+            return;
+        }
+
+        // Si no hay usuarios en el DOM, asegurar que el spinner esté visible
+        let placeholder = document.getElementById('chatUsuariosLoadingPlaceholder');
+        if (!placeholder) {
+            listaUsuarios.innerHTML = `
+                <div class="text-center py-5 text-muted" id="chatUsuariosLoadingPlaceholder">
+                    <div class="spinner-border spinner-border-sm text-primary mb-2" role="status"></div>
+                    <p class="small mb-0">Cargando directorio de usuarios...</p>
+                </div>
+            `;
+        } else {
+            placeholder.style.display = '';
+        }
+
+        try {
+            // URL Absoluta con etiqueta de Django y rutas de respaldo
+            const primaryUrl = `{% url 'api_buscar_usuarios_chat' %}?q=${encodeURIComponent(termino)}`;
+            let resp = await fetch(primaryUrl);
+            if (!resp.ok) {
+                resp = await fetch(`/dashboard/superadmin/api/chat/usuarios/?q=${encodeURIComponent(termino)}`);
+            }
+            if (!resp.ok) {
+                resp = await fetch(`/superadmin/api/chat/usuarios/?q=${encodeURIComponent(termino)}`);
+            }
+            if (!resp.ok) throw new Error(`Error ${resp.status} al consultar usuarios`);
+
+            const data = await resp.json();
+            const usuarios = data.usuarios || [];
+
+            // Ocultar/Remover el spinner
+            const ph = document.getElementById('chatUsuariosLoadingPlaceholder');
+            if (ph) ph.remove();
+
+            if (counterBadge) {
+                counterBadge.textContent = `${usuarios.length} ${usuarios.length === 1 ? 'usuario' : 'usuarios'}`;
+            }
+
+            if (usuarios.length === 0) {
+                listaUsuarios.innerHTML = `
+                    <div class="text-center py-5 px-3 text-muted">
+                        <i class="bi bi-search fs-3 text-muted opacity-50 d-block mb-2"></i>
+                        <p class="fw-semibold mb-1 small text-dark">No se encontraron usuarios</p>
+                        <p class="small text-muted mb-0">Prueba con otro término de búsqueda.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            usuarios.forEach(u => {
+                const isActive = currentActiveUserId === String(u.id);
+                html += `
+                    <div class="chat-contact-item chat-user-item ${isActive ? 'active' : ''}" 
+                         data-chat-id="${u.id}"
+                         data-usuario-id="${u.id}"
+                         data-id="${u.id}"
+                         data-nombre="${escapeHtmlGlobal(u.nombre)}"
+                         data-email="${escapeHtmlGlobal(u.email)}"
+                         data-rol="${escapeHtmlGlobal(u.rol)}"
+                         data-colegio="${escapeHtmlGlobal(u.colegio)}"
+                         data-iniciales="${escapeHtmlGlobal(u.iniciales)}"
+                         onclick="handleUsuarioClick(this)">
+                        <div class="chat-contact-avatar" style="background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%);">
+                            ${escapeHtmlGlobal(u.iniciales)}
+                        </div>
+                        <div class="flex-grow-1 min-w-0">
+                            <div class="d-flex align-items-center justify-content-between mb-0.5">
+                                <span class="chat-contact-title text-truncate">${escapeHtmlGlobal(u.nombre)}</span>
+                                <span class="chat-contact-time flex-shrink-0 ms-1 text-muted" style="font-size: 0.68rem;">
+                                    <i class="bi bi-circle-fill text-success" style="font-size: 0.5rem;" title="Activo"></i>
+                                </span>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span class="chat-contact-snippet text-truncate text-muted">${escapeHtmlGlobal(u.colegio)}</span>
+                                <span class="badge rounded-pill flex-shrink-0 ms-1" style="font-size: 0.64rem; background: rgba(124, 92, 252, 0.1); color: var(--primary, #7C5CFC);">
+                                    ${escapeHtmlGlobal(u.rol)}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            listaUsuarios.innerHTML = html;
+        } catch (e) {
+            console.error("Error cargando usuarios en chat:", e);
+            // Garantizar que el spinner se oculte y mostrar estado de error amigable con reintento
+            listaUsuarios.innerHTML = `
+                <div class="text-center py-5 px-3 text-muted">
+                    <i class="bi bi-exclamation-circle text-danger fs-3 d-block mb-2"></i>
+                    <p class="fw-semibold mb-1 small text-dark">No se pudo cargar la lista de usuarios</p>
+                    <p class="small text-muted mb-3">Ocurrió un error de conexión con el servidor.</p>
+                    <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="buscarUsuariosChat('')">
+                        <i class="bi bi-arrow-clockwise me-1"></i> Reintentar
+                    </button>
+                </div>
+            `;
+            if (counterBadge) counterBadge.textContent = 'Error';
+        }
+    }
+
+    async function cargarUsuarioDirecto(userId) {
+        try {
+            const primaryUrl = `{% url 'api_buscar_usuarios_chat' %}?id=${userId}`;
+            let resp = await fetch(primaryUrl);
+            if (!resp.ok) {
+                resp = await fetch(`/dashboard/superadmin/api/chat/usuarios/?id=${userId}`);
+            }
+            if (!resp.ok) {
+                resp = await fetch(`/superadmin/api/chat/usuarios/?id=${userId}`);
+            }
+            if (!resp.ok) return;
+            const data = await resp.json();
+            if (data.usuarios && data.usuarios.length > 0) {
+                const u = data.usuarios[0];
+                const listaUsuarios = document.getElementById('lista-usuarios');
+                if (listaUsuarios) {
+                    const placeholder = document.getElementById('chatUsuariosLoadingPlaceholder');
+                    if (placeholder) placeholder.remove();
+
+                    let el = listaUsuarios.querySelector(`[data-chat-id="${u.id}"]`);
+                    if (!el) {
+                        el = document.createElement('div');
+                        el.className = 'chat-contact-item chat-user-item active';
+                        el.setAttribute('data-chat-id', u.id);
+                        el.setAttribute('data-usuario-id', u.id);
+                        el.setAttribute('data-id', u.id);
+                        el.setAttribute('data-nombre', u.nombre);
+                        el.setAttribute('data-email', u.email);
+                        el.setAttribute('data-rol', u.rol);
+                        el.setAttribute('data-colegio', u.colegio);
+                        el.setAttribute('data-iniciales', u.iniciales);
+                        el.onclick = function() { handleUsuarioClick(this); };
+                        el.innerHTML = `
+                            <div class="chat-contact-avatar" style="background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%);">
+                                ${escapeHtmlGlobal(u.iniciales)}
+                            </div>
+                            <div class="flex-grow-1 min-w-0">
+                                <div class="d-flex align-items-center justify-content-between mb-0.5">
+                                    <span class="chat-contact-title text-truncate">${escapeHtmlGlobal(u.nombre)}</span>
+                                    <span class="chat-contact-time flex-shrink-0 ms-1 text-muted" style="font-size: 0.68rem;">
+                                        <i class="bi bi-circle-fill text-success" style="font-size: 0.5rem;" title="Activo"></i>
+                                    </span>
+                                </div>
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="chat-contact-snippet text-truncate text-muted">${escapeHtmlGlobal(u.colegio)}</span>
+                                    <span class="badge rounded-pill flex-shrink-0 ms-1" style="font-size: 0.64rem; background: rgba(124, 92, 252, 0.1); color: var(--primary, #7C5CFC);">
+                                        ${escapeHtmlGlobal(u.rol)}
+                                    </span>
+                                </div>
+                            </div>
+                        `;
+                        listaUsuarios.prepend(el);
+                    }
+                    seleccionarUsuarioChat(u);
+                }
+            }
+        } catch (e) {
+            console.error("Error al cargar usuario directo:", e);
+        }
+    }
+
     // Exportar funciones para acceso global
     window.handleColegioClick = handleColegioClick;
     window.seleccionarColegioChat = seleccionarColegioChat;
@@ -929,6 +1451,12 @@
     window.renderizarMensajes = renderizarMensajes;
     window.sendGlobalChatMessage = sendGlobalChatMessage;
     window.buscarColegiosChat = buscarColegiosChat;
+    window.switchChatTab = switchChatTab;
+    window.handleUsuarioClick = handleUsuarioClick;
+    window.seleccionarUsuarioChat = seleccionarUsuarioChat;
+    window.buscarUsuariosChat = buscarUsuariosChat;
+    window.cargarHistorialMensajesUsuario = cargarHistorialMensajesUsuario;
+    window.cargarUsuarioDirecto = cargarUsuarioDirecto;
 
     // ── Inicialización de Eventos del Chat ─────────────────────────────────────
     document.addEventListener('DOMContentLoaded', function () {
@@ -936,9 +1464,39 @@
         const searchInput = document.getElementById('chatContactSearchInput');
         const backBtn = document.getElementById('chatMobileBackBtn');
         const listContainer = document.getElementById('chatContactsListContainer');
+        const userListContainer = document.getElementById('lista-usuarios');
         const chatForm = document.getElementById('globalChatForm');
         const sendBtn = document.getElementById('globalChatBtnSend');
         const inputField = document.getElementById('globalChatInputField');
+        const tabBtnColegios = document.getElementById('tabBtnColegios');
+        const tabBtnUsuarios = document.getElementById('tabBtnUsuarios');
+
+        // Eventos activos en botones de pestañas
+        if (tabBtnColegios) {
+            tabBtnColegios.addEventListener('click', function (e) {
+                e.preventDefault();
+                switchChatTab('colegios');
+            });
+        }
+        if (tabBtnUsuarios) {
+            tabBtnUsuarios.addEventListener('click', function (e) {
+                e.preventDefault();
+                switchChatTab('usuarios');
+            });
+        }
+
+        // Delegación global para tabs de chat (resiliente ante cualquier cambio del DOM)
+        document.addEventListener('click', function (e) {
+            const btn = e.target.closest('#tabBtnUsuarios, #tabBtnColegios');
+            if (btn) {
+                e.preventDefault();
+                if (btn.id === 'tabBtnUsuarios') {
+                    switchChatTab('usuarios');
+                } else if (btn.id === 'tabBtnColegios') {
+                    switchChatTab('colegios');
+                }
+            }
+        });
 
         // Delegación de clics en la lista de colegios (máxima reactividad)
         if (listContainer) {
@@ -949,6 +1507,16 @@
                     if (id) {
                         handleColegioClick(id);
                     }
+                }
+            });
+        }
+
+        // Delegación de clics en la lista de usuarios
+        if (userListContainer) {
+            userListContainer.addEventListener('click', function (e) {
+                const item = e.target.closest('.chat-contact-item');
+                if (item) {
+                    handleUsuarioClick(item);
                 }
             });
         }
@@ -975,10 +1543,14 @@
             });
         }
 
-        // Búsqueda en vivo con debounce de 300ms
+        // Búsqueda en vivo con debounce de 300ms según la pestaña activa
         if (searchInput) {
             const debouncedSearch = debounceChat(function (query) {
-                buscarColegiosChat(query);
+                if (chatActiveTab === 'usuarios') {
+                    buscarUsuariosChat(query);
+                } else {
+                    buscarColegiosChat(query);
+                }
             }, 300);
 
             searchInput.addEventListener('input', function (e) {
@@ -1001,9 +1573,9 @@
         // Cargar colegios e iniciar chat al abrir el offcanvas
         if (offcanvasEl) {
             offcanvasEl.addEventListener('show.bs.offcanvas', function () {
-                if (chatColegiosCache.length === 0) {
+                if (chatColegiosCache.length === 0 && chatActiveTab === 'colegios') {
                     buscarColegiosChat('');
-                } else if (currentActiveColegioId) {
+                } else if (currentActiveColegioId && chatActiveTab === 'colegios') {
                     const activeCol = chatColegiosCache.find(c => c.id === currentActiveColegioId);
                     if (activeCol) {
                         cargarHistorialMensajes(activeCol.id, activeCol.nombre);
@@ -1015,6 +1587,47 @@
                 if (box) box.scrollTop = box.scrollHeight;
                 if (searchInput) searchInput.focus();
             });
+        }
+
+        // ── Lógica de Recepción de Parámetros URL (tab=usuarios & chat_id=...) ──
+        const urlParams = new URLSearchParams(window.location.search);
+        const tabParam = urlParams.get('tab');
+        const chatIdParam = urlParams.get('chat_id');
+
+        if (tabParam === 'usuarios' || chatIdParam) {
+            // Abrir automáticamente el Offcanvas global si está disponible
+            if (offcanvasEl && typeof bootstrap !== 'undefined' && bootstrap.Offcanvas) {
+                const bsOffcanvas = bootstrap.Offcanvas.getOrCreateInstance(offcanvasEl);
+                bsOffcanvas.show();
+            }
+
+            // Si el parámetro tab es igual a usuarios, simular clic en la pestaña 'Usuarios'
+            if (tabParam === 'usuarios') {
+                const tabBtnUsuarios = document.getElementById('tabBtnUsuarios');
+                if (tabBtnUsuarios) {
+                    tabBtnUsuarios.click();
+                } else {
+                    switchChatTab('usuarios');
+                }
+            }
+
+            // Si existe el parámetro chat_id, buscar el elemento y simular un clic
+            if (chatIdParam) {
+                setTimeout(() => {
+                    const targetEl = document.querySelector(
+                        `#lista-usuarios [data-chat-id="${chatIdParam}"], ` +
+                        `#lista-usuarios [data-usuario-id="${chatIdParam}"], ` +
+                        `#lista-usuarios [data-id="${chatIdParam}"]`
+                    );
+
+                    if (targetEl) {
+                        targetEl.click();
+                        targetEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    } else {
+                        cargarUsuarioDirecto(chatIdParam);
+                    }
+                }, 350);
+            }
         }
     });
 
