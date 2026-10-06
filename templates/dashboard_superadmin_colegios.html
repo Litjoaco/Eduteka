@@ -329,8 +329,8 @@
                         <a href="?estado=inactivos{% if q %}&q={{ q }}{% endif %}{% if plan_filtro %}&plan={{ plan_filtro }}{% endif %}" class="filter-pill {% if estado_filtro == 'inactivos' %}active{% endif %}">Inactivos</a>
                     </div>
                     <div>
-                        <select class="form-select form-select-sm rounded-pill px-3 border" onchange="location = this.value;" style="width: auto;">
-                            <option value="?plan=todos{% if q %}&q={{ q }}{% endif %}{% if estado_filtro %}&estado={{ estado_filtro }}{% endif %}" {% if not plan_filtro or plan_filtro == 'todos' %}selected{% endif %}>Filtrar por Plan (Todos)</option>
+                        <select class="form-select form-select-sm rounded-pill ps-3 pe-4 border" onchange="location = this.value;" style="width: auto;">
+                            <option value="?plan=todos{% if q %}&q={{ q }}{% endif %}{% if estado_filtro %}&estado={{ estado_filtro }}{% endif %}" {% if not plan_filtro or plan_filtro == 'todos' %}selected{% endif %}>Filtrar por Plan</option>
                             {% for p in planes %}
                             <option value="?plan={{ p.id }}{% if q %}&q={{ q }}{% endif %}{% if estado_filtro %}&estado={{ estado_filtro }}{% endif %}" {% if plan_filtro == p.id|stringformat:"s" %}selected{% endif %}>{{ p.nombre }}</option>
                             {% endfor %}

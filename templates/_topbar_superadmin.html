@@ -617,6 +617,15 @@
     let chatUsuariosCache = [];
     let chatDrafts = {};             // Diccionario de borradores por ID: { [usuarioId]: 'texto' }
     let chatHistory = {};            // Diccionario de historial dinámico por ID: { [usuarioId]: '<burbujas>' }
+    let pollingInterval = null;      // Control de Short Polling en tiempo real para chat de usuarios
+
+    // Helper: Detener Short Polling de mensajes de usuario
+    function detenerPolling() {
+        if (pollingInterval) {
+            clearInterval(pollingInterval);
+            pollingInterval = null;
+        }
+    }
 
     // Helper: Debounce de búsqueda (300ms)
     function debounceChat(func, delay = 300) {
@@ -779,6 +788,9 @@
 
     async function seleccionarColegioChat(colegio) {
         if (!colegio) return;
+
+        // Detener polling activo de usuarios al pasar a un colegio
+        detenerPolling();
 
         // Guardar estado al salir si previamente había un usuario activo
         if (currentChatType === 'usuario' && currentActiveUserId) {
@@ -1032,6 +1044,9 @@
                 // Dibujar instantáneamente la nueva burbuja en el DOM
                 const msgDiv = document.createElement('div');
                 msgDiv.className = 'd-flex align-items-start justify-content-end gap-2 ms-auto chat-bubble-sent';
+                if (m && m.id) {
+                    msgDiv.setAttribute('data-mensaje-id', m.id);
+                }
                 msgDiv.innerHTML = `
                     <div>
                         <div class="p-3 rounded-4 text-white shadow-sm" style="background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%); border-top-right-radius: 4px !important; font-size: 0.86rem; line-height: 1.45; box-shadow: 0 4px 14px rgba(124, 92, 252, 0.2) !important;">
@@ -1207,6 +1222,9 @@
                 buscarUsuariosChat(searchInput ? searchInput.value : '');
             }
         } else {
+            // Detener polling de usuario al cambiar a la pestaña de colegios
+            detenerPolling();
+
             if (btnColegios) btnColegios.classList.add('active');
             if (btnUsuarios) btnUsuarios.classList.remove('active');
             if (listaColegios) listaColegios.classList.remove('d-none');
@@ -1265,6 +1283,10 @@
 
     function seleccionarUsuarioChat(usuario) {
         if (!usuario) return;
+
+        // Limpiar cualquier polling activo al cambiar de conversación
+        detenerPolling();
+
         const nuevoUsuarioId = String(usuario.id);
         const inputField = document.getElementById('globalChatInputField');
         const box = document.getElementById('globalChatMessagesBox');
@@ -1318,13 +1340,65 @@
         }
     }
 
+    // Helper: Generador de burbujas HTML para mensajes de usuarios (mantiene coherencia visual)
+    function crearBurbujaMensajeUsuarioHTML(m, usuario) {
+        const esMio = (m.tipo === 'mio' || m.es_mio);
+        const hora = m.hora || '';
+        const nombre = (usuario && usuario.nombre) || 'Usuario';
+        const iniciales = (usuario && usuario.iniciales) || 'US';
+        const msgIdAttr = m.id ? `data-mensaje-id="${m.id}"` : '';
+
+        if (esMio) {
+            return `
+                <div class="d-flex align-items-start justify-content-end gap-2 ms-auto chat-bubble-sent" ${msgIdAttr}>
+                    <div>
+                        <div class="p-3 rounded-4 text-white shadow-sm" style="background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%); border-top-right-radius: 4px !important; font-size: 0.86rem; line-height: 1.45; box-shadow: 0 4px 14px rgba(124, 92, 252, 0.2) !important;">
+                            <div class="fw-bold mb-1 text-white-50" style="font-size: 0.74rem;">
+                                Super Admin Eduteka
+                            </div>
+                            ${escapeHtmlGlobal(m.contenido)}
+                        </div>
+                        <div class="text-end text-muted small mt-1 me-1" style="font-size: 0.68rem;">
+                            ${escapeHtmlGlobal(hora)} · <i class="bi bi-check2-all" style="color: var(--primary, #7C5CFC) !important;"></i>
+                        </div>
+                    </div>
+                    <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%); color: white; font-size: 0.85rem;">
+                        <i class="bi bi-headset"></i>
+                    </div>
+                </div>
+            `;
+        } else {
+            return `
+                <div class="d-flex align-items-start gap-2 chat-bubble-received" ${msgIdAttr}>
+                    <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: rgba(124, 92, 252, 0.15); color: var(--primary, #7C5CFC); font-size: 0.85rem; font-weight: 700;">
+                        ${escapeHtmlGlobal(iniciales)}
+                    </div>
+                    <div>
+                        <div class="p-3 rounded-4 bg-white border shadow-xs text-dark" style="border-top-left-radius: 4px !important; font-size: 0.86rem; line-height: 1.45;">
+                            <div class="fw-bold mb-1" style="font-size: 0.74rem; color: var(--primary, #7C5CFC);">
+                                ${escapeHtmlGlobal(nombre)}
+                            </div>
+                            ${escapeHtmlGlobal(m.contenido)}
+                        </div>
+                        <div class="text-muted small mt-1 ms-1" style="font-size: 0.68rem;">
+                            ${escapeHtmlGlobal(hora)} · Recibido
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    }
+
     async function cargarHistorialMensajesUsuario(usuario) {
         const box = document.getElementById('globalChatMessagesBox');
         if (!box || !usuario) return;
 
+        // Limpieza: Detener cualquier polling previo antes de iniciar una nueva consulta
+        detenerPolling();
+
         const userId = String(usuario.id);
 
-        // Limpiar el contenedor y mostrar spinner de carga
+        // Limpiar el contenedor y mostrar spinner de carga inicial
         box.innerHTML = `
             <div class="text-center py-5 my-auto text-muted">
                 <div class="spinner-border spinner-border-sm text-primary mb-2" role="status"></div>
@@ -1351,7 +1425,95 @@
             const data = await resp.json();
             const mensajes = data.mensajes || [];
 
+            // 1. Pintar el historial inicial completo
             renderizarMensajesUsuario(mensajes, usuario);
+
+            // 2. Inicio del Polling (Short Polling cada 3000ms / 3 segundos)
+            let isPollingFetching = false;
+            pollingInterval = setInterval(async () => {
+                // Prevenir peticiones concurrentes solapadas
+                if (isPollingFetching) return;
+
+                const currentBox = document.getElementById('globalChatMessagesBox');
+                // Si el contenedor no existe o el admin cambió de chat/pestaña, cancelar polling
+                if (!currentBox || currentChatType !== 'usuario' || String(currentActiveUserId) !== userId) {
+                    detenerPolling();
+                    return;
+                }
+
+                isPollingFetching = true;
+                try {
+                    // Actualización silenciosa al mismo endpoint
+                    let pollResp = await fetch(urlPrimaria);
+                    if (!pollResp.ok) {
+                        pollResp = await fetch(`/dashboard/superadmin/api/chat/usuarios/${userId}/mensajes/`);
+                    }
+                    if (!pollResp.ok) {
+                        pollResp = await fetch(`/superadmin/api/chat/usuarios/${userId}/mensajes/`);
+                    }
+
+                    if (!pollResp.ok) return;
+
+                    // Si el usuario navegó a otro contacto mientras la petición respondía, abortar
+                    if (currentChatType !== 'usuario' || String(currentActiveUserId) !== userId) {
+                        return;
+                    }
+
+                    const pollData = await pollResp.json();
+                    const mensajesServidor = pollData.mensajes || [];
+
+                    // Comparar cantidad de mensajes en el DOM vs JSON del servidor
+                    const burbujasEnDOM = currentBox.querySelectorAll('.chat-bubble-sent, .chat-bubble-received');
+                    const cantidadEnDOM = burbujasEnDOM.length;
+
+                    // Si el servidor trae más mensajes que los que ya están en pantalla
+                    if (mensajesServidor.length > cantidadEnDOM) {
+                        // Scroll Inteligente (UX): Evaluar si el admin estaba cerca del final ANTES de anexar
+                        const umbralFondo = 150; // Tolerancia de 150px
+                        const distanciaDelFondo = currentBox.scrollHeight - (currentBox.scrollTop + currentBox.clientHeight);
+                        const estabaCercaDelFondo = distanciaDelFondo <= umbralFondo;
+
+                        // Si la conversación estaba vacía con aviso de bienvenida, removerlo
+                        const emptyNotice = currentBox.querySelector('.bi-chat-heart-fill, .bi-chat-dots-fill');
+                        if (emptyNotice) {
+                            currentBox.innerHTML = `
+                                <div class="text-center my-1">
+                                    <span class="badge bg-white text-muted border rounded-pill px-3 py-1 shadow-xs" style="font-size: 0.7rem; font-weight: 600;">
+                                        <i class="bi bi-shield-lock-fill text-primary me-1"></i> Canal Directo Super Admin ↔ ${escapeHtmlGlobal(usuario.nombre)} (${escapeHtmlGlobal(usuario.rol)})
+                                    </span>
+                                </div>
+                            `;
+                        }
+
+                        // Anexar ÚNICAMENTE las nuevas burbujas al final sin rehacer el DOM
+                        const nuevosMensajes = mensajesServidor.slice(cantidadEnDOM);
+                        const fragmento = document.createDocumentFragment();
+
+                        nuevosMensajes.forEach(m => {
+                            // Protección adicional contra duplicados por ID
+                            if (m.id && currentBox.querySelector(`[data-mensaje-id="${m.id}"]`)) {
+                                return;
+                            }
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = crearBurbujaMensajeUsuarioHTML(m, usuario).trim();
+                            if (tempDiv.firstElementChild) {
+                                fragmento.appendChild(tempDiv.firstElementChild);
+                            }
+                        });
+
+                        currentBox.appendChild(fragmento);
+
+                        // Scroll Inteligente: hacer auto-scroll SOLO si ya estaba cerca del final
+                        if (estabaCercaDelFondo) {
+                            currentBox.scrollTop = currentBox.scrollHeight;
+                        }
+                    }
+                } catch (pollErr) {
+                    console.warn('Error en short polling silencioso de usuario:', pollErr);
+                } finally {
+                    isPollingFetching = false;
+                }
+            }, 3000);
 
         } catch (err) {
             console.error('Error cargando historial de usuario:', err);
@@ -1374,7 +1536,6 @@
 
         const nombre = usuario.nombre || 'Usuario';
         const rol = usuario.rol || 'Usuario';
-        const iniciales = usuario.iniciales || 'US';
 
         if (!mensajes || mensajes.length === 0) {
             box.innerHTML = `
@@ -1400,53 +1561,12 @@
         `;
 
         mensajes.forEach(m => {
-            const esMio = (m.tipo === 'mio' || m.es_mio);
-            const hora = m.hora || '';
-
-            if (esMio) {
-                html += `
-                    <div class="d-flex align-items-start justify-content-end gap-2 ms-auto chat-bubble-sent">
-                        <div>
-                            <div class="p-3 rounded-4 text-white shadow-sm" style="background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%); border-top-right-radius: 4px !important; font-size: 0.86rem; line-height: 1.45; box-shadow: 0 4px 14px rgba(124, 92, 252, 0.2) !important;">
-                                <div class="fw-bold mb-1 text-white-50" style="font-size: 0.74rem;">
-                                    Super Admin Eduteka
-                                </div>
-                                ${escapeHtmlGlobal(m.contenido)}
-                            </div>
-                            <div class="text-end text-muted small mt-1 me-1" style="font-size: 0.68rem;">
-                                ${escapeHtmlGlobal(hora)} · <i class="bi bi-check2-all" style="color: var(--primary, #7C5CFC) !important;"></i>
-                            </div>
-                        </div>
-                        <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%); color: white; font-size: 0.85rem;">
-                            <i class="bi bi-headset"></i>
-                        </div>
-                    </div>
-                `;
-            } else {
-                html += `
-                    <div class="d-flex align-items-start gap-2 chat-bubble-received">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: rgba(124, 92, 252, 0.15); color: var(--primary, #7C5CFC); font-size: 0.85rem; font-weight: 700;">
-                            ${escapeHtmlGlobal(iniciales)}
-                        </div>
-                        <div>
-                            <div class="p-3 rounded-4 bg-white border shadow-xs text-dark" style="border-top-left-radius: 4px !important; font-size: 0.86rem; line-height: 1.45;">
-                                <div class="fw-bold mb-1" style="font-size: 0.74rem; color: var(--primary, #7C5CFC);">
-                                    ${escapeHtmlGlobal(nombre)}
-                                </div>
-                                ${escapeHtmlGlobal(m.contenido)}
-                            </div>
-                            <div class="text-muted small mt-1 ms-1" style="font-size: 0.68rem;">
-                                ${escapeHtmlGlobal(hora)} · Recibido
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
+            html += crearBurbujaMensajeUsuarioHTML(m, usuario);
         });
 
         box.innerHTML = html;
 
-        // Auto-scroll al fondo
+        // Auto-scroll al fondo al cargar historial inicial
         setTimeout(() => {
             box.scrollTop = box.scrollHeight;
         }, 50);
@@ -1655,6 +1775,7 @@
     window.buscarUsuariosChat = buscarUsuariosChat;
     window.cargarHistorialMensajesUsuario = cargarHistorialMensajesUsuario;
     window.cargarUsuarioDirecto = cargarUsuarioDirecto;
+    window.detenerPolling = detenerPolling;
     window.chatDrafts = chatDrafts;
     window.chatHistory = chatHistory;
 
@@ -1791,6 +1912,12 @@
                 const box = document.getElementById('globalChatMessagesBox');
                 if (box) box.scrollTop = box.scrollHeight;
                 if (searchInput) searchInput.focus();
+            });
+            offcanvasEl.addEventListener('hide.bs.offcanvas', function () {
+                detenerPolling();
+            });
+            offcanvasEl.addEventListener('hidden.bs.offcanvas', function () {
+                detenerPolling();
             });
         }
 
