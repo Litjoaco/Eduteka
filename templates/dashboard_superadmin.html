@@ -545,7 +545,7 @@
                                     <li><a class="dropdown-item filtro-rango py-1.5 active" href="#" data-rango="30dias"><i class="bi bi-calendar-event me-2 text-muted"></i>Últimos 30 días</a></li>
                                     <li><hr class="dropdown-divider my-1"></li>
                                     <li><a class="dropdown-item filtro-rango py-1.5" href="#" data-rango="este_ano"><i class="bi bi-calendar-check me-2 text-muted"></i>Este Año</a></li>
-                                    <li><a class="dropdown-item filtro-rango py-1.5" href="#" data-rango="ano_anterior"><i class="bi bi-calendar-x me-2 text-muted"></i>Año Anterior</a></li>
+                                    <li><a class="dropdown-item filtro-rango py-1.5" href="#" data-rango="ultimos_5_anos"><i class="bi bi-bar-chart-steps me-2 text-muted"></i>Últimos 5 años</a></li>
                                     <li><hr class="dropdown-divider my-1"></li>
                                     <li><a class="dropdown-item filtro-rango py-1.5" href="#" data-rango="historico"><i class="bi bi-infinity me-2 text-muted"></i>Histórico</a></li>
                                 </ul>
@@ -1078,17 +1078,17 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    filtroLinks.forEach(link => {
-        link.addEventListener('click', function (e) {
-            e.preventDefault();
-            const rango = this.getAttribute('data-rango');
+    document.addEventListener('click', function (e) {
+        const link = e.target.closest('.filtro-rango');
+        if (!link) return;
+        e.preventDefault();
+        const rango = link.getAttribute('data-rango');
 
-            filtroLinks.forEach(l => l.classList.remove('active'));
-            this.classList.add('active');
-            if (labelActivo) labelActivo.textContent = this.textContent.trim();
+        document.querySelectorAll('.filtro-rango').forEach(l => l.classList.remove('active'));
+        link.classList.add('active');
+        if (labelActivo) labelActivo.textContent = link.textContent.trim();
 
-            cargarDatosIngresos(rango);
-        });
+        cargarDatosIngresos(rango);
     });
 
     // Carga inicial dinámica con el filtro por defecto (30 días)

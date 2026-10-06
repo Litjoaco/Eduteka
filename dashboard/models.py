@@ -119,9 +119,10 @@ class SolicitudNuevoColegio(models.Model):
     """
 
     ESTADO_CHOICES = [
-        ('pendiente',  'Pendiente'),
-        ('aprobada',   'Aprobada'),
-        ('rechazada',  'Rechazada'),
+        ('pendiente',   'Pendiente'),
+        ('en_revision', 'En Revisión'),
+        ('aprobada',    'Aprobada'),
+        ('rechazada',   'Rechazada'),
     ]
 
     # ── Datos de la institución solicitante ───────────────────────────────────

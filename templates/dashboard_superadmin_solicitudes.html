@@ -12,6 +12,9 @@
     <!-- Fuentes e Iconos -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <!-- SortableJS para Drag & Drop interactivo estilo Trello -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 
     <style>
         /* ══ DESIGN TOKENS (Estilo Unificado SaaS Eduteka) ═══════════════ */
@@ -242,6 +245,188 @@
         @media (max-width: 991.98px) {
             .content-area { padding: 1.25rem 1rem; }
         }
+
+        /* ══ KANBAN BOARD (TRELLO STYLE) ══════════════════════════════════ */
+        .kanban-board {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 1.25rem;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+        }
+        @media (max-width: 991.98px) {
+            .kanban-board {
+                grid-template-columns: 1fr;
+            }
+        }
+        .kanban-column {
+            background: #F1F4F9;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            display: flex;
+            flex-direction: column;
+            min-height: 520px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            transition: all 0.2s ease;
+        }
+        .kanban-column-header {
+            padding: 1rem 1.15rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(188, 192, 207, 0.45);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            border-top-left-radius: var(--radius-lg);
+            border-top-right-radius: var(--radius-lg);
+        }
+        .kanban-title {
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            font-size: 0.88rem;
+            font-weight: 800;
+            color: var(--dark);
+        }
+        .kanban-badge-counter {
+            font-size: 0.72rem;
+            font-weight: 800;
+            padding: 0.2rem 0.55rem;
+            border-radius: 20px;
+            background: var(--white);
+            color: var(--dark);
+            border: 1px solid var(--border);
+            min-width: 24px;
+            text-align: center;
+        }
+        .kanban-column.col-nuevas { border-top: 3.5px solid #F59E0B; }
+        .kanban-column.col-revision { border-top: 3.5px solid var(--primary); }
+        .kanban-column.col-aprobadas { border-top: 3.5px solid #10B981; }
+
+        .kanban-column.col-nuevas .kanban-title i { color: #F59E0B; }
+        .kanban-column.col-revision .kanban-title i { color: var(--primary); }
+        .kanban-column.col-aprobadas .kanban-title i { color: #10B981; }
+
+        .kanban-cards-container {
+            padding: 0.85rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            flex-grow: 1;
+            min-height: 420px;
+        }
+
+        /* ── KANBAN CARD ── */
+        .kanban-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+            cursor: grab;
+            user-select: none;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+        }
+        .kanban-card:active {
+            cursor: grabbing;
+        }
+        .kanban-card:hover {
+            box-shadow: 0 8px 20px rgba(124, 92, 252, 0.12);
+            transform: translateY(-2px);
+            border-color: rgba(124, 92, 252, 0.5);
+        }
+        .kanban-card-ghost {
+            opacity: 0.35;
+            background: #F4F0FF !important;
+            border: 2px dashed var(--primary) !important;
+        }
+        .kanban-card-chosen {
+            transform: scale(1.02) rotate(1deg);
+            box-shadow: 0 12px 28px rgba(124, 92, 252, 0.22) !important;
+            border-color: var(--primary) !important;
+        }
+
+        .kanban-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.65rem;
+        }
+        .kanban-card-title {
+            font-size: 0.94rem;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 0.35rem;
+            line-height: 1.3;
+        }
+        .kanban-card-meta {
+            font-size: 0.78rem;
+            color: var(--gray-text);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin-bottom: 0.3rem;
+        }
+        .kanban-card-meta i {
+            color: var(--primary);
+            font-size: 0.85rem;
+        }
+        .kanban-card-footer {
+            margin-top: 0.75rem;
+            padding-top: 0.65rem;
+            border-top: 1px solid rgba(188, 192, 207, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.73rem;
+            color: var(--gray-text);
+        }
+
+        .kanban-empty {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--gray-text);
+            font-size: 0.82rem;
+            border: 1.5px dashed rgba(188, 192, 207, 0.65);
+            border-radius: var(--radius-md);
+            margin: auto 0;
+            background: rgba(255, 255, 255, 0.45);
+        }
+        .kanban-empty i {
+            font-size: 1.85rem;
+            display: block;
+            margin-bottom: 0.4rem;
+            opacity: 0.35;
+        }
+
+        /* ── TOAST NOTIFICATION ── */
+        .kanban-toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--dark);
+            color: white;
+            padding: 0.85rem 1.4rem;
+            border-radius: var(--radius-md);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.22);
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            z-index: 9999;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+        }
+        .kanban-toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .kanban-toast.success i { color: #10B981; }
+        .kanban-toast.error i { color: #EF4444; }
     </style>
 </head>
 <body>
@@ -297,10 +482,19 @@
             <div class="row g-3 mb-4">
                 <div class="col-6 col-xl-3">
                     <div class="stat-card">
-                        <div class="stat-icon amber"><i class="bi bi-hourglass-split"></i></div>
+                        <div class="stat-icon amber"><i class="bi bi-inbox-fill"></i></div>
                         <div>
-                            <div class="stat-value">{{ pendientes_total|default:"0" }}</div>
-                            <div class="stat-label">Pendientes de Revisión</div>
+                            <div class="stat-value" id="kpiNuevas">{{ pendientes_total|default:"0" }}</div>
+                            <div class="stat-label">Nuevas Solicitudes</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-xl-3">
+                    <div class="stat-card">
+                        <div class="stat-icon purple"><i class="bi bi-hourglass-split"></i></div>
+                        <div>
+                            <div class="stat-value" id="kpiRevision">{{ en_revision_total|default:"0" }}</div>
+                            <div class="stat-label">En Revisión</div>
                         </div>
                     </div>
                 </div>
@@ -308,195 +502,290 @@
                     <div class="stat-card">
                         <div class="stat-icon teal"><i class="bi bi-check-circle-fill"></i></div>
                         <div>
-                            <div class="stat-value">{{ aprobadas_total|default:"0" }}</div>
-                            <div class="stat-label">Aprobadas ({{ aprobadas_hoy|default:"0" }} hoy)</div>
+                            <div class="stat-value" id="kpiAprobadas">{{ aprobadas_total|default:"0" }}</div>
+                            <div class="stat-label">Aprobadas / Onboarding</div>
                         </div>
                     </div>
                 </div>
                 <div class="col-6 col-xl-3">
                     <div class="stat-card">
-                        <div class="stat-icon rose"><i class="bi bi-x-circle-fill"></i></div>
-                        <div>
-                            <div class="stat-value">{{ rechazadas_total|default:"0" }}</div>
-                            <div class="stat-label">Rechazadas ({{ tasa_rechazo|default:"0" }}%)</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 col-xl-3">
-                    <div class="stat-card">
-                        <div class="stat-icon purple"><i class="bi bi-inbox-fill"></i></div>
+                        <div class="stat-icon purple" style="background:rgba(101,205,191,0.12);color:#0D9488;"><i class="bi bi-collection-fill"></i></div>
                         <div>
                             <div class="stat-value">{{ total_solicitudes|default:"0" }}</div>
-                            <div class="stat-label">Total Solicitudes Registradas</div>
+                            <div class="stat-label">Total en Flujo</div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- TABLE PANEL -->
-            <div class="panel">
-                <div class="panel-header">
-                    <div>
-                        <div class="panel-title">
-                            <i class="bi bi-list-check me-1" style="color:var(--primary);"></i>
-                            Listado de Solicitudes Recibidas
-                        </div>
-                        <div class="panel-subtitle">
-                            Validación de sostenedores, datos de contacto y asignación automática de plan institucional.
+            <!-- CONTROLS & SEARCH BAR -->
+            <div class="panel p-3 mb-4">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                    <div class="d-flex align-items-center gap-2 flex-grow-1" style="max-width: 480px;">
+                        <div class="table-search w-100">
+                            <i class="bi bi-search"></i>
+                            <input type="text" id="tableSearch" placeholder="Buscar por colegio, director o email..." oninput="filterKanbanClient()">
                         </div>
                     </div>
-                    <form method="GET" action="" class="d-flex align-items-center gap-2 flex-wrap">
-                        <div class="table-search">
-                            <i class="bi bi-search"></i>
-                            <input type="text" name="q" value="{{ request.GET.q|default:'' }}" id="tableSearch" placeholder="Buscar colegio, email, RUT..." oninput="filterTableClient()">
-                        </div>
-
-                        <!-- Filtro por Estado -->
-                        <select name="estado" id="filterEstado" class="form-control-custom"
-                            style="width:auto;padding:.45rem .85rem;font-size:.82rem;" onchange="this.form.submit()">
-                            <option value="">Todos los Estados</option>
-                            <option value="pendiente" {% if request.GET.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
-                            <option value="aprobada"  {% if request.GET.estado == 'aprobada'  %}selected{% endif %}>Aprobada</option>
-                            <option value="rechazada" {% if request.GET.estado == 'rechazada' %}selected{% endif %}>Rechazada</option>
-                        </select>
-
-                        <button type="submit" class="btn-outline-custom" style="padding:.45rem .85rem;font-size:.82rem;">
-                            <i class="bi bi-funnel"></i> Filtrar
-                        </button>
-                        {% if request.GET.q or request.GET.estado %}
-                        <a href="{% url 'dashboard_superadmin_solicitudes' %}" class="btn-outline-custom" style="padding:.45rem .85rem;font-size:.82rem;color:#DC2626;border-color:#FCA5A5;">
-                            <i class="bi bi-x-circle"></i> Limpiar
-                        </a>
-                        {% endif %}
-                    </form>
-                </div>
-
-                <div style="overflow-x:auto;">
-                    <table class="solicitudes-table" id="solicitudesTable">
-                        <thead>
-                            <tr>
-                                <th>Nombre del Colegio</th>
-                                <th>Solicitante / RUT</th>
-                                <th>Correo & Teléfono</th>
-                                <th>Plan Solicitado</th>
-                                <th>Fecha de Solicitud</th>
-                                <th>Estado</th>
-                                <th style="width:130px;text-align:center;">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="solicitudesBody">
-
-                            {% for solicitud in solicitudes %}
-                            <tr data-colegio="{{ solicitud.nombre_colegio }}" data-estado="{{ solicitud.get_estado_display }}">
-                                <!-- Nombre del colegio -->
-                                <td>
-                                    <div class="user-cell">
-                                        <div class="user-avatar-circle" style="background:linear-gradient(135deg,#7C5CFC,#5B3FD4);">
-                                            {{ solicitud.nombre_colegio|slice:":2"|upper }}
-                                        </div>
-                                        <div>
-                                            <div class="user-name-text">{{ solicitud.nombre_colegio }}</div>
-                                            <div class="user-subtext"><i class="bi bi-geo-alt me-1"></i>{{ solicitud.ciudad_comuna|default:"Chile" }}</div>
-                                        </div>
-                                    </div>
-                                </td>
-
-                                <!-- Solicitante / RUT -->
-                                <td>
-                                    <div style="font-size:.85rem;font-weight:700;color:var(--dark);">{{ solicitud.nombre_administrador|default:"Director / Admin" }}</div>
-                                    <div style="font-size:.75rem;color:var(--gray-text);font-family:monospace;">RUT: {{ solicitud.rut_sostenedor|default:"Sin RUT" }}</div>
-                                </td>
-
-                                <!-- Correo / Teléfono -->
-                                <td>
-                                    <div style="font-size:.84rem;font-weight:600;color:var(--dark);">{{ solicitud.email_contacto }}</div>
-                                    <div style="font-size:.74rem;color:var(--gray-text);"><i class="bi bi-telephone me-1"></i>{{ solicitud.telefono|default:"Sin teléfono" }}</div>
-                                </td>
-
-                                <!-- Plan Solicitado -->
-                                <td>
-                                    {% if solicitud.plan_solicitado %}
-                                    <span class="role-chip chip-plan">
-                                        <span class="dot"></span>{{ solicitud.plan_solicitado.nombre }}
-                                    </span>
-                                    {% else %}
-                                    <span class="role-chip chip-free">
-                                        <span class="dot"></span>Estándar
-                                    </span>
-                                    {% endif %}
-                                </td>
-
-                                <!-- Fecha de Solicitud -->
-                                <td>
-                                    <div style="font-size:.82rem;font-weight:600;color:var(--dark);">{{ solicitud.created_at|date:"d M Y, H:i" }}</div>
-                                    <div style="font-size:.72rem;color:var(--gray-text);">{{ solicitud.created_at|timesince }} atrás</div>
-                                </td>
-
-                                <!-- Estado Badge -->
-                                <td>
-                                    {% if solicitud.estado == 'pendiente' %}
-                                    <span class="status-badge status-pendiente"><i class="bi bi-clock-history"></i> Pendiente</span>
-                                    {% elif solicitud.estado == 'aprobada' %}
-                                    <span class="status-badge status-aprobada"><i class="bi bi-check-circle-fill"></i> Aprobada</span>
-                                    {% else %}
-                                    <span class="status-badge status-rechazada"><i class="bi bi-x-circle-fill"></i> Rechazada</span>
-                                    {% endif %}
-                                </td>
-
-                                <!-- Acciones -->
-                                <td>
-                                    <div class="d-flex align-items-center justify-content-center gap-1.5">
-                                        {% if solicitud.estado == 'pendiente' %}
-                                        <!-- Botón Aprobar -->
-                                        <button type="button" class="action-btn approve" title="Aprobar Solicitud"
-                                            onclick="confirmApprove('{{ solicitud.nombre_administrador|default:solicitud.nombre_colegio|escapejs }}', '{{ solicitud.nombre_colegio|escapejs }}', '{% if solicitud.plan_solicitado %}{{ solicitud.plan_solicitado.nombre|escapejs }}{% else %}Estándar{% endif %}', '{{ solicitud.id }}')">
-                                            <i class="bi bi-check-lg"></i>
-                                        </button>
-                                        <!-- Botón Rechazar -->
-                                        <button type="button" class="action-btn reject" title="Rechazar Solicitud"
-                                            onclick="confirmReject('{{ solicitud.nombre_administrador|default:solicitud.nombre_colegio|escapejs }}', '{{ solicitud.nombre_colegio|escapejs }}', '{{ solicitud.id }}')">
-                                            <i class="bi bi-x-lg"></i>
-                                        </button>
-                                        {% endif %}
-
-                                        <!-- Botón Ver Detalle -->
-                                        <button type="button" class="action-btn view" title="Ver Detalle Completo"
-                                            onclick="openDetailModal('{{ solicitud.nombre_colegio|escapejs }}', '{{ solicitud.nombre_administrador|default:"Sin asignar"|escapejs }}', '{{ solicitud.rut_sostenedor|default:"Sin RUT"|escapejs }}', '{{ solicitud.email_contacto|escapejs }}', '{{ solicitud.telefono|default:"Sin teléfono"|escapejs }}', '{{ solicitud.ciudad_comuna|default:"Chile"|escapejs }}', '{% if solicitud.plan_solicitado %}{{ solicitud.plan_solicitado.nombre|escapejs }}{% else %}Estándar{% endif %}', '{{ solicitud.created_at|date:"d/m/Y H:i" }}', '{{ solicitud.get_estado_display|escapejs }}', '{{ solicitud.notas_admin|default:"Sin observaciones registradas."|escapejs }}')">
-                                            <i class="bi bi-eye"></i>
-                                        </button>
-
-                                        {% if solicitud.estado == 'aprobada' and solicitud.colegio_creado %}
-                                        <a href="{% url 'ver_detalle_colegio' solicitud.colegio_creado.id %}" class="action-btn view" title="Ver Ficha de Colegio Creado" style="color:#059669;border-color:#A7F3D0;background:#ECFDF5;">
-                                            <i class="bi bi-building-check"></i>
-                                        </a>
-                                        {% endif %}
-                                    </div>
-                                </td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="7" style="text-align:center;padding:3.5rem;color:var(--gray-text);font-size:.9rem;">
-                                    <i class="bi bi-inbox" style="font-size:2.5rem;display:block;margin-bottom:.75rem;opacity:.35;"></i>
-                                    No se encontraron solicitudes con los criterios de búsqueda seleccionados.
-                                </td>
-                            </tr>
-                            {% endfor %}
-
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Table Footer -->
-                <div style="padding:.85rem 1.5rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;">
-                    <span style="font-size:.78rem;color:var(--gray-text);" id="tableCount">
-                        Mostrando <strong>{{ total_solicitudes|default:"0" }}</strong> solicitud(es)
-                    </span>
-                    <div class="d-flex gap-2">
-                        <button class="btn-outline-custom" style="font-size:.78rem;padding:.35rem .85rem;" onclick="exportSolicitudesCSV()">
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <span class="text-muted small fw-semibold me-2 d-none d-md-inline">
+                            <i class="bi bi-hand-index-thumb me-1 text-primary"></i> Arrastra tarjetas entre columnas para actualizar su estado
+                        </span>
+                        <button class="btn-outline-custom" onclick="exportSolicitudesCSV()">
                             <i class="bi bi-download"></i> Exportar CSV
                         </button>
                     </div>
                 </div>
+            </div>
+
+            <!-- ══ KANBAN BOARD (3 COLUMNAS) ══════════════════════════════ -->
+            <div class="kanban-board">
+
+                <!-- ── COLUMNA 1: NUEVAS SOLICITUDES ─────────────────────── -->
+                <div class="kanban-column col-nuevas">
+                    <div class="kanban-column-header">
+                        <div class="kanban-title">
+                            <i class="bi bi-inbox-fill"></i>
+                            <span>Nuevas Solicitudes</span>
+                        </div>
+                        <span class="kanban-badge-counter" id="countNuevas">{{ solicitudes_nuevas.count }}</span>
+                    </div>
+
+                    <div class="kanban-cards-container" id="kanbanNuevas" data-estado="pendiente">
+                        {% for solicitud in solicitudes_nuevas %}
+                        <div class="kanban-card"
+                             data-id="{{ solicitud.id }}"
+                             data-colegio="{{ solicitud.nombre_colegio }}"
+                             data-admin="{{ solicitud.nombre_administrador|default:solicitud.nombre_colegio }}"
+                             data-email="{{ solicitud.email_contacto }}"
+                             data-telefono="{{ solicitud.telefono|default:'Sin teléfono' }}"
+                             data-rut="{{ solicitud.rut_sostenedor|default:'Sin RUT' }}"
+                             data-ciudad="{{ solicitud.ciudad_comuna|default:'Chile' }}"
+                             data-plan="{% if solicitud.plan_solicitado %}{{ solicitud.plan_solicitado.nombre }}{% else %}Estándar{% endif %}"
+                             data-fecha="{{ solicitud.created_at|date:'d/m/Y H:i' }}"
+                             data-notas="{{ solicitud.notas_admin|default:'Sin observaciones registradas.' }}">
+                            
+                            <div class="kanban-card-header">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="user-avatar-circle" style="width:30px;height:30px;font-size:0.75rem;background:linear-gradient(135deg,#F59E0B,#D97706);">
+                                        {{ solicitud.nombre_colegio|slice:":2"|upper }}
+                                    </div>
+                                    {% if solicitud.plan_solicitado %}
+                                    <span class="role-chip chip-plan" style="padding:0.2rem 0.55rem;font-size:0.7rem;">
+                                        <span class="dot"></span>{{ solicitud.plan_solicitado.nombre }}
+                                    </span>
+                                    {% else %}
+                                    <span class="role-chip chip-free" style="padding:0.2rem 0.55rem;font-size:0.7rem;">
+                                        <span class="dot"></span>Estándar
+                                    </span>
+                                    {% endif %}
+                                </div>
+                                <div class="d-flex align-items-center gap-1">
+                                    <button type="button" class="action-btn view" title="Ver Detalle" style="width:26px;height:26px;font-size:0.75rem;"
+                                            onclick="openDetailModalFromCard(this.closest('.kanban-card'))">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    <i class="bi bi-grip-vertical text-muted fs-6" style="cursor:grab;" title="Arrastrar tarjeta"></i>
+                                </div>
+                            </div>
+
+                            <div class="kanban-card-title">{{ solicitud.nombre_colegio }}</div>
+
+                            <div class="kanban-card-meta">
+                                <i class="bi bi-person"></i>
+                                <span>{{ solicitud.nombre_administrador|default:"Director / Admin" }}</span>
+                            </div>
+
+                            <div class="kanban-card-meta">
+                                <i class="bi bi-geo-alt"></i>
+                                <span>{{ solicitud.ciudad_comuna|default:"Chile" }}</span>
+                            </div>
+
+                            <div class="kanban-card-footer">
+                                <span title="{{ solicitud.created_at|date:'d M Y, H:i' }}">
+                                    <i class="bi bi-calendar3 me-1"></i>{{ solicitud.created_at|date:"d M Y" }}
+                                </span>
+                                <span class="text-muted small">
+                                    {{ solicitud.created_at|timesince }} atrás
+                                </span>
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                        <div class="kanban-empty" id="empty-pendiente" style="{% if solicitudes_nuevas.exists %}display:none;{% endif %}">
+                            <i class="bi bi-inbox"></i>
+                            <span>No hay solicitudes nuevas</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── COLUMNA 2: EN REVISIÓN ─────────────────────────────── -->
+                <div class="kanban-column col-revision">
+                    <div class="kanban-column-header">
+                        <div class="kanban-title">
+                            <i class="bi bi-hourglass-split"></i>
+                            <span>En Revisión</span>
+                        </div>
+                        <span class="kanban-badge-counter" id="countRevision">{{ solicitudes_revision.count }}</span>
+                    </div>
+
+                    <div class="kanban-cards-container" id="kanbanRevision" data-estado="en_revision">
+                        {% for solicitud in solicitudes_revision %}
+                        <div class="kanban-card"
+                             data-id="{{ solicitud.id }}"
+                             data-colegio="{{ solicitud.nombre_colegio }}"
+                             data-admin="{{ solicitud.nombre_administrador|default:solicitud.nombre_colegio }}"
+                             data-email="{{ solicitud.email_contacto }}"
+                             data-telefono="{{ solicitud.telefono|default:'Sin teléfono' }}"
+                             data-rut="{{ solicitud.rut_sostenedor|default:'Sin RUT' }}"
+                             data-ciudad="{{ solicitud.ciudad_comuna|default:'Chile' }}"
+                             data-plan="{% if solicitud.plan_solicitado %}{{ solicitud.plan_solicitado.nombre }}{% else %}Estándar{% endif %}"
+                             data-fecha="{{ solicitud.created_at|date:'d/m/Y H:i' }}"
+                             data-notas="{{ solicitud.notas_admin|default:'Sin observaciones registradas.' }}">
+                            
+                            <div class="kanban-card-header">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="user-avatar-circle" style="width:30px;height:30px;font-size:0.75rem;background:linear-gradient(135deg,#7C5CFC,#5B3FD4);">
+                                        {{ solicitud.nombre_colegio|slice:":2"|upper }}
+                                    </div>
+                                    {% if solicitud.plan_solicitado %}
+                                    <span class="role-chip chip-plan" style="padding:0.2rem 0.55rem;font-size:0.7rem;">
+                                        <span class="dot"></span>{{ solicitud.plan_solicitado.nombre }}
+                                    </span>
+                                    {% else %}
+                                    <span class="role-chip chip-free" style="padding:0.2rem 0.55rem;font-size:0.7rem;">
+                                        <span class="dot"></span>Estándar
+                                    </span>
+                                    {% endif %}
+                                </div>
+                                <div class="d-flex align-items-center gap-1">
+                                    <button type="button" class="action-btn view" title="Ver Detalle" style="width:26px;height:26px;font-size:0.75rem;"
+                                            onclick="openDetailModalFromCard(this.closest('.kanban-card'))">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    <i class="bi bi-grip-vertical text-muted fs-6" style="cursor:grab;" title="Arrastrar tarjeta"></i>
+                                </div>
+                            </div>
+
+                            <div class="kanban-card-title">{{ solicitud.nombre_colegio }}</div>
+
+                            <div class="kanban-card-meta">
+                                <i class="bi bi-person"></i>
+                                <span>{{ solicitud.nombre_administrador|default:"Director / Admin" }}</span>
+                            </div>
+
+                            <div class="kanban-card-meta">
+                                <i class="bi bi-geo-alt"></i>
+                                <span>{{ solicitud.ciudad_comuna|default:"Chile" }}</span>
+                            </div>
+
+                            <div class="kanban-card-footer">
+                                <span title="{{ solicitud.created_at|date:'d M Y, H:i' }}">
+                                    <i class="bi bi-calendar3 me-1"></i>{{ solicitud.created_at|date:"d M Y" }}
+                                </span>
+                                <span class="text-muted small">
+                                    {{ solicitud.created_at|timesince }} atrás
+                                </span>
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                        <div class="kanban-empty" id="empty-en_revision" style="{% if solicitudes_revision.exists %}display:none;{% endif %}">
+                            <i class="bi bi-hourglass-split"></i>
+                            <span>Ninguna solicitud en revisión</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── COLUMNA 3: APROBADAS / ONBOARDING ──────────────────── -->
+                <div class="kanban-column col-aprobadas">
+                    <div class="kanban-column-header">
+                        <div class="kanban-title">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>Aprobadas / Onboarding</span>
+                        </div>
+                        <span class="kanban-badge-counter" id="countAprobadas">{{ solicitudes_aprobadas.count }}</span>
+                    </div>
+
+                    <div class="kanban-cards-container" id="kanbanAprobadas" data-estado="aprobada">
+                        {% for solicitud in solicitudes_aprobadas %}
+                        <div class="kanban-card"
+                             data-id="{{ solicitud.id }}"
+                             data-colegio="{{ solicitud.nombre_colegio }}"
+                             data-admin="{{ solicitud.nombre_administrador|default:solicitud.nombre_colegio }}"
+                             data-email="{{ solicitud.email_contacto }}"
+                             data-telefono="{{ solicitud.telefono|default:'Sin teléfono' }}"
+                             data-rut="{{ solicitud.rut_sostenedor|default:'Sin RUT' }}"
+                             data-ciudad="{{ solicitud.ciudad_comuna|default:'Chile' }}"
+                             data-plan="{% if solicitud.plan_solicitado %}{{ solicitud.plan_solicitado.nombre }}{% else %}Estándar{% endif %}"
+                             data-fecha="{{ solicitud.created_at|date:'d/m/Y H:i' }}"
+                             data-notas="{{ solicitud.notas_admin|default:'Sin observaciones registradas.' }}">
+                            
+                            <div class="kanban-card-header">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="user-avatar-circle" style="width:30px;height:30px;font-size:0.75rem;background:linear-gradient(135deg,#10B981,#059669);">
+                                        {{ solicitud.nombre_colegio|slice:":2"|upper }}
+                                    </div>
+                                    {% if solicitud.plan_solicitado %}
+                                    <span class="role-chip chip-plan" style="padding:0.2rem 0.55rem;font-size:0.7rem;">
+                                        <span class="dot"></span>{{ solicitud.plan_solicitado.nombre }}
+                                    </span>
+                                    {% else %}
+                                    <span class="role-chip chip-free" style="padding:0.2rem 0.55rem;font-size:0.7rem;">
+                                        <span class="dot"></span>Estándar
+                                    </span>
+                                    {% endif %}
+                                </div>
+                                <div class="d-flex align-items-center gap-1">
+                                    {% if solicitud.colegio_creado %}
+                                    <a href="{% url 'ver_detalle_colegio' solicitud.colegio_creado.id %}" class="action-btn view" title="Ver Colegio Activado" style="width:26px;height:26px;font-size:0.75rem;color:#059669;border-color:#A7F3D0;background:#ECFDF5;">
+                                        <i class="bi bi-building-check"></i>
+                                    </a>
+                                    {% endif %}
+                                    <button type="button" class="action-btn view" title="Ver Detalle" style="width:26px;height:26px;font-size:0.75rem;"
+                                            onclick="openDetailModalFromCard(this.closest('.kanban-card'))">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    <i class="bi bi-grip-vertical text-muted fs-6" style="cursor:grab;" title="Arrastrar tarjeta"></i>
+                                </div>
+                            </div>
+
+                            <div class="kanban-card-title">{{ solicitud.nombre_colegio }}</div>
+
+                            <div class="kanban-card-meta">
+                                <i class="bi bi-person"></i>
+                                <span>{{ solicitud.nombre_administrador|default:"Director / Admin" }}</span>
+                            </div>
+
+                            <div class="kanban-card-meta">
+                                <i class="bi bi-geo-alt"></i>
+                                <span>{{ solicitud.ciudad_comuna|default:"Chile" }}</span>
+                            </div>
+
+                            <div class="kanban-card-footer">
+                                <span title="{{ solicitud.created_at|date:'d M Y, H:i' }}">
+                                    <i class="bi bi-calendar3 me-1"></i>{{ solicitud.created_at|date:"d M Y" }}
+                                </span>
+                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-0.5" style="font-size:0.68rem;">
+                                    Aprobado
+                                </span>
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                        <div class="kanban-empty" id="empty-aprobada" style="{% if solicitudes_aprobadas.exists %}display:none;{% endif %}">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>No hay solicitudes aprobadas</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- TOAST FEEDBACK FLOTANTE -->
+            <div id="kanbanToast" class="kanban-toast">
+                <i class="bi bi-check-circle-fill fs-5"></i>
+                <span>Estado actualizado correctamente</span>
             </div>
 
         </div><!-- /content-area -->
@@ -669,71 +958,214 @@
         openModal('modalDetail');
     }
 
-    // ── Export CSV
-    function exportSolicitudesCSV() {
-        const rows = document.querySelectorAll('#solicitudesBody tr');
-        let csvContent = "data:text/csv;charset=utf-8,";
-        csvContent += "Colegio,Solicitante,RUT,Email,Telefono,Plan,Fecha,Estado\n";
+    function openDetailModalFromCard(card) {
+        if (!card) return;
+        const colContainer = card.closest('.kanban-cards-container');
+        const estadoKey = colContainer ? colContainer.dataset.estado : '';
+        const displayMap = {
+            'pendiente': 'Pendiente',
+            'en_revision': 'En Revisión',
+            'aprobada': 'Aprobada',
+            'rechazada': 'Rechazada'
+        };
+        openDetailModal(
+            card.dataset.colegio || 'Sin nombre',
+            card.dataset.admin || 'Sin asignar',
+            card.dataset.rut || 'Sin RUT',
+            card.dataset.email || '—',
+            card.dataset.telefono || '—',
+            card.dataset.ciudad || 'Chile',
+            card.dataset.plan || 'Estándar',
+            card.dataset.fecha || '—',
+            displayMap[estadoKey] || estadoKey,
+            card.dataset.notas || 'Sin observaciones registradas.'
+        );
+    }
 
-        rows.forEach(row => {
-            const cols = row.querySelectorAll('td');
-            if (cols.length >= 6) {
-                const colegio     = cols[0].querySelector('.user-name-text')?.innerText.replace(/,/g, ' ') || '';
-                const solicitante = cols[1].querySelector('div:first-child')?.innerText.replace(/,/g, ' ') || '';
-                const rut         = cols[1].querySelector('div:last-child')?.innerText.replace(/RUT:\s*/g, '').replace(/,/g, ' ') || '';
-                const email       = cols[2].querySelector('div:first-child')?.innerText.replace(/,/g, ' ') || '';
-                const telefono    = cols[2].querySelector('div:last-child')?.innerText.replace(/,/g, ' ') || '';
-                const plan        = cols[3].innerText.trim().replace(/,/g, ' ');
-                const fecha       = cols[4].querySelector('div:first-child')?.innerText.replace(/,/g, ' ') || '';
-                const estado      = cols[5].innerText.trim().replace(/,/g, ' ');
+    // ── Toast Notification Logic
+    let toastTimeout = null;
+    function showToast(msg, type = 'success') {
+        const toast = document.getElementById('kanbanToast');
+        if (!toast) return;
+        const icon = toast.querySelector('i');
+        const text = toast.querySelector('span');
 
-                csvContent += `"${colegio}","${solicitante}","${rut}","${email}","${telefono}","${plan}","${fecha}","${estado}"\n`;
+        text.textContent = msg;
+        toast.className = `kanban-toast ${type} show`;
+        if (type === 'success') {
+            icon.className = 'bi bi-check-circle-fill text-success fs-5';
+        } else {
+            icon.className = 'bi bi-exclamation-triangle-fill text-danger fs-5';
+        }
+
+        clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3600);
+    }
+
+    // ── CSRF Token Helper
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
             }
+        }
+        return cookieValue;
+    }
+
+    // ── Dynamic Counters & Empty State Checker
+    function updateCounters() {
+        const countNuevas = document.querySelectorAll('#kanbanNuevas .kanban-card').length;
+        const countRevision = document.querySelectorAll('#kanbanRevision .kanban-card').length;
+        const countAprobadas = document.querySelectorAll('#kanbanAprobadas .kanban-card').length;
+
+        const elNuevas = document.getElementById('countNuevas');
+        const elRevision = document.getElementById('countRevision');
+        const elAprobadas = document.getElementById('countAprobadas');
+
+        if (elNuevas) elNuevas.textContent = countNuevas;
+        if (elRevision) elRevision.textContent = countRevision;
+        if (elAprobadas) elAprobadas.textContent = countAprobadas;
+
+        // Stat cards superiores
+        const kpiNuevas = document.getElementById('kpiNuevas');
+        const kpiRevision = document.getElementById('kpiRevision');
+        const kpiAprobadas = document.getElementById('kpiAprobadas');
+
+        if (kpiNuevas) kpiNuevas.textContent = countNuevas;
+        if (kpiRevision) kpiRevision.textContent = countRevision;
+        if (kpiAprobadas) kpiAprobadas.textContent = countAprobadas;
+    }
+
+    function checkEmptyStates() {
+        ['pendiente', 'en_revision', 'aprobada'].forEach(st => {
+            const list = document.querySelector(`.kanban-cards-container[data-estado="${st}"]`);
+            const empty = document.getElementById(`empty-${st}`);
+            if (list && empty) {
+                const visibleCards = Array.from(list.querySelectorAll('.kanban-card')).filter(c => c.style.display !== 'none');
+                empty.style.display = visibleCards.length > 0 ? 'none' : 'block';
+            }
+        });
+    }
+
+    // ── SortableJS Drag & Drop Initialization
+    document.addEventListener('DOMContentLoaded', () => {
+        const columns = ['kanbanNuevas', 'kanbanRevision', 'kanbanAprobadas'];
+
+        columns.forEach(colId => {
+            const el = document.getElementById(colId);
+            if (!el) return;
+
+            new Sortable(el, {
+                group: 'kanban-solicitudes',
+                animation: 200,
+                ghostClass: 'kanban-card-ghost',
+                chosenClass: 'kanban-card-chosen',
+                dragClass: 'kanban-card-drag',
+                fallbackOnBody: true,
+                swapThreshold: 0.65,
+                onEnd: function (evt) {
+                    if (evt.from === evt.to) return; // Se reordenó dentro de la misma columna
+
+                    const card = evt.item;
+                    const solicitudId = card.dataset.id;
+                    const nuevoEstado = evt.to.dataset.estado;
+                    const colegioNombre = card.dataset.colegio || 'Institución';
+
+                    // Actualizar contadores y estados vacíos en la interfaz
+                    updateCounters();
+                    checkEmptyStates();
+
+                    // Petición asíncrona a la API de Django
+                    fetch('{% url "api_actualizar_estado_solicitud" %}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken') || '{{ csrf_token }}'
+                        },
+                        body: JSON.stringify({
+                            solicitud_id: solicitudId,
+                            nuevo_estado: nuevoEstado
+                        })
+                    })
+                    .then(res => {
+                        if (!res.ok) throw new Error('Error en el servidor al actualizar');
+                        return res.json();
+                    })
+                    .then(data => {
+                        showToast(data.message || `"${colegioNombre}" actualizado a ${nuevoEstado}`, 'success');
+                    })
+                    .catch(err => {
+                        console.error('Error Kanban:', err);
+                        // Revertir posición de la tarjeta
+                        if (evt.from.children[evt.oldIndex]) {
+                            evt.from.insertBefore(card, evt.from.children[evt.oldIndex]);
+                        } else {
+                            evt.from.appendChild(card);
+                        }
+                        updateCounters();
+                        checkEmptyStates();
+                        showToast(`No se pudo mover "${colegioNombre}". Intente nuevamente.`, 'error');
+                    });
+                }
+            });
+        });
+    });
+
+    // ── Live Client-Side Kanban Search Filter
+    function filterKanbanClient() {
+        const q = (document.getElementById('tableSearch')?.value || '').toLowerCase().trim();
+        const cards = document.querySelectorAll('.kanban-card');
+
+        cards.forEach(card => {
+            const col = (card.dataset.colegio || '').toLowerCase();
+            const admin = (card.dataset.admin || '').toLowerCase();
+            const email = (card.dataset.email || '').toLowerCase();
+            const text = card.innerText.toLowerCase();
+
+            const match = !q || col.includes(q) || admin.includes(q) || email.includes(q) || text.includes(q);
+            card.style.display = match ? '' : 'none';
+        });
+
+        checkEmptyStates();
+    }
+
+    // Búsqueda desde la barra superior Topbar
+    document.getElementById('globalSearch')?.addEventListener('input', function () {
+        const input = document.getElementById('tableSearch');
+        if (input) {
+            input.value = this.value;
+            filterKanbanClient();
+        }
+    });
+
+    // ── Export CSV from Kanban Cards
+    function exportSolicitudesCSV() {
+        const cards = document.querySelectorAll('.kanban-card');
+        let csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "ID,Colegio,Solicitante,RUT,Email,Telefono,Plan,Fecha,Columna\n";
+
+        cards.forEach(c => {
+            const colCont = c.closest('.kanban-cards-container');
+            const estado = colCont ? colCont.dataset.estado : '';
+            csvContent += `"${c.dataset.id}","${c.dataset.colegio}","${c.dataset.admin}","${c.dataset.rut}","${c.dataset.email}","${c.dataset.telefono}","${c.dataset.plan}","${c.dataset.fecha}","${estado}"\n`;
         });
 
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
         link.setAttribute("href", encodedUri);
-        link.setAttribute("download", `solicitudes_eduteka_${new Date().toISOString().slice(0,10)}.csv`);
+        link.setAttribute("download", `solicitudes_kanban_${new Date().toISOString().slice(0,10)}.csv`);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
     }
-
-    // ── Instant Client-Side Table Filter
-    function filterTableClient() {
-        const q      = (document.getElementById('tableSearch').value || '').toLowerCase();
-        const estado = (document.getElementById('filterEstado').value || '').toLowerCase();
-        const rows   = document.querySelectorAll('#solicitudesBody tr');
-        let vis      = 0;
-
-        rows.forEach(row => {
-            const rowColegio = (row.dataset.colegio || '').toLowerCase();
-            const rowEstado  = (row.dataset.estado || '').toLowerCase();
-            const text       = row.innerText.toLowerCase();
-
-            const matchQ      = !q      || text.includes(q) || rowColegio.includes(q);
-            const matchEstado = !estado || rowEstado.includes(estado);
-
-            const show = matchQ && matchEstado;
-            row.style.display = show ? '' : 'none';
-            if (show) vis++;
-        });
-
-        const countEl = document.getElementById('tableCount');
-        if (countEl) {
-            countEl.innerHTML = 'Mostrando <strong>' + vis + '</strong> de <strong>' + rows.length + '</strong> solicitud(es)';
-        }
-    }
-
-    // Búsqueda desde la barra superior
-    document.getElementById('globalSearch')?.addEventListener('input', function () {
-        const input = document.getElementById('tableSearch');
-        if (input) {
-            input.value = this.value;
-            filterTableClient();
-        }
-    });
 </script>
 
 </body>

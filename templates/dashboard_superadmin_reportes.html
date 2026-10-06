@@ -4,46 +4,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generador de Reportes Avanzados - Super Admin Eduteka</title>
+    <title>Generador de Reportes — Super Admin Eduteka</title>
 
-    <!-- Bootstrap CSS -->
+    <!-- Bootstrap 5 CSS -->
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
 
     <!-- Fuentes e Iconos -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
-    <!-- Tailwind CSS (CDN con utilidades SaaS) -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            50: '#f4f0ff',
-                            100: '#e9e0ff',
-                            500: '#7C5CFC',
-                            600: '#6747E3',
-                            700: '#5234c1',
-                        },
-                        emeraldbrand: '#10B981',
-                        darkbg: '#151A35',
-                    }
-                }
-            }
-        }
-    </script>
 
     <style>
-        
         :root {
             --primary:        #7C5CFC;
             --primary-soft:   rgba(124, 92, 252, 0.08);
             --primary-hover:  #6747E3;
             --secondary:      #65CDBF;
-            --secondary-soft: rgba(101, 205, 191, 0.08);
+            --secondary-soft: rgba(101, 205, 191, 0.10);
             --bg:             #F8F9FD;
             --white:          #FFFFFF;
             --dark:           #151A35;
@@ -52,6 +28,8 @@
             --radius-lg:      16px;
             --radius-md:      10px;
             --radius-sm:      8px;
+            --shadow-sm:      0 2px 12px rgba(0,0,0,0.04);
+            --shadow-md:      0 6px 24px rgba(0,0,0,0.07);
         }
 
         * { font-family: 'Plus Jakarta Sans', sans-serif; box-sizing: border-box; }
@@ -65,149 +43,177 @@
         }
 
         body::before {
-            content: '';
-            position: fixed;
-            top: -15%; left: 65%;
+            content: ''; position: fixed; top: -15%; left: 65%;
             width: 50vw; height: 50vw;
-            background: radial-gradient(circle, rgba(124, 92, 252, 0.07) 0%, rgba(255,255,255,0) 70%);
+            background: radial-gradient(circle, rgba(124, 92, 252, 0.06) 0%, transparent 70%);
             z-index: -2; pointer-events: none;
         }
         body::after {
-            content: '';
-            position: fixed;
-            top: 45%; left: -15%;
+            content: ''; position: fixed; top: 45%; left: -15%;
             width: 40vw; height: 40vw;
-            background: radial-gradient(circle, rgba(16, 185, 129, 0.06) 0%, rgba(255,255,255,0) 70%);
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.05) 0%, transparent 70%);
             z-index: -2; pointer-events: none;
         }
 
         .wrapper { display: flex; width: 100%; align-items: stretch; }
 
-        
-        .topbar {
-            height: 70px;
-            background: rgba(255, 255, 255, 0.85) !important;
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border);
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 2rem;
-            position: sticky; top: 0; z-index: 98;
+        .content-area {
+            padding: 1.75rem 2rem;
+            max-width: 1440px;
+            width: 100%;
+            margin: 0 auto;
         }
-        .search-bar { position: relative; width: 340px; }
-        .search-bar i { position: absolute; left: .85rem; top: 50%; transform: translateY(-50%); color: var(--gray-text); }
-        .search-bar input {
-            width: 100%; padding: .5rem 1rem .5rem 2.4rem;
-            border: 1px solid var(--border); border-radius: var(--radius-md);
-            background: var(--bg); font-size: .85rem; outline: none; transition: all .2s;
+
+        .hero-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 0.25rem;
         }
-        .search-bar input:focus { border-color: var(--primary); background: var(--white); box-shadow: 0 0 0 3px rgba(124,92,252,.12); }
-
-        .topbar-right { display: flex; align-items: center; gap: 1.25rem; }
-        .user-profile {
-            display: flex; align-items: center; gap: .75rem;
-            background: var(--white); padding: .35rem .85rem .35rem .4rem;
-            border-radius: 30px; border: 1px solid var(--border);
+        .hero-subtitle {
+            font-size: 0.88rem;
+            color: var(--gray-text);
+            margin-bottom: 0;
         }
-        .user-avatar {
-            width: 32px; height: 32px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
-            color: white; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 700; font-size: .85rem;
-        }
-        .user-name { font-weight: 600; font-size: .88rem; color: var(--dark); }
 
-        
-        .content-area { padding: 1.75rem 2rem; max-width: 1450px; width: 100%; margin: 0 auto; }
-
-        
-        .hero-title { font-size: 1.5rem; font-weight: 800; color: var(--dark); letter-spacing: -.02em; }
-        .hero-subtitle { font-size: .88rem; color: var(--gray-text); margin-top: .2rem; }
-
-        
-        .btn-primary-custom {
-            background: var(--primary); color: white; border: none;
-            border-radius: var(--radius-md); padding: .65rem 1.4rem;
-            font-weight: 700; font-size: .9rem; display: inline-flex;
-            align-items: center; justify-content: center; gap: .6rem; transition: all .2s; text-decoration: none;
-            box-shadow: 0 4px 14px rgba(124, 92, 252, 0.28);
-            cursor: pointer;
-        }
-        .btn-primary-custom:hover { background: var(--primary-hover); color: white; transform: translateY(-1px); }
-
-        .btn-excel-custom {
-            background: #10B981; color: white; border: none;
-            border-radius: var(--radius-md); padding: .75rem 1.75rem;
-            font-weight: 700; font-size: .95rem; display: inline-flex;
-            align-items: center; justify-content: center; gap: .65rem; transition: all .2s; text-decoration: none;
-            box-shadow: 0 6px 18px rgba(16, 185, 129, 0.3);
-            cursor: pointer;
-        }
-        .btn-excel-custom:hover { background: #059669; color: white; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4); }
-
-        .btn-outline-custom {
-            background: var(--white); color: var(--dark);
-            border: 1px solid var(--border); border-radius: var(--radius-md);
-            padding: .6rem 1.1rem; font-weight: 600; font-size: .85rem;
-            display: inline-flex; align-items: center; gap: .5rem;
-            transition: all .2s; text-decoration: none; cursor: pointer;
-        }
-        .btn-outline-custom:hover { background: var(--bg); border-color: var(--primary); color: var(--primary); }
-
-        
-        .panel {
-            background: var(--white); border-radius: var(--radius-lg);
-            border: 1px solid var(--border); overflow: hidden;
-            box-shadow: 0 2px 12px rgba(0,0,0,.02);
+        .kpi-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.15rem 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.25s ease;
             height: 100%;
         }
+        .kpi-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+        .kpi-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35rem;
+            flex-shrink: 0;
+        }
+
+        .panel-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
         .panel-header {
-            padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border);
-            display: flex; align-items: center; justify-content: space-between;
-            flex-wrap: wrap; gap: .75rem; background: var(--white);
-        }
-        .panel-title { font-size: 1.05rem; font-weight: 800; color: var(--dark); }
-        .panel-subtitle { font-size: .8rem; color: var(--gray-text); margin-top: .15rem; }
-
-        
-        .form-control-custom {
-            width: 100%; padding: .65rem .9rem;
-            border: 1px solid var(--border); border-radius: var(--radius-md);
-            background: var(--bg); font-size: .88rem; color: var(--dark);
-            outline: none; transition: all .2s;
-        }
-        .form-control-custom:focus {
-            border-color: var(--primary); background: var(--white);
-            box-shadow: 0 0 0 3px rgba(124,92,252,.12);
-        }
-        .form-label-custom {
-            font-size: .78rem; font-weight: 800; color: var(--dark);
-            text-transform: uppercase; letter-spacing: 0.04em;
-            margin-bottom: .45rem; display: block;
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--white);
         }
 
-        
         .step-badge {
-            width: 26px; height: 26px; border-radius: 50%;
-            background: var(--primary); color: white;
-            display: inline-flex; align-items: center; justify-content: center;
-            font-weight: 800; font-size: .8rem; flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.82rem;
+            flex-shrink: 0;
         }
 
-        
-        .reportes-table { width: 100%; border-collapse: separate; border-spacing: 0; }
-        .reportes-table th {
-            background: #FAFBFF; padding: .85rem 1.1rem;
-            font-size: .72rem; font-weight: 800; text-transform: uppercase;
-            letter-spacing: .06em; color: var(--gray-text);
-            border-bottom: 1px solid var(--border); white-space: nowrap;
+        /* Radio cards estilo SaaS */
+        .report-option-card {
+            border: 2px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1rem 1.1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #FAFBFF;
+            height: 100%;
+            position: relative;
+            display: flex;
+            flex-direction: column;
         }
-        .reportes-table td {
-            padding: 1rem 1.1rem; vertical-align: middle;
-            border-bottom: 1px solid rgba(188,192,207,.3); font-size: .85rem;
+        .report-option-card:hover {
+            border-color: var(--primary);
+            background: #FFFFFF;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 14px rgba(124, 92, 252, 0.12);
         }
-        .reportes-table tbody tr { transition: background .15s; }
-        .reportes-table tbody tr:hover { background: rgba(248,249,253,1); }
+        .report-option-input:checked + .report-option-card {
+            border-color: var(--primary);
+            background: rgba(124, 92, 252, 0.04);
+            box-shadow: 0 0 0 1px var(--primary);
+        }
+        .report-option-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .btn-excel-primary {
+            background: #10B981;
+            color: #ffffff;
+            font-weight: 700;
+            border-radius: var(--radius-md);
+            padding: 0.7rem 1.6rem;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.28);
+        }
+        .btn-excel-primary:hover {
+            background: #059669;
+            color: #ffffff;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(16, 185, 129, 0.35);
+        }
+
+        .table-custom {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        .table-custom th {
+            background: #F8F9FD;
+            padding: 0.85rem 1.2rem;
+            font-size: 0.74rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--gray-text);
+            border-bottom: 1px solid var(--border);
+        }
+        .table-custom td {
+            padding: 0.95rem 1.2rem;
+            vertical-align: middle;
+            border-bottom: 1px solid #EEF0F6;
+            font-size: 0.86rem;
+        }
+        .table-custom tbody tr:hover {
+            background: #FAFBFF;
+        }
 
         @media (max-width: 991.98px) {
             .content-area { padding: 1.25rem 1rem; }
@@ -217,321 +223,293 @@
 <body>
 
 <div class="wrapper">
+    <!-- Sidebar Unificado Super Admin -->
     {% include '_sidebar_superadmin.html' with active_page='reportes' %}
 
-    <main class="main-content">
+    <main class="main-content" style="flex:1; overflow-y:auto;">
 
-        <!-- TOPBAR -->
+        <!-- Topbar Global -->
         {% include '_topbar_superadmin.html' with topbar_badge='Engine openpyxl Habilitado' %}
 
-        <!-- CONTENT AREA -->
-        <div class="content-area space-y-6">
+        <div class="content-area">
 
-            <!-- ENCABEZADO / HERO -->
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 class="hero-title flex items-center gap-2.5">
-                        <span class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-lg">
-                            <i class="fa-solid fa-file-excel"></i>
-                        </span>
-                        Generador de Reportes Avanzados
-                    </h1>
-                    <p class="hero-subtitle">Exportación de datos cruzados del sistema en formato CSV y Excel (.xlsx) procesados dinámicamente.</p>
+            <!-- Mensajes Django -->
+            {% if messages %}
+                <div class="mb-3">
+                    {% for message in messages %}
+                        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show rounded-4" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
                 </div>
-                <div class="flex items-center gap-3">
-                    <button type="button" onclick="window.location.reload();" class="btn-outline-custom">
-                        <i class="fa-solid fa-rotate-right"></i>
-                        <span class="hidden sm:inline">Actualizar</span>
+            {% endif %}
+
+            <!-- ── Encabezado / Hero ──────────────────────────────────────── -->
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+                <div>
+                    <h1 class="hero-title d-flex align-items-center gap-2">
+                        <span class="d-inline-flex align-items-center justify-content-center text-success bg-success-subtle rounded-3 p-2" style="width:38px;height:38px;">
+                            <i class="bi bi-file-earmark-excel-fill fs-5"></i>
+                        </span>
+                        Generador de Reportes y Descargas
+                    </h1>
+                    <p class="hero-subtitle">Exportación instantánea en memoria de datos consolidados del SaaS mediante openpyxl (.xlsx).</p>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <button type="button" class="btn btn-outline-secondary rounded-pill btn-sm px-3" onclick="window.location.reload();">
+                        <i class="bi bi-arrow-clockwise me-1"></i> Actualizar
                     </button>
-                    <a href="#historialReportes" class="btn-outline-custom">
-                        <i class="fa-solid fa-clock-rotate-left"></i>
-                        Ver Historial
+                    <a href="{% url 'exportar_colegios_excel' %}" class="btn-excel-primary btn-sm">
+                        <i class="bi bi-download"></i> Descargar Reporte Maestro
                     </a>
                 </div>
             </div>
 
-            <!-- PANEL PRINCIPAL (FORMULARIO DE GENERACIÓN) -->
-            <div class="panel p-6 md:p-8">
-                <form id="formReportGenerator" method="GET" action="{% url 'descargar_excel' %}">
-
-                    <!-- PASO 1: TIPO DE REPORTE -->
-                    <div class="mb-8">
-                        <div class="flex items-center gap-3 mb-4 pb-2 border-b border-slate-100">
-                            <span class="step-badge">1</span>
-                            <div>
-                                <h3 class="font-extrabold text-base text-slate-800">Seleccionar Tipo de Reporte</h3>
-                                <p class="text-xs text-slate-500">Elija el conjunto de datos maestro que desea consolidar en el archivo.</p>
-                            </div>
+            <!-- ── Tarjetas Métricas Rápidas ──────────────────────────────── -->
+            <div class="row g-3 mb-4">
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="kpi-card">
+                        <div class="kpi-icon" style="background: rgba(124, 92, 252, 0.1); color: var(--primary);">
+                            <i class="bi bi-buildings"></i>
                         </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                            <!-- Opción 1: Facturación Mensual y Proyecciones -->
-                            <label class="relative flex flex-col p-4 rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-brand-500 bg-slate-50 hover:bg-white group">
-                                <input type="radio" name="reportType" value="Facturación Mensual y Proyecciones" class="peer sr-only" checked>
-                                <div class="absolute top-3 right-3 text-brand-500 opacity-0 peer-checked:opacity-100 transition">
-                                    <i class="fa-solid fa-circle-check text-lg"></i>
-                                </div>
-                                <div class="w-10 h-10 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-lg mb-3">
-                                    <i class="fa-solid fa-receipt"></i>
-                                </div>
-                                <span class="font-bold text-sm text-slate-800 group-hover:text-brand-600">Facturación y Proyecciones</span>
-                                <span class="text-xs text-slate-500 mt-1">Ingresos, MRR, pagos pendientes y estado SII.</span>
-                            </label>
-
-                            <!-- Opción 2: Estado de Onboarding de Clientes -->
-                            <label class="relative flex flex-col p-4 rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-brand-500 bg-slate-50 hover:bg-white group">
-                                <input type="radio" name="reportType" value="Estado de Onboarding de Clientes" class="peer sr-only">
-                                <div class="absolute top-3 right-3 text-brand-500 opacity-0 peer-checked:opacity-100 transition">
-                                    <i class="fa-solid fa-circle-check text-lg"></i>
-                                </div>
-                                <div class="w-10 h-10 rounded-lg bg-teal-100 text-teal-600 flex items-center justify-center text-lg mb-3">
-                                    <i class="fa-solid fa-flag"></i>
-                                </div>
-                                <span class="font-bold text-sm text-slate-800 group-hover:text-brand-600">Estado de Onboarding</span>
-                                <span class="text-xs text-slate-500 mt-1">Avance del checklist, etapas completadas y tiempos.</span>
-                            </label>
-
-                            <!-- Opción 3: Uso Académico Global -->
-                            <label class="relative flex flex-col p-4 rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-brand-500 bg-slate-50 hover:bg-white group">
-                                <input type="radio" name="reportType" value="Uso Académico Global" class="peer sr-only">
-                                <div class="absolute top-3 right-3 text-brand-500 opacity-0 peer-checked:opacity-100 transition">
-                                    <i class="fa-solid fa-circle-check text-lg"></i>
-                                </div>
-                                <div class="w-10 h-10 rounded-lg bg-purple-100 text-brand-500 flex items-center justify-center text-lg mb-3">
-                                    <i class="fa-solid fa-graduation-cap"></i>
-                                </div>
-                                <span class="font-bold text-sm text-slate-800 group-hover:text-brand-600">Uso Académico Global</span>
-                                <span class="text-xs text-slate-500 mt-1">Métricas de asistencia, notas creadas y anotaciones.</span>
-                            </label>
-
-                            <!-- Opción 4: Directorio de Usuarios -->
-                            <label class="relative flex flex-col p-4 rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-brand-500 bg-slate-50 hover:bg-white group">
-                                <input type="radio" name="reportType" value="Directorio de Usuarios Globales" class="peer sr-only">
-                                <div class="absolute top-3 right-3 text-brand-500 opacity-0 peer-checked:opacity-100 transition">
-                                    <i class="fa-solid fa-circle-check text-lg"></i>
-                                </div>
-                                <div class="w-10 h-10 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center text-lg mb-3">
-                                    <i class="fa-solid fa-users-gear"></i>
-                                </div>
-                                <span class="font-bold text-sm text-slate-800 group-hover:text-brand-600">Directorio de Usuarios</span>
-                                <span class="text-xs text-slate-500 mt-1">Nombres, emails, roles asignados y último acceso.</span>
-                            </label>
+                        <div>
+                            <div class="text-muted small fw-semibold">Colegios en Base</div>
+                            <div class="fs-4 fw-bold text-dark">{{ total_colegios|default:"0" }}</div>
                         </div>
                     </div>
-
-                    <!-- PASO 2: FILTROS APLICABLES -->
-                    <div class="mb-8">
-                        <div class="flex items-center gap-3 mb-4 pb-2 border-b border-slate-100">
-                            <span class="step-badge">2</span>
-                            <div>
-                                <h3 class="font-extrabold text-base text-slate-800">Filtros y Parámetros de Extracción</h3>
-                                <p class="text-xs text-slate-500">Defina el rango temporal, segmentación geográfica y formato de salida.</p>
-                            </div>
+                </div>
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="kpi-card">
+                        <div class="kpi-icon" style="background: rgba(16, 185, 129, 0.1); color: #10B981;">
+                            <i class="bi bi-check-circle-fill"></i>
                         </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-                            <!-- Rango de Fechas (Desde - Hasta) -->
-                            <div class="space-y-3">
-                                <div>
-                                    <label for="dateFrom" class="form-label-custom">Fecha Desde</label>
-                                    <input type="date" id="dateFrom" class="form-control-custom" value="2026-07-01">
-                                </div>
-                                <div>
-                                    <label for="dateTo" class="form-label-custom">Fecha Hasta</label>
-                                    <input type="date" id="dateTo" class="form-control-custom" value="2026-08-16">
-                                </div>
-                            </div>
-
-                            <!-- Filtrar por Plan -->
-                            <div>
-                                <label for="selectPlan" class="form-label-custom">Filtrar por Plan</label>
-                                <select id="selectPlan" class="form-control-custom cursor-pointer">
-                                    <option value="">Todos los Planes</option>
-                                    <option value="Básico">Plan Básico</option>
-                                    <option value="Estándar">Plan Estándar (Pro)</option>
-                                    <option value="Premium">Plan Premium / Enterprise</option>
-                                </select>
-
-                                <div class="mt-4">
-                                    <label for="selectFormat" class="form-label-custom">Formato de Salida</label>
-                                    <select id="selectFormat" class="form-control-custom font-semibold cursor-pointer">
-                                        <option value="xlsx">Excel (.xlsx) - openpyxl</option>
-                                        <option value="csv">CSV (.csv) - Valores separados por coma</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <!-- Filtrar por Región -->
-                            <div>
-                                <label for="selectRegion" class="form-label-custom">Filtrar por Región</label>
-                                <select id="selectRegion" class="form-control-custom cursor-pointer">
-                                    <option value="">Todas las Regiones</option>
-                                    <option value="RM">Región Metropolitana</option>
-                                    <option value="Antofagasta">Región de Antofagasta</option>
-                                    <option value="Valparaíso">Región de Valparaíso</option>
-                                    <option value="Biobío">Región del Biobío</option>
-                                    <option value="Los Lagos">Región de Los Lagos</option>
-                                </select>
-                            </div>
-
-                            <!-- Opciones Adicionales de Columnas (Checkboxes) -->
-                            <div>
-                                <label class="form-label-custom">Campos Personalizados</label>
-                                <div class="space-y-2.5 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
-                                    <label class="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer">
-                                        <input type="checkbox" class="w-4 h-4 rounded text-brand-500 focus:ring-brand-500" checked>
-                                        Incluir datos de contacto del Director
-                                    </label>
-                                    <label class="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer">
-                                        <input type="checkbox" class="w-4 h-4 rounded text-brand-500 focus:ring-brand-500" checked>
-                                        Desglose de IVA y folios SII
-                                    </label>
-                                    <label class="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer">
-                                        <input type="checkbox" class="w-4 h-4 rounded text-brand-500 focus:ring-brand-500" checked>
-                                        Métricas de retención y asistencia
-                                    </label>
-                                </div>
-                            </div>
+                        <div>
+                            <div class="text-muted small fw-semibold">Colegios Activos</div>
+                            <div class="fs-4 fw-bold text-dark">{{ colegios_activos|default:"0" }}</div>
                         </div>
                     </div>
-
-                    <!-- BOTÓN DE ACCIÓN PRINCIPAL -->
-                    <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
-                        <div class="text-xs text-slate-500 font-medium flex items-center gap-2">
-                            <i class="fa-solid fa-shield-check text-emerald-600 text-sm"></i>
-                            Los reportes son procesados de manera segura en el servidor backend usando openpyxl.
+                </div>
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="kpi-card">
+                        <div class="kpi-icon" style="background: rgba(101, 205, 191, 0.15); color: #0D9488;">
+                            <i class="bi bi-layers-fill"></i>
                         </div>
-
-                        <a href="{% url 'descargar_excel' %}" class="btn-excel-custom w-full sm:w-auto" id="btnDownloadExcel">
-                            <i class="fa-solid fa-file-excel text-xl"></i>
-                            Generar y Descargar Excel (.xlsx)
-                        </a>
+                        <div>
+                            <div class="text-muted small fw-semibold">Planes de Suscripción</div>
+                            <div class="fs-4 fw-bold text-dark">{{ total_planes|default:"0" }}</div>
+                        </div>
                     </div>
-
-                </form>
+                </div>
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="kpi-card">
+                        <div class="kpi-icon" style="background: rgba(245, 158, 11, 0.1); color: #F59E0B;">
+                            <i class="bi bi-cpu-fill"></i>
+                        </div>
+                        <div>
+                            <div class="text-muted small fw-semibold">Motor de Exportación</div>
+                            <div class="fs-6 fw-bold text-dark text-truncate">openpyxl (En Memoria)</div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <!-- SECCIÓN INFERIOR (HISTORIAL DE EXPORTACIONES) -->
-            <div class="panel" id="historialReportes">
+            <!-- ── Formulario de Configuración y Descarga ──────────────────── -->
+            <div class="panel-card">
                 <div class="panel-header">
-                    <div>
-                        <h2 class="panel-title flex items-center gap-2">
-                            <i class="fa-solid fa-clock-rotate-left text-brand-500"></i>
-                            Últimos Reportes Generados
-                        </h2>
-                        <p class="panel-subtitle">Historial de archivos exportados recientemente disponibles para descarga rápida.</p>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-sliders2-vertical text-primary fs-5"></i>
+                        <h2 class="fs-6 fw-bold text-dark m-0">Parámetros del Generador</h2>
                     </div>
-                    <span class="text-xs font-bold text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
-                        3 archivos guardados
+                    <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1.5 fw-bold" style="font-size:0.75rem;">
+                        Descarga Real Activa
                     </span>
                 </div>
 
-                <div class="overflow-x-auto">
-                    <table class="reportes-table">
+                <div class="p-4">
+                    <form method="GET" action="{% url 'exportar_colegios_excel' %}" id="reportForm">
+
+                        <!-- Paso 1: Tipo de Reporte -->
+                        <div class="mb-4 pb-3 border-bottom">
+                            <div class="d-flex align-items-center gap-2 mb-3">
+                                <span class="step-badge">1</span>
+                                <div>
+                                    <h3 class="fs-6 fw-bold text-dark m-0">Seleccione el Tipo de Reporte</h3>
+                                    <small class="text-muted">Elija el conjunto de datos maestro que desea exportar.</small>
+                                </div>
+                            </div>
+
+                            <div class="row g-3">
+                                <!-- Opción 1: Colegios y MRR -->
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <input type="radio" class="d-none report-option-input" name="tipo_reporte" id="repColegios" value="colegios_mrr" checked>
+                                    <label for="repColegios" class="report-option-card">
+                                        <div class="report-option-icon" style="background:#EBF5FF; color:#2563EB;">
+                                            <i class="bi bi-building"></i>
+                                        </div>
+                                        <strong class="text-dark small mb-1">Colegios y MRR Estimado</strong>
+                                        <span class="text-muted" style="font-size:0.75rem;">ID, nombre del colegio, plan actual, estado y MRR mensual.</span>
+                                    </label>
+                                </div>
+
+                                <!-- Opción 2: Facturación y Cobros -->
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <input type="radio" class="d-none report-option-input" name="tipo_reporte" id="repFacturacion" value="facturacion">
+                                    <label for="repFacturacion" class="report-option-card">
+                                        <div class="report-option-icon" style="background:#ECFDF5; color:#059669;">
+                                            <i class="bi bi-receipt"></i>
+                                        </div>
+                                        <strong class="text-dark small mb-1">Facturación y Folios SII</strong>
+                                        <span class="text-muted" style="font-size:0.75rem;">Historial de pagos, facturas emitidas y recaudación total.</span>
+                                    </label>
+                                </div>
+
+                                <!-- Opción 3: Onboarding y Estado -->
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <input type="radio" class="d-none report-option-input" name="tipo_reporte" id="repOnboarding" value="onboarding">
+                                    <label for="repOnboarding" class="report-option-card">
+                                        <div class="report-option-icon" style="background:#F5F3FF; color:#7C5CFC;">
+                                            <i class="bi bi-flag"></i>
+                                        </div>
+                                        <strong class="text-dark small mb-1">Estado de Implementación</strong>
+                                        <span class="text-muted" style="font-size:0.75rem;">Progreso del embudo de configuración inicial de colegios.</span>
+                                    </label>
+                                </div>
+
+                                <!-- Opción 4: Usuarios Globales -->
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <input type="radio" class="d-none report-option-input" name="tipo_reporte" id="repUsuarios" value="usuarios">
+                                    <label for="repUsuarios" class="report-option-card">
+                                        <div class="report-option-icon" style="background:#FEF3C7; color:#D97706;">
+                                            <i class="bi bi-people"></i>
+                                        </div>
+                                        <strong class="text-dark small mb-1">Directorio de Usuarios</strong>
+                                        <span class="text-muted" style="font-size:0.75rem;">Cuentas registradas, colegios vinculados y roles globales.</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Paso 2: Filtros y Parámetros -->
+                        <div class="mb-4">
+                            <div class="d-flex align-items-center gap-2 mb-3">
+                                <span class="step-badge">2</span>
+                                <div>
+                                    <h3 class="fs-6 fw-bold text-dark m-0">Filtros y Formato de Salida</h3>
+                                    <small class="text-muted">Personalice los criterios antes de descargar el archivo.</small>
+                                </div>
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-12 col-md-4">
+                                    <label class="form-label small fw-bold text-muted text-uppercase">Plan Específico</label>
+                                    <select class="form-select rounded-3 shadow-none" name="filtro_plan" style="font-size:0.86rem;">
+                                        <option value="">Todos los Planes</option>
+                                        {% for p in planes %}
+                                            <option value="{{ p.id }}">{{ p.nombre }}</option>
+                                        {% empty %}
+                                            <option value="1">Plan Básico</option>
+                                            <option value="2">Plan Estándar</option>
+                                            <option value="3">Plan Premium</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div class="col-12 col-md-4">
+                                    <label class="form-label small fw-bold text-muted text-uppercase">Estado del Colegio</label>
+                                    <select class="form-select rounded-3 shadow-none" name="filtro_estado" style="font-size:0.86rem;">
+                                        <option value="">Todos los Estados</option>
+                                        <option value="activo">Activos</option>
+                                        <option value="onboarding">En Onboarding</option>
+                                        <option value="pendiente">Pendientes</option>
+                                        <option value="suspendido">Suspendidos</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-12 col-md-4">
+                                    <label class="form-label small fw-bold text-muted text-uppercase">Formato de Archivo</label>
+                                    <select class="form-select rounded-3 shadow-none fw-semibold" name="formato" style="font-size:0.86rem;">
+                                        <option value="xlsx" selected>Excel (.xlsx) — openpyxl</option>
+                                        <option value="csv">CSV (.csv) — Separado por comas</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botón de Descarga Real -->
+                        <div class="pt-3 border-top d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
+                            <div class="text-muted small d-flex align-items-center gap-1.5">
+                                <i class="bi bi-shield-check text-success fs-5"></i>
+                                <span>El archivo <strong>Reporte_Colegios_Eduteka.xlsx</strong> se generará en memoria sin demoras.</span>
+                            </div>
+                            <button type="submit" class="btn-excel-primary">
+                                <i class="bi bi-file-earmark-arrow-down-fill fs-5"></i>
+                                Descargar Reporte en Excel (.xlsx)
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+            <!-- ── Tabla de Colegios en Base de Datos ──────────────────────── -->
+            <div class="panel-card">
+                <div class="panel-header">
+                    <div>
+                        <h2 class="fs-6 fw-bold text-dark m-0"><i class="bi bi-clock-history text-primary me-1"></i> Vista Previa de Colegios para Exportación</h2>
+                        <small class="text-muted">Colegios que se incluirán en la generación del archivo Excel.</small>
+                    </div>
+                    <a href="{% url 'dashboard_superadmin_colegios' %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                        Ver Todos los Colegios
+                    </a>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table-custom">
                         <thead>
                             <tr>
-                                <th>Nombre del Reporte</th>
-                                <th>Generado por</th>
-                                <th>Fecha y Hora</th>
-                                <th>Tamaño</th>
-                                <th class="text-end">Acciones</th>
+                                <th>ID</th>
+                                <th>Nombre del Colegio</th>
+                                <th>Plan Actual</th>
+                                <th>Estado</th>
+                                <th>Suscripción</th>
+                                <th class="text-end">Acción</th>
                             </tr>
                         </thead>
-                        <tbody id="historyTableBody">
-
-                            <!-- FILA 1 -->
-                            <tr>
-                                <td>
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-9 h-9 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-lg flex-shrink-0">
-                                            <i class="fa-solid fa-file-excel"></i>
-                                        </div>
-                                        <div>
-                                            <div class="font-bold text-slate-800">Facturacion_Mensual_Julio_2026.xlsx</div>
-                                            <div class="text-xs text-slate-400">Tipo: Facturación Mensual y Proyecciones</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="font-semibold text-slate-800">Carlos Silva</div>
-                                    <div class="text-xs text-slate-400">Super Admin</div>
-                                </td>
-                                <td class="whitespace-nowrap">
-                                    <div class="font-bold text-slate-700">16/08/2026</div>
-                                    <div class="text-xs text-slate-400 font-mono">18:20 hrs</div>
-                                </td>
-                                <td class="whitespace-nowrap font-mono font-bold text-slate-600">
-                                    2.4 MB
-                                </td>
-                                <td class="text-end whitespace-nowrap">
-                                    <button type="button" onclick="downloadSample('Facturacion_Mensual_Julio_2026.xlsx');" class="btn-outline-custom text-xs py-1.5 px-3">
-                                        <i class="fa-solid fa-download text-emerald-600 me-1"></i> Volver a Descargar
-                                    </button>
-                                </td>
-                            </tr>
-
-                            <!-- FILA 2 -->
-                            <tr>
-                                <td>
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-9 h-9 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-lg flex-shrink-0">
-                                            <i class="fa-solid fa-file-excel"></i>
-                                        </div>
-                                        <div>
-                                            <div class="font-bold text-slate-800">Onboarding_Colegios_Q3_2026.xlsx</div>
-                                            <div class="text-xs text-slate-400">Tipo: Estado de Onboarding de Clientes</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="font-semibold text-slate-800">Carlos Silva</div>
-                                    <div class="text-xs text-slate-400">Super Admin</div>
-                                </td>
-                                <td class="whitespace-nowrap">
-                                    <div class="font-bold text-slate-700">15/08/2026</div>
-                                    <div class="text-xs text-slate-400 font-mono">11:45 hrs</div>
-                                </td>
-                                <td class="whitespace-nowrap font-mono font-bold text-slate-600">
-                                    1.8 MB
-                                </td>
-                                <td class="text-end whitespace-nowrap">
-                                    <button type="button" onclick="downloadSample('Onboarding_Colegios_Q3_2026.xlsx');" class="btn-outline-custom text-xs py-1.5 px-3">
-                                        <i class="fa-solid fa-download text-emerald-600 me-1"></i> Volver a Descargar
-                                    </button>
-                                </td>
-                            </tr>
-
-                            <!-- FILA 3 -->
-                            <tr>
-                                <td>
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-9 h-9 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-lg flex-shrink-0">
-                                            <i class="fa-solid fa-file-excel"></i>
-                                        </div>
-                                        <div>
-                                            <div class="font-bold text-slate-800">Reporte_Uso_Academico_Nacional.xlsx</div>
-                                            <div class="text-xs text-slate-400">Tipo: Uso Académico Global</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="font-semibold text-slate-800">María González</div>
-                                    <div class="text-xs text-slate-400">Auditor Académico</div>
-                                </td>
-                                <td class="whitespace-nowrap">
-                                    <div class="font-bold text-slate-700">12/08/2026</div>
-                                    <div class="text-xs text-slate-400 font-mono">09:30 hrs</div>
-                                </td>
-                                <td class="whitespace-nowrap font-mono font-bold text-slate-600">
-                                    4.1 MB
-                                </td>
-                                <td class="text-end whitespace-nowrap">
-                                    <button type="button" onclick="downloadSample('Reporte_Uso_Academico_Nacional.xlsx');" class="btn-outline-custom text-xs py-1.5 px-3">
-                                        <i class="fa-solid fa-download text-emerald-600 me-1"></i> Volver a Descargar
-                                    </button>
-                                </td>
-                            </tr>
-
+                        <tbody>
+                            {% if colegios_recientes %}
+                                {% for col in colegios_recientes %}
+                                <tr>
+                                    <td class="fw-bold text-muted">#{{ col.id }}</td>
+                                    <td class="fw-bold text-dark">{{ col.nombre }}</td>
+                                    <td>
+                                        <span class="badge bg-primary-subtle text-primary rounded-pill px-2.5 py-1">
+                                            {{ col.suscripcion.plan.nombre|default:"Sin Plan" }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge {% if col.estado == 'activo' %}bg-success-subtle text-success{% else %}bg-warning-subtle text-warning{% endif %} rounded-pill px-2.5 py-1">
+                                            {{ col.get_estado_display|default:col.estado }}
+                                        </span>
+                                    </td>
+                                    <td class="text-muted small">
+                                        {{ col.suscripcion.tipo_facturacion|default:"Mensual"|title }}
+                                    </td>
+                                    <td class="text-end">
+                                        <a href="{% url 'exportar_colegios_excel' %}" class="btn btn-sm btn-outline-success rounded-pill px-3" title="Descargar Excel">
+                                            <i class="bi bi-download me-1"></i> Excel
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-4 text-muted">
+                                        <i class="bi bi-folder2-open fs-2 d-block mb-2 text-muted"></i>
+                                        No hay colegios registrados para previsualizar.
+                                    </td>
+                                </tr>
+                            {% endif %}
                         </tbody>
                     </table>
                 </div>
@@ -541,56 +519,8 @@
     </main>
 </div>
 
-<script>
-    function generateReport(e) {
-        e.preventDefault();
-        const reportType = document.querySelector('input[name="reportType"]:checked').value;
-        const format = document.getElementById('selectFormat').value.toUpperCase();
-
-        const filename = `${reportType.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.${format.toLowerCase()}`;
-
-        alert(`¡Generando reporte dinámico openpyxl!\n\nArchivo: ${filename}\nFormato: ${format}\n\nEl archivo se descargará automáticamente.`);
-
-        // Append new row to history table visually
-        const tbody = document.getElementById('historyTableBody');
-        const newRowHtml = `
-            <tr class="bg-emerald-50/50">
-                <td>
-                    <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-lg flex-shrink-0">
-                            <i class="fa-solid fa-file-excel"></i>
-                        </div>
-                        <div>
-                            <div class="font-bold text-slate-800">${filename}</div>
-                            <div class="text-xs text-slate-400">Tipo: ${reportType}</div>
-                        </div>
-                    </div>
-                </td>
-                <td>
-                    <div class="font-semibold text-slate-800">Carlos Silva</div>
-                    <div class="text-xs text-slate-400">Super Admin</div>
-                </td>
-                <td class="whitespace-nowrap">
-                    <div class="font-bold text-slate-700">Hoy</div>
-                    <div class="text-xs text-slate-400 font-mono">Ahora mismo</div>
-                </td>
-                <td class="whitespace-nowrap font-mono font-bold text-emerald-700">
-                    3.2 MB
-                </td>
-                <td class="text-end whitespace-nowrap">
-                    <button type="button" onclick="downloadSample('${filename}');" class="btn-outline-custom text-xs py-1.5 px-3">
-                        <i class="fa-solid fa-download text-emerald-600 me-1"></i> Volver a Descargar
-                    </button>
-                </td>
-            </tr>
-        `;
-        tbody.insertAdjacentHTML('afterbegin', newRowHtml);
-    }
-
-    function downloadSample(filename) {
-        alert(`Iniciando descarga del archivo de reporte: ${filename}`);
-    }
-</script>
+<!-- Bootstrap 5 Bundle JS -->
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 
 </body>
 </html>

@@ -999,7 +999,7 @@ def dashboard_superadmin_configuracion_view(request):
 
         messages.success(
             request,
-            '✅ Configuración de Integraciones y APIs guardada correctamente.'
+            '✅ Configuración de servicios y conexiones guardada correctamente.'
         )
         return redirect('dashboard_superadmin_configuracion')
 
@@ -1633,27 +1633,20 @@ def dashboard_superadmin_solicitudes_view(request):
     est_f = request.GET.get('estado', '').strip()
 
     # ── KPIs globales (sin filtros)
-    pendientes_total = SolicitudNuevoColegio.objects.filter(estado='pendiente').count()
-    aprobadas_total  = SolicitudNuevoColegio.objects.filter(estado='aprobada').count()
-    rechazadas_total = SolicitudNuevoColegio.objects.filter(estado='rechazada').count()
-    aprobadas_hoy    = SolicitudNuevoColegio.objects.filter(
+    pendientes_total  = SolicitudNuevoColegio.objects.filter(estado='pendiente').count()
+    en_revision_total = SolicitudNuevoColegio.objects.filter(estado='en_revision').count()
+    aprobadas_total   = SolicitudNuevoColegio.objects.filter(estado='aprobada').count()
+    rechazadas_total  = SolicitudNuevoColegio.objects.filter(estado='rechazada').count()
+    aprobadas_hoy     = SolicitudNuevoColegio.objects.filter(
         estado='aprobada', updated_at__date=hoy
     ).count()
-    total_resueltas  = aprobadas_total + rechazadas_total
-    tasa_rechazo     = round((rechazadas_total / total_resueltas) * 100, 1) if total_resueltas else 0
+    total_resueltas   = aprobadas_total + rechazadas_total
+    tasa_rechazo      = round((rechazadas_total / total_resueltas) * 100, 1) if total_resueltas else 0
 
-    # ── QuerySet base (Priorizando 'Pendientes' primero, luego por fecha más reciente)
+    # ── QuerySet base
     solicitudes = SolicitudNuevoColegio.objects.select_related(
         'plan_solicitado', 'colegio_creado'
-    ).annotate(
-        prioridad_estado=Case(
-            When(estado='pendiente', then=Value(1)),
-            When(estado='aprobada', then=Value(2)),
-            When(estado='rechazada', then=Value(3)),
-            default=Value(4),
-            output_field=IntegerField(),
-        )
-    ).order_by('prioridad_estado', '-created_at')
+    ).order_by('-created_at')
 
     # Aplicar filtros
     if q:
@@ -1667,16 +1660,96 @@ def dashboard_superadmin_solicitudes_view(request):
     if est_f:
         solicitudes = solicitudes.filter(estado=est_f.lower())
 
+    solicitudes_nuevas    = solicitudes.filter(estado='pendiente')
+    solicitudes_revision  = solicitudes.filter(estado='en_revision')
+    solicitudes_aprobadas = solicitudes.filter(estado='aprobada')
+
     context = {
-        'pendientes_total':  pendientes_total,
-        'aprobadas_total':   aprobadas_total,
-        'rechazadas_total':  rechazadas_total,
-        'aprobadas_hoy':     aprobadas_hoy,
-        'tasa_rechazo':      tasa_rechazo,
-        'solicitudes':       solicitudes,
-        'total_solicitudes': solicitudes.count(),
+        'pendientes_total':     pendientes_total,
+        'en_revision_total':    en_revision_total,
+        'aprobadas_total':      aprobadas_total,
+        'rechazadas_total':     rechazadas_total,
+        'aprobadas_hoy':        aprobadas_hoy,
+        'tasa_rechazo':         tasa_rechazo,
+        'solicitudes':          solicitudes,
+        'solicitudes_nuevas':   solicitudes_nuevas,
+        'solicitudes_revision': solicitudes_revision,
+        'solicitudes_aprobadas': solicitudes_aprobadas,
+        'total_solicitudes':    solicitudes.count(),
     }
     return render(request, 'dashboard_superadmin_solicitudes.html', context)
+
+
+@superadmin_required
+@require_POST
+def api_actualizar_estado_solicitud(request):
+    """
+    Endpoint AJAX/Fetch para actualizar el estado de una solicitud desde el tablero Kanban.
+    Acepta tanto JSON como Form Data con 'solicitud_id' y 'nuevo_estado'.
+    Estados: 'pendiente' (Nuevas), 'en_revision' (En Revisión), 'aprobada' (Aprobadas / Onboarding).
+    Si se arrastra a 'aprobada', provisiona el colegio si aún no existe.
+    """
+    import json
+    from dashboard.models import SolicitudNuevoColegio
+
+    solicitud_id = None
+    nuevo_estado = None
+
+    if request.content_type == 'application/json':
+        try:
+            payload = json.loads(request.body)
+            solicitud_id = payload.get('solicitud_id')
+            nuevo_estado = payload.get('nuevo_estado')
+        except Exception:
+            return JsonResponse({'status': 'error', 'message': 'Cuerpo JSON inválido.'}, status=400)
+    else:
+        solicitud_id = request.POST.get('solicitud_id')
+        nuevo_estado = request.POST.get('nuevo_estado')
+
+    if not solicitud_id or not nuevo_estado:
+        return JsonResponse({'status': 'error', 'message': 'Faltan parámetros solicitud_id o nuevo_estado.'}, status=400)
+
+    estados_validos = ['pendiente', 'en_revision', 'aprobada', 'rechazada']
+    if nuevo_estado not in estados_validos:
+        return JsonResponse({'status': 'error', 'message': f'Estado no válido: {nuevo_estado}'}, status=400)
+
+    try:
+        solicitud = SolicitudNuevoColegio.objects.select_related('colegio_creado').get(id=solicitud_id)
+    except SolicitudNuevoColegio.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Solicitud no encontrada.'}, status=404)
+
+    estado_anterior = solicitud.estado
+
+    # Si se mueve a 'aprobada' y no ha sido creada la institución aún
+    colegio_id = None
+    if nuevo_estado == 'aprobada':
+        if not solicitud.colegio_creado:
+            colegio = solicitud.aprobar_y_crear_colegio()
+            colegio_id = colegio.id
+        else:
+            solicitud.estado = 'aprobada'
+            solicitud.save(update_fields=['estado'])
+            colegio_id = solicitud.colegio_creado.id
+        mensaje = f'✅ "{solicitud.nombre_colegio}" aprobada y colegio activado (#{colegio_id}).'
+    else:
+        solicitud.estado = nuevo_estado
+        solicitud.save(update_fields=['estado'])
+        display_map = {
+            'pendiente': 'Nuevas Solicitudes',
+            'en_revision': 'En Revisión',
+            'rechazada': 'Rechazada',
+        }
+        mensaje = f'📌 "{solicitud.nombre_colegio}" movida a {display_map.get(nuevo_estado, nuevo_estado)}.'
+
+    return JsonResponse({
+        'status': 'success',
+        'solicitud_id': solicitud.id,
+        'estado_anterior': estado_anterior,
+        'nuevo_estado': nuevo_estado,
+        'colegio_id': colegio_id,
+        'message': mensaje,
+        'colegio_nombre': solicitud.nombre_colegio,
+    })
 
 
 
@@ -2005,7 +2078,124 @@ def dashboard_superadmin_auditoria_view(request):
 @superadmin_required
 def dashboard_superadmin_reportes_view(request):
     """Centro de Reportes y Descarga de Métricas del Super Administrador."""
-    return render(request, 'dashboard_superadmin_reportes.html')
+    from colegios.models import Colegio, Suscripcion
+    from planes.models import Plan
+
+    total_colegios = Colegio.objects.count()
+    colegios_activos = Colegio.objects.filter(estado='activo').count()
+    total_planes = Plan.objects.count()
+    colegios_recientes = Colegio.objects.select_related('suscripcion', 'suscripcion__plan').order_by('-id')[:5]
+    planes = Plan.objects.all()
+
+    context = {
+        'active_page': 'reportes',
+        'total_colegios': total_colegios,
+        'colegios_activos': colegios_activos,
+        'total_planes': total_planes,
+        'colegios_recientes': colegios_recientes,
+        'planes': planes,
+        'topbar_badge': 'Engine openpyxl Habilitado',
+    }
+    return render(request, 'dashboard_superadmin_reportes.html', context)
+
+
+@superadmin_required
+def exportar_colegios_excel(request):
+    """
+    Genera y descarga en memoria un archivo Excel (.xlsx) con los colegios clientes y su MRR estimado.
+    Columnas: 'ID', 'Nombre del Colegio', 'Plan Actual', 'Estado', 'MRR Estimado'.
+    Optimizado con select_related('suscripcion', 'suscripcion__plan') para evitar consultas N+1.
+    """
+    colegios = Colegio.objects.select_related('suscripcion', 'suscripcion__plan').order_by('id')
+
+    # 1. Crear libro de trabajo en memoria
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Colegios"
+
+    # Estilos elegantes alineados al diseño de Eduteka
+    header_fill = PatternFill(start_color="7C5CFC", end_color="7C5CFC", fill_type="solid")
+    header_font = Font(name="Calibri", bold=True, color="FFFFFF", size=11)
+    header_align = Alignment(horizontal="center", vertical="center")
+    thin_border = Border(
+        left=Side(style='thin', color="BCC0CF"),
+        right=Side(style='thin', color="BCC0CF"),
+        top=Side(style='thin', color="BCC0CF"),
+        bottom=Side(style='thin', color="BCC0CF"),
+    )
+    data_font = Font(name="Calibri", size=10)
+    alt_fill = PatternFill(start_color="F4F0FF", end_color="F4F0FF", fill_type="solid")
+
+    # 2. Definición de encabezados requeridos
+    headers = ['ID', 'Nombre del Colegio', 'Plan Actual', 'Estado', 'MRR Estimado']
+    ws.row_dimensions[1].height = 28
+
+    for col_idx, h in enumerate(headers, start=1):
+        cell = ws.cell(row=1, column=col_idx, value=h)
+        cell.fill = header_fill
+        cell.font = header_font
+        cell.alignment = header_align
+        cell.border = thin_border
+
+    # 3. Población de filas
+    for row_idx, col in enumerate(colegios, start=2):
+        susc = getattr(col, 'suscripcion', None)
+        plan_nombre = susc.plan.nombre if (susc and susc.plan) else "Sin Plan"
+        estado = col.get_estado_display() if hasattr(col, 'get_estado_display') else col.estado
+
+        # Cálculo de MRR Estimado (mensual recurrente)
+        mrr_estimado = 0
+        if susc:
+            if susc.tipo_facturacion == 'anual' and susc.monto:
+                mrr_estimado = float(susc.monto) / 12.0
+            elif susc.monto:
+                mrr_estimado = float(susc.monto)
+            elif susc.plan and susc.plan.precio_mensual:
+                mrr_estimado = float(susc.plan.precio_mensual)
+
+        mrr_str = f"${int(mrr_estimado):,}".replace(',', '.') + " CLP" if mrr_estimado > 0 else "$0 CLP"
+
+        row_data = [
+            col.id,
+            col.nombre,
+            plan_nombre,
+            estado,
+            mrr_str
+        ]
+
+        is_alt = (row_idx % 2 == 0)
+        for col_idx, val in enumerate(row_data, start=1):
+            cell = ws.cell(row=row_idx, column=col_idx, value=val)
+            cell.font = data_font
+            cell.border = thin_border
+            if col_idx in [1, 4]:
+                cell.alignment = Alignment(horizontal="center", vertical="center")
+            elif col_idx == 5:
+                cell.alignment = Alignment(horizontal="right", vertical="center")
+            else:
+                cell.alignment = Alignment(horizontal="left", vertical="center")
+            if is_alt:
+                cell.fill = alt_fill
+
+        ws.row_dimensions[row_idx].height = 20
+
+    # 4. Ajustar ancho de columnas automáticamente
+    for col_cells in ws.columns:
+        max_len = max(len(str(c.value or '')) for c in col_cells)
+        col_letter = get_column_letter(col_cells[0].column)
+        ws.column_dimensions[col_letter].width = max(max_len + 4, 14)
+
+    # 5. Guardar en memoria y retornar HttpResponse
+    buffer = io.BytesIO()
+    wb.save(buffer)
+    buffer.seek(0)
+
+    response = HttpResponse(
+        buffer.getvalue(),
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = 'attachment; filename="Reporte_Colegios_Eduteka.xlsx"'
+    return response
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -2418,7 +2608,7 @@ def api_crecimiento_ingresos_view(request):
     from django.http import JsonResponse
     from django.utils import timezone
     from django.db.models import Sum
-    from django.db.models.functions import TruncDay, TruncMonth
+    from django.db.models.functions import TruncDay, TruncMonth, TruncYear
     from colegios.models import FacturaGasto
 
     rango = request.GET.get('rango', '30dias')
@@ -2490,7 +2680,39 @@ def api_crecimiento_ingresos_view(request):
         for m in range(1, 13):
             data.append(mapa_montos.get(m, 0.0))
 
-    # ── 4. Filtro: Año Anterior ───────────────────────────────────────────────
+    # ── 4. Filtro: Últimos 5 Años (Agrupado por Año con TruncYear) ─────────────
+    elif rango == 'ultimos_5_anos':
+        anio_actual = hoy.year
+        anios = [anio_actual - 4 + i for i in range(5)]  # Ej: [2022, 2023, 2024, 2025, 2026]
+        fecha_inicio = date(anios[0], 1, 1)
+        fecha_fin = date(anios[-1], 12, 31)
+
+        registros = (
+            FacturaGasto.objects.filter(
+                estado_pago='pagado',
+                fecha_emision__range=[fecha_inicio, fecha_fin]
+            )
+            .annotate(anio=TruncYear('fecha_emision'))
+            .values('anio')
+            .annotate(total=Sum('monto_total'))
+            .order_by('anio')
+        )
+        mapa_montos = {}
+        for r in registros:
+            anio_val = r['anio']
+            if hasattr(anio_val, 'year'):
+                year_num = anio_val.year
+            else:
+                try:
+                    year_num = int(str(anio_val)[:4])
+                except (ValueError, TypeError):
+                    continue
+            mapa_montos[year_num] = float(r['total'] or 0.0)
+
+        labels = [str(a) for a in anios]
+        data = [mapa_montos.get(a, 0.0) for a in anios]
+
+    # ── 5. Filtro: Año Anterior (Compatibilidad) ──────────────────────────────
     elif rango == 'ano_anterior':
         anio_anterior = hoy.year - 1
         fecha_inicio = date(anio_anterior, 1, 1)

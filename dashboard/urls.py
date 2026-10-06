@@ -26,6 +26,7 @@ urlpatterns = [
     path('superadmin/solicitudes-global/', views.dashboard_superadmin_solicitudes_view, name='dashboard_superadmin_solicitudes'),
     path('superadmin/solicitudes/<int:solicitud_id>/aprobar/', views.superadmin_aprobar_solicitud, name='superadmin_aprobar_solicitud'),
     path('superadmin/solicitudes/<int:solicitud_id>/rechazar/', views.superadmin_rechazar_solicitud, name='superadmin_rechazar_solicitud'),
+    path('superadmin/solicitudes/api/actualizar-estado/', views.api_actualizar_estado_solicitud, name='api_actualizar_estado_solicitud'),
     # Éxito del Cliente (CSM)
     path('superadmin/onboarding/', views.dashboard_superadmin_onboarding_view, name='dashboard_superadmin_onboarding'),
     # Comunicación
@@ -36,6 +37,7 @@ urlpatterns = [
     path('superadmin/academico/', views.dashboard_superadmin_academico_view, name='dashboard_superadmin_academico'),
     # Generador de Reportes Personalizables (openpyxl)
     path('superadmin/reportes/', views.dashboard_superadmin_reportes_view, name='dashboard_superadmin_reportes'),
+    path('superadmin/reportes/colegios/excel/', views.exportar_colegios_excel, name='exportar_colegios_excel'),
     path('superadmin/reportes/descargar/', views.exportar_reporte_colegios_excel, name='descargar_excel'),
     path('superadmin/finanzas/exportar/', views.exportar_finanzas_excel, name='exportar_finanzas_excel'),
     # API Interactiva de Gráficos Superadmin

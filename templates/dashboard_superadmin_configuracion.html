@@ -315,6 +315,49 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        /* ── Sección Colapsable: Ajustes Técnicos Avanzados ── */
+        .advanced-settings-wrapper {
+            border-top: 1px dashed var(--border);
+            padding-top: 1.15rem;
+        }
+        .btn-toggle-advanced {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.42rem 0.9rem;
+            background: #F1F3F9;
+            color: #4B5565;
+            border: 1px solid #D5DAE5;
+            border-radius: var(--radius-md);
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+        .btn-toggle-advanced:hover {
+            background: #E8ECF5;
+            color: var(--dark);
+            border-color: #BCC4D5;
+        }
+        .btn-toggle-advanced[aria-expanded="true"] {
+            background: var(--primary-soft);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+        .btn-toggle-advanced .chevron-advanced {
+            font-size: 0.75rem;
+            transition: transform 0.25s ease;
+        }
+        .btn-toggle-advanced[aria-expanded="true"] .chevron-advanced {
+            transform: rotate(180deg);
+        }
+        .advanced-settings-box {
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: var(--radius-md);
+        }
+
         @media (max-width: 991.98px) {
             .content-area { padding: 1.25rem 1rem; }
             .integration-header { padding: 1rem; }
@@ -343,7 +386,7 @@
                         <h1 class="hero-title mb-0">Configuración General del Sistema</h1>
                     </div>
                     <p class="hero-subtitle ms-1">
-                        Parámetros globales de Eduteka SaaS, integraciones, políticas de seguridad y módulos.
+                        Parámetros generales de Eduteka, plataformas de cobro y facturación, seguridad de cuentas y módulos escolares.
                     </p>
                 </div>
             </div>
@@ -368,10 +411,10 @@
                 <div class="col-12 col-lg-3">
                     <div class="config-nav" role="tablist" aria-orientation="vertical">
                         <button type="button" class="config-tab-btn active" data-tab="integraciones" role="tab" aria-selected="true" aria-controls="tab-integraciones" onclick="switchTab('integraciones', this)">
-                            <i class="bi bi-cpu-fill"></i>
+                            <i class="bi bi-puzzle-fill"></i>
                             <div>
-                                <div>Integraciones y APIs</div>
-                                <div style="font-size:.7rem;font-weight:400;opacity:.8;">MercadoPago, SII, SendGrid</div>
+                                <div>Servicios Conectados</div>
+                                <div style="font-size:.7rem;font-weight:400;opacity:.8;">Pagos, Facturación, Correos</div>
                             </div>
                         </button>
 
@@ -379,23 +422,23 @@
                             <i class="bi bi-shield-lock-fill"></i>
                             <div>
                                 <div>Seguridad y Accesos</div>
-                                <div style="font-size:.7rem;font-weight:400;opacity:.8;">2FA, Sesiones, Políticas</div>
+                                <div style="font-size:.7rem;font-weight:400;opacity:.8;">Doble paso, Claves y Sesiones</div>
                             </div>
                         </button>
 
                         <button type="button" class="config-tab-btn" data-tab="features" role="tab" aria-selected="false" aria-controls="tab-features" onclick="switchTab('features', this)">
                             <i class="bi bi-toggle-on"></i>
                             <div>
-                                <div>Feature Flags</div>
-                                <div style="font-size:.7rem;font-weight:400;opacity:.8;">Módulos y Betas SaaS</div>
+                                <div>Módulos Adicionales</div>
+                                <div style="font-size:.7rem;font-weight:400;opacity:.8;">Herramientas y Novedades</div>
                             </div>
                         </button>
 
                         <button type="button" class="config-tab-btn danger-tab" data-tab="sistema" role="tab" aria-selected="false" aria-controls="tab-sistema" onclick="switchTab('sistema', this)">
                             <i class="bi bi-exclamation-triangle-fill"></i>
                             <div>
-                                <div>Estado del Sistema</div>
-                                <div style="font-size:.7rem;font-weight:400;opacity:.8;">Mantenimiento y Alertas</div>
+                                <div>Estado de la Plataforma</div>
+                                <div style="font-size:.7rem;font-weight:400;opacity:.8;">Mantención y Disponibilidad</div>
                             </div>
                         </button>
                     </div>
@@ -411,10 +454,10 @@
                         <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
                             <div>
                                 <h2 class="h5 fw-bold mb-1" style="color:var(--dark);">
-                                    <i class="bi bi-cpu text-primary me-1"></i> Integraciones y Conectores Externos
+                                    <i class="bi bi-puzzle text-primary me-1"></i> Servicios Conectados y Plataformas Externas
                                 </h2>
                                 <p class="text-muted small mb-0">
-                                    Configura credenciales y servicios SaaS. Haz clic en <strong>Configurar</strong> para expandir y editar.
+                                    Conecta plataformas de cobro, facturación y correo electrónico para los colegios. Haz clic en <strong>Configurar</strong> para revisar cada servicio.
                                 </p>
                             </div>
                             <span class="badge" style="background:rgba(16,185,129,.1);color:#059669;font-weight:700;padding:.45rem .85rem;border-radius:20px;font-size:.76rem;">
@@ -438,13 +481,13 @@
                                         </div>
                                         <div>
                                             <div class="integration-title">MercadoPago / Transbank Webpay</div>
-                                            <div class="integration-subtitle">Cobros recurrentes, suscripciones SaaS y pasarela de checkout</div>
+                                            <div class="integration-subtitle">Cobro en línea de matrículas, mensualidades escolares y planes</div>
                                         </div>
                                     </div>
 
                                     <div class="d-flex align-items-center gap-3">
                                         <span class="badge-status-pill">
-                                            🟢 Conectado ({% if config.mp_modo == 'live' %}Producción{% else %}Sandbox{% endif %})
+                                            🟢 Conectado ({% if config.mp_modo == 'live' %}Modo Real{% else %}Modo de Prueba{% endif %})
                                         </span>
                                         <button type="button" class="btn-configurar" id="btnConfigMP"
                                                 data-bs-toggle="collapse"
@@ -464,38 +507,61 @@
                                             {% csrf_token %}
                                             <div class="row g-3">
                                                 <div class="col-12 col-md-6">
-                                                    <label class="form-label-custom" for="mp_public_key">Public Key (MercadoPago / Webpay)</label>
+                                                    <label class="form-label-custom" for="mp_modo">Modo de Operación de Pagos</label>
+                                                    <select id="mp_modo" name="mp_modo" class="form-control-custom">
+                                                        <option value="live"    {% if config.mp_modo == 'live' %}selected{% endif %}>Modo Real (Cobros bancarios verdaderos)</option>
+                                                        <option value="sandbox" {% if config.mp_modo == 'sandbox' or not config.mp_modo %}selected{% endif %}>Modo de Prueba (Simulación sin dinero real)</option>
+                                                    </select>
+                                                    <div style="font-size:.74rem;color:var(--gray-text);" class="mt-1">Permite alternar entre pruebas de simulación y cobros reales a los apoderados.</div>
+                                                </div>
+                                                <div class="col-12 col-md-6">
+                                                    <label class="form-label-custom" for="mp_public_key">Identificador Público del Comercio (Clave Pública)</label>
                                                     <input type="text" id="mp_public_key" name="mp_public_key" class="form-control-custom"
                                                            placeholder="APP_USR-..."
                                                            value="{{ config.mp_public_key|default:'' }}">
+                                                    <div style="font-size:.74rem;color:var(--gray-text);" class="mt-1">Código público visible de la cuenta recaudadora del establecimiento.</div>
                                                 </div>
-                                                <div class="col-12 col-md-6">
-                                                    <label class="form-label-custom" for="mp_access_token">Access Token (Secret Key)</label>
-                                                    <div class="position-relative">
-                                                        <input type="password" id="mp_access_token" name="mp_access_token" class="form-control-custom pe-5"
-                                                               placeholder="APP_USR-..."
-                                                               value="{{ config.mp_access_token|default:'' }}">
-                                                        <button type="button" class="btn btn-sm text-muted position-absolute end-0 top-50 translate-middle-y me-2 border-0 bg-transparent"
-                                                                onclick="togglePasswordVisibility('mp_access_token', this)" title="Mostrar / Ocultar">
-                                                            <i class="bi bi-eye"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                <div class="col-12 col-md-6">
-                                                    <label class="form-label-custom" for="mp_modo">Modo de Procesamiento</label>
-                                                    <select id="mp_modo" name="mp_modo" class="form-control-custom">
-                                                        <option value="live"    {% if config.mp_modo == 'live'    %}selected{% endif %}>Live / Producción</option>
-                                                        <option value="sandbox" {% if config.mp_modo == 'sandbox' or not config.mp_modo %}selected{% endif %}>Sandbox / Pruebas</option>
-                                                    </select>
-                                                </div>
-                                                <div class="col-12 col-md-6">
-                                                    <label class="form-label-custom" for="mp_webhook">URL Webhook de Notificaciones IPN</label>
-                                                    <div class="input-group">
-                                                        <input type="text" id="mp_webhook" class="form-control-custom" readonly value="https://eduteka.cl/api/payments/webhook/">
-                                                        <button type="button" class="btn btn-outline-secondary px-3" style="border-color:var(--border);"
-                                                                onclick="copiarAlPortapapeles('mp_webhook', this)" title="Copiar al portapapeles">
-                                                            <i class="bi bi-clipboard"></i>
-                                                        </button>
+                                            </div>
+
+                                            <!-- SECCIÓN COLAPSABLE: AJUSTES TÉCNICOS AVANZADOS -->
+                                            <div class="advanced-settings-wrapper mt-4">
+                                                <button type="button" class="btn-toggle-advanced" data-bs-toggle="collapse" data-bs-target="#advancedTechMP" aria-expanded="false" aria-controls="advancedTechMP">
+                                                    <i class="bi bi-gear-wide-connected"></i>
+                                                    <span>Ajustes Técnicos Avanzados</span>
+                                                    <i class="bi bi-chevron-down chevron-advanced ms-2"></i>
+                                                </button>
+                                                <div class="collapse mt-3" id="advancedTechMP">
+                                                    <div class="advanced-settings-box p-3">
+                                                        <div class="d-flex align-items-center gap-2 mb-3 text-muted" style="font-size:.8rem;">
+                                                            <i class="bi bi-shield-lock-fill text-warning"></i>
+                                                            <span>Parámetros de conexión interna del servidor. Solo modifica estos valores si tu proveedor de pagos o soporte técnico te lo indica.</span>
+                                                        </div>
+                                                        <div class="row g-3">
+                                                            <div class="col-12 col-md-6">
+                                                                <label class="form-label-custom" for="mp_access_token">Clave Secreta de Acceso (Secret Key / Token)</label>
+                                                                <div class="position-relative">
+                                                                    <input type="password" id="mp_access_token" name="mp_access_token" class="form-control-custom pe-5"
+                                                                           placeholder="APP_USR-..."
+                                                                           value="{{ config.mp_access_token|default:'' }}">
+                                                                    <button type="button" class="btn btn-sm text-muted position-absolute end-0 top-50 translate-middle-y me-2 border-0 bg-transparent"
+                                                                            onclick="togglePasswordVisibility('mp_access_token', this)" title="Mostrar / Ocultar">
+                                                                        <i class="bi bi-eye"></i>
+                                                                    </button>
+                                                                </div>
+                                                                <div style="font-size:.72rem;color:var(--gray-text);" class="mt-1">Llave privada de seguridad para procesar transacciones bancarias.</div>
+                                                            </div>
+                                                            <div class="col-12 col-md-6">
+                                                                <label class="form-label-custom" for="mp_webhook">Enlace de Notificaciones Automáticas (Webhook IPN)</label>
+                                                                <div class="input-group">
+                                                                    <input type="text" id="mp_webhook" class="form-control-custom" readonly value="https://eduteka.cl/api/payments/webhook/">
+                                                                    <button type="button" class="btn btn-outline-secondary px-3" style="border-color:var(--border);"
+                                                                            onclick="copiarAlPortapapeles('mp_webhook', this)" title="Copiar al portapapeles">
+                                                                        <i class="bi bi-clipboard"></i>
+                                                                    </button>
+                                                                </div>
+                                                                <div style="font-size:.72rem;color:var(--gray-text);" class="mt-1">Dirección a la cual la pasarela avisa cuando una mensualidad fue pagada con éxito.</div>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -533,13 +599,13 @@
                                         </div>
                                         <div>
                                             <div class="integration-title">Servicio de Impuestos Internos (SII)</div>
-                                            <div class="integration-subtitle">Emisión automática de boletas y facturas electrónicas de los clientes</div>
+                                            <div class="integration-subtitle">Emisión y timbrado automático de boletas y facturas electrónicas para colegios</div>
                                         </div>
                                     </div>
 
                                     <div class="d-flex align-items-center gap-3">
                                         <span class="badge-status-pill">
-                                            🟢 Conectado ({% if config.sii_ambiente == 'produccion' %}Producción{% else %}Sandbox{% endif %})
+                                            🟢 Conectado ({% if config.sii_ambiente == 'produccion' %}Ambiente Oficial{% else %}Modo de Prueba{% endif %})
                                         </span>
                                         <button type="button" class="btn-configurar" id="btnConfigSII"
                                                 data-bs-toggle="collapse"
@@ -558,35 +624,58 @@
                                         <form method="POST" action="{% url 'dashboard_superadmin_configuracion' %}" id="form-sii">
                                             {% csrf_token %}
                                             <div class="row g-3">
-                                                <div class="col-12 col-md-6">
-                                                    <label class="form-label-custom" for="sii_rut">RUT Emisor de la Empresa</label>
+                                                <div class="col-12 col-md-4">
+                                                    <label class="form-label-custom" for="sii_rut">RUT del Emisor Tributario</label>
                                                     <input type="text" id="sii_rut" name="sii_rut" class="form-control-custom"
                                                            placeholder="77.123.456-K"
                                                            value="{{ config.sii_rut|default:'' }}">
+                                                    <div style="font-size:.72rem;color:var(--gray-text);" class="mt-1">RUT legal de la institución o sostenedor.</div>
                                                 </div>
-                                                <div class="col-12 col-md-6">
-                                                    <label class="form-label-custom" for="sii_razon_social">Razón Social Registrada</label>
+                                                <div class="col-12 col-md-4">
+                                                    <label class="form-label-custom" for="sii_razon_social">Razón Social o Nombre Legal</label>
                                                     <input type="text" id="sii_razon_social" name="sii_razon_social" class="form-control-custom"
                                                            placeholder="Eduteka SpA"
                                                            value="{{ config.sii_razon_social|default:'' }}">
+                                                    <div style="font-size:.72rem;color:var(--gray-text);" class="mt-1">Nombre registrado ante el SII.</div>
                                                 </div>
-                                                <div class="col-12 col-md-6">
-                                                    <label class="form-label-custom" for="sii_ambiente">Ambiente SII</label>
+                                                <div class="col-12 col-md-4">
+                                                    <label class="form-label-custom" for="sii_ambiente">Ambiente de Facturación</label>
                                                     <select id="sii_ambiente" name="sii_ambiente" class="form-control-custom">
-                                                        <option value="produccion"    {% if config.sii_ambiente == 'produccion' %}selected{% endif %}>Producción (Oficial)</option>
-                                                        <option value="certificacion" {% if config.sii_ambiente == 'certificacion' or not config.sii_ambiente %}selected{% endif %}>Certificación / Staging (Testing)</option>
+                                                        <option value="produccion"    {% if config.sii_ambiente == 'produccion' %}selected{% endif %}>Ambiente Oficial (Emisión con validez legal)</option>
+                                                        <option value="certificacion" {% if config.sii_ambiente == 'certificacion' or not config.sii_ambiente %}selected{% endif %}>Modo de Prueba / Certificación (Pruebas del SII)</option>
                                                     </select>
+                                                    <div style="font-size:.72rem;color:var(--gray-text);" class="mt-1">Define si los documentos son oficiales o simulaciones.</div>
                                                 </div>
-                                                <div class="col-12 col-md-6">
-                                                    <label class="form-label-custom" for="sii_token">Token API Facturación Electrónica</label>
-                                                    <div class="position-relative">
-                                                        <input type="password" id="sii_token" name="sii_token" class="form-control-custom pe-5"
-                                                               placeholder="sii_live_token_..."
-                                                               value="{{ config.sii_token|default:'' }}">
-                                                        <button type="button" class="btn btn-sm text-muted position-absolute end-0 top-50 translate-middle-y me-2 border-0 bg-transparent"
-                                                                onclick="togglePasswordVisibility('sii_token', this)" title="Mostrar / Ocultar">
-                                                            <i class="bi bi-eye"></i>
-                                                        </button>
+                                            </div>
+
+                                            <!-- SECCIÓN COLAPSABLE: AJUSTES TÉCNICOS AVANZADOS -->
+                                            <div class="advanced-settings-wrapper mt-4">
+                                                <button type="button" class="btn-toggle-advanced" data-bs-toggle="collapse" data-bs-target="#advancedTechSII" aria-expanded="false" aria-controls="advancedTechSII">
+                                                    <i class="bi bi-gear-wide-connected"></i>
+                                                    <span>Ajustes Técnicos Avanzados</span>
+                                                    <i class="bi bi-chevron-down chevron-advanced ms-2"></i>
+                                                </button>
+                                                <div class="collapse mt-3" id="advancedTechSII">
+                                                    <div class="advanced-settings-box p-3">
+                                                        <div class="d-flex align-items-center gap-2 mb-3 text-muted" style="font-size:.8rem;">
+                                                            <i class="bi bi-key-fill text-warning"></i>
+                                                            <span>Clave de autorización digital para timbraje electrónico ante el SII. No modifiques este valor sin asistencia especializada.</span>
+                                                        </div>
+                                                        <div class="row g-3">
+                                                            <div class="col-12">
+                                                                <label class="form-label-custom" for="sii_token">Token de Autorización Digital (Clave Secreta SII)</label>
+                                                                <div class="position-relative">
+                                                                    <input type="password" id="sii_token" name="sii_token" class="form-control-custom pe-5"
+                                                                           placeholder="sii_live_token_..."
+                                                                           value="{{ config.sii_token|default:'' }}">
+                                                                    <button type="button" class="btn btn-sm text-muted position-absolute end-0 top-50 translate-middle-y me-2 border-0 bg-transparent"
+                                                                            onclick="togglePasswordVisibility('sii_token', this)" title="Mostrar / Ocultar">
+                                                                        <i class="bi bi-eye"></i>
+                                                                    </button>
+                                                                </div>
+                                                                <div style="font-size:.72rem;color:var(--gray-text);" class="mt-1">Certificado o token provisto para firmar documentos tributarios electrónicos (DTE).</div>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -602,7 +691,7 @@
                                                     Cancelar
                                                 </button>
                                                 <button type="submit" class="btn-primary-custom" id="btn-guardar-sii">
-                                                    <i class="bi bi-check2-circle"></i> Guardar Credenciales SII
+                                                    <i class="bi bi-check2-circle"></i> Guardar Conexión SII
                                                 </button>
                                             </div>
                                         </form>
@@ -622,14 +711,14 @@
                                             <i class="bi bi-envelope-paper-fill"></i>
                                         </div>
                                         <div>
-                                            <div class="integration-title">SendGrid / AWS SES</div>
-                                            <div class="integration-subtitle">Infraestructura de correo transaccional para boletines, clave y comprobantes</div>
+                                            <div class="integration-title">Servicio de Correo Institucional (SendGrid / AWS SES)</div>
+                                            <div class="integration-subtitle">Envío automático de comunicados, restablecimiento de contraseñas y avisos a colegios</div>
                                         </div>
                                     </div>
 
                                     <div class="d-flex align-items-center gap-3">
                                         <span class="badge-status-pill">
-                                            🟢 Conectado (API)
+                                            🟢 Conectado
                                         </span>
                                         <button type="button" class="btn-configurar" id="btnConfigEmail"
                                                 data-bs-toggle="collapse"
@@ -645,29 +734,52 @@
 
                                 <div id="collapseEmail" class="collapse" data-bs-parent="#accordionIntegraciones">
                                     <div class="integration-body p-4">
-                                        <form onsubmit="handleSaveConfig(event, 'Proveedor de Correo')">
+                                        <form onsubmit="handleSaveConfig(event, 'Servicio de Correo')">
                                             <div class="row g-3">
-                                                <div class="col-12 col-md-6">
-                                                    <label class="form-label-custom" for="email_api_key">API Key SendGrid / AWS Secret</label>
-                                                    <div class="position-relative">
-                                                        <input type="password" id="email_api_key" class="form-control-custom pe-5" value="SG.293819283719283719283">
-                                                        <button type="button" class="btn btn-sm text-muted position-absolute end-0 top-50 translate-middle-y me-2 border-0 bg-transparent"
-                                                                onclick="togglePasswordVisibility('email_api_key', this)" title="Mostrar / Ocultar">
-                                                            <i class="bi bi-eye"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                <div class="col-12 col-md-6">
-                                                    <label class="form-label-custom" for="email_remitente">Email Remitente Corporativo</label>
+                                                <div class="col-12 col-md-4">
+                                                    <label class="form-label-custom" for="email_remitente">Correo Electrónico Remitente</label>
                                                     <input type="email" id="email_remitente" class="form-control-custom" value="notificaciones@eduteka.cl">
+                                                    <div style="font-size:.72rem;color:var(--gray-text);" class="mt-1">Dirección visible desde donde se envían los avisos.</div>
                                                 </div>
-                                                <div class="col-12 col-md-6">
-                                                    <label class="form-label-custom" for="email_nombre">Nombre de Remitente</label>
-                                                    <input type="text" id="email_nombre" class="form-control-custom" value="Plataforma Eduteka SaaS">
+                                                <div class="col-12 col-md-4">
+                                                    <label class="form-label-custom" for="email_nombre">Nombre Mostrado del Remitente</label>
+                                                    <input type="text" id="email_nombre" class="form-control-custom" value="Plataforma Eduteka">
+                                                    <div style="font-size:.72rem;color:var(--gray-text);" class="mt-1">Nombre que verán apoderados y docentes al recibir un mensaje.</div>
                                                 </div>
-                                                <div class="col-12 col-md-6">
-                                                    <label class="form-label-custom" for="email_limite">Límite Diario de Envíos</label>
+                                                <div class="col-12 col-md-4">
+                                                    <label class="form-label-custom" for="email_limite">Límite Diario de Mensajes</label>
                                                     <input type="number" id="email_limite" class="form-control-custom" value="50000">
+                                                    <div style="font-size:.72rem;color:var(--gray-text);" class="mt-1">Tope seguro por jornada para asegurar la llegada a bandeja de entrada.</div>
+                                                </div>
+                                            </div>
+
+                                            <!-- SECCIÓN COLAPSABLE: AJUSTES TÉCNICOS AVANZADOS -->
+                                            <div class="advanced-settings-wrapper mt-4">
+                                                <button type="button" class="btn-toggle-advanced" data-bs-toggle="collapse" data-bs-target="#advancedTechEmail" aria-expanded="false" aria-controls="advancedTechEmail">
+                                                    <i class="bi bi-gear-wide-connected"></i>
+                                                    <span>Ajustes Técnicos Avanzados</span>
+                                                    <i class="bi bi-chevron-down chevron-advanced ms-2"></i>
+                                                </button>
+                                                <div class="collapse mt-3" id="advancedTechEmail">
+                                                    <div class="advanced-settings-box p-3">
+                                                        <div class="d-flex align-items-center gap-2 mb-3 text-muted" style="font-size:.8rem;">
+                                                            <i class="bi bi-key-fill text-warning"></i>
+                                                            <span>Clave de autorización técnica con el servidor de correo transaccional. Modificar solo en caso de cambiar de proveedor.</span>
+                                                        </div>
+                                                        <div class="row g-3">
+                                                            <div class="col-12">
+                                                                <label class="form-label-custom" for="email_api_key">Clave de Autorización del Servidor de Correo (API Key)</label>
+                                                                <div class="position-relative">
+                                                                    <input type="password" id="email_api_key" class="form-control-custom pe-5" value="SG.293819283719283719283">
+                                                                    <button type="button" class="btn btn-sm text-muted position-absolute end-0 top-50 translate-middle-y me-2 border-0 bg-transparent"
+                                                                            onclick="togglePasswordVisibility('email_api_key', this)" title="Mostrar / Ocultar">
+                                                                        <i class="bi bi-eye"></i>
+                                                                    </button>
+                                                                </div>
+                                                                <div style="font-size:.72rem;color:var(--gray-text);" class="mt-1">Token de conexión directa para envío seguro de correos masivos.</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
 
@@ -677,7 +789,7 @@
                                                     Cancelar
                                                 </button>
                                                 <button type="submit" class="btn-primary-custom">
-                                                    <i class="bi bi-check2-circle"></i> Guardar Proveedor de Correo
+                                                    <i class="bi bi-check2-circle"></i> Guardar Configuración de Correo
                                                 </button>
                                             </div>
                                         </form>
@@ -696,9 +808,9 @@
                                 <div>
                                     <h2 class="panel-box-title d-flex align-items-center gap-2">
                                         <i class="bi bi-shield-check text-primary"></i>
-                                        Políticas Globales de Seguridad y Control de Sesión
+                                        Políticas de Seguridad y Control de Sesión
                                     </h2>
-                                    <div class="panel-box-desc">Definición de parámetros de autenticación, tiempos de caducidad y accesos.</div>
+                                    <div class="panel-box-desc">Configura la protección de las cuentas, tiempos de espera y filtros de seguridad para toda la comunidad escolar.</div>
                                 </div>
                             </div>
 
@@ -706,21 +818,21 @@
                                 <div class="row g-4">
                                     <!-- Inactividad de sesión -->
                                     <div class="col-12 col-md-6">
-                                        <label class="form-label-custom">Tiempo Máximo de Inactividad de Sesión</label>
+                                        <label class="form-label-custom">Tiempo de Espera por Inactividad</label>
                                         <select class="form-control-custom">
-                                            <option value="15">15 Minutos (Estricto)</option>
-                                            <option value="30" selected>30 Minutos (Recomendado)</option>
-                                            <option value="60">60 Minutos</option>
+                                            <option value="15">15 Minutos (Máxima protección)</option>
+                                            <option value="30" selected>30 Minutos (Recomendado para colegios)</option>
+                                            <option value="60">60 Minutos (1 hora)</option>
                                             <option value="120">120 Minutos (2 horas)</option>
                                         </select>
-                                        <div style="font-size:.74rem;color:var(--gray-text);" class="mt-1">Las sesiones inactivas se cerrarán automáticamente cumplido este plazo.</div>
+                                        <div style="font-size:.74rem;color:var(--gray-text);" class="mt-1">Si un usuario no realiza ninguna acción en este tiempo, su sesión se cerrará de forma automática para proteger sus datos.</div>
                                     </div>
 
                                     <!-- Máximo de intentos fallidos -->
                                     <div class="col-12 col-md-6">
-                                        <label class="form-label-custom">Intentos Fallidos antes de Bloqueo de IP</label>
+                                        <label class="form-label-custom">Intentos Fallidos antes de Suspender el Acceso</label>
                                         <input type="number" class="form-control-custom" value="5" min="3" max="10">
-                                        <div style="font-size:.74rem;color:var(--gray-text);" class="mt-1">Aplica un bloqueo temporal de 30 min a la IP de origen.</div>
+                                        <div style="font-size:.74rem;color:var(--gray-text);" class="mt-1">Protege contra accesos indebidos bloqueando temporalmente durante 30 minutos a quien ingrese contraseñas equivocadas repetidas veces.</div>
                                     </div>
 
                                     <div class="col-12"><hr class="my-1"></div>
@@ -730,10 +842,10 @@
                                         <div class="flag-card mb-3">
                                             <div>
                                                 <div class="flag-title d-flex align-items-center gap-2">
-                                                    <i class="bi bi-key-fill text-primary"></i>
-                                                    Forzar Autenticación de 2 Factores (2FA) obligatoria
+                                                    <i class="bi bi-phone-fill text-primary"></i>
+                                                    Exigir doble paso de seguridad (Código al celular)
                                                 </div>
-                                                <div class="flag-desc">Requerir código OTP / Google Authenticator para roles Directores, Administradores y Sostenedores.</div>
+                                                <div class="flag-desc">Solicita un código de confirmación de 6 dígitos cada vez que directores, administradores o sostenedores inicien sesión para proteger información sensible.</div>
                                             </div>
                                             <div class="form-check form-switch">
                                                 <input class="form-check-input" type="checkbox" id="check2FA" checked style="width:2.5em;height:1.3em;">
@@ -744,9 +856,9 @@
                                             <div>
                                                 <div class="flag-title d-flex align-items-center gap-2">
                                                     <i class="bi bi-lock-fill text-primary"></i>
-                                                    Política de Contraseñas Estrictas
+                                                    Exigir Contraseñas Seguras y Robustas
                                                 </div>
-                                                <div class="flag-desc">Exigir mínimo 10 caracteres, incluyendo mayúsculas, números y símbolos especiales.</div>
+                                                <div class="flag-desc">Obliga a que las contraseñas tengan un mínimo de 10 caracteres combinando letras mayúsculas, números y símbolos.</div>
                                             </div>
                                             <div class="form-check form-switch">
                                                 <input class="form-check-input" type="checkbox" id="checkPassPolicy" checked style="width:2.5em;height:1.3em;">
@@ -757,9 +869,9 @@
                                             <div>
                                                 <div class="flag-title d-flex align-items-center gap-2">
                                                     <i class="bi bi-globe-americas text-primary"></i>
-                                                    Restricción Geográfica IP (Solo Chile)
+                                                    Bloquear accesos desde el extranjero
                                                 </div>
-                                                <div class="flag-desc">Bloquear intentos de acceso iniciados desde fuera del territorio nacional (salvo VPN autorizada).</div>
+                                                <div class="flag-desc">Permite iniciar sesión únicamente desde conexiones dentro de Chile para proteger las cuentas de intentos de ingreso desde otros países.</div>
                                             </div>
                                             <div class="form-check form-switch">
                                                 <input class="form-check-input" type="checkbox" id="checkGeoIP" style="width:2.5em;height:1.3em;">
@@ -783,23 +895,23 @@
                             <div class="panel-box-header">
                                 <div>
                                     <h2 class="panel-box-title d-flex align-items-center gap-2">
-                                        <i class="bi bi-toggle-on text-primary"></i>
-                                        Control Global de Módulos & Feature Flags
+                                        <i class="bi bi-puzzle-fill text-primary"></i>
+                                        Control de Módulos Adicionales y Nuevas Funciones
                                     </h2>
-                                    <div class="panel-box-desc">Habilita o deshabilita funcionalidades avanzadas en toda la infraestructura SaaS de Eduteka.</div>
+                                    <div class="panel-box-desc">Activa o desactiva herramientas adicionales y novedades escolares para todos los colegios de Eduteka.</div>
                                 </div>
                             </div>
 
-                            <form onsubmit="handleSaveConfig(event, 'Feature Flags')">
+                            <form onsubmit="handleSaveConfig(event, 'Módulos Adicionales')">
                                 <div class="d-flex flex-column gap-3">
 
                                     <div class="flag-card">
                                         <div>
                                             <div class="flag-title d-flex align-items-center gap-2">
                                                 <i class="bi bi-journal-check text-primary"></i>
-                                                Habilitar Nuevo Libro de Clases V3.0 (Beta)
+                                                Nuevo Libro de Clases Digital (Versión de Prueba)
                                             </div>
-                                            <div class="flag-desc">Permite a los profesores probar el nuevo diseño interactivo con firma digital avanzada.</div>
+                                            <div class="flag-desc">Permite a los profesores probar el diseño interactivo actualizado con firma digital antes de su activación definitiva.</div>
                                         </div>
                                         <div class="form-check form-switch">
                                             <input class="form-check-input" type="checkbox" checked style="width:2.5em;height:1.3em;">
@@ -810,9 +922,9 @@
                                         <div>
                                             <div class="flag-title d-flex align-items-center gap-2">
                                                 <i class="bi bi-building-gear text-primary"></i>
-                                                Integración Oficial Mineduc / SIMCE
+                                                Sincronización Oficial con Mineduc / SIMCE
                                             </div>
-                                            <div class="flag-desc">Sincronización automatizada de actas de rendimiento académico con servidores del Ministerio.</div>
+                                            <div class="flag-desc">Envío y actualización automática de calificaciones y actas académicas con los registros del Ministerio de Educación.</div>
                                         </div>
                                         <div class="form-check form-switch">
                                             <input class="form-check-input" type="checkbox" checked style="width:2.5em;height:1.3em;">
@@ -823,9 +935,9 @@
                                         <div>
                                             <div class="flag-title d-flex align-items-center gap-2">
                                                 <i class="bi bi-phone-vibrate text-primary"></i>
-                                                App Móvil para Apoderados y Estudiantes
+                                                Aplicación Móvil para Familias y Estudiantes
                                             </div>
-                                            <div class="flag-desc">Habilita notificaciones push de asistencia e inspectoría en dispositivos Android / iOS.</div>
+                                            <div class="flag-desc">Habilita avisos de asistencia, citaciones y comunicaciones escolares directo a los celulares de apoderados y alumnos.</div>
                                         </div>
                                         <div class="form-check form-switch">
                                             <input class="form-check-input" type="checkbox" checked style="width:2.5em;height:1.3em;">
@@ -836,9 +948,9 @@
                                         <div>
                                             <div class="flag-title d-flex align-items-center gap-2">
                                                 <i class="bi bi-calculator text-primary"></i>
-                                                Módulo ERP de Gestión Financiera Avanzada
+                                                Módulo de Gestión Financiera y Cobranzas
                                             </div>
-                                            <div class="flag-desc">Activa el motor de conciliación bancaria y presupuestos para colegios con Plan Premium.</div>
+                                            <div class="flag-desc">Activa el control de cuotas, seguimiento de mensualidades y presupuestos para instituciones con plan habilitado.</div>
                                         </div>
                                         <div class="form-check form-switch">
                                             <input class="form-check-input" type="checkbox" checked style="width:2.5em;height:1.3em;">
@@ -849,9 +961,9 @@
                                         <div>
                                             <div class="flag-title d-flex align-items-center gap-2">
                                                 <i class="bi bi-qr-code text-primary"></i>
-                                                Generador de Certificados con Código QR
+                                                Emisión de Certificados Escolares con Código QR
                                             </div>
-                                            <div class="flag-desc">Validación pública inmediata de certificados de alumno regular y concentración de notas.</div>
+                                            <div class="flag-desc">Permite a los colegios emitir certificados de alumno regular y concentración de notas con verificación inmediata mediante código QR.</div>
                                         </div>
                                         <div class="form-check form-switch">
                                             <input class="form-check-input" type="checkbox" style="width:2.5em;height:1.3em;">
@@ -862,7 +974,7 @@
 
                                 <div class="mt-4 text-end">
                                     <button type="submit" class="btn-primary-custom">
-                                        <i class="bi bi-check2-circle"></i> Actualizar Feature Flags
+                                        <i class="bi bi-check2-circle"></i> Guardar Módulos Adicionales
                                     </button>
                                 </div>
                             </form>
@@ -876,10 +988,10 @@
                                 <div>
                                     <div class="d-flex align-items-center gap-2">
                                         <i class="bi bi-exclamation-octagon-fill text-danger fs-4"></i>
-                                        <h2 class="fs-5 fw-bold text-danger mb-0">Área de Control Crítico del Sistema</h2>
+                                        <h2 class="fs-5 fw-bold text-danger mb-0">Control de Disponibilidad y Estado de la Plataforma</h2>
                                     </div>
                                     <div style="font-size:.82rem;color:#991B1B;margin-top:.2rem;">
-                                        Estas acciones afectan la disponibilidad completa de Eduteka para todas las instituciones activas.
+                                        Estas acciones suspenden temporalmente la plataforma para todas las instituciones educativas activas.
                                     </div>
                                 </div>
                                 <span class="badge" style="background:#FEE2E2;color:#991B1B;font-weight:700;padding:.4rem .75rem;border-radius:20px;font-size:.75rem;">
@@ -887,17 +999,17 @@
                                 </span>
                             </div>
 
-                            <form onsubmit="handleSaveConfig(event, 'Estado del Sistema')">
+                            <form onsubmit="handleSaveConfig(event, 'Estado de la Plataforma')">
 
                                 <!-- Switch Modo Mantenimiento -->
                                 <div class="p-3 mb-4 rounded" style="background:white;border:1px solid #FCA5A5;">
                                     <div class="d-flex align-items-center justify-content-between">
                                         <div>
                                             <div class="fw-bold text-danger" style="font-size:.92rem;">
-                                                <i class="bi bi-power me-1"></i> Activar Modo Mantenimiento Global
+                                                <i class="bi bi-power me-1"></i> Activar Modo de Mantención General
                                             </div>
                                             <div style="font-size:.78rem;color:var(--gray-text);margin-top:.15rem;">
-                                                Bloquea el acceso a directores, profesores y estudiantes. Solo el Super Admin mantendrá acceso.
+                                                Pausa temporalmente el acceso a profesores, apoderados y estudiantes. Solo el Administrador Principal podrá ingresar a la plataforma.
                                             </div>
                                         </div>
                                         <div class="form-check form-switch">
@@ -908,9 +1020,9 @@
 
                                 <!-- Mensaje de Mantenimiento -->
                                 <div class="mb-4">
-                                    <label class="form-label-custom" style="color:#7F1D1D;">Mensaje Visible para los Usuarios</label>
+                                    <label class="form-label-custom" style="color:#7F1D1D;">Aviso Informativo para la Comunidad Escolar</label>
                                     <textarea class="form-control-custom" rows="3" style="border-color:#FCA5A5;"
-                                        placeholder="Ej: Nos encontramos realizando una actualización programada de nuestros servidores. La plataforma volverá a estar disponible a las 06:00 AM."></textarea>
+                                        placeholder="Ej: Estimada comunidad educativa: Nos encontramos realizando labores de actualización y mantención del sistema. La plataforma volverá a estar disponible hoy a las 06:00 hrs. Agradecemos su comprensión."></textarea>
                                 </div>
 
                                 <!-- Modo Solo Lectura -->
@@ -918,10 +1030,10 @@
                                     <div class="d-flex align-items-center justify-content-between">
                                         <div>
                                             <div class="fw-bold text-dark" style="font-size:.9rem;">
-                                                <i class="bi bi-lock me-1" style="color:#D97706;"></i> Modo Solo Lectura (Read-Only)
+                                                <i class="bi bi-lock me-1" style="color:#D97706;"></i> Bloquear Edición de Datos (Solo Consulta)
                                             </div>
                                             <div style="font-size:.78rem;color:var(--gray-text);margin-top:.15rem;">
-                                                Permite la consulta de datos pero bloquea la edición de notas, asistencias e inscripciones.
+                                                Permite a los usuarios consultar datos e historiales escolares, pero impide registrar o modificar notas, asistencias y matrículas durante periodos de cierre o revisión.
                                             </div>
                                         </div>
                                         <div class="form-check form-switch">
@@ -932,7 +1044,7 @@
 
                                 <div class="d-flex justify-content-end">
                                     <button type="submit" class="btn-danger-custom">
-                                        <i class="bi bi-exclamation-triangle"></i> Guardar Estado del Sistema
+                                        <i class="bi bi-exclamation-triangle"></i> Aplicar Cambios al Estado del Sistema
                                     </button>
                                 </div>
                             </form>

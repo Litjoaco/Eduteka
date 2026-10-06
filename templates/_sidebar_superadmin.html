@@ -1,18 +1,31 @@
 {% load static %}
 {% comment %}
-  Sidebar unificado Super Admin Eduteka (248px - Estilo Unificado SaaS).
+  Sidebar unificado Super Admin Eduteka (Retráctil / Collapsible 248px -> 80px - Arquitectura 4x4 SaaS).
   Uso: {% include '_sidebar_superadmin.html' with active_page='dashboard' %}
   active_page opciones: dashboard | colegios | planes | facturacion | ordenes | modulos | estadisticas | configuracion | usuarios | roles | onboarding | solicitudes_global | comunicados | auditoria | academico | reportes
 {% endcomment %}
 
+<!-- ⚡ SCRIPT DE EJECUCIÓN INMEDIATA (Zero-FOUC / Anti-Parpadeo):
+     Se ejecuta sincrónicamente antes de que el motor de renderizado dibuje el DOM -->
+<script>
+  (function() {
+    try {
+      var state = localStorage.getItem('sidebarState');
+      if (state === 'collapsed' && window.innerWidth >= 992) {
+        document.documentElement.classList.add('sidebar-collapsed');
+      }
+    } catch(e) {}
+  })();
+</script>
+
 <style>
-  
   html {
     font-size: 14px !important;
   }
 
   :root {
-    --sw: 248px;
+    --sw:            248px;
+    --sw-collapsed:  80px;
     --primary:       #7C5CFC;
     --primary-soft:  rgba(124,92,252,.08);
     --primary-hover: #6747E3;
@@ -26,76 +39,359 @@
     --radius-lg:     16px;
     --radius-md:     10px;
     --radius-sm:     8px;
+    --ease-smooth:   cubic-bezier(0.4, 0, 0.2, 1);
   }
 
+  /* ── Estructura Base del Sidebar ────────────────────────────────────────── */
   .sidebar {
-    width: var(--sw); min-width: var(--sw);
+    width: var(--sw);
+    min-width: var(--sw);
     background: var(--white);
     border-right: 1px solid var(--border);
-    position: fixed; top: 0; bottom: 0; left: 0;
-    display: flex; flex-direction: column;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
     z-index: 1040;
-    transition: transform .3s ease;
+    transition: width 0.3s ease, min-width 0.3s ease, transform 0.3s ease;
+    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.02);
   }
+
   @media (max-width: 991.98px) {
-    .sidebar { transform: translateX(-100%); }
-    .sidebar.open, .sidebar.active { transform: translateX(0); }
+    .sidebar {
+      transform: translateX(-100%);
+      box-shadow: none;
+    }
+    .sidebar.open, .sidebar.active {
+      transform: translateX(0);
+      box-shadow: 8px 0 32px rgba(15, 23, 42, 0.2);
+    }
+    body.sidebar-mobile-open {
+      overflow: hidden;
+    }
   }
 
-  .sidebar-logo {
-    display: flex; justify-content: center; align-items: center;
-    padding: 1.25rem 1.5rem .9rem;
+  /* ── Encabezado del Sidebar & Botón Toggle ──────────────────────────────── */
+  .sidebar-header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.15rem 1.15rem 0.75rem;
+    transition: padding 0.3s ease;
+    min-height: 64px;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.6);
   }
-  .sidebar-logo img { max-height: 80px; width: auto; max-width: 85%; }
 
+  .sidebar-brand-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    overflow: hidden;
+    max-width: 165px;
+    transition: all 0.3s ease;
+  }
+
+  .sidebar-logo-full {
+    max-height: 42px;
+    width: auto;
+    max-width: 155px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Botón de contracción/expansión moderno con chevron */
+  .sidebar-toggle-btn {
+    background: #F1F5F9;
+    border: 1px solid var(--border);
+    color: var(--gray-text);
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    flex-shrink: 0;
+    outline: none;
+    padding: 0;
+  }
+
+  .sidebar-toggle-btn:hover {
+    background: var(--primary);
+    color: var(--white);
+    border-color: var(--primary);
+    transform: scale(1.06);
+    box-shadow: 0 3px 10px rgba(124, 92, 252, 0.25);
+  }
+
+  .sidebar-toggle-btn i {
+    font-size: 0.85rem;
+    transition: transform 0.3s ease;
+  }
+
+  /* ── Badge de Rol (Super Admin) ────────────────────────────────────────── */
   .sidebar-role-badge {
-    margin: 0 .75rem .6rem;
-    background: rgba(124,92,252,.08);
-    border: 1px solid rgba(124,92,252,.15);
+    margin: 0.75rem 0.75rem 0.4rem;
+    background: rgba(124, 92, 252, 0.08);
+    border: 1px solid rgba(124, 92, 252, 0.15);
     border-radius: 10px;
-    padding: .45rem .85rem;
-    display: flex; align-items: center; justify-content: center; gap: .5rem;
-    font-size: .75rem; font-weight: 700; color: var(--primary);
-    letter-spacing: .03em;
+    padding: 0.45rem 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--primary);
+    letter-spacing: 0.03em;
     text-transform: uppercase;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    overflow: hidden;
   }
 
+  .sidebar-role-badge i {
+    font-size: 0.95rem;
+    flex-shrink: 0;
+  }
+
+  /* ── Navegación y Scroll ───────────────────────────────────────────────── */
   .sidebar-nav {
-    flex: 1; overflow-y: auto;
-    padding: .4rem .65rem 0;
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0.35rem 0.65rem 0;
     scrollbar-width: none;
+    transition: padding 0.3s ease;
   }
   .sidebar-nav::-webkit-scrollbar { display: none; }
 
+  /* ── Separadores sutiles de Bloque (Arquitectura 4x4) ──────────────────── */
   .nav-section-label {
-    font-size: .62rem; font-weight: 700; text-transform: uppercase;
-    letter-spacing: .08em; color: var(--gray-text);
-    padding: .5rem .75rem .2rem; margin-top: .2rem;
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #94A3B8;
+    padding: 0.65rem 0.75rem 0.25rem;
+    margin-top: 0.45rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+  }
+  .nav-section-label:first-of-type {
+    margin-top: 0.1rem;
+    padding-top: 0.35rem;
+  }
+  .nav-section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #E2E8F0;
+    opacity: 0.8;
+    transition: all 0.3s ease;
   }
 
+  /* ── Ítems Estándar y Toggles Desplegables ──────────────────────────────── */
   .nav-item {
-    display: flex; align-items: center; gap: .7rem;
-    padding: .55rem .85rem;
-    color: var(--gray-text); font-weight: 500; font-size: .86rem;
-    border-radius: var(--radius-md); text-decoration: none;
-    transition: background .15s, color .15s;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.52rem 0.85rem;
+    color: var(--gray-text);
+    font-weight: 500;
+    font-size: 0.85rem;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: background 0.18s ease, color 0.18s ease, padding 0.3s ease, transform 0.2s ease;
     margin-bottom: 2px;
+    white-space: nowrap;
+    position: relative;
   }
-  .nav-item i { font-size: 1.05rem; flex-shrink: 0; }
-  .nav-item:hover { background: var(--bg); color: var(--dark); }
+  .nav-item i {
+    font-size: 1.05rem;
+    flex-shrink: 0;
+    transition: transform 0.2s ease, font-size 0.3s ease;
+  }
+  .nav-item span {
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+  .nav-item:hover {
+    background: var(--bg);
+    color: var(--dark);
+  }
+  .nav-item:hover i {
+    transform: scale(1.08);
+  }
   .nav-item.active {
-    background: var(--primary); color: #fff; font-weight: 600;
-    box-shadow: 0 4px 14px rgba(108,79,240,.28);
+    background: var(--primary);
+    color: #ffffff;
+    font-weight: 600;
+    box-shadow: 0 4px 14px rgba(108, 79, 240, 0.28);
   }
-  .nav-item.active i { color: #fff; }
-  .nav-item.danger { color: #EF4444; }
-  .nav-item.danger i { color: #EF4444; }
-  .nav-item.danger:hover { background: #FEF2F2; color: #DC2626; }
+  .nav-item.active i {
+    color: #ffffff;
+  }
 
+  .nav-item-toggle {
+    width: 100%;
+    border: none;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.52rem 0.85rem;
+    color: var(--gray-text);
+    font-weight: 500;
+    font-size: 0.85rem;
+    border-radius: var(--radius-md);
+    transition: all 0.2s ease;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    position: relative;
+    outline: none;
+  }
+  .nav-item-toggle i:first-child {
+    font-size: 1.05rem;
+    flex-shrink: 0;
+    transition: transform 0.2s ease, font-size 0.3s ease;
+  }
+  .nav-item-toggle:hover {
+    background: var(--bg);
+    color: var(--dark);
+  }
+  .nav-item-toggle:hover i:first-child {
+    transform: scale(1.08);
+  }
+  .nav-item-toggle .nav-chevron {
+    font-size: 0.68rem;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    color: #94A3B8;
+  }
+  .nav-item-toggle[aria-expanded="true"] .nav-chevron {
+    transform: rotate(180deg);
+    color: var(--primary);
+  }
+  .nav-item-toggle.active-parent {
+    color: var(--primary);
+    background: var(--primary-soft);
+    font-weight: 600;
+  }
+  .nav-item-toggle.active-parent i:first-child {
+    color: var(--primary);
+  }
+
+  /* ── Sub-ítems Colapsables (Blindaje contra colisión Tailwind / Bootstrap) ── */
+  .sidebar .collapse {
+    visibility: visible !important;
+    transition: all 0.2s ease;
+  }
+  .sidebar .collapse:not(.show) {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    opacity: 0 !important;
+  }
+  .sidebar .collapse.show {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+  .sidebar .nav-subitems {
+    padding: 0.2rem 0 0.4rem 1.45rem !important;
+    position: relative;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 3px;
+    visibility: visible !important;
+    opacity: 1 !important;
+    transition: all 0.2s ease;
+  }
+  .sidebar .nav-subitems::before {
+    content: '';
+    position: absolute;
+    left: 1.15rem;
+    top: 0.25rem;
+    bottom: 0.45rem;
+    width: 1.5px;
+    background: #E2E8F0;
+    border-radius: 2px;
+    transition: opacity 0.25s ease;
+  }
+  .sidebar .nav-subitem {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.55rem !important;
+    padding: 0.42rem 0.8rem !important;
+    color: #4A5568 !important;
+    font-size: 0.82rem !important;
+    font-weight: 500 !important;
+    border-radius: var(--radius-sm);
+    text-decoration: none !important;
+    transition: all 0.18s ease;
+    white-space: nowrap;
+    position: relative;
+    visibility: visible !important;
+    opacity: 1 !important;
+    background: transparent;
+  }
+  .sidebar .nav-subitem i {
+    font-size: 0.95rem !important;
+    line-height: 1 !important;
+    color: #94A3B8 !important;
+    transition: color 0.15s ease, transform 0.15s ease;
+    flex-shrink: 0 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: inline-block !important;
+  }
+  .sidebar .nav-subitem span {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    color: inherit !important;
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: 1.3;
+  }
+  .sidebar .nav-subitem:hover {
+    color: var(--dark) !important;
+    background: rgba(124, 92, 252, 0.06) !important;
+  }
+  .sidebar .nav-subitem:hover i {
+    color: var(--primary) !important;
+    transform: scale(1.1);
+  }
+  .sidebar .nav-subitem.active {
+    color: var(--primary) !important;
+    font-weight: 700 !important;
+    background: var(--primary-soft) !important;
+  }
+  .sidebar .nav-subitem.active i {
+    color: var(--primary) !important;
+  }
+
+  /* ── Pie del Sidebar ───────────────────────────────────────────────────── */
   .sidebar-footer {
-    padding: .65rem; border-top: 1px solid var(--border); margin-top: auto;
+    padding: 0.65rem;
+    border-top: 1px solid var(--border);
+    margin-top: auto;
+    transition: padding 0.3s ease;
   }
 
+  /* ── Backdrop Móvil ────────────────────────────────────────────────────── */
   .sidebar-backdrop {
     display: none;
     position: fixed;
@@ -116,127 +412,804 @@
     }
   }
 
-  /* Main content offset unificado a 248px */
+  /* ── Desplazamiento del Contenido Principal (Layout Offset) ─────────────── */
   .main-content, .main-wrapper {
-    margin-left: 248px !important;
-    width: calc(100% - 248px) !important;
-    min-height: 100vh; display: flex; flex-direction: column;
+    margin-left: var(--sw) !important;
+    width: calc(100% - var(--sw)) !important;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    transition: margin-left 0.3s ease, width 0.3s ease;
   }
   @media (max-width: 991.98px) {
-    .main-content, .main-wrapper { margin-left: 0 !important; width: 100% !important; }
+    .main-content, .main-wrapper {
+      margin-left: 0 !important;
+      width: 100% !important;
+    }
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     COMPORTAMIENTO VISUAL COLAPSADO (.sidebar-collapsed)
+     ══════════════════════════════════════════════════════════════════════════ */
+  html.sidebar-collapsed .sidebar,
+  body.sidebar-collapsed .sidebar,
+  .sidebar.sidebar-collapsed {
+    width: var(--sw-collapsed) !important;
+    min-width: var(--sw-collapsed) !important;
+  }
+
+  html.sidebar-collapsed .main-content,
+  html.sidebar-collapsed .main-wrapper,
+  body.sidebar-collapsed .main-content,
+  body.sidebar-collapsed .main-wrapper {
+    margin-left: var(--sw-collapsed) !important;
+    width: calc(100% - var(--sw-collapsed)) !important;
+  }
+
+  @media (max-width: 991.98px) {
+    html.sidebar-collapsed .main-content,
+    html.sidebar-collapsed .main-wrapper,
+    body.sidebar-collapsed .main-content,
+    body.sidebar-collapsed .main-wrapper {
+      margin-left: 0 !important;
+      width: 100% !important;
+    }
+  }
+
+  /* Header colapsado */
+  html.sidebar-collapsed .sidebar-header-top,
+  body.sidebar-collapsed .sidebar-header-top {
+    padding: 1rem 0.4rem 0.65rem;
+    justify-content: center;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+  html.sidebar-collapsed .sidebar-brand-link,
+  body.sidebar-collapsed .sidebar-brand-link {
+    max-width: 100%;
+    justify-content: center;
+    display: flex;
+  }
+  html.sidebar-collapsed .sidebar-logo-full,
+  body.sidebar-collapsed .sidebar-logo-full {
+    display: block !important;
+    max-width: 44px;
+    max-height: 38px;
+    width: auto;
+    margin: 0 auto;
+    object-fit: contain;
+  }
+  html.sidebar-collapsed .sidebar-toggle-btn i,
+  body.sidebar-collapsed .sidebar-toggle-btn i {
+    transform: rotate(180deg);
+  }
+
+  /* Badge de rol colapsado */
+  html.sidebar-collapsed .sidebar-role-badge,
+  body.sidebar-collapsed .sidebar-role-badge {
+    margin: 0.35rem auto 0.5rem;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: 10px;
+    justify-content: center;
+  }
+  html.sidebar-collapsed .sidebar-role-badge span,
+  body.sidebar-collapsed .sidebar-role-badge span {
+    display: none !important;
+  }
+
+  /* Separadores de los 4 grandes bloques colapsados (se transforman en divisores limpios) */
+  html.sidebar-collapsed .nav-section-label,
+  body.sidebar-collapsed .nav-section-label {
+    font-size: 0 !important;
+    line-height: 0 !important;
+    color: transparent !important;
+    height: 1px;
+    min-height: 1px;
+    padding: 0 !important;
+    margin: 0.75rem 0.65rem;
+    background: #E2E8F0;
+    overflow: hidden;
+    justify-content: center;
+  }
+  html.sidebar-collapsed .nav-section-label::after,
+  body.sidebar-collapsed .nav-section-label::after {
+    display: none !important;
+  }
+
+  /* Ítems de navegación colapsados (íconos centrados y textos fluidamente ocultos) */
+  html.sidebar-collapsed .sidebar-nav,
+  body.sidebar-collapsed .sidebar-nav {
+    padding: 0.35rem 0.45rem 0;
+  }
+
+  html.sidebar-collapsed .nav-item,
+  body.sidebar-collapsed .nav-item,
+  html.sidebar-collapsed .nav-item-toggle,
+  body.sidebar-collapsed .nav-item-toggle {
+    justify-content: center;
+    padding: 0.68rem 0;
+    width: 100%;
+    gap: 0;
+    border-radius: 12px;
+    margin-bottom: 4px;
+  }
+  html.sidebar-collapsed .nav-item span,
+  body.sidebar-collapsed .nav-item span,
+  html.sidebar-collapsed .nav-item-toggle span,
+  body.sidebar-collapsed .nav-item-toggle span,
+  html.sidebar-collapsed .nav-item-toggle .nav-chevron,
+  body.sidebar-collapsed .nav-item-toggle .nav-chevron {
+    display: none !important;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    visibility: hidden;
+  }
+  html.sidebar-collapsed .nav-item i,
+  body.sidebar-collapsed .nav-item i,
+  html.sidebar-collapsed .nav-item-toggle i:first-child,
+  body.sidebar-collapsed .nav-item-toggle i:first-child {
+    font-size: 1.25rem !important;
+    margin: 0 auto;
+  }
+
+  /* Subítems colapsados */
+  html.sidebar-collapsed .nav-subitems,
+  body.sidebar-collapsed .nav-subitems {
+    padding: 0.2rem 0;
+    gap: 3px;
+  }
+  html.sidebar-collapsed .nav-subitems::before,
+  body.sidebar-collapsed .nav-subitems::before {
+    display: none !important;
+  }
+  html.sidebar-collapsed .nav-subitem,
+  body.sidebar-collapsed .nav-subitem {
+    justify-content: center;
+    padding: 0.55rem 0;
+    border-radius: 10px;
+    gap: 0;
+  }
+  html.sidebar-collapsed .nav-subitem span,
+  body.sidebar-collapsed .nav-subitem span {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+  }
+  html.sidebar-collapsed .nav-subitem i,
+  body.sidebar-collapsed .nav-subitem i {
+    font-size: 1.05rem !important;
+    margin: 0 auto;
+  }
+
+  /* Footer colapsado */
+  html.sidebar-collapsed .sidebar-footer,
+  body.sidebar-collapsed .sidebar-footer {
+    padding: 0.65rem 0.4rem;
+  }
+  html.sidebar-collapsed .sidebar-footer .nav-item,
+  body.sidebar-collapsed .sidebar-footer .nav-item {
+    justify-content: center;
+    padding: 0.65rem 0;
+  }
+  html.sidebar-collapsed .sidebar-footer .nav-item span,
+  body.sidebar-collapsed .sidebar-footer .nav-item span {
+    display: none !important;
+  }
+  html.sidebar-collapsed .sidebar-footer .nav-item i,
+  body.sidebar-collapsed .sidebar-footer .nav-item i {
+    font-size: 1.25rem !important;
+    margin: 0 auto;
+  }
+
+  /* ── Pastilla Flotante Estilo SaaS (Floating Tooltip) ────────────────────── */
+  #edutekaFloatingTooltip {
+    position: fixed;
+    z-index: 999999;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    background: rgba(21, 26, 53, 0.94);
+    color: #FFFFFF;
+    padding: 0.4rem 0.85rem;
+    border-radius: 9px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.35), 0 0 12px rgba(124, 92, 252, 0.2);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-50%) translateX(-6px) scale(0.95);
+    transition: opacity 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
+                transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
+                visibility 0.18s;
+  }
+  #edutekaFloatingTooltip.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(-50%) translateX(0) scale(1);
+  }
+  #edutekaFloatingTooltip.is-active {
+    border-color: rgba(124, 92, 252, 0.5);
+    background: rgba(19, 21, 46, 0.96);
   }
 </style>
 
 <aside class="sidebar" id="sidebar">
-  <div class="sidebar-logo">
-    <img src="{% static 'img/logo.png' %}" alt="Eduteka">
+
+  <!-- ── Header Superior con Logo y Botón Toggle ──────────────────────────── -->
+  <div class="sidebar-header-top">
+    <a href="{% url 'dashboard_superadmin' %}" class="sidebar-brand-link" title="Eduteka Super Admin">
+      <img src="{% static 'img/logo.png' %}" alt="Eduteka" class="sidebar-logo-full">
+    </a>
+    <button type="button" class="sidebar-toggle-btn d-none d-lg-flex" id="sidebarCollapseBtn" title="Contraer o expandir menú (Ctrl+B)">
+      <i class="bi bi-chevron-left" id="sidebarToggleIcon"></i>
+    </button>
   </div>
 
-  <div class="sidebar-role-badge">
-    <i class="bi bi-shield-check fs-6"></i>
-    Super Admin
+  <!-- ── Rol Super Admin ──────────────────────────────────────────────────── -->
+  <div class="sidebar-role-badge" title="Nivel de Acceso: Super Admin">
+    <i class="bi bi-shield-check"></i>
+    <span>Super Admin</span>
   </div>
 
   <nav class="sidebar-nav">
+
+    <!-- ══════════════════════════════════════════════════════
+         BLOQUE 1: PANEL PRINCIPAL
+    ══════════════════════════════════════════════════════ -->
     <div class="nav-section-label">Panel Principal</div>
 
-    <a href="{% url 'dashboard_superadmin' %}" class="nav-item {% if active_page == 'dashboard' %}active{% endif %}">
-      <i class="bi bi-grid-1x2"></i> Resumen Global
+    <a href="{% url 'dashboard_superadmin' %}" 
+       class="nav-item {% if active_page == 'dashboard' %}active{% endif %}" 
+       data-label="Resumen Global"
+       title="Resumen general y métricas clave">
+      <i class="bi bi-grid-1x2"></i>
+      <span>Resumen Global</span>
     </a>
 
-    <div class="nav-section-label" style="margin-top:.4rem;">GESTIÓN COMERCIAL</div>
 
-    <a href="{% url 'dashboard_superadmin_colegios' %}" class="nav-item {% if active_page == 'colegios' %}active{% endif %}">
-      <i class="bi bi-building"></i> Colegios Clientes
-    </a>
-    <a href="{% url 'dashboard_superadmin_planes' %}" class="nav-item {% if active_page == 'planes' %}active{% endif %}">
-      <i class="bi bi-credit-card"></i> Planes y Suscripciones
-    </a>
-    <a href="{% url 'dashboard_superadmin_facturacion' %}" class="nav-item {% if active_page == 'facturacion' %}active{% endif %}">
-      <i class="bi bi-receipt"></i> Facturación y SII
-    </a>
-    <a href="{% url 'dashboard_superadmin_ordenes' %}" class="nav-item {% if active_page == 'ordenes' %}active{% endif %}">
-      <i class="bi bi-folder2-open"></i> Órdenes de Compra
-    </a>
-    <a href="{% url 'dashboard_superadmin_modulos_erp' %}" class="nav-item {% if active_page == 'modulos' %}active{% endif %}">
-      <i class="bi bi-boxes"></i> Módulos ERP
-    </a>
+    <!-- ══════════════════════════════════════════════════════
+         BLOQUE 2: GESTIÓN ESCOLAR Y VENTAS
+    ══════════════════════════════════════════════════════ -->
+    <div class="nav-section-label">Gestión Escolar y Ventas</div>
 
-    <div class="nav-section-label" style="margin-top:.4rem;">Control de Accesos</div>
+    <!-- Desplegable: Colegios y Admisiones -->
+    <button class="nav-item-toggle {% if active_page == 'colegios' or active_page == 'solicitudes_global' %}active-parent{% endif %}"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#menuColegios"
+            data-label="Colegios y Admisión"
+            aria-expanded="{% if active_page == 'colegios' or active_page == 'solicitudes_global' %}true{% else %}false{% endif %}"
+            aria-controls="menuColegios"
+            title="Colegios y Admisión">
+      <i class="bi bi-building"></i>
+      <span>Colegios y Admisión</span>
+      <i class="bi bi-chevron-down nav-chevron ms-auto"></i>
+    </button>
+    <div class="collapse {% if active_page == 'colegios' or active_page == 'solicitudes_global' %}show{% endif %}" id="menuColegios">
+      <div class="nav-subitems">
+        <a href="{% url 'dashboard_superadmin_colegios' %}" 
+           class="nav-subitem {% if active_page == 'colegios' %}active{% endif %}"
+           data-label="Colegios Clientes"
+           title="Colegios Clientes">
+          <i class="bi bi-buildings"></i>
+          <span>Colegios Clientes</span>
+        </a>
+        <a href="{% url 'dashboard_superadmin_solicitudes' %}" 
+           class="nav-subitem {% if active_page == 'solicitudes_global' %}active{% endif %}"
+           data-label="Solicitudes de Admisión"
+           title="Solicitudes de Admisión (Kanban)">
+          <i class="bi bi-inbox-fill"></i>
+          <span>Solicitudes de Admisión</span>
+        </a>
+      </div>
+    </div>
 
-    <a href="{% url 'dashboard_superadmin_usuarios' %}" class="nav-item {% if active_page == 'usuarios' %}active{% endif %}">
-      <i class="bi bi-people"></i> Usuarios Globales
-    </a>
-    <a href="{% url 'dashboard_superadmin_roles' %}" class="nav-item {% if active_page == 'roles' %}active{% endif %}">
-      <i class="bi bi-key"></i> Roles y Permisos
-    </a>
-    <a href="{% url 'dashboard_superadmin_solicitudes' %}" class="nav-item {% if active_page == 'solicitudes_global' %}active{% endif %}">
-      <i class="bi bi-clipboard-check"></i> Solicitudes de Acceso
-    </a>
-
-    <div class="nav-section-label" style="margin-top:.4rem;">ATENCIÓN Y SOPORTE</div>
-
-    <a href="{% url 'dashboard_superadmin_onboarding' %}" class="nav-item {% if active_page == 'onboarding' %}active{% endif %}">
-      <i class="bi bi-flag"></i> Implementación
-    </a>
-
-    <div class="nav-section-label" style="margin-top:.4rem;">Comunicación</div>
-
-    <a href="{% url 'dashboard_superadmin_comunicados' %}" class="nav-item {% if active_page == 'comunicados' %}active{% endif %}">
-      <i class="bi bi-megaphone"></i> Centro de Comunicados
-    </a>
-
-    <div class="nav-section-label" style="margin-top:.4rem;">Seguridad y Auditoría</div>
-
-    <a href="{% url 'dashboard_superadmin_auditoria' %}" class="nav-item {% if active_page == 'auditoria' %}active{% endif %}">
-      <i class="bi bi-shield-lock-fill"></i> Registro de Auditoría
-    </a>
-
-    <div class="nav-section-label" style="margin-top:.4rem;">Gestión Académica Global</div>
-
-    <a href="{% url 'dashboard_superadmin_academico' %}" class="nav-item {% if active_page == 'academico' %}active{% endif %}">
-      <i class="bi bi-mortarboard-fill"></i> Monitor Académico
+    <!-- Implementación / Onboarding -->
+    <a href="{% url 'dashboard_superadmin_onboarding' %}" 
+       class="nav-item {% if active_page == 'onboarding' %}active{% endif %}" 
+       data-label="Implementación"
+       title="Embudo de configuración inicial de colegios">
+      <i class="bi bi-flag-fill"></i>
+      <span>Implementación</span>
     </a>
 
-    <div class="nav-section-label" style="margin-top:.4rem;">Analítica y Ajustes</div>
+    <!-- Planes y Suscripciones -->
+    <a href="{% url 'dashboard_superadmin_planes' %}" 
+       class="nav-item {% if active_page == 'planes' or active_page == 'modulos' %}active{% endif %}" 
+       data-label="Planes y Suscripciones"
+       title="Gestión de planes, precios y módulos ERP">
+      <i class="bi bi-layers-fill"></i>
+      <span>Planes y Suscripciones</span>
+    </a>
 
-    <a href="{% url 'dashboard_superadmin_reportes' %}" class="nav-item {% if active_page == 'reportes' %}active{% endif %}">
-      <i class="bi bi-file-earmark-excel-fill"></i> Generador de Reportes
+    <!-- Desplegable: Facturación y Cobranza -->
+    <button class="nav-item-toggle {% if active_page == 'facturacion' or active_page == 'ordenes' %}active-parent{% endif %}"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#menuFacturacion"
+            data-label="Facturación y Cobros"
+            aria-expanded="{% if active_page == 'facturacion' or active_page == 'ordenes' %}true{% else %}false{% endif %}"
+            aria-controls="menuFacturacion"
+            title="Facturación y Cobros">
+      <i class="bi bi-receipt"></i>
+      <span>Facturación y Cobros</span>
+      <i class="bi bi-chevron-down nav-chevron ms-auto"></i>
+    </button>
+    <div class="collapse {% if active_page == 'facturacion' or active_page == 'ordenes' %}show{% endif %}" id="menuFacturacion">
+      <div class="nav-subitems">
+        <a href="{% url 'dashboard_superadmin_facturacion' %}" 
+           class="nav-subitem {% if active_page == 'facturacion' %}active{% endif %}"
+           data-label="Facturación y SII"
+           title="Facturación y SII">
+          <i class="bi bi-receipt-cutoff"></i>
+          <span>Facturación y SII</span>
+        </a>
+        <a href="{% url 'dashboard_superadmin_ordenes' %}" 
+           class="nav-subitem {% if active_page == 'ordenes' %}active{% endif %}"
+           data-label="Órdenes de Compra"
+           title="Órdenes de Compra">
+          <i class="bi bi-bag-check-fill"></i>
+          <span>Órdenes de Compra</span>
+        </a>
+      </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════════════
+         BLOQUE 3: USUARIOS Y COMUNIDAD
+    ══════════════════════════════════════════════════════ -->
+    <div class="nav-section-label">Usuarios y Comunidad</div>
+
+    <!-- Desplegable: Control de Accesos (IAM) -->
+    <button class="nav-item-toggle {% if active_page == 'usuarios' or active_page == 'roles' %}active-parent{% endif %}"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#menuAccesos"
+            data-label="Control de Accesos"
+            aria-expanded="{% if active_page == 'usuarios' or active_page == 'roles' %}true{% else %}false{% endif %}"
+            aria-controls="menuAccesos"
+            title="Control de Accesos (IAM)">
+      <i class="bi bi-people-fill"></i>
+      <span>Control de Accesos</span>
+      <i class="bi bi-chevron-down nav-chevron ms-auto"></i>
+    </button>
+    <div class="collapse {% if active_page == 'usuarios' or active_page == 'roles' %}show{% endif %}" id="menuAccesos">
+      <div class="nav-subitems">
+        <a href="{% url 'dashboard_superadmin_usuarios' %}" 
+           class="nav-subitem {% if active_page == 'usuarios' %}active{% endif %}"
+           data-label="Usuarios Globales"
+           title="Usuarios Globales">
+          <i class="bi bi-person-lines-fill"></i>
+          <span>Usuarios Globales</span>
+        </a>
+        <a href="{% url 'dashboard_superadmin_roles' %}" 
+           class="nav-subitem {% if active_page == 'roles' %}active{% endif %}"
+           data-label="Roles y Permisos"
+           title="Roles y Permisos">
+          <i class="bi bi-shield-lock-fill"></i>
+          <span>Roles y Permisos</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Centro de Comunicados -->
+    <a href="{% url 'dashboard_superadmin_comunicados' %}" 
+       class="nav-item {% if active_page == 'comunicados' %}active{% endif %}" 
+       data-label="Centro de Comunicados"
+       title="Avisos masivos y notificaciones del sistema">
+      <i class="bi bi-megaphone-fill"></i>
+      <span>Centro de Comunicados</span>
     </a>
-    <a href="{% url 'dashboard_superadmin_estadisticas' %}" class="nav-item {% if active_page == 'estadisticas' %}active{% endif %}">
-      <i class="bi bi-graph-up-arrow"></i> Estadísticas Globales
+
+
+    <!-- ══════════════════════════════════════════════════════
+         BLOQUE 4: INTELIGENCIA Y SISTEMA
+    ══════════════════════════════════════════════════════ -->
+    <div class="nav-section-label">Inteligencia y Sistema</div>
+
+    <!-- Monitor Académico -->
+    <a href="{% url 'dashboard_superadmin_academico' %}" 
+       class="nav-item {% if active_page == 'academico' %}active{% endif %}" 
+       data-label="Monitor Académico"
+       title="Monitoreo pedagógico global de colegios">
+      <i class="bi bi-mortarboard-fill"></i>
+      <span>Monitor Académico</span>
     </a>
-    <a href="{% url 'dashboard_superadmin_configuracion' %}" class="nav-item {% if active_page == 'configuracion' %}active{% endif %}">
-      <i class="bi bi-gear"></i> Configuración
+
+    <!-- Desplegable: Analítica y Reportes -->
+    <button class="nav-item-toggle {% if active_page == 'estadisticas' or active_page == 'reportes' %}active-parent{% endif %}"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#menuAnalitica"
+            data-label="Analítica y Reportes"
+            aria-expanded="{% if active_page == 'estadisticas' or active_page == 'reportes' %}true{% else %}false{% endif %}"
+            aria-controls="menuAnalitica"
+            title="Analítica y Reportes">
+      <i class="bi bi-graph-up-arrow"></i>
+      <span>Analítica y Reportes</span>
+      <i class="bi bi-chevron-down nav-chevron ms-auto"></i>
+    </button>
+    <div class="collapse {% if active_page == 'estadisticas' or active_page == 'reportes' %}show{% endif %}" id="menuAnalitica">
+      <div class="nav-subitems">
+        <a href="{% url 'dashboard_superadmin_estadisticas' %}" 
+           class="nav-subitem {% if active_page == 'estadisticas' %}active{% endif %}"
+           data-label="Estadísticas Globales"
+           title="Estadísticas Globales">
+          <i class="bi bi-bar-chart-line-fill"></i>
+          <span>Estadísticas Globales</span>
+        </a>
+        <a href="{% url 'dashboard_superadmin_reportes' %}" 
+           class="nav-subitem {% if active_page == 'reportes' %}active{% endif %}"
+           data-label="Descarga de Reportes"
+           title="Descarga de Reportes Excel/PDF">
+          <i class="bi bi-file-earmark-arrow-down-fill"></i>
+          <span>Descarga de Reportes</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Registro de Auditoría -->
+    <a href="{% url 'dashboard_superadmin_auditoria' %}" 
+       class="nav-item {% if active_page == 'auditoria' %}active{% endif %}" 
+       data-label="Registro de Auditoría"
+       title="Historial de acciones y eventos de seguridad">
+      <i class="bi bi-shield-check"></i>
+      <span>Registro de Auditoría</span>
     </a>
+
+    <!-- Configuración del Sistema -->
+    <a href="{% url 'dashboard_superadmin_configuracion' %}" 
+       class="nav-item {% if active_page == 'configuracion' %}active{% endif %}" 
+       data-label="Configuración"
+       title="Ajustes de la plataforma y pasarelas de pago">
+      <i class="bi bi-gear-fill"></i>
+      <span>Configuración</span>
+    </a>
+
   </nav>
 
   <div class="sidebar-footer">
-    <a href="{% url 'dashboard_usuario' %}" class="nav-item">
-      <i class="bi bi-arrow-left-circle"></i> Volver a Portal Colegio
+    <a href="{% url 'dashboard_usuario' %}" 
+       class="nav-item" 
+       data-label="Volver a Portal Colegio"
+       title="Cambiar a la vista del colegio">
+      <i class="bi bi-arrow-left-circle"></i>
+      <span>Volver a Portal Colegio</span>
     </a>
   </div>
 </aside>
 
 <div class="sidebar-backdrop" id="sidebarBackdropSuper" onclick="closeSidebarSuperAdmin()"></div>
 
+<!-- ── Lógica JavaScript Vanilla Blindada: Delegación de Eventos, Try/Catch y Anti-Congelamiento ── -->
 <script>
-  window.openSidebarSuperAdmin = function() {
-    var sb = document.getElementById('sidebar');
-    if (sb) sb.classList.add('open');
-    document.body.classList.add('sidebar-mobile-open');
-  };
-  window.closeSidebarSuperAdmin = function() {
-    var sb = document.getElementById('sidebar');
-    if (sb) sb.classList.remove('open');
-    document.body.classList.remove('sidebar-mobile-open');
-  };
-  window.toggleSidebarSuperAdmin = function() {
-    var sb = document.getElementById('sidebar');
-    if (sb && (sb.classList.contains('open') || sb.classList.contains('active'))) {
-      closeSidebarSuperAdmin();
-    } else {
-      openSidebarSuperAdmin();
+(function() {
+  'use strict';
+
+  // 1. Helpers Seguros de Almacenamiento Local (Evita excepciones en incógnito o cuotas llenas)
+  function safeGetStorage(key, defaultValue) {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        var val = window.localStorage.getItem(key);
+        return val !== null ? val : defaultValue;
+      }
+    } catch (err) {
+      console.warn('[Eduteka Sidebar] Error al leer localStorage (' + key + '):', err);
+    }
+    return defaultValue;
+  }
+
+  function safeSetStorage(key, value) {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.setItem(key, value);
+      }
+    } catch (err) {
+      console.warn('[Eduteka Sidebar] Error al escribir en localStorage (' + key + '):', err);
+    }
+  }
+
+  // 2. Sincronización Visual de UI (Iconos, Chevrones y Atributos de accesibilidad)
+  function updateSidebarCollapseUI(isCollapsed) {
+    try {
+      var toggleBtn = document.getElementById('sidebarCollapseBtn');
+      var toggleIcon = document.getElementById('sidebarToggleIcon');
+      if (toggleBtn) {
+        toggleBtn.setAttribute('title', isCollapsed ? 'Expandir menú (Ctrl+B)' : 'Contraer menú (Ctrl+B)');
+        toggleBtn.setAttribute('aria-expanded', isCollapsed ? 'false' : 'true');
+      }
+      if (toggleIcon) {
+        if (isCollapsed) {
+          toggleIcon.classList.remove('bi-chevron-left');
+          toggleIcon.classList.add('bi-chevron-right');
+        } else {
+          toggleIcon.classList.remove('bi-chevron-right');
+          toggleIcon.classList.add('bi-chevron-left');
+        }
+      }
+    } catch (err) {
+      console.warn('[Eduteka Sidebar] Error al actualizar UI de colapso:', err);
+    }
+  }
+
+  // 3. Función Central para Alternar Colapso
+  window.toggleSidebarCollapse = function(targetState) {
+    try {
+      var isCurrentlyCollapsed = document.documentElement.classList.contains('sidebar-collapsed');
+      var newState = (typeof targetState === 'boolean') ? targetState : !isCurrentlyCollapsed;
+
+      if (newState) {
+        document.documentElement.classList.add('sidebar-collapsed');
+        document.body.classList.add('sidebar-collapsed');
+        safeSetStorage('sidebarState', 'collapsed');
+      } else {
+        document.documentElement.classList.remove('sidebar-collapsed');
+        document.body.classList.remove('sidebar-collapsed');
+        safeSetStorage('sidebarState', 'expanded');
+      }
+
+      updateSidebarCollapseUI(newState);
+    } catch (err) {
+      console.warn('[Eduteka Sidebar] Error en toggleSidebarCollapse:', err);
     }
   };
+
+  // 4. Gestión del Tooltip Flotante SaaS (Delegado y reutilizable)
+  var tooltipEl = null;
+
+  function getOrCreateFloatingTooltip() {
+    try {
+      if (!tooltipEl) {
+        tooltipEl = document.getElementById('edutekaFloatingTooltip');
+      }
+      if (!tooltipEl) {
+        tooltipEl = document.createElement('div');
+        tooltipEl.id = 'edutekaFloatingTooltip';
+        document.body.appendChild(tooltipEl);
+      }
+      return tooltipEl;
+    } catch (err) {
+      console.warn('[Eduteka Sidebar] Error al crear floating tooltip:', err);
+      return null;
+    }
+  }
+
+  function showFloatingTooltip(item) {
+    try {
+      var tt = getOrCreateFloatingTooltip();
+      if (!tt) return;
+
+      var label = item.getAttribute('data-label') || item.getAttribute('title');
+      if (!label) return;
+
+      var iconEl = item.querySelector('i');
+      var iconHtml = iconEl ? iconEl.outerHTML : '<i class="bi bi-circle"></i>';
+      var isActive = item.classList.contains('active') || item.classList.contains('active-parent');
+
+      tt.innerHTML = iconHtml + ' <span>' + label + '</span>' +
+        (isActive ? ' <span class="badge bg-light text-dark px-1.5 py-0.5" style="font-size:0.65rem; border-radius:6px; margin-left:5px;">Activo</span>' : '');
+
+      if (isActive) {
+        tt.classList.add('is-active');
+      } else {
+        tt.classList.remove('is-active');
+      }
+
+      var rect = item.getBoundingClientRect();
+      tt.style.top = (rect.top + rect.height / 2) + 'px';
+      tt.style.left = (rect.right + 8) + 'px';
+
+      requestAnimationFrame(function() {
+        tt.classList.add('show');
+      });
+    } catch (err) {
+      console.warn('[Eduteka Sidebar] Error al mostrar tooltip:', err);
+    }
+  }
+
+  function hideFloatingTooltip() {
+    try {
+      if (tooltipEl) {
+        tooltipEl.classList.remove('show');
+      }
+    } catch (err) {
+      console.warn('[Eduteka Sidebar] Error al ocultar tooltip:', err);
+    }
+  }
+
+  // 5. Inicialización Idempotente y Segura
+  function initSidebar() {
+    try {
+      var savedState = safeGetStorage('sidebarState', 'expanded');
+      var isDesktop = window.innerWidth >= 992;
+      var shouldCollapse = (savedState === 'collapsed') && isDesktop;
+
+      if (shouldCollapse) {
+        document.documentElement.classList.add('sidebar-collapsed');
+        document.body.classList.add('sidebar-collapsed');
+      } else {
+        document.documentElement.classList.remove('sidebar-collapsed');
+        document.body.classList.remove('sidebar-collapsed');
+      }
+      updateSidebarCollapseUI(shouldCollapse);
+
+      // Restaurar posición de Scroll de forma segura
+      var sidebarNav = document.querySelector('.sidebar-nav');
+      if (sidebarNav) {
+        var savedScroll = sessionStorage.getItem('eduteka_superadmin_sidebar_scroll');
+        if (savedScroll !== null) {
+          sidebarNav.scrollTop = parseInt(savedScroll, 10);
+        }
+        sidebarNav.addEventListener('scroll', function() {
+          try {
+            sessionStorage.setItem('eduteka_superadmin_sidebar_scroll', sidebarNav.scrollTop);
+          } catch(e) {}
+        }, { passive: true });
+      }
+    } catch (err) {
+      console.warn('[Eduteka Sidebar] Error durante initSidebar:', err);
+    }
+  }
+
+  // 6. DELEGACIÓN DE EVENTOS GLOBAL (Inmune a reemplazos del DOM o navegación rápida)
+  if (!window.__edutekaSidebarDelegationAttached) {
+    window.__edutekaSidebarDelegationAttached = true;
+
+    // Delegación Única de Clicks en document
+    document.addEventListener('click', function(e) {
+      try {
+        // A) Botón Toggle de Retracción del Sidebar (Header y Topbar)
+        var toggleBtn = e.target.closest('#sidebarCollapseBtn, #desktopSidebarToggleBtn, .btn-sidebar-collapse, [data-action="toggle-sidebar"]');
+        if (toggleBtn) {
+          e.preventDefault();
+          e.stopPropagation();
+          window.toggleSidebarCollapse();
+          return;
+        }
+
+        // B) Desplegables / Accordions de los 4 Bloques (.nav-item-toggle)
+        var navToggle = e.target.closest('.sidebar .nav-item-toggle');
+        if (navToggle) {
+          // Si el menú está colapsado en desktop, expandirlo inmediatamente para ver el contenido
+          var isCollapsed = document.documentElement.classList.contains('sidebar-collapsed');
+          if (isCollapsed && window.innerWidth >= 992) {
+            window.toggleSidebarCollapse(false);
+          }
+
+          // Compatibilidad Inteligente con Bootstrap:
+          // Si Bootstrap JS está cargado en la página, permitimos su evento nativo.
+          // Si Bootstrap JS NO está cargado (o falló), realizamos un toggle CSS manual a prueba de fallos.
+          var hasBootstrapCollapse = (typeof window.bootstrap !== 'undefined' && typeof window.bootstrap.Collapse !== 'undefined');
+          if (!hasBootstrapCollapse) {
+            e.preventDefault();
+            var targetSelector = navToggle.getAttribute('data-bs-target') || navToggle.getAttribute('href');
+            if (targetSelector) {
+              var targetMenu = document.querySelector(targetSelector);
+              if (targetMenu) {
+                var isOpen = targetMenu.classList.contains('show');
+                targetMenu.classList.toggle('show', !isOpen);
+                navToggle.setAttribute('aria-expanded', !isOpen ? 'true' : 'false');
+              }
+            }
+          }
+          return;
+        }
+
+        // C) Botón de Menú Móvil (#mobileMenuBtn en topbar)
+        var mobileBtn = e.target.closest('#mobileMenuBtn, .mobile-menu-btn');
+        if (mobileBtn) {
+          e.preventDefault();
+          window.toggleSidebarSuperAdmin();
+          return;
+        }
+
+        // D) Backdrop móvil
+        var backdrop = e.target.closest('#sidebarBackdropSuper');
+        if (backdrop) {
+          e.preventDefault();
+          window.closeSidebarSuperAdmin();
+          return;
+        }
+      } catch (err) {
+        console.warn('[Eduteka Sidebar] Error en delegación de click:', err);
+      }
+    });
+
+    // Delegación de Mouseover (Tooltips en modo contraído)
+    document.addEventListener('mouseover', function(e) {
+      try {
+        var item = e.target.closest('.sidebar .nav-item[data-label], .sidebar .nav-item-toggle[data-label], .sidebar .nav-subitem[data-label]');
+        if (!item) return;
+
+        var isCollapsed = document.documentElement.classList.contains('sidebar-collapsed') ||
+                          document.body.classList.contains('sidebar-collapsed');
+        if (!isCollapsed || window.innerWidth < 992) {
+          hideFloatingTooltip();
+          return;
+        }
+
+        showFloatingTooltip(item);
+      } catch (err) {
+        console.warn('[Eduteka Sidebar] Error en mouseover tooltip:', err);
+      }
+    });
+
+    // Delegación de Mouseout (Ocultar tooltips)
+    document.addEventListener('mouseout', function(e) {
+      try {
+        var item = e.target.closest('.sidebar .nav-item[data-label], .sidebar .nav-item-toggle[data-label], .sidebar .nav-subitem[data-label]');
+        if (item && (!e.relatedTarget || !item.contains(e.relatedTarget))) {
+          hideFloatingTooltip();
+        }
+      } catch (err) {
+        console.warn('[Eduteka Sidebar] Error en mouseout tooltip:', err);
+      }
+    });
+
+    // Atajo de teclado global: Ctrl+B o Cmd+B
+    document.addEventListener('keydown', function(e) {
+      try {
+        if ((e.ctrlKey || e.metaKey) && (e.key === 'b' || e.key === 'B')) {
+          var activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+          if (activeTag !== 'input' && activeTag !== 'textarea') {
+            e.preventDefault();
+            window.toggleSidebarCollapse();
+          }
+        }
+      } catch (err) {
+        console.warn('[Eduteka Sidebar] Error en atajo de teclado:', err);
+      }
+    });
+  }
+
+  // Disparo de inicialización estrictamente seguro
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSidebar);
+  } else {
+    initSidebar();
+  }
+
+  // 7. Funciones de Control Móvil Globales
+  window.openSidebarSuperAdmin = function() {
+    try {
+      var sb = document.getElementById('sidebar');
+      if (sb) sb.classList.add('open');
+      document.body.classList.add('sidebar-mobile-open');
+    } catch(err) {
+      console.warn('[Eduteka Sidebar] Error en openSidebarSuperAdmin:', err);
+    }
+  };
+
+  window.closeSidebarSuperAdmin = function() {
+    try {
+      var sb = document.getElementById('sidebar');
+      if (sb) sb.classList.remove('open', 'active');
+      document.body.classList.remove('sidebar-mobile-open');
+    } catch(err) {
+      console.warn('[Eduteka Sidebar] Error en closeSidebarSuperAdmin:', err);
+    }
+  };
+
+  window.toggleSidebarSuperAdmin = function() {
+    try {
+      var sb = document.getElementById('sidebar');
+      if (sb && (sb.classList.contains('open') || sb.classList.contains('active'))) {
+        window.closeSidebarSuperAdmin();
+      } else {
+        window.openSidebarSuperAdmin();
+      }
+    } catch(err) {
+      console.warn('[Eduteka Sidebar] Error en toggleSidebarSuperAdmin:', err);
+    }
+  };
+})();
 </script>
