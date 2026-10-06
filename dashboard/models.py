@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 
 class ComunicadoGlobal(models.Model):
     PUBLICO_CHOICES = [
@@ -216,3 +217,45 @@ class EstadoOnboarding(models.Model):
 
     def __str__(self):
         return f"Onboarding de {self.colegio.nombre} ({self.porcentaje_completado()}%)"
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# MODELO: MENSAJES DE CHAT DIRECTO (Super Admin ↔ Usuario Individual)
+# ══════════════════════════════════════════════════════════════════════════════
+
+class MensajeUsuario(models.Model):
+    """
+    Persistencia de mensajes del Centro de Mensajes entre Super Admin
+    y usuarios individuales (Directores, Docentes, Estudiantes, etc.).
+    """
+    remitente = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='mensajes_usuario_enviados',
+        verbose_name="Remitente"
+    )
+    destinatario = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='mensajes_usuario_recibidos',
+        verbose_name="Destinatario"
+    )
+    contenido = models.TextField(verbose_name="Contenido del Mensaje")
+    fecha_creacion = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de Creación")
+    leido = models.BooleanField(default=False, verbose_name="¿Leído?")
+
+    class Meta:
+        verbose_name = "Mensaje de Usuario"
+        verbose_name_plural = "Mensajes de Usuarios"
+        ordering = ['fecha_creacion']
+        indexes = [
+            models.Index(fields=['remitente', 'destinatario', 'fecha_creacion']),
+            models.Index(fields=['destinatario', 'leido']),
+        ]
+
+    def __str__(self):
+        remitente_nombre = getattr(self.remitente, 'username', 'Desconocido')
+        destinatario_nombre = getattr(self.destinatario, 'username', 'Desconocido')
+        fecha = self.fecha_creacion.strftime('%d/%m/%Y %H:%M') if self.fecha_creacion else 'Sin fecha'
+        return f"De {remitente_nombre} para {destinatario_nombre} ({fecha})"
+

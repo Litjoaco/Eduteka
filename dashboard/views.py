@@ -6,6 +6,8 @@ from django.db.models import Sum, Count, Q
 from solicitudes.models import SolicitudAcceso, MiembroColegio
 from colegios.models import Colegio, ColegioModulo, RolColegio, Estudiante, CursoColegio, Suscripcion, MensajeChat
 from planes.models import Plan
+from dashboard.models import MensajeUsuario
+import json
 
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -3053,6 +3055,145 @@ def api_buscar_usuarios_chat(request):
         'total': len(usuarios_data),
         'usuarios': usuarios_data
     })
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# APIS: CHAT CON USUARIOS INDIVIDUALES (Centro de Mensajes Super Admin)
+# ══════════════════════════════════════════════════════════════════════════════
+
+@login_required
+def api_obtener_mensajes_usuario(request, usuario_id=None):
+    """
+    Endpoint GET: Obtiene el historial de mensajes bidireccional entre
+    el usuario en sesión (request.user) y el usuario seleccionado (usuario_id).
+    Marca automáticamente como leídos los mensajes recibidos del interlocutor.
+    """
+    if not (request.user.is_superuser or request.user.is_staff):
+        return JsonResponse({'status': 'error', 'error': 'Acceso no autorizado.'}, status=403)
+
+    if not usuario_id:
+        usuario_id = request.GET.get('usuario_id') or request.GET.get('id')
+
+    if not usuario_id:
+        return JsonResponse({
+            'status': 'error',
+            'error': 'Falta el identificador del usuario.'
+        }, status=400)
+
+    otro_usuario = get_object_or_404(User, id=usuario_id)
+
+    # Marcar como leídos los mensajes que el otro usuario le envió a request.user
+    MensajeUsuario.objects.filter(
+        remitente=otro_usuario,
+        destinatario=request.user,
+        leido=False
+    ).update(leido=True)
+
+    # Consultar todos los mensajes entre request.user y otro_usuario ordenados cronológicamente
+    mensajes_qs = MensajeUsuario.objects.filter(
+        Q(remitente=request.user, destinatario=otro_usuario) |
+        Q(remitente=otro_usuario, destinatario=request.user)
+    ).order_by('fecha_creacion')
+
+    mensajes_data = []
+    for m in mensajes_qs:
+        es_mio = (m.remitente_id == request.user.id)
+        mensajes_data.append({
+            'id': m.id,
+            'remitente_id': m.remitente_id,
+            'destinatario_id': m.destinatario_id,
+            'tipo': 'mio' if es_mio else 'del_otro',
+            'es_mio': es_mio,
+            'contenido': m.contenido,
+            'leido': m.leido,
+            'hora': m.fecha_creacion.strftime('%H:%M') if m.fecha_creacion else '',
+            'fecha': m.fecha_creacion.strftime('%d/%m/%Y') if m.fecha_creacion else '',
+            'fecha_creacion': m.fecha_creacion.isoformat() if m.fecha_creacion else '',
+        })
+
+    perfil = getattr(otro_usuario, 'perfil', None)
+    nombre = (perfil and perfil.nombre_completo) or otro_usuario.get_full_name() or otro_usuario.username
+    partes = nombre.split()
+    iniciales = (partes[0][0] + (partes[1][0] if len(partes) > 1 else '')).upper() if partes else 'US'
+
+    return JsonResponse({
+        'status': 'success',
+        'total': len(mensajes_data),
+        'usuario': {
+            'id': otro_usuario.id,
+            'username': otro_usuario.username,
+            'nombre': nombre,
+            'iniciales': iniciales,
+            'email': otro_usuario.email,
+        },
+        'mensajes': mensajes_data
+    })
+
+
+@login_required
+@require_POST
+def api_enviar_mensaje_usuario(request):
+    """
+    Endpoint POST: Recibe por Fetch/AJAX (JSON o Form Data) el destinatario_id y el contenido del mensaje.
+    Crea una nueva instancia de MensajeUsuario y retorna un JSON con el mensaje creado.
+    """
+    if not (request.user.is_superuser or request.user.is_staff):
+        return JsonResponse({'status': 'error', 'error': 'Acceso no autorizado.'}, status=403)
+
+    destinatario_id = None
+    contenido = ""
+
+    # 1. Procesar payload JSON (si el fetch envía application/json)
+    if request.content_type == 'application/json':
+        try:
+            data = json.loads(request.body.decode('utf-8'))
+            destinatario_id = data.get('destinatario_id') or data.get('usuario_id') or data.get('id')
+            contenido = data.get('contenido', '').strip()
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'error': f'JSON inválido: {str(e)}'}, status=400)
+
+    # 2. Procesar FormData / POST estándar como fallback
+    if not destinatario_id:
+        destinatario_id = request.POST.get('destinatario_id') or request.POST.get('usuario_id') or request.POST.get('id')
+    if not contenido:
+        contenido = request.POST.get('contenido', '').strip()
+
+    if not destinatario_id or not contenido:
+        return JsonResponse({
+            'status': 'error',
+            'error': 'Falta el id del destinatario o el contenido del mensaje.'
+        }, status=400)
+
+    try:
+        destinatario = User.objects.get(id=destinatario_id)
+    except User.DoesNotExist:
+        return JsonResponse({
+            'status': 'error',
+            'error': 'El usuario destinatario especificado no existe.'
+        }, status=404)
+
+    mensaje = MensajeUsuario.objects.create(
+        remitente=request.user,
+        destinatario=destinatario,
+        contenido=contenido
+    )
+
+    return JsonResponse({
+        'status': 'success',
+        'mensaje': {
+            'id': mensaje.id,
+            'remitente_id': mensaje.remitente_id,
+            'destinatario_id': mensaje.destinatario_id,
+            'tipo': 'mio',
+            'es_mio': True,
+            'contenido': mensaje.contenido,
+            'leido': mensaje.leido,
+            'hora': mensaje.fecha_creacion.strftime('%H:%M') if mensaje.fecha_creacion else '',
+            'fecha': mensaje.fecha_creacion.strftime('%d/%m/%Y') if mensaje.fecha_creacion else '',
+            'fecha_creacion': mensaje.fecha_creacion.isoformat() if mensaje.fecha_creacion else '',
+        }
+    }, status=201)
+
 
 
 

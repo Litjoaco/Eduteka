@@ -615,6 +615,8 @@
     let chatActiveTab = 'colegios';   // 'colegios' | 'usuarios'
     let chatColegiosCache = [];
     let chatUsuariosCache = [];
+    let chatDrafts = {};             // Diccionario de borradores por ID: { [usuarioId]: 'texto' }
+    let chatHistory = {};            // Diccionario de historial dinámico por ID: { [usuarioId]: '<burbujas>' }
 
     // Helper: Debounce de búsqueda (300ms)
     function debounceChat(func, delay = 300) {
@@ -777,7 +779,17 @@
 
     async function seleccionarColegioChat(colegio) {
         if (!colegio) return;
+
+        // Guardar estado al salir si previamente había un usuario activo
+        if (currentChatType === 'usuario' && currentActiveUserId) {
+            const prevInput = document.getElementById('globalChatInputField');
+            const prevBox = document.getElementById('globalChatMessagesBox');
+            if (prevInput) chatDrafts[currentActiveUserId] = prevInput.value;
+            if (prevBox) chatHistory[currentActiveUserId] = prevBox.innerHTML;
+        }
+
         currentActiveColegioId = colegio.id;
+        currentChatType = 'colegio';
         try {
             sessionStorage.setItem('eduteka_active_chat_school', String(colegio.id));
         } catch (e) {}
@@ -797,12 +809,17 @@
         const locationEl = document.getElementById('chatActiveLocation');
         const avatarEl = document.getElementById('chatActiveAvatar');
         const hiddenIdInput = document.getElementById('globalChatActiveColegioId');
+        const inputField = document.getElementById('globalChatInputField');
 
         if (nameEl) nameEl.textContent = colegio.nombre;
         if (adminEl) adminEl.textContent = `Director(a): ${colegio.admin || 'Dirección / Administración'}`;
         if (locationEl) locationEl.textContent = colegio.ciudad || 'Chile';
         if (avatarEl) avatarEl.textContent = colegio.iniciales || 'ED';
         if (hiddenIdInput) hiddenIdInput.value = colegio.id;
+        if (inputField) {
+            inputField.placeholder = "Escribe un mensaje al colegio...";
+            inputField.value = '';
+        }
 
         // En pantallas pequeñas, alternar a la vista de conversación
         const contactsCol = document.getElementById('chatContactsCol');
@@ -940,7 +957,7 @@
         const text = input.value.trim();
         if (!text) return;
 
-        // Caso 1: Chat activo con Usuario
+        // Caso 1: Chat activo con Usuario (Persistencia real con Fetch POST)
         if (currentChatType === 'usuario') {
             const userId = currentActiveUserId || (hiddenIdInput ? hiddenIdInput.value : null);
             if (!userId) {
@@ -948,43 +965,120 @@
                 return;
             }
 
-            const hora = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            const emptyNotice = box.querySelector('.bi-chat-dots-fill');
-            if (emptyNotice) box.innerHTML = '';
+            if (btnSend) btnSend.disabled = true;
 
-            const msgDiv = document.createElement('div');
-            msgDiv.className = 'd-flex align-items-start justify-content-end gap-2 ms-auto chat-bubble-sent';
-            msgDiv.innerHTML = `
-                <div>
-                    <div class="p-3 rounded-4 text-white shadow-sm" style="background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%); border-top-right-radius: 4px !important; font-size: 0.86rem; line-height: 1.45; box-shadow: 0 4px 14px rgba(124, 92, 252, 0.2) !important;">
-                        <div class="fw-bold mb-1 text-white-50" style="font-size: 0.74rem;">
-                            Super Admin Eduteka
+            try {
+                const csrfToken = getCookieGlobal('csrftoken') || '{{ csrf_token }}';
+
+                let urlPost = "{% url 'api_enviar_mensaje_usuario' %}";
+                let response = await fetch(urlPost, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        destinatario_id: parseInt(userId, 10),
+                        contenido: text
+                    })
+                });
+
+                if (!response.ok) {
+                    // Fallback a ruta absoluta
+                    response = await fetch('/dashboard/superadmin/api/chat/usuarios/enviar/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrfToken,
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({
+                            destinatario_id: parseInt(userId, 10),
+                            contenido: text
+                        })
+                    });
+                }
+
+                if (!response.ok) {
+                    response = await fetch('/superadmin/api/chat/usuarios/enviar/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrfToken,
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({
+                            destinatario_id: parseInt(userId, 10),
+                            contenido: text
+                        })
+                    });
+                }
+
+                const data = await response.json();
+                if (!response.ok || data.status === 'error') {
+                    throw new Error(data.error || 'Error al enviar el mensaje');
+                }
+
+                const m = data.mensaje || {};
+                const hora = m.hora || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                // Remover aviso de conversación vacía si existía
+                const emptyNotice = box.querySelector('.bi-chat-heart-fill, .bi-chat-dots-fill');
+                if (emptyNotice) {
+                    box.innerHTML = '';
+                }
+
+                // Dibujar instantáneamente la nueva burbuja en el DOM
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'd-flex align-items-start justify-content-end gap-2 ms-auto chat-bubble-sent';
+                msgDiv.innerHTML = `
+                    <div>
+                        <div class="p-3 rounded-4 text-white shadow-sm" style="background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%); border-top-right-radius: 4px !important; font-size: 0.86rem; line-height: 1.45; box-shadow: 0 4px 14px rgba(124, 92, 252, 0.2) !important;">
+                            <div class="fw-bold mb-1 text-white-50" style="font-size: 0.74rem;">
+                                Super Admin Eduteka
+                            </div>
+                            ${escapeHtmlGlobal(text)}
                         </div>
-                        ${escapeHtmlGlobal(text)}
+                        <div class="text-end text-muted small mt-1 me-1" style="font-size: 0.68rem;">
+                            ${escapeHtmlGlobal(hora)} · <i class="bi bi-check2 text-primary"></i>
+                        </div>
                     </div>
-                    <div class="text-end text-muted small mt-1 me-1" style="font-size: 0.68rem;">
-                        ${hora} · <i class="bi bi-check2 text-primary"></i>
+                    <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%); color: white; font-size: 0.85rem;">
+                        <i class="bi bi-headset"></i>
                     </div>
-                </div>
-                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%); color: white; font-size: 0.85rem;">
-                    <i class="bi bi-headset"></i>
-                </div>
-            `;
+                `;
 
-            box.appendChild(msgDiv);
-            input.value = '';
-            box.scrollTop = box.scrollHeight;
+                box.appendChild(msgDiv);
+                input.value = '';
 
-            const userItem = document.querySelector(
-                `#lista-usuarios [data-chat-id="${userId}"], ` +
-                `#lista-usuarios [data-usuario-id="${userId}"], ` +
-                `#lista-usuarios [data-id="${userId}"]`
-            );
-            if (userItem) {
-                const snippetEl = userItem.querySelector('.chat-contact-snippet');
-                const timeEl = userItem.querySelector('.chat-contact-time');
-                if (snippetEl) snippetEl.textContent = `Tú: ${text.length > 30 ? text.substring(0, 30) + '...' : text}`;
-                if (timeEl) timeEl.textContent = hora;
+                // Limpiar borrador y actualizar estado en cliente
+                chatDrafts[userId] = '';
+
+                // Scrolling automático al final
+                setTimeout(() => {
+                    box.scrollTop = box.scrollHeight;
+                }, 30);
+
+                // Actualizar snippet y hora en la lista de usuarios
+                const userItem = document.querySelector(
+                    `#lista-usuarios [data-chat-id="${userId}"], ` +
+                    `#lista-usuarios [data-usuario-id="${userId}"], ` +
+                    `#lista-usuarios [data-id="${userId}"]`
+                );
+                if (userItem) {
+                    const snippetEl = userItem.querySelector('.chat-contact-snippet');
+                    const timeEl = userItem.querySelector('.chat-contact-time');
+                    if (snippetEl) snippetEl.textContent = `Tú: ${text.length > 30 ? text.substring(0, 30) + '...' : text}`;
+                    if (timeEl) timeEl.textContent = hora;
+                }
+
+            } catch (err) {
+                console.error('Error enviando mensaje a usuario:', err);
+                alert('No se pudo enviar el mensaje. Inténtalo de nuevo.');
+            } finally {
+                if (btnSend) btnSend.disabled = false;
+                if (input) input.focus();
             }
             return;
         }
@@ -1171,15 +1265,31 @@
 
     function seleccionarUsuarioChat(usuario) {
         if (!usuario) return;
-        currentActiveUserId = String(usuario.id);
-        currentChatType = 'usuario';
+        const nuevoUsuarioId = String(usuario.id);
+        const inputField = document.getElementById('globalChatInputField');
+        const box = document.getElementById('globalChatMessagesBox');
 
+        // 1. Guardar el estado al salir: Borrador e Historial del usuario previo
+        if (currentActiveUserId && currentChatType === 'usuario') {
+            if (inputField) {
+                chatDrafts[currentActiveUserId] = inputField.value;
+            }
+            if (box) {
+                chatHistory[currentActiveUserId] = box.innerHTML;
+            }
+        }
+
+        // Actualizar variables de estado activo
+        currentActiveUserId = nuevoUsuarioId;
+        currentChatType = 'usuario';
+        window.currentUsuarioActivo = usuario;
+
+        // 2. Pintar panel superior/derecho con la información del nuevo contacto
         const nameEl = document.getElementById('chatActiveSchoolName');
         const adminEl = document.getElementById('chatActiveAdminName');
         const locationEl = document.getElementById('chatActiveLocation');
         const avatarEl = document.getElementById('chatActiveAvatar');
         const hiddenIdInput = document.getElementById('globalChatActiveColegioId');
-        const inputField = document.getElementById('globalChatInputField');
 
         if (nameEl) nameEl.textContent = usuario.nombre;
         if (adminEl) adminEl.textContent = `Rol: ${usuario.rol} · ${usuario.email || ''}`;
@@ -1189,7 +1299,6 @@
             avatarEl.style.background = 'linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%)';
         }
         if (hiddenIdInput) hiddenIdInput.value = usuario.id;
-        if (inputField) inputField.placeholder = `Escribe un mensaje a ${usuario.nombre.split(' ')[0]}...`;
 
         const contactsCol = document.getElementById('chatContactsCol');
         const convoCol = document.getElementById('chatConversationCol');
@@ -1198,57 +1307,146 @@
             convoCol.classList.add('mobile-show');
         }
 
+        // 3. Cargar Historial Real de Mensajes desde la Base de Datos (GET API)
         cargarHistorialMensajesUsuario(usuario);
+
+        // 4. Restaurar el estado al entrar: Recuperar borrador si existía para este ID
+        if (inputField) {
+            inputField.placeholder = `Escribe un mensaje a ${usuario.nombre.split(' ')[0]}...`;
+            inputField.value = chatDrafts[nuevoUsuarioId] || '';
+            inputField.focus();
+        }
     }
 
-    function cargarHistorialMensajesUsuario(usuario) {
+    async function cargarHistorialMensajesUsuario(usuario) {
         const box = document.getElementById('globalChatMessagesBox');
-        if (!box) return;
+        if (!box || !usuario) return;
 
-        const primerNombre = usuario.nombre.split(' ')[0];
+        const userId = String(usuario.id);
 
+        // Limpiar el contenedor y mostrar spinner de carga
         box.innerHTML = `
-            <div class="text-center my-1">
-                <span class="badge bg-white text-muted border rounded-pill px-3 py-1 shadow-xs" style="font-size: 0.7rem; font-weight: 600;">
-                    <i class="bi bi-shield-lock-fill text-primary me-1"></i> Canal Directo Super Admin ↔ ${escapeHtmlGlobal(usuario.nombre)} (${escapeHtmlGlobal(usuario.rol)})
-                </span>
-            </div>
-
-            <div class="d-flex align-items-start gap-2 chat-bubble-received">
-                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: rgba(124, 92, 252, 0.15); color: var(--primary, #7C5CFC); font-size: 0.85rem; font-weight: 700;">
-                    ${escapeHtmlGlobal(usuario.iniciales || 'U')}
-                </div>
-                <div>
-                    <div class="p-3 rounded-4 bg-white border shadow-xs text-dark" style="border-top-left-radius: 4px !important; font-size: 0.86rem; line-height: 1.45;">
-                        <div class="fw-bold mb-1" style="font-size: 0.74rem; color: var(--primary, #7C5CFC);">
-                            ${escapeHtmlGlobal(usuario.nombre)}
-                        </div>
-                        Hola equipo de soporte Eduteka, tengo una duda sobre la actualización de las nóminas de este período en ${escapeHtmlGlobal(usuario.colegio || 'el colegio')}.
-                    </div>
-                    <div class="text-muted small mt-1 ms-1" style="font-size: 0.68rem;">
-                        Hoy · Recibido
-                    </div>
-                </div>
-            </div>
-
-            <div class="d-flex align-items-start justify-content-end gap-2 ms-auto chat-bubble-sent">
-                <div>
-                    <div class="p-3 rounded-4 text-white shadow-sm" style="background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%); border-top-right-radius: 4px !important; font-size: 0.86rem; line-height: 1.45; box-shadow: 0 4px 14px rgba(124, 92, 252, 0.2) !important;">
-                        <div class="fw-bold mb-1 text-white-50" style="font-size: 0.74rem;">
-                            Super Admin Eduteka
-                        </div>
-                        ¡Hola ${escapeHtmlGlobal(primerNombre)}! Con gusto te apoyamos. ¿Nos confirmas si ya cargaron la planilla CSV de estudiantes o requieres que revisemos los permisos de tu perfil?
-                    </div>
-                    <div class="text-end text-muted small mt-1 me-1" style="font-size: 0.68rem;">
-                        Hoy · <i class="bi bi-check2-all" style="color: var(--primary, #7C5CFC) !important;"></i>
-                    </div>
-                </div>
-                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%); color: white; font-size: 0.85rem;">
-                    <i class="bi bi-headset"></i>
-                </div>
+            <div class="text-center py-5 my-auto text-muted">
+                <div class="spinner-border spinner-border-sm text-primary mb-2" role="status"></div>
+                <p class="small mb-0">Cargando mensajes con ${escapeHtmlGlobal(usuario.nombre)}...</p>
             </div>
         `;
 
+        try {
+            const template = "{% url 'api_obtener_mensajes_usuario' usuario_id=999999 %}";
+            const urlPrimaria = template.replace('999999', userId);
+
+            let resp = await fetch(urlPrimaria);
+            if (!resp.ok) {
+                resp = await fetch(`/dashboard/superadmin/api/chat/usuarios/${userId}/mensajes/`);
+            }
+            if (!resp.ok) {
+                resp = await fetch(`/superadmin/api/chat/usuarios/${userId}/mensajes/`);
+            }
+
+            if (!resp.ok) {
+                throw new Error(`Error ${resp.status} al consultar mensajes`);
+            }
+
+            const data = await resp.json();
+            const mensajes = data.mensajes || [];
+
+            renderizarMensajesUsuario(mensajes, usuario);
+
+        } catch (err) {
+            console.error('Error cargando historial de usuario:', err);
+            box.innerHTML = `
+                <div class="text-center py-5 my-auto text-muted">
+                    <i class="bi bi-exclamation-circle text-danger fs-3 d-block mb-2"></i>
+                    <p class="fw-semibold mb-1 small text-dark">No se pudo cargar la conversación</p>
+                    <p class="small text-muted mb-3">Ocurrió un error al consultar el servidor.</p>
+                    <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="cargarHistorialMensajesUsuario(window.currentUsuarioActivo)">
+                        <i class="bi bi-arrow-clockwise me-1"></i> Reintentar
+                    </button>
+                </div>
+            `;
+        }
+    }
+
+    function renderizarMensajesUsuario(mensajes, usuario) {
+        const box = document.getElementById('globalChatMessagesBox');
+        if (!box) return;
+
+        const nombre = usuario.nombre || 'Usuario';
+        const rol = usuario.rol || 'Usuario';
+        const iniciales = usuario.iniciales || 'US';
+
+        if (!mensajes || mensajes.length === 0) {
+            box.innerHTML = `
+                <div class="text-center py-5 my-auto text-muted">
+                    <div class="mb-3 d-inline-flex p-3 rounded-circle" style="background: rgba(124, 92, 252, 0.08); color: var(--primary, #7C5CFC); font-size: 1.75rem;">
+                        <i class="bi bi-chat-heart-fill"></i>
+                    </div>
+                    <h6 class="fw-bold text-dark mb-1">Inicia la conversación con ${escapeHtmlGlobal(nombre)}</h6>
+                    <p class="small text-muted mb-0" style="max-width: 320px; margin: 0 auto; line-height: 1.4;">
+                        Canal directo con ${escapeHtmlGlobal(rol)}. Escribe un mensaje abajo para comenzar el chat.
+                    </p>
+                </div>
+            `;
+            return;
+        }
+
+        let html = `
+            <div class="text-center my-1">
+                <span class="badge bg-white text-muted border rounded-pill px-3 py-1 shadow-xs" style="font-size: 0.7rem; font-weight: 600;">
+                    <i class="bi bi-shield-lock-fill text-primary me-1"></i> Canal Directo Super Admin ↔ ${escapeHtmlGlobal(nombre)} (${escapeHtmlGlobal(rol)})
+                </span>
+            </div>
+        `;
+
+        mensajes.forEach(m => {
+            const esMio = (m.tipo === 'mio' || m.es_mio);
+            const hora = m.hora || '';
+
+            if (esMio) {
+                html += `
+                    <div class="d-flex align-items-start justify-content-end gap-2 ms-auto chat-bubble-sent">
+                        <div>
+                            <div class="p-3 rounded-4 text-white shadow-sm" style="background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%); border-top-right-radius: 4px !important; font-size: 0.86rem; line-height: 1.45; box-shadow: 0 4px 14px rgba(124, 92, 252, 0.2) !important;">
+                                <div class="fw-bold mb-1 text-white-50" style="font-size: 0.74rem;">
+                                    Super Admin Eduteka
+                                </div>
+                                ${escapeHtmlGlobal(m.contenido)}
+                            </div>
+                            <div class="text-end text-muted small mt-1 me-1" style="font-size: 0.68rem;">
+                                ${escapeHtmlGlobal(hora)} · <i class="bi bi-check2-all" style="color: var(--primary, #7C5CFC) !important;"></i>
+                            </div>
+                        </div>
+                        <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%); color: white; font-size: 0.85rem;">
+                            <i class="bi bi-headset"></i>
+                        </div>
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div class="d-flex align-items-start gap-2 chat-bubble-received">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: rgba(124, 92, 252, 0.15); color: var(--primary, #7C5CFC); font-size: 0.85rem; font-weight: 700;">
+                            ${escapeHtmlGlobal(iniciales)}
+                        </div>
+                        <div>
+                            <div class="p-3 rounded-4 bg-white border shadow-xs text-dark" style="border-top-left-radius: 4px !important; font-size: 0.86rem; line-height: 1.45;">
+                                <div class="fw-bold mb-1" style="font-size: 0.74rem; color: var(--primary, #7C5CFC);">
+                                    ${escapeHtmlGlobal(nombre)}
+                                </div>
+                                ${escapeHtmlGlobal(m.contenido)}
+                            </div>
+                            <div class="text-muted small mt-1 ms-1" style="font-size: 0.68rem;">
+                                ${escapeHtmlGlobal(hora)} · Recibido
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+
+        box.innerHTML = html;
+
+        // Auto-scroll al fondo
         setTimeout(() => {
             box.scrollTop = box.scrollHeight;
         }, 50);
@@ -1457,6 +1655,8 @@
     window.buscarUsuariosChat = buscarUsuariosChat;
     window.cargarHistorialMensajesUsuario = cargarHistorialMensajesUsuario;
     window.cargarUsuarioDirecto = cargarUsuarioDirecto;
+    window.chatDrafts = chatDrafts;
+    window.chatHistory = chatHistory;
 
     // ── Inicialización de Eventos del Chat ─────────────────────────────────────
     document.addEventListener('DOMContentLoaded', function () {
@@ -1535,6 +1735,11 @@
             });
         }
         if (inputField) {
+            inputField.addEventListener('input', function (e) {
+                if (currentChatType === 'usuario' && currentActiveUserId) {
+                    chatDrafts[currentActiveUserId] = e.target.value;
+                }
+            });
             inputField.addEventListener('keydown', function (e) {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import ComunicadoGlobal, ConfiguracionGlobal, SolicitudNuevoColegio
+from .models import ComunicadoGlobal, ConfiguracionGlobal, SolicitudNuevoColegio, MensajeUsuario
 
 
 @admin.register(ComunicadoGlobal)
@@ -45,3 +45,21 @@ class SolicitudNuevoColegioAdmin(admin.ModelAdmin):
             'classes': ('collapse',),
         }),
     )
+
+
+@admin.register(MensajeUsuario)
+class MensajeUsuarioAdmin(admin.ModelAdmin):
+    list_display = ('id', 'remitente', 'destinatario', 'contenido_resumido', 'leido', 'fecha_creacion')
+    list_filter = ('leido', 'fecha_creacion')
+    search_fields = (
+        'remitente__username', 'remitente__first_name', 'remitente__last_name', 'remitente__email',
+        'destinatario__username', 'destinatario__first_name', 'destinatario__last_name', 'destinatario__email',
+        'contenido'
+    )
+    ordering = ('-fecha_creacion',)
+    readonly_fields = ('fecha_creacion',)
+
+    def contenido_resumido(self, obj):
+        return obj.contenido[:60] + '...' if len(obj.contenido) > 60 else obj.contenido
+    contenido_resumido.short_description = 'Mensaje'
+

@@ -48,6 +48,9 @@ urlpatterns = [
     path('superadmin/api/chat/colegios/', views.api_buscar_colegios_chat, name='api_buscar_colegios_chat'),
     path('superadmin/api/chat/usuarios/', views.api_buscar_usuarios_chat, name='api_buscar_usuarios_chat'),
     path('superadmin/api/chat/mensajes/<int:colegio_id>/', views.api_historial_chat, name='api_historial_chat'),
+    path('superadmin/api/chat/usuarios/<int:usuario_id>/mensajes/', views.api_obtener_mensajes_usuario, name='api_obtener_mensajes_usuario'),
+    path('superadmin/api/chat/usuarios/mensajes/', views.api_obtener_mensajes_usuario, name='api_obtener_mensajes_usuario_query'),
+    path('superadmin/api/chat/usuarios/enviar/', views.api_enviar_mensaje_usuario, name='api_enviar_mensaje_usuario'),
     path('solicitudes/<int:solicitud_id>/aprobar/', views.aprobar_solicitud, name='aprobar_solicitud'),
     path('solicitudes/<int:solicitud_id>/rechazar/', views.rechazar_solicitud, name='rechazar_solicitud'),
 ]
