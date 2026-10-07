@@ -51,6 +51,8 @@ urlpatterns = [
     path('superadmin/api/chat/usuarios/<int:usuario_id>/mensajes/', views.api_obtener_mensajes_usuario, name='api_obtener_mensajes_usuario'),
     path('superadmin/api/chat/usuarios/mensajes/', views.api_obtener_mensajes_usuario, name='api_obtener_mensajes_usuario_query'),
     path('superadmin/api/chat/usuarios/enviar/', views.api_enviar_mensaje_usuario, name='api_enviar_mensaje_usuario'),
+    path('superadmin/api/chat/usuarios/eliminar/<int:mensaje_id>/', views.api_eliminar_mensaje, name='api_eliminar_mensaje'),
+    path('api/chat/eliminar/<int:mensaje_id>/', views.api_eliminar_mensaje, name='api_eliminar_mensaje_alias'),
     path('solicitudes/<int:solicitud_id>/aprobar/', views.aprobar_solicitud, name='aprobar_solicitud'),
     path('solicitudes/<int:solicitud_id>/rechazar/', views.rechazar_solicitud, name='rechazar_solicitud'),
 ]

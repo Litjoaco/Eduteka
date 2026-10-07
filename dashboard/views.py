@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_http_methods
 from django.contrib import messages
 from django.db.models import Sum, Count, Q
 from solicitudes.models import SolicitudAcceso, MiembroColegio
@@ -3195,8 +3195,55 @@ def api_enviar_mensaje_usuario(request):
     }, status=201)
 
 
+@login_required
+@require_http_methods(["POST", "DELETE"])
+def api_eliminar_mensaje(request, mensaje_id):
+    """
+    Endpoint para eliminación definitiva (Hard Delete) de un mensaje de chat.
+    Soporta tanto MensajeUsuario (Chat de Usuarios) como MensajeChat (Chat de Colegios).
+    Seguridad Crítica: Valida que el usuario autenticado (request.user) sea
+    el remitente del mensaje. Si no lo es, retorna un error 403.
+    """
+    # 1. Intentar buscar y eliminar en MensajeUsuario (Centro de Mensajes con Usuarios)
+    try:
+        mensaje = MensajeUsuario.objects.get(id=mensaje_id)
+        if mensaje.remitente != request.user:
+            return JsonResponse({
+                'status': 'error',
+                'error': 'No tienes permisos para eliminar este mensaje. Solo el remitente puede eliminarlo.'
+            }, status=403)
 
+        mensaje.delete()
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Mensaje eliminado exitosamente.',
+            'mensaje_id': mensaje_id
+        }, status=200)
+    except MensajeUsuario.DoesNotExist:
+        pass
 
+    # 2. Intentar buscar y eliminar en MensajeChat (Centro de Mensajes con Colegios)
+    try:
+        mensaje_chat = MensajeChat.objects.get(id=mensaje_id)
+        es_autor = (
+            (mensaje_chat.remitente == 'superadmin' and (request.user.is_superuser or request.user.is_staff))
+            or (mensaje_chat.usuario == request.user)
+        )
+        if not es_autor:
+            return JsonResponse({
+                'status': 'error',
+                'error': 'No tienes permisos para eliminar este mensaje.'
+            }, status=403)
 
-
+        mensaje_chat.delete()
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Mensaje eliminado exitosamente.',
+            'mensaje_id': mensaje_id
+        }, status=200)
+    except MensajeChat.DoesNotExist:
+        return JsonResponse({
+            'status': 'error',
+            'error': 'El mensaje no existe o ya fue eliminado.'
+        }, status=404)
 

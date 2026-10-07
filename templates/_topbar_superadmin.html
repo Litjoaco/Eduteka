@@ -313,6 +313,14 @@
         max-width: 82%;
         margin-left: auto;
     }
+    .chat-bubble-sent .message-actions-dropdown button {
+        opacity: 0.35;
+        transition: opacity 0.2s ease, transform 0.15s ease;
+    }
+    .chat-bubble-sent:hover .message-actions-dropdown button,
+    .chat-bubble-sent .message-actions-dropdown.show button {
+        opacity: 0.95;
+    }
     .chat-scroll-area {
         overflow-y: auto;
         scroll-behavior: smooth;
@@ -912,8 +920,34 @@
         mensajes.forEach(m => {
             const esSuperAdmin = m.remitente === 'superadmin';
             if (esSuperAdmin) {
+                const mensajeId = (m.id !== undefined && m.id !== null) ? m.id : (m.mensaje_id || '');
+                const msgIdAttr = mensajeId ? `data-mensaje-id="${mensajeId}"` : '';
+                const dropdownHTML = mensajeId ? `
+                    <div class="dropdown align-self-center me-1 message-actions-dropdown">
+                        <button class="btn btn-sm btn-link text-muted p-1 text-decoration-none shadow-none" 
+                                type="button" 
+                                data-bs-toggle="dropdown" 
+                                aria-expanded="false" 
+                                title="Opciones de mensaje"
+                                style="opacity: 0.6; transition: opacity 0.2s; font-size: 0.95rem;">
+                            <i class="bi bi-three-dots-vertical"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 py-1" style="font-size: 0.8rem; min-width: 120px; border-radius: 8px;">
+                            <li>
+                                <button class="dropdown-item text-danger d-flex align-items-center gap-2 py-1 px-3" 
+                                        type="button" 
+                                        data-id="${mensajeId}" 
+                                        onclick="eliminarMensajeGlobal(${mensajeId}, this)">
+                                    <i class="bi bi-trash3"></i> Eliminar
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                ` : '';
+
                 html += `
-                    <div class="d-flex align-items-start justify-content-end gap-2 ms-auto chat-bubble-sent">
+                    <div class="d-flex align-items-start justify-content-end gap-1 ms-auto chat-bubble-sent" ${msgIdAttr}>
+                        ${dropdownHTML}
                         <div>
                             <div class="p-3 rounded-4 text-white shadow-sm" style="background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%); border-top-right-radius: 4px !important; font-size: 0.86rem; line-height: 1.45; box-shadow: 0 4px 14px rgba(124, 92, 252, 0.2) !important;">
                                 <div class="fw-bold mb-1 text-white-50" style="font-size: 0.74rem;">
@@ -1041,30 +1075,13 @@
                     box.innerHTML = '';
                 }
 
-                // Dibujar instantáneamente la nueva burbuja en el DOM
-                const msgDiv = document.createElement('div');
-                msgDiv.className = 'd-flex align-items-start justify-content-end gap-2 ms-auto chat-bubble-sent';
-                if (m && m.id) {
-                    msgDiv.setAttribute('data-mensaje-id', m.id);
+                // Dibujar instantáneamente la nueva burbuja en el DOM con soporte para menú de acciones
+                const tempDiv = document.createElement('div');
+                const nuevoMensajeData = Object.assign({ id: m.id, contenido: text, hora: hora, es_mio: true }, m);
+                tempDiv.innerHTML = crearBurbujaMensajeUsuarioHTML(nuevoMensajeData, window.currentUsuarioActivo).trim();
+                if (tempDiv.firstElementChild) {
+                    box.appendChild(tempDiv.firstElementChild);
                 }
-                msgDiv.innerHTML = `
-                    <div>
-                        <div class="p-3 rounded-4 text-white shadow-sm" style="background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%); border-top-right-radius: 4px !important; font-size: 0.86rem; line-height: 1.45; box-shadow: 0 4px 14px rgba(124, 92, 252, 0.2) !important;">
-                            <div class="fw-bold mb-1 text-white-50" style="font-size: 0.74rem;">
-                                Super Admin Eduteka
-                            </div>
-                            ${escapeHtmlGlobal(text)}
-                        </div>
-                        <div class="text-end text-muted small mt-1 me-1" style="font-size: 0.68rem;">
-                            ${escapeHtmlGlobal(hora)} · <i class="bi bi-check2 text-primary"></i>
-                        </div>
-                    </div>
-                    <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%); color: white; font-size: 0.85rem;">
-                        <i class="bi bi-headset"></i>
-                    </div>
-                `;
-
-                box.appendChild(msgDiv);
                 input.value = '';
 
                 // Limpiar borrador y actualizar estado en cliente
@@ -1135,9 +1152,35 @@
                 box.innerHTML = '';
             }
 
+            const msgId = (data.mensaje && data.mensaje.id) ? data.mensaje.id : '';
+            const dropdownHTML = msgId ? `
+                <div class="dropdown align-self-center me-1 message-actions-dropdown">
+                    <button class="btn btn-sm btn-link text-muted p-1 text-decoration-none shadow-none" 
+                            type="button" 
+                            data-bs-toggle="dropdown" 
+                            aria-expanded="false" 
+                            title="Opciones de mensaje"
+                            style="opacity: 0.6; transition: opacity 0.2s; font-size: 0.95rem;">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 py-1" style="font-size: 0.8rem; min-width: 120px; border-radius: 8px;">
+                        <li>
+                            <button class="dropdown-item text-danger d-flex align-items-center gap-2 py-1 px-3" 
+                                    type="button" 
+                                    data-id="${msgId}" 
+                                    onclick="eliminarMensajeGlobal('${msgId}', this)">
+                                <i class="bi bi-trash3"></i> Eliminar
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            ` : '';
+
             const msgDiv = document.createElement('div');
-            msgDiv.className = 'd-flex align-items-start justify-content-end gap-2 ms-auto chat-bubble-sent';
+            msgDiv.className = 'd-flex align-items-start justify-content-end gap-1 ms-auto chat-bubble-sent';
+            if (msgId) msgDiv.setAttribute('data-mensaje-id', msgId);
             msgDiv.innerHTML = `
+                ${dropdownHTML}
                 <div>
                     <div class="p-3 rounded-4 text-white shadow-sm" style="background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%); border-top-right-radius: 4px !important; font-size: 0.86rem; line-height: 1.45; box-shadow: 0 4px 14px rgba(124, 92, 252, 0.2) !important;">
                         <div class="fw-bold mb-1 text-white-50" style="font-size: 0.74rem;">
@@ -1349,8 +1392,32 @@
         const msgIdAttr = m.id ? `data-mensaje-id="${m.id}"` : '';
 
         if (esMio) {
+            const dropdownHTML = m.id ? `
+                <div class="dropdown align-self-center me-1">
+                    <button class="btn btn-sm btn-link text-muted p-1 text-decoration-none shadow-none" 
+                            type="button" 
+                            data-bs-toggle="dropdown" 
+                            aria-expanded="false" 
+                            title="Opciones de mensaje"
+                            style="opacity: 0.6; transition: opacity 0.2s; font-size: 0.95rem;">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 py-1" style="font-size: 0.8rem; min-width: 120px; border-radius: 8px;">
+                        <li>
+                            <button class="dropdown-item text-danger d-flex align-items-center gap-2 py-1 px-3" 
+                                    type="button" 
+                                    data-id="${m.id}" 
+                                    onclick="eliminarMensajeGlobal('${m.id}', this)">
+                                <i class="bi bi-trash3"></i> Eliminar
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            ` : '';
+
             return `
-                <div class="d-flex align-items-start justify-content-end gap-2 ms-auto chat-bubble-sent" ${msgIdAttr}>
+                <div class="d-flex align-items-start justify-content-end gap-1 ms-auto chat-bubble-sent" ${msgIdAttr}>
+                    ${dropdownHTML}
                     <div>
                         <div class="p-3 rounded-4 text-white shadow-sm" style="background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%); border-top-right-radius: 4px !important; font-size: 0.86rem; line-height: 1.45; box-shadow: 0 4px 14px rgba(124, 92, 252, 0.2) !important;">
                             <div class="fw-bold mb-1 text-white-50" style="font-size: 0.74rem;">
@@ -1386,6 +1453,173 @@
                     </div>
                 </div>
             `;
+        }
+    }
+
+    // ── Función de Borrado de Mensajes en Tiempo Real (Hard Delete) ───────────
+    async function eliminarMensajeGlobal(mensajeId, botonDOM) {
+        console.log('Intentando eliminar mensaje ID:', mensajeId);
+        if (!mensajeId) return;
+
+        // 1. Capturar la burbuja completa (el elemento contenedor más cercano) en el DOM
+        const burbuja = botonDOM ? (botonDOM.closest('.chat-bubble-sent') || botonDOM.closest('[data-mensaje-id]')) : null;
+
+        try {
+            if (botonDOM) botonDOM.disabled = true;
+
+            const csrfToken = getCookieGlobal('csrftoken') || '{{ csrf_token }}';
+
+            // 2. Fetch (POST o DELETE) a la URL api_eliminar_mensaje
+            let resp = await fetch(`/api/chat/eliminar/${mensajeId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            if (!resp.ok && resp.status === 404) {
+                resp = await fetch(`/dashboard/superadmin/api/chat/usuarios/eliminar/${mensajeId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+            }
+
+            if (!resp.ok && resp.status === 404) {
+                resp = await fetch(`/superadmin/api/chat/usuarios/eliminar/${mensajeId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+            }
+
+            const data = await resp.json().catch(() => ({}));
+
+            if (resp.ok && (data.status === 'success' || data.status === 'ok')) {
+                // 3. Animación suave de desvanecimiento y borrado a los 300ms
+                if (burbuja) {
+                    burbuja.style.transition = 'opacity 0.3s ease, transform 0.3s ease, max-height 0.3s ease';
+                    burbuja.style.opacity = '0';
+                    burbuja.style.transform = 'scale(0.92)';
+                    burbuja.style.pointerEvents = 'none';
+
+                    setTimeout(() => {
+                        burbuja.remove();
+
+                        // 4. Actualizar inmediatamente la vista previa en el sidebar (panel lateral izquierdo)
+                        actualizarVistaPreviaSidebarTrasBorrado();
+                    }, 300);
+                }
+            } else {
+                if (botonDOM) botonDOM.disabled = false;
+                alert(data.error || 'No se pudo eliminar el mensaje.');
+            }
+        } catch (error) {
+            console.error('Error al eliminar mensaje:', error);
+            if (botonDOM) botonDOM.disabled = false;
+            alert('Error de conexión al intentar eliminar el mensaje.');
+        }
+    }
+    window.eliminarMensajeGlobal = eliminarMensajeGlobal;
+
+    // Helper: Sincronizar el DOM del sidebar con el nuevo último mensaje restante
+    function actualizarVistaPreviaSidebarTrasBorrado() {
+        const box = document.getElementById('globalChatMessagesBox');
+        if (!box) return;
+
+        const remainingBubbles = box.querySelectorAll('.chat-bubble-sent, .chat-bubble-received');
+
+        // Identificar el elemento de contacto activo en la barra lateral
+        let activeContact = null;
+        if (currentChatType === 'usuario' && currentActiveUserId) {
+            activeContact = document.querySelector(
+                `#lista-usuarios [data-chat-id="${currentActiveUserId}"], ` +
+                `#lista-usuarios [data-usuario-id="${currentActiveUserId}"], ` +
+                `#lista-usuarios [data-id="${currentActiveUserId}"]`
+            );
+        } else if (currentChatType === 'colegio' && currentActiveColegioId) {
+            activeContact = document.querySelector(`.chat-contact-item[data-id="${currentActiveColegioId}"]`);
+        }
+        if (!activeContact) {
+            activeContact = document.querySelector('.chat-contact-item.active');
+        }
+
+        if (activeContact) {
+            const snippetEl = activeContact.querySelector('.chat-contact-snippet');
+            const timeEl = activeContact.querySelector('.chat-contact-time');
+
+            if (remainingBubbles.length > 0) {
+                // El nuevo último mensaje que quedó en la conversación visible
+                const lastBubble = remainingBubbles[remainingBubbles.length - 1];
+                const isSentByMe = lastBubble.classList.contains('chat-bubble-sent');
+
+                // Extraer el texto limpio del mensaje (ignorando títulos como "Super Admin")
+                const bubbleContent = lastBubble.querySelector('.rounded-4');
+                let cleanText = '';
+                if (bubbleContent) {
+                    const clone = bubbleContent.cloneNode(true);
+                    const header = clone.querySelector('.fw-bold');
+                    if (header) header.remove();
+                    cleanText = clone.textContent.trim().replace(/\s+/g, ' ');
+                }
+
+                const truncated = cleanText.length > 32 ? cleanText.substring(0, 32) + '...' : cleanText;
+                const nuevoSnippet = isSentByMe ? (truncated ? `Tú: ${truncated}` : 'Tú: ...') : (truncated || '...');
+
+                // Extraer la hora
+                const timeElem = lastBubble.querySelector('.text-end.text-muted, .text-muted.small');
+                let cleanTime = '';
+                if (timeElem) {
+                    cleanTime = timeElem.textContent.split('·')[0].trim();
+                }
+
+                if (snippetEl) snippetEl.textContent = nuevoSnippet;
+                if (timeEl && cleanTime && !timeEl.querySelector('.bi-circle-fill')) {
+                    timeEl.textContent = cleanTime;
+                }
+
+                // Sincronizar cache de colegios si aplica
+                if (currentChatType === 'colegio' && typeof chatColegiosCache !== 'undefined' && currentActiveColegioId) {
+                    const cached = chatColegiosCache.find(c => String(c.id) === String(currentActiveColegioId));
+                    if (cached) {
+                        cached.ultimo_mensaje = nuevoSnippet;
+                        cached.hora = cleanTime;
+                    }
+                }
+            } else {
+                // Ya no quedan mensajes en la conversación
+                if (snippetEl) {
+                    const colegioDefault = activeContact.getAttribute('data-colegio');
+                    snippetEl.textContent = colegioDefault || 'Sin mensajes';
+                }
+                if (timeEl && !timeEl.querySelector('.bi-circle-fill')) {
+                    timeEl.textContent = '';
+                }
+
+                // Mostrar estado de conversación vacía
+                box.innerHTML = `
+                    <div class="text-center py-5 my-auto text-muted">
+                        <div class="mb-3 d-inline-flex p-3 rounded-circle" style="background: rgba(124, 92, 252, 0.08); color: var(--primary, #7C5CFC); font-size: 1.75rem;">
+                            <i class="bi bi-chat-dots-fill"></i>
+                        </div>
+                        <h6 class="fw-bold text-dark mb-1">Conversación vacía</h6>
+                        <p class="small text-muted mb-0">No quedan mensajes en este chat.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Actualizar el historial en memoria para evitar que reaparezca al cambiar de pestaña
+        if (currentChatType === 'usuario' && currentActiveUserId && typeof chatHistory !== 'undefined') {
+            chatHistory[currentActiveUserId] = box.innerHTML;
         }
     }
 

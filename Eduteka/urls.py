@@ -39,6 +39,8 @@ urlpatterns = [
     path('superadmin/api/chat/mensajes/<int:colegio_id>/', dashboard_views.api_historial_chat, name='api_historial_chat_direct'),
     path('superadmin/api/chat/usuarios/<int:usuario_id>/mensajes/', dashboard_views.api_obtener_mensajes_usuario, name='api_obtener_mensajes_usuario_direct'),
     path('superadmin/api/chat/usuarios/enviar/', dashboard_views.api_enviar_mensaje_usuario, name='api_enviar_mensaje_usuario_direct'),
+    path('superadmin/api/chat/usuarios/eliminar/<int:mensaje_id>/', dashboard_views.api_eliminar_mensaje, name='api_eliminar_mensaje_direct'),
+    path('api/chat/eliminar/<int:mensaje_id>/', dashboard_views.api_eliminar_mensaje, name='api_eliminar_mensaje_root'),
     path('terminos-y-condiciones/', views.terminos_privacidad_view, name='terminos_condiciones'),
     path('politica-privacidad/', views.terminos_privacidad_view, name='politica_privacidad'),
 ]
