@@ -271,12 +271,9 @@
                     </p>
                 </div>
                 <div class="d-flex gap-2 flex-wrap">
-                    <a href="#" class="btn-outline-custom" onclick="exportReport(event)">
+                    <a href="{% url 'exportar_onboarding_csv' %}" class="btn-outline-custom">
                         <i class="bi bi-download"></i> Exportar Informe CSV
                     </a>
-                    <button class="btn-primary-custom" onclick="openAssistModal()">
-                        <i class="bi bi-headset"></i> Contactar Atascados
-                    </button>
                 </div>
             </div>
 
@@ -530,7 +527,7 @@
                                     <div class="d-flex align-items-center justify-content-center gap-1">
                                         <button class="action-btn view" title="Ver detalle"><i class="bi bi-eye"></i></button>
                                         {% if pct < 100 %}
-                                        <button class="action-btn mail" title="Enviar ayuda"><i class="bi bi-envelope"></i></button>
+                                        <button class="action-btn mail" title="Enviar ayuda por chat" onclick="openAssistModal()"><i class="bi bi-chat-dots"></i></button>
                                         {% if estado.is_atascado %}
                                         <button class="action-btn help" title="Asistir setup"><i class="bi bi-headset"></i></button>
                                         {% endif %}
@@ -569,36 +566,8 @@
     </main>
 </div><!-- /wrapper -->
 
-<div class="modal-overlay" id="modalContact">
-    <div class="modal-box">
-        <div class="d-flex align-items-center justify-content-between mb-3">
-            <div>
-                <div class="modal-title" id="modalContactTitle">Enviar Asistencia de Onboarding</div>
-                <div class="modal-subtitle" id="modalContactSubtitle">Ofrece soporte directo al administrador del colegio.</div>
-            </div>
-            <button onclick="closeModal('modalContact')"
-                style="background:none;border:none;font-size:1.3rem;color:var(--gray-text);cursor:pointer;line-height:1;">&times;</button>
-        </div>
+<!-- Modal 'Enviar Asistencia de Onboarding' pospuesto temporalmente -->
 
-        <div class="mb-3">
-            <label class="form-label-custom">Destinatario</label>
-            <input type="text" class="form-control-custom" id="inputDestinatario" readonly>
-        </div>
-        <div class="mb-3">
-            <label class="form-label-custom">Asunto</label>
-            <input type="text" class="form-control-custom" value="Soporte Eduteka: ¿Podemos ayudarte a completar tu configuración?">
-        </div>
-        <div class="mb-3">
-            <label class="form-label-custom">Mensaje Personalizado</label>
-            <textarea class="form-control-custom" rows="4">Hola, notamos que tu colegio ha quedado estancado en el proceso de onboarding. Nuestro equipo de soporte está listo para asistirte en una sesión guiada de 15 minutos para dejar tu plataforma operativa.</textarea>
-        </div>
-
-        <div class="d-flex gap-2 justify-content-end pt-3 mt-3" style="border-top:1px solid var(--border);">
-            <button onclick="closeModal('modalContact')" class="btn-outline-custom">Cancelar</button>
-            <button class="btn-primary-custom"><i class="bi bi-send-fill"></i> Enviar Mensaje</button>
-        </div>
-    </div>
-</div>
 
 <div class="modal-overlay" id="modalDetail">
     <div class="modal-box">
@@ -638,14 +607,54 @@
         el.addEventListener('click', e => { if (e.target === el) closeModal(el.id); });
     });
 
-    function openContactModal(nombre, email) {
-        document.getElementById('inputDestinatario').value = nombre + ' <' + email + '>';
+    function openContactModal(destinatario) {
+        document.getElementById('inputDestinatario').value = destinatario || 'Administradores con configuración pausada (> 3 días)';
         openModal('modalContact');
     }
 
     function openAssistModal() {
-        openContactModal('Sostenedores Atascados', 'soporte@eduteka.cl');
+        openContactModal('Administradores con configuración pausada (> 3 días)');
     }
+
+    // Manejo de envío AJAX vía fetch para el modal de asistencia
+    document.addEventListener('DOMContentLoaded', () => {
+        const formAsistencia = document.getElementById('formAsistenciaChat');
+        if (formAsistencia) {
+            formAsistencia.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const btn = document.getElementById('btnEnviarAsistencia');
+                const originalHtml = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Enviando...';
+
+                const formData = new FormData(this);
+
+                fetch(this.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    btn.disabled = false;
+                    btn.innerHTML = originalHtml;
+                    if (data.status === 'success') {
+                        closeModal('modalContact');
+                        alert('✅ ' + data.message);
+                    } else {
+                        alert('⚠️ ' + (data.message || 'Error al enviar mensaje.'));
+                    }
+                })
+                .catch(err => {
+                    console.error('Error enviando vía AJAX:', err);
+                    // Fallback a envío convencional de formulario
+                    formAsistencia.submit();
+                });
+            });
+        }
+    });
 
     function assistSetup(colegio) {
         alert('Iniciando sesión de soporte remoto para asistirte en el setup de ' + colegio + '...');
@@ -678,8 +687,8 @@
     }
 
     function exportReport(e) {
-        e.preventDefault();
-        alert('Descargando reporte de onboarding e métricas CSM...');
+        if (e) e.preventDefault();
+        window.location.href = "{% url 'exportar_onboarding_csv' %}";
     }
 
     

@@ -407,13 +407,14 @@
         <!-- Botón Chat Global Flotante con Badge de Notificación -->
         <button type="button" 
                 class="btn-topbar-chat position-relative" 
+                id="btnTopbarChat"
                 data-bs-toggle="offcanvas" 
                 data-bs-target="#offcanvasChatGlobal" 
                 aria-controls="offcanvasChatGlobal"
                 title="Centro de Mensajes y Soporte Global">
             <i class="bi bi-chat-dots fs-5"></i>
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:0.65rem; padding:0.25em 0.5em; transform:translate(-35%, -15%) !important;">
-                2
+            <span id="chatGlobalUnreadBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none" style="font-size:0.65rem; padding:0.25em 0.5em; transform:translate(-35%, -15%) !important;">
+                0
                 <span class="visually-hidden">mensajes nuevos</span>
             </span>
         </button>
@@ -580,12 +581,7 @@
                 </div>
 
                 <!-- Historial de Mensajes (Burbujas en el Centro) -->
-                <div id="globalChatMessagesBox" class="flex-grow-1 chat-scroll-area p-3 p-md-4 d-flex flex-column gap-3" style="background: #F8FAFC;">
-                    <div class="text-center py-5 my-auto text-muted">
-                        <div class="spinner-border spinner-border-sm text-primary mb-2" role="status"></div>
-                        <p class="small mb-0">Cargando conversación...</p>
-                    </div>
-                </div>
+                <div id="globalChatMessagesBox" class="flex-grow-1 chat-scroll-area p-3 p-md-4 d-flex flex-column gap-3" style="background: #F8FAFC;"></div>
 
                 <!-- Input Fijo en la Parte Inferior -->
                 <div class="p-3 bg-white border-top shadow-xs z-1 flex-shrink-0">
@@ -666,6 +662,134 @@
         const div = document.createElement('div');
         div.appendChild(document.createTextNode(string));
         return div.innerHTML;
+    }
+
+    // ── Estado y Notificaciones en Tiempo Real (Badges WhatsApp Style) ─────────
+    let cacheNoLeidosPorRemitente = {};
+    let totalNoLeidosGlobal = 0;
+
+    async function actualizarBadgesNoLeidos() {
+        try {
+            let resp = await fetch('/api/chat/no-leidos/');
+            if (!resp.ok) {
+                resp = await fetch('/dashboard/superadmin/api/chat/usuarios/no-leidos/');
+            }
+            if (!resp.ok) return;
+
+            const data = await resp.json();
+            const total = data.total_no_leidos || 0;
+            const porRemitente = data.por_remitente || {};
+
+            totalNoLeidosGlobal = total;
+            cacheNoLeidosPorRemitente = porRemitente;
+
+            // 1. Actualizar Badge Global (Navbar)
+            actualizarBadgeGlobal(total);
+
+            // 2. Actualizar Badges por Contacto (Sidebar)
+            actualizarBadgesContactos(porRemitente);
+
+        } catch (err) {
+            console.warn('Error al consultar badges no leídos:', err);
+        }
+    }
+
+    function actualizarBadgeGlobal(total) {
+        let badge = document.getElementById('chatGlobalUnreadBadge');
+        const btnChat = document.getElementById('btnTopbarChat') || document.querySelector('.btn-topbar-chat');
+
+        if (!badge && btnChat) {
+            badge = document.createElement('span');
+            badge.id = 'chatGlobalUnreadBadge';
+            badge.className = 'position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger';
+            badge.style.cssText = 'font-size:0.65rem; padding:0.25em 0.5em; transform:translate(-35%, -15%) !important;';
+            btnChat.appendChild(badge);
+        }
+
+        if (!badge) return;
+
+        if (total > 0) {
+            badge.textContent = total > 99 ? '99+' : total;
+            badge.classList.remove('d-none');
+            badge.style.display = '';
+        } else {
+            badge.textContent = '0';
+            badge.classList.add('d-none');
+            badge.style.display = 'none';
+        }
+    }
+
+    function actualizarBadgesContactos(porRemitente) {
+        if (!porRemitente) return;
+        const contactItems = document.querySelectorAll('.chat-contact-item');
+
+        contactItems.forEach(item => {
+            const id = item.getAttribute('data-chat-id') || 
+                       item.getAttribute('data-usuario-id') || 
+                       item.getAttribute('data-id');
+            if (!id) return;
+
+            const cantidad = porRemitente[id] || porRemitente[parseInt(id, 10)] || 0;
+
+            const esUsuarioAbierto = (currentChatType === 'usuario' && String(currentActiveUserId) === String(id));
+            const esColegioAbierto = (currentChatType === 'colegio' && String(currentActiveColegioId) === String(id));
+            const estaAbierto = esUsuarioAbierto || esColegioAbierto;
+
+            let badge = item.querySelector('.chat-unread-badge');
+
+            if (cantidad > 0 && !estaAbierto) {
+                if (!badge) {
+                    badge = document.createElement('span');
+                    badge.className = 'badge bg-danger rounded-pill flex-shrink-0 ms-1 chat-unread-badge shadow-xs';
+                    badge.style.cssText = 'font-size: 0.65rem; min-width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; padding: 0 4px;';
+                    
+                    const timeContainer = item.querySelector('.chat-contact-time');
+                    if (timeContainer) {
+                        timeContainer.insertAdjacentElement('afterend', badge);
+                    } else {
+                        const topRow = item.querySelector('.chat-contact-title')?.parentNode;
+                        if (topRow) {
+                            topRow.appendChild(badge);
+                        } else {
+                            item.appendChild(badge);
+                        }
+                    }
+                }
+                badge.textContent = cantidad > 99 ? '99+' : cantidad;
+                badge.style.display = '';
+            } else {
+                if (badge) {
+                    badge.remove();
+                }
+            }
+        });
+    }
+
+    function limpiarBadgeContacto(contactoId) {
+        if (!contactoId) return;
+        const strId = String(contactoId);
+
+        // Remover badge visual del contacto en la barra lateral
+        const items = document.querySelectorAll(
+            `#lista-usuarios [data-chat-id="${strId}"], ` +
+            `#lista-usuarios [data-usuario-id="${strId}"], ` +
+            `#lista-usuarios [data-id="${strId}"], ` +
+            `#lista-colegios [data-id="${strId}"], ` +
+            `.chat-contact-item[data-id="${strId}"]`
+        );
+        items.forEach(el => {
+            const b = el.querySelector('.chat-unread-badge');
+            if (b) b.remove();
+        });
+
+        // Descontar inmediatamente del total global
+        const cantidadRestada = cacheNoLeidosPorRemitente[strId] || cacheNoLeidosPorRemitente[parseInt(strId, 10)] || 0;
+        if (cantidadRestada > 0) {
+            delete cacheNoLeidosPorRemitente[strId];
+            delete cacheNoLeidosPorRemitente[parseInt(strId, 10)];
+            totalNoLeidosGlobal = Math.max(0, totalNoLeidosGlobal - cantidadRestada);
+            actualizarBadgeGlobal(totalNoLeidosGlobal);
+        }
     }
 
     // ── Búsqueda de Colegios con Debounce (Fetch API) ─────────────────────────
@@ -775,11 +899,16 @@
         });
 
         listContainer.innerHTML = html;
+        actualizarBadgesContactos(cacheNoLeidosPorRemitente);
     }
 
     // ── Selección de Colegio y Carga de Conversación ───────────────────────────
     function handleColegioClick(colegioId) {
         if (!colegioId) return;
+
+        // Limpiar visualmente el badge del colegio seleccionado inmediatamente
+        limpiarBadgeContacto(colegioId);
+
         const idNum = parseInt(colegioId, 10);
         let colegio = chatColegiosCache.find(c => c.id === idNum);
         if (!colegio) {
@@ -882,19 +1011,113 @@
             }
 
             const data = await response.json();
-            renderizarMensajes(data.mensajes, colegioNombre);
+            const mensajes = data.mensajes || [];
+
+            // Limpieza explícita del contenedor antes de renderizar
+            box.innerHTML = '';
+
+            if (mensajes.length === 0) {
+                box.innerHTML = `
+                    <div class="text-center py-5 my-auto text-muted">
+                        <div class="mb-3 d-inline-flex p-3 rounded-circle" style="background: rgba(124, 92, 252, 0.08); color: var(--primary, #7C5CFC); font-size: 1.75rem;">
+                            <i class="bi bi-chat-dots-fill"></i>
+                        </div>
+                        <h6 class="fw-bold text-dark mb-1">Comienza una conversación con ${escapeHtmlGlobal(colegioNombre)}</h6>
+                        <p class="small text-muted mb-0" style="max-width: 320px; margin: 0 auto; line-height: 1.4;">
+                            Canal directo con la administración. Escribe un mensaje abajo para dar soporte inmediato a esta institución.
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <div class="text-center my-1">
+                    <span class="badge bg-white text-muted border rounded-pill px-3 py-1 shadow-xs" style="font-size: 0.7rem; font-weight: 600;">
+                        <i class="bi bi-calendar-event me-1"></i> Historial de Soporte · ${escapeHtmlGlobal(colegioNombre)}
+                    </span>
+                </div>
+            `;
+
+            // Iteración sobre los mensajes reales retornados por el servidor
+            mensajes.forEach(mensaje => {
+                const esSuperAdmin = mensaje.remitente === 'superadmin' || mensaje.tipo === 'mio' || mensaje.es_mio;
+                const hora = mensaje.hora || mensaje.fecha || '';
+                const mensajeId = (mensaje.id !== undefined && mensaje.id !== null) ? mensaje.id : (mensaje.mensaje_id || '');
+                const msgIdAttr = mensajeId ? `data-mensaje-id="${mensajeId}"` : '';
+
+                if (esSuperAdmin) {
+                    const dropdownHTML = mensajeId ? `
+                        <div class="dropdown align-self-center me-1 message-actions-dropdown">
+                            <button class="btn btn-sm btn-link text-muted p-1 text-decoration-none shadow-none" 
+                                    type="button" 
+                                    data-bs-toggle="dropdown" 
+                                    aria-expanded="false" 
+                                    title="Opciones de mensaje"
+                                    style="opacity: 0.6; transition: opacity 0.2s; font-size: 0.95rem;">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 py-1" style="font-size: 0.8rem; min-width: 120px; border-radius: 8px;">
+                                <li>
+                                    <button class="dropdown-item text-danger d-flex align-items-center gap-2 py-1 px-3" 
+                                            type="button" 
+                                            data-id="${mensajeId}" 
+                                            onclick="eliminarMensajeGlobal('${mensajeId}', this)">
+                                        <i class="bi bi-trash3"></i> Eliminar
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                    ` : '';
+
+                    html += `
+                        <div class="d-flex align-items-start justify-content-end gap-1 ms-auto chat-bubble-sent" ${msgIdAttr}>
+                            ${dropdownHTML}
+                            <div>
+                                <div class="p-3 rounded-4 text-white shadow-sm" style="background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%); border-top-right-radius: 4px !important; font-size: 0.86rem; line-height: 1.45; box-shadow: 0 4px 14px rgba(124, 92, 252, 0.2) !important;">
+                                    <div class="fw-bold mb-1 text-white-50" style="font-size: 0.74rem;">
+                                        Super Admin Eduteka
+                                    </div>
+                                    ${escapeHtmlGlobal(mensaje.contenido)}
+                                </div>
+                                <div class="text-end text-muted small mt-1 me-1" style="font-size: 0.68rem;">
+                                    ${escapeHtmlGlobal(hora)} · <i class="bi bi-check2-all" style="color: var(--primary, #7C5CFC) !important;"></i>
+                                </div>
+                            </div>
+                            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%); color: white; font-size: 0.85rem;">
+                                <i class="bi bi-headset"></i>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="d-flex align-items-start gap-2 chat-bubble-received" ${msgIdAttr}>
+                            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: rgba(101, 205, 191, 0.2); color: #0d9488; font-size: 0.85rem; font-weight: 700;">
+                                <i class="bi bi-building"></i>
+                            </div>
+                            <div>
+                                <div class="p-3 rounded-4 bg-white border shadow-xs text-dark" style="border-top-left-radius: 4px !important; font-size: 0.86rem; line-height: 1.45;">
+                                    <div class="fw-bold mb-1" style="font-size: 0.74rem; color: #0d9488;">
+                                        ${escapeHtmlGlobal(colegioNombre)}
+                                    </div>
+                                    ${escapeHtmlGlobal(mensaje.contenido)}
+                                </div>
+                                <div class="text-muted small mt-1 ms-1" style="font-size: 0.68rem;">
+                                    ${escapeHtmlGlobal(hora)} · Recibido
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            box.innerHTML = html;
+            setTimeout(() => {
+                box.scrollTop = box.scrollHeight;
+            }, 50);
+
         } catch (err) {
             console.error('Error cargando historial de chat:', err);
-            renderizarMensajes([], colegioNombre);
-        }
-    }
-
-    // ── Renderizado de Burbujas de Chat ───────────────────────────────────────
-    function renderizarMensajes(mensajes, colegioNombre) {
-        const box = document.getElementById('globalChatMessagesBox');
-        if (!box) return;
-
-        if (!mensajes || mensajes.length === 0) {
             box.innerHTML = `
                 <div class="text-center py-5 my-auto text-muted">
                     <div class="mb-3 d-inline-flex p-3 rounded-circle" style="background: rgba(124, 92, 252, 0.08); color: var(--primary, #7C5CFC); font-size: 1.75rem;">
@@ -906,90 +1129,17 @@
                     </p>
                 </div>
             `;
-            return;
         }
+    }
 
-        let html = `
-            <div class="text-center my-1">
-                <span class="badge bg-white text-muted border rounded-pill px-3 py-1 shadow-xs" style="font-size: 0.7rem; font-weight: 600;">
-                    <i class="bi bi-calendar-event me-1"></i> Historial de Soporte · ${escapeHtmlGlobal(colegioNombre)}
-                </span>
-            </div>
-        `;
-
-        mensajes.forEach(m => {
-            const esSuperAdmin = m.remitente === 'superadmin';
-            if (esSuperAdmin) {
-                const mensajeId = (m.id !== undefined && m.id !== null) ? m.id : (m.mensaje_id || '');
-                const msgIdAttr = mensajeId ? `data-mensaje-id="${mensajeId}"` : '';
-                const dropdownHTML = mensajeId ? `
-                    <div class="dropdown align-self-center me-1 message-actions-dropdown">
-                        <button class="btn btn-sm btn-link text-muted p-1 text-decoration-none shadow-none" 
-                                type="button" 
-                                data-bs-toggle="dropdown" 
-                                aria-expanded="false" 
-                                title="Opciones de mensaje"
-                                style="opacity: 0.6; transition: opacity 0.2s; font-size: 0.95rem;">
-                            <i class="bi bi-three-dots-vertical"></i>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 py-1" style="font-size: 0.8rem; min-width: 120px; border-radius: 8px;">
-                            <li>
-                                <button class="dropdown-item text-danger d-flex align-items-center gap-2 py-1 px-3" 
-                                        type="button" 
-                                        data-id="${mensajeId}" 
-                                        onclick="eliminarMensajeGlobal(${mensajeId}, this)">
-                                    <i class="bi bi-trash3"></i> Eliminar
-                                </button>
-                            </li>
-                        </ul>
-                    </div>
-                ` : '';
-
-                html += `
-                    <div class="d-flex align-items-start justify-content-end gap-1 ms-auto chat-bubble-sent" ${msgIdAttr}>
-                        ${dropdownHTML}
-                        <div>
-                            <div class="p-3 rounded-4 text-white shadow-sm" style="background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%); border-top-right-radius: 4px !important; font-size: 0.86rem; line-height: 1.45; box-shadow: 0 4px 14px rgba(124, 92, 252, 0.2) !important;">
-                                <div class="fw-bold mb-1 text-white-50" style="font-size: 0.74rem;">
-                                    Super Admin Eduteka
-                                </div>
-                                ${escapeHtmlGlobal(m.contenido)}
-                            </div>
-                            <div class="text-end text-muted small mt-1 me-1" style="font-size: 0.68rem;">
-                                ${escapeHtmlGlobal(m.hora || '')} · <i class="bi bi-check2-all" style="color: var(--primary, #7C5CFC) !important;"></i>
-                            </div>
-                        </div>
-                        <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: linear-gradient(135deg, #7C5CFC 0%, #6747E3 100%); color: white; font-size: 0.85rem;">
-                            <i class="bi bi-headset"></i>
-                        </div>
-                    </div>
-                `;
-            } else {
-                html += `
-                    <div class="d-flex align-items-start gap-2 chat-bubble-received">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: rgba(101, 205, 191, 0.2); color: #0d9488; font-size: 0.85rem; font-weight: 700;">
-                            <i class="bi bi-building"></i>
-                        </div>
-                        <div>
-                            <div class="p-3 rounded-4 bg-white border shadow-xs text-dark" style="border-top-left-radius: 4px !important; font-size: 0.86rem; line-height: 1.45;">
-                                <div class="fw-bold mb-1" style="font-size: 0.74rem; color: #0d9488;">
-                                    ${escapeHtmlGlobal(colegioNombre)}
-                                </div>
-                                ${escapeHtmlGlobal(m.contenido)}
-                            </div>
-                            <div class="text-muted small mt-1 ms-1" style="font-size: 0.68rem;">
-                                ${escapeHtmlGlobal(m.hora || '')} · Recibido
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
-        });
-
-        box.innerHTML = html;
-        setTimeout(() => {
-            box.scrollTop = box.scrollHeight;
-        }, 50);
+    // Compatibilidad y helper global
+    function renderizarMensajes(mensajes, colegioNombre) {
+        const box = document.getElementById('globalChatMessagesBox');
+        if (!box) return;
+        box.innerHTML = '';
+        if (typeof cargarHistorialMensajes === 'function' && window.currentActiveColegioId) {
+            // Ya gestionado directamente por cargarHistorialMensajes
+        }
     }
 
     // ── Envío de Mensaje con Fetch API / Local (enviar_mensaje_chat) ─────────
@@ -1304,6 +1454,9 @@
         }
 
         if (!item) return;
+
+        // Limpiar visualmente el badge del usuario seleccionado inmediatamente
+        limpiarBadgeContacto(userId);
 
         document.querySelectorAll('#lista-usuarios .chat-contact-item').forEach(el => el.classList.remove('active'));
         item.classList.add('active');
@@ -1775,7 +1928,7 @@
             box.innerHTML = `
                 <div class="text-center py-5 my-auto text-muted">
                     <div class="mb-3 d-inline-flex p-3 rounded-circle" style="background: rgba(124, 92, 252, 0.08); color: var(--primary, #7C5CFC); font-size: 1.75rem;">
-                        <i class="bi bi-chat-heart-fill"></i>
+                        <i class="bi bi-chat-dots-fill"></i>
                     </div>
                     <h6 class="fw-bold text-dark mb-1">Inicia la conversación con ${escapeHtmlGlobal(nombre)}</h6>
                     <p class="small text-muted mb-0" style="max-width: 320px; margin: 0 auto; line-height: 1.4;">
@@ -1918,6 +2071,7 @@
                 `;
             });
             listaUsuarios.innerHTML = html;
+            actualizarBadgesContactos(cacheNoLeidosPorRemitente);
         } catch (e) {
             console.error("Error cargando usuarios en chat:", e);
             // Garantizar que el spinner se oculte y mostrar estado de error amigable con reintento
@@ -2214,6 +2368,10 @@
                 }, 350);
             }
         }
+
+        // ── Polling Global de Notificaciones (Badges WhatsApp Style) ─────────
+        actualizarBadgesNoLeidos();
+        setInterval(actualizarBadgesNoLeidos, 6000);
     });
 
     // ── Buscador Global Spotlight (Debounce + Fetch API) ──────────────────────

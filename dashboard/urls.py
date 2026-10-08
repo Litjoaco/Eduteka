@@ -29,6 +29,8 @@ urlpatterns = [
     path('superadmin/solicitudes/api/actualizar-estado/', views.api_actualizar_estado_solicitud, name='api_actualizar_estado_solicitud'),
     # Éxito del Cliente (CSM)
     path('superadmin/onboarding/', views.dashboard_superadmin_onboarding_view, name='dashboard_superadmin_onboarding'),
+    path('superadmin/onboarding/exportar-csv/', views.exportar_informe_onboarding_csv, name='exportar_onboarding_csv'),
+    path('superadmin/onboarding/enviar-asistencia/', views.enviar_asistencia_masiva_chat, name='enviar_asistencia_masiva_chat'),
     # Comunicación
     path('superadmin/comunicados/', views.dashboard_superadmin_comunicados_view, name='dashboard_superadmin_comunicados'),
     # Seguridad y Auditoría
@@ -53,6 +55,8 @@ urlpatterns = [
     path('superadmin/api/chat/usuarios/enviar/', views.api_enviar_mensaje_usuario, name='api_enviar_mensaje_usuario'),
     path('superadmin/api/chat/usuarios/eliminar/<int:mensaje_id>/', views.api_eliminar_mensaje, name='api_eliminar_mensaje'),
     path('api/chat/eliminar/<int:mensaje_id>/', views.api_eliminar_mensaje, name='api_eliminar_mensaje_alias'),
+    path('api/chat/no-leidos/', views.api_mensajes_no_leidos, name='api_mensajes_no_leidos'),
+    path('superadmin/api/chat/usuarios/no-leidos/', views.api_mensajes_no_leidos, name='api_mensajes_no_leidos_superadmin'),
     path('solicitudes/<int:solicitud_id>/aprobar/', views.aprobar_solicitud, name='aprobar_solicitud'),
     path('solicitudes/<int:solicitud_id>/rechazar/', views.rechazar_solicitud, name='rechazar_solicitud'),
 ]

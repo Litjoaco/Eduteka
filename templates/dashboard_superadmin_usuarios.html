@@ -406,7 +406,8 @@
                         </thead>
                         <tbody id="usersBody">
                             {% for usuario in usuarios %}
-                            <tr data-colegio="{% if usuario.colegios_administrados.first %}{{ usuario.colegios_administrados.first.nombre }}{% elif usuario.membresias_colegio.first %}{{ usuario.membresias_colegio.first.colegio.nombre }}{% else %}Sin Colegio{% endif %}"
+                            <tr id="user-row-{{ usuario.id }}" data-usuario-id="{{ usuario.id }}"
+                                data-colegio="{% if usuario.colegios_administrados.first %}{{ usuario.colegios_administrados.first.nombre }}{% elif usuario.membresias_colegio.first %}{{ usuario.membresias_colegio.first.colegio.nombre }}{% else %}Sin Colegio{% endif %}"
                                 data-rol="{% if usuario.is_superuser %}Super Admin{% elif usuario.colegios_administrados.exists %}Director{% elif usuario.membresias_colegio.first.rol %}{{ usuario.membresias_colegio.first.rol.nombre }}{% else %}Usuario{% endif %}"
                                 data-estado="{% if usuario.is_active %}Activo{% else %}Suspendido{% endif %}">
                                 <td>
@@ -469,7 +470,7 @@
                                         <div style="font-size:.78rem;color:var(--gray-text);">Sin registro previo</div>
                                     {% endif %}
                                 </td>
-                                <td>
+                                <td class="user-status-cell">
                                     {% if usuario.is_active %}
                                         <span class="status-badge status-activo"><i class="bi bi-circle-fill" style="font-size:.45rem;"></i> Activo</span>
                                     {% else %}
@@ -606,7 +607,7 @@
 
 <div class="modal-overlay" id="modalBlock">
     <div class="modal-box" style="width:440px;text-align:center;">
-        <form method="POST" action="{% url 'dashboard_superadmin_usuarios' %}">
+        <form id="formBlockUser" method="POST" action="{% url 'dashboard_superadmin_usuarios' %}">
             {% csrf_token %}
             <input type="hidden" name="accion" value="toggle_estado">
             <input type="hidden" name="usuario_id" id="blockUsuarioId" value="">
@@ -686,21 +687,173 @@
     }
 
     function confirmBlockUser(id, nombre, isActive) {
-        document.getElementById('blockUsuarioId').value = id;
-        document.getElementById('blockUserName').textContent = nombre;
-        if (isActive) {
-            document.getElementById('blockModalTitle').textContent = 'Suspender Acceso de Usuario';
-            document.getElementById('blockModalDesc').innerHTML = '¿Deseas suspender a <strong style="color:var(--dark);">' + nombre + '</strong>? No podrá iniciar sesión en la plataforma.';
-            document.getElementById('btnConfirmBlock').style.background = '#DC2626';
-            document.getElementById('btnConfirmBlock').innerHTML = '<i class="bi bi-slash-circle"></i> Suspender Acceso';
-        } else {
-            document.getElementById('blockModalTitle').textContent = 'Activar Acceso de Usuario';
-            document.getElementById('blockModalDesc').innerHTML = '¿Deseas reactivar el acceso para <strong style="color:var(--dark);">' + nombre + '</strong>?';
-            document.getElementById('btnConfirmBlock').style.background = '#059669';
-            document.getElementById('btnConfirmBlock').innerHTML = '<i class="bi bi-check-circle"></i> Activar Acceso';
+        // Actualización dinámica y garantizada del ID y nombre del usuario en el formulario
+        const inputId = document.getElementById('blockUsuarioId');
+        if (inputId) {
+            inputId.value = id;
+        }
+        const nameEl = document.getElementById('blockUserName');
+        if (nameEl) {
+            nameEl.textContent = nombre;
+        }
+
+        const btnConfirm = document.getElementById('btnConfirmBlock');
+        if (btnConfirm) {
+            btnConfirm.disabled = false;
+            btnConfirm.removeAttribute('disabled');
+            if (isActive) {
+                document.getElementById('blockModalTitle').textContent = 'Suspender Acceso de Usuario';
+                document.getElementById('blockModalDesc').innerHTML = '¿Deseas suspender a <strong style="color:var(--dark);">' + nombre + '</strong>? No podrá iniciar sesión en la plataforma.';
+                btnConfirm.style.background = '#DC2626';
+                btnConfirm.innerHTML = '<i class="bi bi-slash-circle"></i> Suspender Acceso';
+            } else {
+                document.getElementById('blockModalTitle').textContent = 'Activar Acceso de Usuario';
+                document.getElementById('blockModalDesc').innerHTML = '¿Deseas reactivar el acceso para <strong style="color:var(--dark);">' + nombre + '</strong>?';
+                btnConfirm.style.background = '#059669';
+                btnConfirm.innerHTML = '<i class="bi bi-check-circle"></i> Activar Acceso';
+            }
         }
         openModal('modalBlock');
     }
+
+    // ── Modernización Fetch API (AJAX) para Activar / Suspender Usuario ──────
+    document.addEventListener('DOMContentLoaded', () => {
+        const formBlock = document.getElementById('formBlockUser');
+        if (formBlock) {
+            // Sobreescribir onsubmit directamente para prevenir acumulación de listeners
+            formBlock.onsubmit = function(e) {
+                e.preventDefault();
+
+                const usuarioId = document.getElementById('blockUsuarioId').value;
+                const btnConfirm = document.getElementById('btnConfirmBlock');
+                const originalHtml = btnConfirm ? btnConfirm.innerHTML : 'Confirmar';
+                const originalBg = btnConfirm ? btnConfirm.style.background : '';
+
+                if (btnConfirm) {
+                    btnConfirm.disabled = true;
+                    btnConfirm.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Procesando...';
+                }
+
+                // 1. Auditoría de URL: asegurar ruta con barra final para evitar redirect 301
+                let targetUrl = this.getAttribute('action') || window.location.pathname;
+                if (!targetUrl.endsWith('/')) {
+                    targetUrl += '/';
+                }
+
+                // 2. Preparar FormData sin alterar Content-Type
+                const formData = new FormData(this);
+                formData.append('is_ajax', 'true');
+
+                // 3. Headers de seguridad y CSRF Token
+                const csrfTokenEl = document.querySelector('[name=csrfmiddlewaretoken]');
+                const csrfToken = csrfTokenEl ? csrfTokenEl.value : '';
+
+                fetch(targetUrl, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRFToken': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error('Error HTTP ' + res.status + ': ' + res.statusText);
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    if (data.status === 'success') {
+                        // ── Cierre de Modal a prueba de balas ───────────────────
+                        try {
+                            const modalElement = document.getElementById('modalBlock');
+                            if (modalElement && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                                const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                                if (modalInstance) {
+                                    modalInstance.hide();
+                                }
+                            }
+                        } catch (modalErr) {
+                            console.error('Error cerrando modal con Bootstrap:', modalErr);
+                        }
+                        if (typeof closeModal === 'function') {
+                            closeModal('modalBlock');
+                        }
+
+                        // ── Try/Catch interno: Manipulación segura del DOM ─────
+                        try {
+                            const row = document.getElementById('user-row-' + usuarioId) 
+                                || document.querySelector(`tr[data-usuario-id="${usuarioId}"]`);
+
+                            if (row) {
+                                const statusCell = row.querySelector('.user-status-cell') || row.children[4];
+                                const blockBtn = row.querySelector('.action-btn.block');
+                                const userNameEl = document.getElementById('blockUserName');
+                                const userName = userNameEl ? userNameEl.textContent.trim() : '';
+                                const esActivo = (data.is_active !== undefined ? data.is_active : (data.nuevo_estado === 'activo'));
+
+                                if (esActivo) {
+                                    // Pasa a Activo: badge verde y botón para suspender (rojo/peligro)
+                                    row.dataset.estado = 'Activo';
+                                    if (statusCell) {
+                                        statusCell.innerHTML = '<span class="status-badge status-activo"><i class="bi bi-circle-fill" style="font-size:.45rem;"></i> Activo</span>';
+                                    }
+                                    if (blockBtn) {
+                                        blockBtn.className = 'action-btn block text-danger';
+                                        blockBtn.title = 'Suspender acceso';
+                                        blockBtn.innerHTML = '<i class="bi bi-slash-circle"></i>';
+                                        blockBtn.setAttribute('data-action', 'suspender');
+                                        blockBtn.setAttribute('data-is-active', 'true');
+                                        blockBtn.setAttribute('onclick', `confirmBlockUser('${usuarioId}', '${userName.replace(/'/g, "\\'")}', true)`);
+                                    }
+                                } else {
+                                    // Pasa a Suspendido: badge rojo y botón para activar (verde/éxito)
+                                    row.dataset.estado = 'Suspendido';
+                                    if (statusCell) {
+                                        statusCell.innerHTML = '<span class="status-badge status-suspendido"><i class="bi bi-x-circle-fill" style="font-size:.45rem;"></i> Suspendido</span>';
+                                    }
+                                    if (blockBtn) {
+                                        blockBtn.className = 'action-btn block text-success';
+                                        blockBtn.title = 'Activar acceso';
+                                        blockBtn.innerHTML = '<i class="bi bi-check-circle text-success"></i>';
+                                        blockBtn.setAttribute('data-action', 'activar');
+                                        blockBtn.setAttribute('data-is-active', 'false');
+                                        blockBtn.setAttribute('onclick', `confirmBlockUser('${usuarioId}', '${userName.replace(/'/g, "\\'")}', false)`);
+                                    }
+                                }
+
+                                // Feedback visual sutil en la fila sin alterar el scroll
+                                row.style.transition = 'background-color 0.4s ease';
+                                const prevBg = row.style.backgroundColor;
+                                row.style.backgroundColor = esActivo ? 'rgba(16, 185, 129, 0.12)' : 'rgba(239, 68, 68, 0.12)';
+                                setTimeout(() => { row.style.backgroundColor = prevBg; }, 1200);
+                            }
+                        } catch (e) {
+                            console.error('Error actualizando el DOM:', e);
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Detalle del error:', error);
+                })
+                .finally(() => {
+                    // ── Fallback de limpieza Zombi (¡Crucial!) ───────────────
+                    document.body.classList.remove('modal-open');
+                    document.body.style.overflow = '';
+                    document.body.style.paddingRight = '';
+                    document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
+
+                    if (btnConfirm) {
+                        btnConfirm.disabled = false;
+                        btnConfirm.removeAttribute('disabled');
+                        btnConfirm.innerHTML = originalHtml;
+                        btnConfirm.style.background = originalBg;
+                    }
+                });
+            };
+        }
+    });
 
     
     function filterTable() {

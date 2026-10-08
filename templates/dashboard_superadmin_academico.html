@@ -445,6 +445,14 @@
                                 </td>
                                 <td class="text-end whitespace-nowrap">
                                     <div class="flex items-center justify-end gap-2">
+                                        <!-- Botón de Chat con el Colegio -->
+                                        <a href="{% if colegio.id %}{% url 'dashboard_superadmin_colegios' %}?chat_id={{ colegio.id }}{% elif colegio.admin_id %}{% url 'dashboard_superadmin_colegios' %}?chat_id={{ colegio.admin_id }}{% else %}#{% endif %}" 
+                                           class="btn-outline-custom text-xs py-1 px-2.5 text-purple-600 hover:text-purple-700 hover:bg-purple-50"
+                                           title="Abrir Chat con el Colegio"
+                                           data-bs-toggle="offcanvas" 
+                                           data-bs-target="#offcanvasChatGlobal">
+                                            <i class="bi bi-chat-dots"></i>
+                                        </a>
                                         <button type="button" onclick="openAlertModal('Liceo Bicentenario Norte', 'director@liceobicentenarionorte.cl', '9 días sin registrar asistencia')" class="btn-primary-custom text-xs py-1 px-3 bg-red-600 hover:bg-red-700 shadow-none">
                                             <i class="fa-solid fa-paper-plane me-1"></i> Enviar Alerta
                                         </button>
@@ -488,6 +496,14 @@
                                 </td>
                                 <td class="text-end whitespace-nowrap">
                                     <div class="flex items-center justify-end gap-2">
+                                        <!-- Botón de Chat con el Colegio -->
+                                        <a href="{% if colegio.id %}{% url 'dashboard_superadmin_colegios' %}?chat_id={{ colegio.id }}{% elif colegio.admin_id %}{% url 'dashboard_superadmin_colegios' %}?chat_id={{ colegio.admin_id }}{% else %}#{% endif %}" 
+                                           class="btn-outline-custom text-xs py-1 px-2.5 text-purple-600 hover:text-purple-700 hover:bg-purple-50"
+                                           title="Abrir Chat con el Colegio"
+                                           data-bs-toggle="offcanvas" 
+                                           data-bs-target="#offcanvasChatGlobal">
+                                            <i class="bi bi-chat-dots"></i>
+                                        </a>
                                         <button type="button" onclick="openAlertModal('Colegio San Diego de Alcalá', 'direccion@colegiosandiego.cl', '6 días sin registrar asistencia')" class="btn-primary-custom text-xs py-1 px-3 bg-amber-600 hover:bg-amber-700 shadow-none">
                                             <i class="fa-solid fa-paper-plane me-1"></i> Enviar Alerta
                                         </button>
@@ -531,6 +547,14 @@
                                 </td>
                                 <td class="text-end whitespace-nowrap">
                                     <div class="flex items-center justify-end gap-2">
+                                        <!-- Botón de Chat con el Colegio -->
+                                        <a href="{% if colegio.id %}{% url 'dashboard_superadmin_colegios' %}?chat_id={{ colegio.id }}{% elif colegio.admin_id %}{% url 'dashboard_superadmin_colegios' %}?chat_id={{ colegio.admin_id }}{% else %}#{% endif %}" 
+                                           class="btn-outline-custom text-xs py-1 px-2.5 text-purple-600 hover:text-purple-700 hover:bg-purple-50"
+                                           title="Abrir Chat con el Colegio"
+                                           data-bs-toggle="offcanvas" 
+                                           data-bs-target="#offcanvasChatGlobal">
+                                            <i class="bi bi-chat-dots"></i>
+                                        </a>
                                         <button type="button" onclick="openAlertModal('Instituto Politécnico del Sur', 'rectoria@politecnicodelsur.cl', '12 días sin registrar asistencia')" class="btn-primary-custom text-xs py-1 px-3 bg-red-600 hover:bg-red-700 shadow-none">
                                             <i class="fa-solid fa-paper-plane me-1"></i> Enviar Alerta
                                         </button>

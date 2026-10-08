@@ -632,7 +632,7 @@
                         <div class="donut-layout">
                             <!-- Donut Chart -->
                             <div style="position:relative; width:180px; height:180px; flex-shrink:0;">
-                                <canvas id="planesChart" width="180" height="180"></canvas>
+                                <canvas id="chartPlanes" width="180" height="180"></canvas>
                                 <!-- Centro label -->
                                 <div id="donutCenter" style="
                                     position:absolute; top:50%; left:50%;
@@ -1095,60 +1095,75 @@ document.addEventListener('DOMContentLoaded', function () {
     cargarDatosIngresos('30dias');
 
     
-    const planesRaw  = JSON.parse('{{ distribucion_planes_json|escapejs }}');
-    const COLORS     = ['#7C5CFC','#65CDBF','#F59E0B','#EF4444','#10B981','#6366F1','#EC4899'];
-    const hasData    = planesRaw.data.some(v => v > 0);
-    const totalColeg = planesRaw.data.reduce((a, b) => a + b, 0);
+    // ── Gráfico de Distribución de Planes (Chart.js Doughnut) ──────────────────
+    const datosGrafico = JSON.parse('{{ grafico_planes_json|safe }}');
+    const COLORS = ['#7C5CFC', '#65CDBF', '#F59E0B', '#10B981', '#6366F1', '#EC4899', '#EF4444'];
+    
+    const hasData = datosGrafico.data && datosGrafico.data.some(v => v > 0);
+    const totalColeg = hasData ? datosGrafico.data.reduce((a, b) => a + b, 0) : 0;
 
-    // Centro label
+    // Actualizar indicador central de cantidad total
     const donutTotal = document.getElementById('donutTotal');
-    if (donutTotal) donutTotal.textContent = hasData ? totalColeg : '—';
+    if (donutTotal) {
+        donutTotal.textContent = hasData ? totalColeg : '—';
+    }
 
-    const planesCtx = document.getElementById('planesChart').getContext('2d');
-    new Chart(planesCtx, {
-        type: 'doughnut',
-        data: {
-            labels: planesRaw.labels,
-            datasets: [{
-                data: hasData ? planesRaw.data : [1, 1, 1],
-                backgroundColor: COLORS,
-                borderWidth: 3,
-                borderColor: '#fff',
-                hoverOffset: 8,
-                hoverBorderWidth: 3,
-                hoverBorderColor: '#ffffff'
-            }]
-        },
-        options: {
-            responsive: false,
-            cutout: '68%',
-            animation: { animateRotate: true, duration: 1000 },
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    backgroundColor: '#151A35', padding: 10,
-                    callbacks: {
-                        label: ctx => hasData
-                            ? ` ${ctx.label}: ${ctx.parsed} colegios`
-                            : ` ${ctx.label}: Sin datos`
+    // Inicializar Chart.js en el canvas
+    const canvasPlanes = document.getElementById('chartPlanes') || document.getElementById('planesChart');
+    if (canvasPlanes) {
+        const planesCtx = canvasPlanes.getContext('2d');
+        new Chart(planesCtx, {
+            type: 'doughnut',
+            data: {
+                labels: datosGrafico.labels,
+                datasets: [{
+                    data: hasData ? datosGrafico.data : [1, 1, 1],
+                    backgroundColor: COLORS,
+                    borderWidth: 3,
+                    borderColor: '#ffffff',
+                    hoverOffset: 8,
+                    hoverBorderWidth: 3,
+                    hoverBorderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: false,
+                cutout: '68%',
+                animation: { animateRotate: true, duration: 1000 },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#151A35',
+                        padding: 10,
+                        cornerRadius: 8,
+                        callbacks: {
+                            label: function (ctx) {
+                                return hasData
+                                    ? ` ${ctx.label}: ${ctx.parsed} colegios`
+                                    : ` ${ctx.label}: Sin datos`;
+                            }
+                        }
                     }
                 }
             }
-        }
-    });
+        });
+    }
 
-    // Leyenda personalizada
+    // Configuración y renderizado de la leyenda personalizada
     const leyenda = document.getElementById('planesLeyenda');
-    if (leyenda) {
-        planesRaw.labels.forEach((lbl, i) => {
-            const cnt = planesRaw.data[i];
+    if (leyenda && datosGrafico.labels) {
+        leyenda.innerHTML = '';
+        datosGrafico.labels.forEach((lbl, i) => {
+            const cnt = (datosGrafico.data && datosGrafico.data[i]) ? datosGrafico.data[i] : 0;
             const pct = totalColeg > 0 ? Math.round((cnt / totalColeg) * 100) : 0;
+            const color = COLORS[i % COLORS.length];
+
             leyenda.innerHTML += `
                 <div class="leg-row">
-                    <div class="leg-dot" style="background:${COLORS[i]};"></div>
+                    <div class="leg-dot" style="background:${color};"></div>
                     <span class="leg-name">${lbl}</span>
                     <span class="leg-count">${hasData ? cnt + ' col.' : '—'}</span>
-                    <span class="leg-pct">${pct}%</span>
+                    <span class="leg-pct">${hasData ? pct + '%' : '0%'}</span>
                 </div>`;
         });
     }

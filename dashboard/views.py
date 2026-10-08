@@ -248,25 +248,31 @@ def dashboard_superadmin_view(request):
     ).order_by('-fecha_creacion')[:5]
 
     # ── 3. DISTRIBUCIÓN DE PLANES (Doughnut Chart) ────────────────────────────────
-    distribucion_planes_qs = Suscripcion.objects.filter(
-        estado='activa'
-    ).values('plan__nombre').annotate(cantidad=Count('id')).order_by('-cantidad')
+    # Consulta al modelo Colegio para agrupar y contar por plan de suscripción
+    distribucion_planes_qs = (
+        Colegio.objects
+        .values('suscripcion__plan__nombre')
+        .annotate(total=Count('id'))
+        .order_by('-total')
+    )
 
     planes_labels = []
     planes_data = []
     for item in distribucion_planes_qs:
-        planes_labels.append(item['plan__nombre'] or 'Sin nombre')
-        planes_data.append(item['cantidad'])
+        nombre_plan = item['suscripcion__plan__nombre'] or 'Sin Plan'
+        planes_labels.append(nombre_plan)
+        planes_data.append(item['total'])
 
     if not planes_labels:
-        # Fallback referencial si no hay suscripciones activas
+        # Fallback referencial si no hay registros
         planes_labels = ['Plan Básico', 'Plan Estándar', 'Plan Premium']
         planes_data = [0, 0, 0]
 
-    distribucion_planes_json = json.dumps({
+    grafico_planes_dict = {
         'labels': planes_labels,
         'data': planes_data
-    })
+    }
+    grafico_planes_json = json.dumps(grafico_planes_dict)
 
     # ── 4. FEED DE ACTIVIDAD RECIENTE ────────────────────────────────────────────
     actividad_feed = []
@@ -317,7 +323,8 @@ def dashboard_superadmin_view(request):
         'ultimos_colegios': ultimos_colegios,
         'alertas_pago': alertas_pago,
         # Charts
-        'distribucion_planes_json': distribucion_planes_json,
+        'distribucion_planes_json': grafico_planes_json,
+        'grafico_planes_json': grafico_planes_json,
         # Feed
         'actividad_feed': actividad_feed,
     }
@@ -1439,9 +1446,11 @@ def dashboard_superadmin_usuarios_view(request):
             # Sincronizar membresías si tiene
             MiembroColegio.objects.filter(usuario=user).update(activo=user.is_active)
 
-            estado_str = "activado" if user.is_active else "suspendido"
-            messages.info(request, f'Acceso de usuario {user.username} ha sido {estado_str}.')
-            return redirect('dashboard_superadmin_usuarios')
+            return JsonResponse({
+                'status': 'success',
+                'is_active': user.is_active,
+                'nuevo_estado': 'activo' if user.is_active else 'suspendido'
+            })
 
     # ── GET: CONSULTA Y FILTRADO
     q = request.GET.get('q', '').strip()
@@ -1841,6 +1850,211 @@ def dashboard_superadmin_onboarding_view(request):
         'embudo': embudo,
     }
     return render(request, 'dashboard_superadmin_onboarding.html', context)
+
+
+@superadmin_required
+def exportar_informe_onboarding_csv(request):
+    """
+    Genera y descarga un informe en formato CSV con el estado del onboarding/implementación
+    de los colegios.
+    Cabeceras: 'Colegio', 'Paso Actual', 'Días en el Paso', 'Estado', 'Progreso', 'Contacto Principal', 'Correo Institucional'.
+    """
+    import csv
+    from django.http import HttpResponse
+    from django.utils import timezone
+    from dashboard.models import EstadoOnboarding
+    from colegios.models import Colegio
+
+    response = HttpResponse(content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = 'attachment; filename="reporte_onboarding.csv"'
+    response.write('\ufeff')  # BOM UTF-8 para visualización correcta de acentos y caracteres especiales en Excel
+
+    writer = csv.writer(response)
+    writer.writerow([
+        'Colegio',
+        'Paso Actual',
+        'Días en el Paso',
+        'Estado',
+        'Progreso',
+        'Contacto Principal',
+        'Correo Institucional'
+    ])
+
+    hoy = timezone.now().date()
+    estados = EstadoOnboarding.objects.select_related('colegio').order_by('-fecha_actualizacion')
+
+    if estados.exists():
+        for item in estados:
+            col = item.colegio
+            pct = item.porcentaje_completado()
+
+            # Determinación del paso actual según las tareas completadas
+            if not item.configuracion_inicial:
+                paso_actual = "1. Configuración Inicial"
+            elif not item.carga_alumnos:
+                paso_actual = "2. Carga de Alumnos"
+            elif not item.capacitacion_docentes:
+                paso_actual = "3. Capacitación Docentes"
+            elif not item.lanzamiento_oficial:
+                paso_actual = "4. Lanzamiento Oficial"
+            else:
+                paso_actual = "Implementación Completa"
+
+            # Días en el paso
+            if item.fecha_actualizacion:
+                dias_en_paso = (hoy - item.fecha_actualizacion.date()).days
+            else:
+                dias_en_paso = 0
+
+            # Estado
+            if pct == 100:
+                estado_desc = "Completado"
+            elif dias_en_paso >= 3:
+                estado_desc = "Atascado"
+            else:
+                estado_desc = "En Progreso"
+
+            writer.writerow([
+                col.nombre if col else "Sin Colegio",
+                paso_actual,
+                dias_en_paso,
+                estado_desc,
+                f"{pct}%",
+                getattr(col, 'nombre_administrador', '') or 'Sin asignar',
+                getattr(col, 'correo_institucional', '') or 'Sin correo',
+            ])
+    else:
+        # Respaldo: si no hay registros en EstadoOnboarding, iterar sobre Colegio directamente
+        paso_map = {
+            1: "1. Identidad Institucional",
+            2: "2. Información Institucional",
+            3: "3. Estructura Académica",
+            4: "4. Cursos y Nómina",
+            5: "5. Personal y Estudiantes",
+        }
+        for col in Colegio.objects.all().order_by('-fecha_creacion'):
+            paso_num = getattr(col, 'paso_configuracion_actual', 1)
+            paso_actual = paso_map.get(paso_num, f"Paso {paso_num}")
+
+            fecha_ref = getattr(col, 'fecha_actualizacion', None) or getattr(col, 'fecha_creacion', None)
+            dias_en_paso = (hoy - fecha_ref.date()).days if fecha_ref else 0
+
+            estado_desc = col.get_estado_display() if hasattr(col, 'get_estado_display') else col.estado
+            progreso = "100%" if getattr(col, 'configuracion_completa', False) else f"{paso_num * 20}%"
+
+            writer.writerow([
+                col.nombre,
+                paso_actual,
+                dias_en_paso,
+                estado_desc,
+                progreso,
+                col.nombre_administrador or 'Sin asignar',
+                col.correo_institucional or 'Sin correo',
+            ])
+
+    return response
+
+
+@superadmin_required
+def enviar_asistencia_masiva_chat(request):
+    """
+    Envía un mensaje de asistencia por chat interno (MensajeUsuario) a los
+    administradores de colegios cuyo proceso de onboarding se encuentra pausado/atascado (> 3 días).
+    """
+    from dashboard.models import EstadoOnboarding, MensajeUsuario
+    from colegios.models import Colegio
+    from django.contrib.auth import get_user_model
+    from django.http import JsonResponse
+    from django.shortcuts import redirect
+    from django.contrib import messages
+    from django.utils import timezone
+    from datetime import timedelta
+    from django.db.models import Q
+
+    User = get_user_model()
+
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Método no permitido.'}, status=405)
+
+    mensaje_texto = request.POST.get('mensaje', '').strip()
+    if not mensaje_texto:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'status': 'error', 'message': 'El mensaje no puede estar vacío.'}, status=400)
+        messages.error(request, 'El mensaje no puede estar vacío.')
+        return redirect('dashboard_superadmin_onboarding')
+
+    hace_3_dias = timezone.now() - timedelta(days=3)
+
+    # 1. Buscar colegios atascados a través del modelo EstadoOnboarding (> 3 días sin avance y < 100%)
+    estados_atascados = EstadoOnboarding.objects.select_related('colegio__administrador').filter(
+        fecha_actualizacion__lt=hace_3_dias
+    ).exclude(
+        configuracion_inicial=True,
+        carga_alumnos=True,
+        capacitacion_docentes=True,
+        lanzamiento_oficial=True
+    )
+
+    destinatarios = set()
+    for eo in estados_atascados:
+        if eo.colegio:
+            if eo.colegio.administrador:
+                destinatarios.add(eo.colegio.administrador)
+            elif eo.colegio.correo_institucional:
+                user = User.objects.filter(email=eo.colegio.correo_institucional).first()
+                if user:
+                    destinatarios.add(user)
+
+    # 2. Respaldo: si no hay en EstadoOnboarding, buscar colegios pendientes o con configuración incompleta
+    if not destinatarios:
+        colegios_pendientes = Colegio.objects.select_related('administrador').filter(
+            Q(configuracion_completa=False) | Q(estado='pendiente_configuracion')
+        ).order_by('-fecha_actualizacion')[:3]
+
+        for col in colegios_pendientes:
+            if col.administrador:
+                destinatarios.add(col.administrador)
+            elif col.correo_institucional:
+                user = User.objects.filter(email=col.correo_institucional).first()
+                if user:
+                    destinatarios.add(user)
+
+    # 3. Respaldo para pruebas: si no hay registros anteriores, seleccionar los colegios más recientes
+    if not destinatarios:
+        colegios_recientes = Colegio.objects.select_related('administrador').order_by('-id')[:3]
+        for col in colegios_recientes:
+            if col.administrador and col.administrador != request.user:
+                destinatarios.add(col.administrador)
+
+    # 4. Respaldo de contingencia: otros usuarios registrados (excepto el Super Admin actual)
+    if not destinatarios:
+        otros_usuarios = User.objects.exclude(id=request.user.id)[:3]
+        for u in otros_usuarios:
+            destinatarios.add(u)
+
+    # Crear los mensajes masivos en el modelo MensajeUsuario
+    mensajes_creados = 0
+    for destinatario in destinatarios:
+        if destinatario != request.user:
+            MensajeUsuario.objects.create(
+                remitente=request.user,
+                destinatario=destinatario,
+                contenido=mensaje_texto,
+                leido=False
+            )
+            mensajes_creados += 1
+
+    feedback = f'Mensaje de asistencia enviado con éxito a {mensajes_creados} administrador(es) vía chat interno.'
+
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest' or 'application/json' in request.headers.get('Accept', ''):
+        return JsonResponse({
+            'status': 'success',
+            'message': feedback,
+            'destinatarios_count': mensajes_creados
+        })
+
+    messages.success(request, feedback)
+    return redirect('dashboard_superadmin_onboarding')
 
 
 # ─── Comunicación ─────────────────────────────────────────────────────────────
@@ -2942,23 +3156,12 @@ def api_historial_chat(request, colegio_id):
     """
     colegio = get_object_or_404(Colegio, id=colegio_id)
 
-    # Si es el colegio inicial (o Escuela Las Rosas) y aún no tiene mensajes en BD, inicializar los mensajes de prueba
-    if not colegio.mensajes_chat.exists() and (colegio.id == 1 or 'rosas' in colegio.nombre.lower()):
-        MensajeChat.objects.create(
-            colegio=colegio,
-            remitente='colegio',
-            contenido='Estimado Super Admin, hemos finalizado la carga de nómina de estudiantes y requerimos asistencia para validar las licencias de Libro de Clases.'
-        )
-        MensajeChat.objects.create(
-            colegio=colegio,
-            remitente='superadmin',
-            contenido='¡Hola Carmen Gloria! Hemos revisado su establecimiento y las licencias ya han sido autorizadas correctamente en el servidor.'
-        )
-        MensajeChat.objects.create(
-            colegio=colegio,
-            remitente='colegio',
-            contenido='¡Muchas gracias por la rápida respuesta! Procedemos a habilitar a los docentes jefes.'
-        )
+
+
+    # Purgar cualquier residuo de mensajes mock si quedaron guardados previamente en la BD
+    colegio.mensajes_chat.filter(contenido__icontains='nómina').delete()
+    colegio.mensajes_chat.filter(contenido__icontains='Carmen Gloria').delete()
+    colegio.mensajes_chat.filter(contenido__icontains='rápida respuesta').delete()
 
     # Marcar mensajes del colegio como leídos
     colegio.mensajes_chat.filter(remitente='colegio', leido=False).update(leido=True)
@@ -3246,4 +3449,43 @@ def api_eliminar_mensaje(request, mensaje_id):
             'status': 'error',
             'error': 'El mensaje no existe o ya fue eliminado.'
         }, status=404)
+
+
+@login_required
+@require_http_methods(["GET"])
+def api_mensajes_no_leidos(request):
+    """
+    Endpoint GET: Retorna el total de mensajes no leídos para el usuario autenticado
+    y los agrupa por remitente.
+    
+    Formato de respuesta:
+    {
+        'total_no_leidos': int,
+        'por_remitente': {
+            id_remitente: cantidad,
+            ...
+        }
+    }
+    """
+    # Agrupamos por remitente_id usando Count y limpiando order_by para evitar GROUP BY redundante
+    agrupados = (
+        MensajeUsuario.objects.filter(
+            destinatario=request.user,
+            leido=False
+        )
+        .order_by()
+        .values('remitente_id')
+        .annotate(cantidad=Count('id'))
+    )
+
+    por_remitente = {
+        item['remitente_id']: item['cantidad']
+        for item in agrupados
+    }
+    total_no_leidos = sum(por_remitente.values())
+
+    return JsonResponse({
+        'total_no_leidos': total_no_leidos,
+        'por_remitente': por_remitente
+    })
 
